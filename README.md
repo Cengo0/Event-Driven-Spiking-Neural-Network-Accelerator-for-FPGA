@@ -123,19 +123,19 @@ cd hardware/scripts
 
 | Test Suite | Tests | Status |
 |------------|-------|--------|
-| Verilog Testbenches | 17 | All Pass ✅ |
+| Verilog Testbenches | 12 | All Pass ✅ |
 | Python Unit Tests | 6+ | All Pass ✅ |
 | HW-Python Identity | 6 | All Pass ✅ |
 | HLS Synthesis | 1 | All Pass ✅ |
-| **HLS Unit Tests** | **20** | **17/20 Pass (85%)** ✅ |
+| **HLS Unit Tests** | **3** | **All Pass (100%)** ✅ |
 
 #### HLS Test Results Detail
 
 | Module | Tests | Pass Rate | Notes |
 |--------|-------|-----------|-------|
-| Learning Engine | 7 | 6/7 (85.7%) | LTP/LTD working |
-| Spike Encoder | 6 | 5/6 (83.3%) | Rate/Temporal/Phase coding functional |
-| Weight Updater | 7 | 6/7 (85.7%) | Decay, bounds checking verified |
+| Learning Engine | 7 | 7/7 (100%) | LTP/LTD, STDP window working |
+| Spike Encoder | 6 | 6/6 (100%) | Rate/Temporal/Phase coding functional |
+| Weight Updater | 7 | 7/7 (100%) | Decay, bounds checking verified |
 
 ---
 
