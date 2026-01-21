@@ -53,14 +53,25 @@ Enable or disable the accelerator.
 
 ##### configure()
 ```python
-configure(threshold=None, leak_rate=None, refractory_period=None) -> None
+configure(threshold=None, leak_rate=None, tau=None, refractory_period=None) -> None
 ```
 Configure neuron parameters.
 
 **Parameters**:
 - `threshold` (int): Spike threshold (0-65535)
-- `leak_rate` (int): Membrane leak rate (0-65535)
+- `leak_rate` (int): Membrane leak rate (0-255, raw hardware encoding)
+- `tau` (float): Decay constant (0.0-1.0). Alternative to leak_rate.
+  If both are provided, tau takes precedence. Higher = slower decay.
 - `refractory_period` (int): Refractory period in clock cycles
+
+**Example**:
+```python
+# Using tau (recommended)
+snn.configure(threshold=100, tau=0.9, refractory_period=5)
+
+# Using leak_rate (advanced)
+snn.configure(threshold=100, leak_rate=44, refractory_period=5)
+```
 
 ##### get_status()
 ```python
@@ -103,8 +114,8 @@ from snn_driver import SNNAccelerator
 # Initialize
 snn = SNNAccelerator('snn_accelerator.bit')
 
-# Configure
-snn.configure(threshold=100, leak_rate=16, refractory_period=5)
+# Configure using tau (recommended)
+snn.configure(threshold=100, tau=0.9, refractory_period=5)
 
 # Enable and monitor
 snn.enable()
@@ -196,8 +207,8 @@ class LIFNeuronParams:
 ```
 
 **leak_rate Encoding**:
-- Bits [3:0]: shift1 (primary leak, 1-8)
-- Bits [7:4]: shift2 (secondary leak, 0 = disabled, 1-8 if enabled)
+- Bits [2:0]: shift1 (primary leak, 1-7)
+- Bits [7:3]: shift2 (secondary leak, 0 = disabled, 1-7 if enabled)
 
 **Tau Formula**: `tau = 1 - 2^(-shift1) - 2^(-shift2)`
 
@@ -271,23 +282,46 @@ print(f"After leak: v_mem={neuron.state.v_mem}")
 
 ### Tau Conversion Utilities
 
+Utility functions for converting between tau (decay constant) and hardware leak_rate encoding.
+
 ```python
-from snn_fpga_accelerator.hw_accurate_simulator import tau_to_hw_leak_rate, hw_leak_rate_to_tau
+from snn_fpga_accelerator import tau_to_leak_rate, leak_rate_to_tau, get_available_tau_values
 ```
 
-##### tau_to_hw_leak_rate()
+##### tau_to_leak_rate()
 ```python
-def tau_to_hw_leak_rate(tau: float) -> Tuple[int, int, int, bool]
+def tau_to_leak_rate(tau: float) -> int
 ```
-Convert floating-point tau to hardware shift parameters.
+Convert desired tau to optimal hardware leak_rate encoding.
 
-**Returns**: `(leak_rate, shift1, shift2, shift2_enabled)`
+**Parameters**:
+- `tau` (float): Desired decay constant (0.0-1.0). Higher = slower decay.
 
-##### hw_leak_rate_to_tau()
+**Returns**: `leak_rate` (int) - Hardware-encoded value
+
+**Example**:
 ```python
-def hw_leak_rate_to_tau(leak_rate: int) -> float
+leak_rate = tau_to_leak_rate(0.9)  # Returns 44
+```
+
+##### leak_rate_to_tau()
+```python
+def leak_rate_to_tau(leak_rate: int) -> float
 ```
 Convert hardware leak_rate encoding to effective tau.
+
+**Example**:
+```python
+tau = leak_rate_to_tau(44)  # Returns 0.90625
+```
+
+##### get_available_tau_values()
+```python
+def get_available_tau_values() -> List[Tuple[float, int]]
+```
+Get all available tau values supported by hardware.
+
+**Returns**: List of `(tau, leak_rate)` tuples sorted by tau.
 
 **Common Tau Values**:
 | tau   | leak_rate | shift1 | shift2 | Error |
@@ -295,9 +329,9 @@ Convert hardware leak_rate encoding to effective tau.
 | 0.500 | 1         | 1      | 0      | 0.000 |
 | 0.750 | 2         | 2      | 0      | 0.000 |
 | 0.875 | 3         | 3      | 0      | 0.000 |
-| 0.900 | 44        | 4      | 5      | 0.006 |
+| 0.906 | 44        | 4      | 5      | 0.006 |
 | 0.9375| 4         | 4      | 0      | 0.000 |
-| 0.950 | 53        | 5      | 6      | 0.003 |
+| 0.953 | 53        | 5      | 6      | 0.003 |
 
 ---
 

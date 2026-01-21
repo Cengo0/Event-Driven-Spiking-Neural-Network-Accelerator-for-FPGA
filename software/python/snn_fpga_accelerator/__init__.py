@@ -176,6 +176,10 @@ from .hw_accurate_simulator import (
     verify_lif_neuron,
     verify_stdp_engine,
     FixedPoint,
+    # Tau/leak_rate conversion utilities
+    tau_to_leak_rate,
+    leak_rate_to_tau,
+    get_available_tau_values,
 )
 
 # =============================================================================
@@ -285,6 +289,7 @@ __all__ = [
     'HWAccurateLIFNeuron', 'HWAccurateSTDPEngine', 'HWAccurateSNNSimulator',
     'LIFNeuronParams', 'LIFNeuronState',
     'verify_lif_neuron', 'verify_stdp_engine', 'FixedPoint',
+    'tau_to_leak_rate', 'leak_rate_to_tau', 'get_available_tau_values',
     
     # Submodules
     'neuron', 'layer', 'encoder', 'training',

@@ -47,7 +47,7 @@ External Input → Block Design (PS + HLS IP) → Verilog RTL (Neurons) → Outp
 - **lif_neuron_array** (`lif_neuron_array.v`):
   - 256 LIF neurons
   - **AC-based** (Accumulate only, no DSP multipliers)
-  - LUT RAM-based state storage (optimized from BRAM)
+  - LUT RAM-based state storage
   - Parallel processing (8 units)
   - Shift-based exponential leak
 
@@ -108,7 +108,7 @@ This will:
 |----------|----------|------------|-------|-------|
 | LUT | 12,396 | 26,700 | +14,304 | RTL neurons/router added |
 | FF | 10,616 | 24,276 | +13,660 | RTL state registers |
-| BRAM | 54.5 | 16.5 | **-38** | State optimized to LUT RAM |
+| BRAM | 54.5 | 16.5 | **-38** | State stored in LUT RAM |
 | DSP | 58 | 38 | **-20** | AC-based (no multipliers) |
 
 ### Timing Results

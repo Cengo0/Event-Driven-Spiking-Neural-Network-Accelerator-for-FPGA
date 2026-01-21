@@ -32,8 +32,8 @@ This project adheres to a code of conduct that all contributors are expected to 
 Before contributing, ensure you have:
 
 1. **For Software Development**:
-   - Python 3.13 or higher
-   - PyTorch 2.9.0 or higher
+   - Python 3.11 or higher
+   - PyTorch 2.8.0 or higher
    - NumPy, pytest, and other Python dependencies
 
 2. **For Hardware Development**:
@@ -87,8 +87,8 @@ pip install pytest pytest-cov black flake8 mypy
 #### Hardware Environment
 ```bash
 # Source Xilinx tools (Vitis 2025.2+)
-source /opt/Xilinx/Vivado/2025.2/settings64.sh
-source /opt/Xilinx/Vitis/2025.2/settings64.sh
+source /tools/Xilinx/2025.2/Vivado/settings64.sh
+source /tools/Xilinx/2025.2/Vitis/settings64.sh
 ```
 
 > **Note**: Vitis 2025.2 uses `v++` CLI for HLS. Legacy `vitis_hls -f script.tcl` is deprecated.

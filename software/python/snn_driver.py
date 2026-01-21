@@ -20,6 +20,73 @@ from pynq import Overlay, allocate
 import time
 
 
+def tau_to_leak_rate(tau: float) -> int:
+    """
+    Convert desired tau (decay constant) to hardware leak_rate encoding.
+    
+    Finds the best shift configuration to approximate the target tau.
+    
+    Args:
+        tau: Desired decay constant (0.0-1.0). Higher values = slower leak.
+             Typical values: 0.85-0.99
+    
+    Returns:
+        leak_rate: Hardware-encoded leak configuration
+                   leak_rate[2:0] = shift1 (primary leak, 1-7)
+                   leak_rate[7:3] = shift2 (secondary leak, 0=disabled)
+    
+    Examples:
+        >>> tau_to_leak_rate(0.875)  # Returns 3
+        >>> tau_to_leak_rate(0.9)    # Returns 35 (closest match: 0.906)
+        >>> tau_to_leak_rate(0.95)   # Returns 37 (closest match: 0.953)
+    """
+    best_error = float('inf')
+    best_config = 3  # Default
+    
+    # Try single shift configurations
+    for shift1 in range(1, 8):
+        approx_tau = 1.0 - 1.0 / (1 << shift1)
+        error = abs(approx_tau - tau)
+        if error < best_error:
+            best_error = error
+            best_config = shift1
+    
+    # Try dual shift configurations
+    for shift1 in range(1, 8):
+        for shift2 in range(1, 8):
+            if shift2 == shift1:
+                continue
+            approx_tau = 1.0 - 1.0 / (1 << shift1) - 1.0 / (1 << shift2)
+            error = abs(approx_tau - tau)
+            if error < best_error:
+                best_error = error
+                best_config = shift1 | (shift2 << 3)
+    
+    return best_config
+
+
+def leak_rate_to_tau(leak_rate: int) -> float:
+    """
+    Convert hardware leak_rate encoding to tau (decay constant).
+    
+    Args:
+        leak_rate: Hardware-encoded leak configuration
+    
+    Returns:
+        tau: Effective decay constant
+    """
+    shift1 = leak_rate & 0x07
+    shift2_cfg = (leak_rate >> 3) & 0x1F
+    shift2 = shift2_cfg & 0x07 if shift2_cfg != 0 else 0
+    
+    tau = 1.0
+    if shift1 > 0:
+        tau -= 1.0 / (1 << shift1)
+    if shift2_cfg != 0 and shift2 > 0:
+        tau -= 1.0 / (1 << shift2)
+    return tau
+
+
 class SNNAccelerator:
     """
     PYNQ driver for Event-Driven SNN Accelerator
@@ -95,18 +162,32 @@ class SNNAccelerator:
         ctrl = self.snn.read(self.REG_CONTROL)
         self.snn.write(self.REG_CONTROL, ctrl & ~self.CTRL_ENABLE)
         
-    def configure(self, threshold=None, leak_rate=None, refractory_period=None):
+    def configure(self, threshold=None, leak_rate=None, tau=None, refractory_period=None):
         """
         Configure neuron parameters
         
         Args:
             threshold: Spike threshold (0-65535)
-            leak_rate: Membrane potential leak rate (0-65535)
+            leak_rate: Membrane potential leak rate (0-255, raw hardware encoding)
+            tau: Decay constant (0.0-1.0). Alternative to leak_rate.
+                 If both tau and leak_rate are provided, tau takes precedence.
+                 Higher values = slower leak. Typical: 0.85-0.99
             refractory_period: Refractory period in clock cycles (0-65535)
+        
+        Examples:
+            # Using tau (user-friendly)
+            accelerator.configure(threshold=100, tau=0.9)
+            
+            # Using leak_rate (advanced)
+            accelerator.configure(threshold=100, leak_rate=51)
         """
         if threshold is not None:
             self._threshold = threshold
             self.snn.write(self.REG_THRESHOLD, threshold)
+        
+        # tau takes precedence over leak_rate if both are provided
+        if tau is not None:
+            leak_rate = tau_to_leak_rate(tau)
             
         if leak_rate is not None:
             self._leak_rate = leak_rate

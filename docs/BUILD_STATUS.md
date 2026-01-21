@@ -56,12 +56,12 @@ Slice           8,742    13,300      65.73%
 |----------|----------|---------------------|--------|
 | LUT      | 12,396 (23.30%) | 26,700 (50.19%) | +14,304 (RTL) |
 | FF       | 10,616 (9.98%)  | 24,276 (22.82%) | +13,660 (RTL) |
-| BRAM     | 54.5 (38.93%)   | 16.5 (11.79%)   | -38 (optimized) |
+| BRAM     | 54.5 (38.93%)   | 16.5 (11.79%)   | -38 (LUT RAM) |
 | DSP      | 58 (26.36%)     | 38 (17.27%)     | -20 (AC-based) |
 | WNS      | +0.493 ns       | +0.845 ns       | Better timing |
 
 **Key Observations**:
-- BRAM usage reduced by ~70% in integrated build (state optimized to LUT RAM)
+- BRAM usage reduced by ~70% in integrated build (state stored in LUT RAM)
 - DSP usage reduced by ~35% (AC-based neurons avoid MAC operations)
 - Timing improved (+0.352 ns better slack)
 - Total LUT usage at 50%, leaving room for expansion
@@ -234,12 +234,13 @@ ol = Overlay('/home/xilinx/snn_accelerator_hls.bit')
 
 | Document | Status | Notes |
 |----------|--------|-------|
-| `README.md` | ✅ Updated | Actual results from implementation |
-| `docs/HARDWARE_SPECIFICATIONS.md` | ✅ Updated | Resource tables, timing, power |
-| `docs/VERILOG_RTL_SPECIFICATIONS.md` | ✅ Complete | All 24 Verilog modules documented |
+| `README.md` | ✅ Updated | Build overview, tau-based API |
+| `docs/architecture.md` | ✅ Updated | System architecture, tau encoding |
+| `docs/api_reference.md` | ✅ Updated | tau_to_leak_rate() functions added |
+| `docs/user_guide.md` | ✅ Updated | Tau-based configuration examples |
 | `docs/BUILD_STATUS.md` | ✅ This file | Comprehensive build report |
-| `docs/architecture.md` | ⏳ Needs update | Should reflect current build state |
-| `docs/user_guide.md` | ⏳ Needs update | Add deployment instructions |
+| `docs/INTEGRATED_SYSTEM.md` | ✅ Complete | HLS+RTL integration details |
+| `docs/developer_guide.md` | ✅ Complete | Development setup |
 
 ---
 

@@ -122,12 +122,12 @@ Define your SNN architecture:
 ```python
 from snn_fpga_accelerator import SNNAccelerator
 
-# Basic configuration
+# Basic configuration - use tau for intuitive decay control
 config = {
     'num_neurons': 200,
     'neuron_type': 'LIF',
     'threshold': 1000,         # 16-bit threshold
-    'leak_rate': 3,            # Shift-based: tau=0.875 (shift1=3)
+    'tau': 0.9,                # Decay constant (auto-converted to hardware encoding)
     'refractory_period': 5,    # timesteps
     'layers': [
         {'type': 'input', 'size': 784},
@@ -140,21 +140,41 @@ accelerator = SNNAccelerator()
 accelerator.configure_network(config)
 ```
 
-**Leak Rate Encoding** (Shift-Based Decay):
+**Tau-Based Configuration** (Recommended):
+
+Simply specify your desired decay constant (tau), and the system automatically finds the best hardware configuration:
+
+```python
+# Tau = 0.9 means membrane potential decays to 90% each timestep
+accelerator.configure(threshold=1000, tau=0.9, refractory_period=5)
+```
+
+| Desired tau | Actual tau | Description |
+|-------------|------------|-------------|
+| 0.50 | 0.500 | Fast decay (50% per timestep) |
+| 0.75 | 0.750 | Moderate-fast decay |
+| 0.85 | 0.844 | Moderate decay |
+| 0.90 | 0.906 | Moderate-slow decay |
+| 0.95 | 0.953 | Slow decay |
+| 0.99 | 0.992 | Very slow decay |
+
+<details>
+<summary>Advanced: Manual leak_rate Encoding</summary>
 
 The `leak_rate` parameter encodes shift values for power-efficient exponential decay:
-- Bits [3:0]: shift1 (primary leak)
-- Bits [7:4]: shift2 (secondary leak, 0=disabled)
-
-Common values:
-| leak_rate | tau    | Description |
-|-----------|--------|-------------|
-| 3         | 0.875  | shift1=3, moderate decay |
-| 4         | 0.9375 | shift1=4, slow decay |
-| 44        | 0.906  | shift1=4 + shift2=5, fine-tuned |
-| 53        | 0.953  | shift1=5 + shift2=6, very slow |
+- Bits [2:0]: shift1 (primary leak, 1-7)
+- Bits [7:3]: shift2 (secondary leak, 0=disabled)
 
 Formula: `tau = 1 - 2^(-shift1) - 2^(-shift2)`
+
+| leak_rate | shift1 | shift2 | tau |
+|-----------|--------|--------|-----|
+| 3 | 3 | 0 | 0.875 |
+| 4 | 4 | 0 | 0.9375 |
+| 44 | 4 | 5 | 0.906 |
+| 53 | 5 | 6 | 0.953 |
+
+</details>
 
 ### Loading Weights
 

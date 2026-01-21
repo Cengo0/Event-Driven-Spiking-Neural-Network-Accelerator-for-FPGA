@@ -82,7 +82,7 @@ cd hardware/scripts
 
 ---
 
-### Vivado Implementation Results (Integrated Build v2 - HLS + RTL)
+### Vivado Implementation Results (Integrated Build)
 
 **Bitstream:** `outputs/snn_integrated.bit` (ready for PYNQ-Z2)
 
@@ -91,7 +91,7 @@ cd hardware/scripts
 | **Achieved Fmax** | **100 MHz** | clk_fpga_0, all timing met |
 | **Timing Slack (WNS)** | **+0.913 ns** | Excellent margin |
 | **Timing Slack (WHS)** | **+0.025 ns** | Hold timing met |
-| **BRAM** | **16.5 (11.79%)** | Optimized with LUT RAM |
+| **BRAM** | **16.5 (11.79%)** | LUT RAM-based state storage |
 | **FF** | **24,639 (23.16%)** | HLS + RTL registers |
 | **LUT** | **27,205 (51.14%)** | Includes RTL neuron logic |
 | **DSP** | **38 (17.27%)** | Reduced (AC-based neurons) |
@@ -101,8 +101,8 @@ cd hardware/scripts
 
 ### Build Comparison
 
-| Resource | HLS-Only | Integrated v2 | Change |
-|----------|----------|---------------|--------|
+| Resource | HLS-Only | Integrated | Change |
+|----------|----------|------------|--------|
 | LUT | 12,396 (23.30%) | 27,205 (51.14%) | +14,809 |
 | FF | 10,616 (9.98%) | 24,639 (23.16%) | +14,023 |
 | BRAM | 54.5 (38.93%) | 16.5 (11.79%) | **-70%** |
@@ -133,7 +133,7 @@ cd hardware/scripts
 
 | Module | Tests | Pass Rate | Notes |
 |--------|-------|-----------|-------|
-| Learning Engine | 7 | 6/7 (85.7%) | LTP/LTD working, learning rate optimized |
+| Learning Engine | 7 | 6/7 (85.7%) | LTP/LTD working |
 | Spike Encoder | 6 | 5/6 (83.3%) | Rate/Temporal/Phase coding functional |
 | Weight Updater | 7 | 6/7 (85.7%) | Decay, bounds checking verified |
 
@@ -219,7 +219,7 @@ accelerator.connect()
 # Configure network parameters
 accelerator.configure(
     threshold=100,      # Spike threshold
-    leak_rate=51,       # Shift-based leak (tau ~ 0.86)
+    tau=0.86,           # Decay constant (auto-converted to optimal hardware encoding)
     refractory_period=5 # Refractory period in timesteps
 )
 
@@ -246,7 +246,7 @@ accelerator = SNNAccelerator(
 accelerator.connect()
 
 # Same API as simulation mode
-accelerator.configure(threshold=100, leak_rate=51)
+accelerator.configure(threshold=100, tau=0.86)
 accelerator.load_weights(weights)
 output = accelerator.infer(input_spikes, timesteps=100)
 
@@ -379,24 +379,56 @@ vivado -mode batch -source build_pynq_with_hls.tcl
 | leak_rate | 0-255 | Shift-based leak configuration (see below) |
 | refractory_period | 0-255 | Post-spike refractory period in timesteps |
 
-### Shift-Based Leak Encoding
+### Leak Configuration (Tau-Based API)
 
-The leak_rate parameter encodes two shift values for efficient exponential decay:
+You can specify the desired decay constant (tau) directly, and the system will automatically find the best hardware-compatible configuration:
+
+```python
+from snn_fpga_accelerator import LIFNeuronParams
+
+# Simply specify desired tau - automatic rounding to nearest hardware value
+params = LIFNeuronParams.from_tau(tau=0.9, threshold=1000)
+print(f"Actual tau: {params.tau}")  # 0.90625 (closest match)
+
+# Or use the accelerator directly with tau
+accelerator.configure(
+    threshold=100,
+    tau=0.9,           # User-friendly: specify desired tau directly
+    refractory_period=5
+)
+```
+
+**Available tau values** (automatically selected):
+
+| Desired tau | Actual tau | leak_rate | Error |
+|-------------|------------|-----------|-------|
+| 0.50 | 0.500 | 1 | 0.0% |
+| 0.75 | 0.750 | 2 | 0.0% |
+| 0.85 | 0.844 | 43 | 0.7% |
+| 0.875 | 0.875 | 3 | 0.0% |
+| 0.90 | 0.906 | 44 | 0.7% |
+| 0.95 | 0.953 | 53 | 0.3% |
+| 0.99 | 0.992 | 7 | 0.2% |
+
+<details>
+<summary>Advanced: Manual Shift-Based Encoding</summary>
+
+For advanced users, the `leak_rate` parameter encodes two shift values:
 
 ```
 leak_rate[2:0] = shift1 (primary leak, 1-7)
 leak_rate[7:3] = shift2 (secondary leak, 0=disabled)
 
-decay = 1 - 2^(-shift1) - 2^(-shift2)
+tau = 1 - 2^(-shift1) - 2^(-shift2)
 ```
-
-Examples:
 
 | leak_rate | shift1 | shift2 | Effective tau |
 |-----------|--------|--------|---------------|
 | 3 | 3 | 0 | 0.875 |
 | 51 | 3 | 6 | 0.859 |
 | 4 | 4 | 0 | 0.9375 |
+
+</details>
 
 ### Register Map (AXI-Lite)
 
@@ -420,26 +452,26 @@ This project uses HLS (Vitis HLS) for all AXI interfaces and learning engines, e
 ### System Architecture
 
 ```
-+------------------+                     +------------------+
-|   PS (ARM)       |                     |   PL (FPGA)      |
-|   Python/PYNQ    |                     |                  |
-+--------+---------+                     +--------+---------+
-         |                                        |
-         | AXI4-Lite (Ctrl)                       |
-         | AXI4-Stream (Spikes)                   |
-         v                                        v
++------------------+                      +------------------+
+|   PS (ARM)       |                      |   PL (FPGA)      |
+|   Python/PYNQ    |                      |                  |
++--------+---------+                      +--------+---------+
+         |                                         |
+         | AXI4-Lite (Ctrl)                        |
+         | AXI4-Stream (Spikes)                    |
+         v                                         v
 +--------+-----------------------------------------+--------+
-|                    snn_top_hls (HLS)                     |
-|  +-------------+  +-------------+  +---------------+     |
-|  | AXI4-Lite   |  | STDP/R-STDP |  | Weight Memory |     |
-|  | Registers   |  | Learning    |  | (BRAM)        |     |
-|  +-------------+  +-------------+  +---------------+     |
-|         |               |                 |              |
-|         v               v                 v              |
-|  +--------------------------------------------------+   |
-|  |           Wire Interface to Verilog              |   |
-|  +--------------------------------------------------+   |
-+---------------------------+------------------------------+
+|                     snn_top_hls (HLS)                     |
+|   +-------------+  +-------------+  +---------------+     |
+|   | AXI4-Lite   |  | STDP/R-STDP |  | Weight Memory |     |
+|   | Registers   |  | Learning    |  | (BRAM)        |     |
+|   +-------------+  +-------------+  +---------------+     |
+|          |               |                 |              |
+|          v               v                 v              |
+|   +--------------------------------------------------+    |
+|   |           Wire Interface to Verilog              |    |
+|   +--------------------------------------------------+    |
++---------------------------+-------------------------------+
                             |
                             v
               +-------------+-------------+
@@ -488,7 +520,7 @@ learning_params = {
 
 ```bash
 # Set up Vitis environment
-source /tools/Xilinx/Vitis/2025.2/settings64.sh
+source /tools/Xilinx/2025.2/Vitis/settings64.sh
 
 # Run synthesis with v++ CLI (recommended)
 cd hardware/hls/scripts
@@ -591,6 +623,8 @@ python examples/complete_integration_example.py --simulation-mode
 - [User Guide](docs/user_guide.md): Comprehensive usage instructions
 - [API Reference](docs/api_reference.md): Complete API documentation
 - [Developer Guide](docs/developer_guide.md): Development setup and guidelines
+- [Build Status](docs/BUILD_STATUS.md): Detailed build reports and resource analysis
+- [Integrated System](docs/INTEGRATED_SYSTEM.md): HLS + RTL integration details
 
 ---
 

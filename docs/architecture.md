@@ -126,8 +126,11 @@ Common tau approximations:
 | 0.950      | 5      | 6      | 0.9531     | 0.003 |
 
 **leak_rate Encoding**:
-- Bits [3:0]: shift1 (primary leak shift)
-- Bits [7:4]: shift2 (secondary leak shift, 0 = disabled)
+- Bits [2:0]: shift1 (primary leak shift, 1-7)
+- Bits [7:3]: shift2 (secondary leak shift, 0 = disabled)
+
+> **Tip**: Use `tau_to_leak_rate(tau)` function to automatically find optimal encoding.
+> See [API Reference](api_reference.md) for details.
 
 **Parameters**:
 - Threshold: 16-bit unsigned, typical range [100, 2000]

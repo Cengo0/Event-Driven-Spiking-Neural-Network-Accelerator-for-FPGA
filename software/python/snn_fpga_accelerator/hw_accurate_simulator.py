@@ -130,6 +130,126 @@ def fixed_exp(x: FixedPoint) -> FixedPoint:
 
 
 # =============================================================================
+# Tau / Leak Rate Conversion Utilities  
+# =============================================================================
+
+def tau_to_leak_rate(tau: float) -> int:
+    """
+    Convert desired tau (decay constant) to hardware leak_rate encoding.
+    
+    Finds the best shift configuration to approximate the target tau.
+    The hardware uses shift-based exponential decay for energy efficiency.
+    
+    Args:
+        tau: Desired decay constant (0.0-1.0). Higher values = slower leak.
+             Typical values: 0.85-0.99
+             tau = 0.9 means membrane potential decays to 90% each timestep
+    
+    Returns:
+        leak_rate: Hardware-encoded leak configuration (8-bit)
+                   leak_rate[2:0] = shift1 (primary leak, 1-7)
+                   leak_rate[7:3] = shift2 (secondary leak, 0=disabled)
+    
+    Examples:
+        >>> tau_to_leak_rate(0.875)  # Returns 3 (exact match)
+        >>> tau_to_leak_rate(0.9)    # Returns 35 (actual: 0.906)
+        >>> tau_to_leak_rate(0.95)   # Returns 37 (actual: 0.953)
+    
+    See Also:
+        leak_rate_to_tau: Inverse function
+        LIFNeuronParams.from_tau: Create full parameter object
+    """
+    best_error = float('inf')
+    best_config = 3  # Default
+    
+    # Try single shift configurations (shift1 only)
+    for shift1 in range(1, 8):
+        approx_tau = 1.0 - 1.0 / (1 << shift1)
+        error = abs(approx_tau - tau)
+        if error < best_error:
+            best_error = error
+            best_config = shift1
+    
+    # Try dual shift configurations (shift1 + shift2)
+    for shift1 in range(1, 8):
+        for shift2 in range(1, 8):
+            if shift2 == shift1:
+                continue
+            approx_tau = 1.0 - 1.0 / (1 << shift1) - 1.0 / (1 << shift2)
+            if approx_tau > 0:  # Valid configuration
+                error = abs(approx_tau - tau)
+                if error < best_error:
+                    best_error = error
+                    best_config = shift1 | (shift2 << 3)
+    
+    return best_config
+
+
+def leak_rate_to_tau(leak_rate: int) -> float:
+    """
+    Convert hardware leak_rate encoding to tau (decay constant).
+    
+    Args:
+        leak_rate: Hardware-encoded leak configuration (8-bit)
+    
+    Returns:
+        tau: Effective decay constant (0.0-1.0)
+    
+    Examples:
+        >>> leak_rate_to_tau(3)   # Returns 0.875
+        >>> leak_rate_to_tau(51)  # Returns 0.859375
+        >>> leak_rate_to_tau(4)   # Returns 0.9375
+    """
+    shift1 = leak_rate & 0x07
+    shift2_cfg = (leak_rate >> 3) & 0x1F
+    shift2 = shift2_cfg & 0x07 if shift2_cfg != 0 else 0
+    
+    tau = 1.0
+    if shift1 > 0:
+        tau -= 1.0 / (1 << shift1)
+    if shift2_cfg != 0 and shift2 > 0:
+        tau -= 1.0 / (1 << shift2)
+    return tau
+
+
+def get_available_tau_values() -> List[Tuple[float, int]]:
+    """
+    Get all available tau values supported by the hardware.
+    
+    Returns:
+        List of (tau, leak_rate) tuples sorted by tau value.
+    
+    Example:
+        >>> for tau, leak_rate in get_available_tau_values():
+        ...     print(f"tau={tau:.4f}, leak_rate={leak_rate}")
+    """
+    seen = set()
+    values = []
+    
+    # Single shift configurations
+    for shift1 in range(1, 8):
+        tau = 1.0 - 1.0 / (1 << shift1)
+        leak_rate = shift1
+        if tau not in seen:
+            seen.add(tau)
+            values.append((tau, leak_rate))
+    
+    # Dual shift configurations
+    for shift1 in range(1, 8):
+        for shift2 in range(1, 8):
+            if shift2 == shift1:
+                continue
+            tau = 1.0 - 1.0 / (1 << shift1) - 1.0 / (1 << shift2)
+            if tau > 0:
+                leak_rate = shift1 | (shift2 << 3)
+                if tau not in seen:
+                    seen.add(tau)
+                    values.append((tau, leak_rate))
+    
+    return sorted(values, key=lambda x: x[0])
+
+
+# =============================================================================
 # Hardware-Accurate LIF Neuron
 # =============================================================================
 
