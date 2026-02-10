@@ -1,3 +1,0 @@
-<msgs>
-<msg msg_severity="INFO" msg_id="HLS 200-111" tags="RUNTIME" msg_body="Finished File checks and directory preparation: CPU user time: 1.04 seconds. CPU system time: 0.45 seconds. Elapsed time: 1.35 seconds; current allocated memory: 258.141 MB."/>
-<msg msg_severity="INFO" msg_id="HLS 200-111" tags="RUNTIME" msg_body="Finished Source Code Analysis and Preprocessing: CPU user time: 0.01 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.01 seconds; current allocated memory: 258.141 MB."/>

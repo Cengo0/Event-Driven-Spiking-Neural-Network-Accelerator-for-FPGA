@@ -47,10 +47,13 @@ env/
 vivado_*.backup.*
 xsim_*.backup.*
 
-# HLS
-*.pb
-*.sdb
-*.rlx
+# HLS (scoped)
+hardware/hls/**/*.pb
+hardware/hls/**/*.sdb
+hardware/hls/**/*.rlx
+hardware/hls/**/*.db
+hardware/hls/**/.autopilot/
+hardware/hls/**/.debug/
 
 # Vitis HLS output (v++ generated)
 hardware/hls/hls_output/hls/.autopilot/
@@ -64,6 +67,12 @@ hardware/hls/hls_output/hls/*.xml
 hardware/hls/hls_output/hls/*.json
 hardware/hls/hls_output/hls/config.cmdline
 hardware/hls/.Xil/
+
+# HLS C simulation outputs
+hardware/hls/hls_csim_output/
+
+# HLS solution directory
+hardware/hls/snn_top_hls/
 
 # HLS compiled test binaries
 hardware/hls/test/tb_active_tracking
