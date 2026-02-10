@@ -174,7 +174,7 @@ v++ -c --mode hls \
 
 ### Optimization
 
-Current HLS design targets 512 neurons with aggressive pipelining:
+Current HLS design targets 720 neurons with aggressive pipelining:
 
 - **Pipeline**: `#pragma HLS PIPELINE II=1` — all major loops (LTD, LTP, WEIGHT_SUM) run at II=1
 - **Loop unroll**: `#pragma HLS UNROLL factor=4` — used on LTD_LOOP, RSTDP_INNER, DECAY loops
@@ -184,9 +184,9 @@ Current HLS design targets 512 neurons with aggressive pipelining:
 Avoid DSP usage: Use shifts instead of multiplies when possible.
 
 **Key constants** (in `snn_top_hls.h`):
-- `MAX_NEURONS = 512`, `MAX_SYNAPSES = 262144`
+- `MAX_NEURONS = 720`, `MAX_SYNAPSES = 518400`
 - `NEURON_ID_WIDTH = 10` (10-bit neuron IDs via `neuron_id_t`)
-- `WEIGHT_WIDTH = 8`, `MAX_INPUT_CHANNELS = 784`
+- `WEIGHT_WIDTH = 4`, `MAX_INPUT_CHANNELS = 784`
 
 ## Python Development
 

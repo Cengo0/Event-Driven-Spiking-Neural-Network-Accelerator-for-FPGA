@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'snn_top_hls_Pipeline_INIT_WEIGHT_OUTER_INIT_WEIGHT_INNER'
 ================================================================
-* Date:           Tue Feb 10 19:37:18 2026
+* Date:           Tue Feb 10 21:00:47 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -20,7 +20,7 @@
     +--------+----------+----------+------------+
     |  Clock |  Target  | Estimated| Uncertainty|
     +--------+----------+----------+------------+
-    |ap_clk  |  10.00 ns|  7.237 ns|     2.70 ns|
+    |ap_clk  |  10.00 ns|  5.737 ns|     2.70 ns|
     +--------+----------+----------+------------+
 
 + Latency: 
@@ -29,7 +29,7 @@
     |  Latency (cycles) |  Latency (absolute) |  Interval |      Pipeline     |
     |   min   |   max   |    min   |    max   | min | max |        Type       |
     +---------+---------+----------+----------+-----+-----+-------------------+
-    |   262146|   262146|  2.621 ms|  2.621 ms|    0|    0|  loop pipeline stp|
+    |   518405|   518405|  5.184 ms|  5.184 ms|    0|    0|  loop pipeline stp|
     +---------+---------+----------+----------+-----+-----+-------------------+
 
     + Detail: 
@@ -41,7 +41,7 @@
         |                                       |  Latency (cycles) | Iteration|  Initiation Interval  |  Trip  |          |
         |               Loop Name               |   min   |   max   |  Latency |  achieved |   target  |  Count | Pipelined|
         +---------------------------------------+---------+---------+----------+-----------+-----------+--------+----------+
-        |- INIT_WEIGHT_OUTER_INIT_WEIGHT_INNER  |   262144|   262144|         2|          1|          1|  262144|       yes|
+        |- INIT_WEIGHT_OUTER_INIT_WEIGHT_INNER  |   518403|   518403|         5|          1|          1|  518400|       yes|
         +---------------------------------------+---------+---------+----------+-----------+-----------+--------+----------+
 
 
@@ -53,19 +53,19 @@
 +-----------------+---------+-----+--------+-------+-----+
 |       Name      | BRAM_18K| DSP |   FF   |  LUT  | URAM|
 +-----------------+---------+-----+--------+-------+-----+
-|DSP              |        -|    -|       -|      -|    -|
+|DSP              |        -|    1|       -|      -|    -|
 |Expression       |        -|    -|       0|    113|    -|
 |FIFO             |        -|    -|       -|      -|    -|
 |Instance         |        -|    -|       -|      -|    -|
 |Memory           |        -|    -|       -|      -|    -|
 |Multiplexer      |        -|    -|       0|     54|    -|
-|Register         |        -|    -|      42|      -|    -|
+|Register         |        -|    -|     195|     64|    -|
 +-----------------+---------+-----+--------+-------+-----+
-|Total            |        0|    0|      42|    167|    0|
+|Total            |        0|    1|     195|    231|    0|
 +-----------------+---------+-----+--------+-------+-----+
 |Available        |      280|  220|  106400|  53200|    0|
 +-----------------+---------+-----+--------+-------+-----+
-|Utilization (%)  |        0|    0|      ~0|     ~0|    0|
+|Utilization (%)  |        0|   ~0|      ~0|     ~0|    0|
 +-----------------+---------+-----+--------+-------+-----+
 
 + Detail: 
@@ -73,7 +73,11 @@
     N/A
 
     * DSP: 
-    N/A
+    +-----------------------------------+-------------------------------+--------------+
+    |              Instance             |             Module            |  Expression  |
+    +-----------------------------------+-------------------------------+--------------+
+    |mac_muladd_9ns_8ns_8ns_16_4_1_U27  |mac_muladd_9ns_8ns_8ns_16_4_1  |  i0 * i1 + i2|
+    +-----------------------------------+-------------------------------+--------------+
 
     * Memory: 
     N/A
@@ -85,16 +89,16 @@
     +--------------------------+----------+----+---+----+------------+------------+
     |       Variable Name      | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
     +--------------------------+----------+----+---+----+------------+------------+
-    |add_ln748_1_fu_265_p2     |         +|   0|  0|  26|          19|           1|
-    |add_ln748_fu_282_p2       |         +|   0|  0|  13|          10|           1|
-    |add_ln749_fu_359_p2       |         +|   0|  0|  13|          10|           1|
-    |icmp_ln748_fu_259_p2      |      icmp|   0|  0|  27|          19|          20|
-    |icmp_ln749_fu_288_p2      |      icmp|   0|  0|  12|          10|          11|
-    |select_ln748_1_fu_302_p3  |    select|   0|  0|  10|           1|          10|
-    |select_ln748_fu_294_p3    |    select|   0|  0|  10|           1|           1|
+    |add_ln587_1_fu_265_p2     |         +|   0|  0|  26|          19|           1|
+    |add_ln587_fu_282_p2       |         +|   0|  0|  13|          10|           1|
+    |add_ln588_fu_343_p2       |         +|   0|  0|  13|          10|           1|
+    |icmp_ln587_fu_259_p2      |      icmp|   0|  0|  26|          19|          14|
+    |icmp_ln588_fu_288_p2      |      icmp|   0|  0|  13|          10|          10|
+    |select_ln587_1_fu_302_p3  |    select|   0|  0|  10|           1|          10|
+    |select_ln587_fu_294_p3    |    select|   0|  0|  10|           1|           1|
     |ap_enable_pp0             |       xor|   0|  0|   2|           1|           2|
     +--------------------------+----------+----+---+----+------------+------------+
-    |Total                     |          |   0|  0| 113|          71|          47|
+    |Total                     |          |   0|  0| 113|          71|          40|
     +--------------------------+----------+----+---+----+------------+------------+
 
     * Multiplexer: 
@@ -112,18 +116,30 @@
     +--------------------------------------+----+-----------+-----+-----------+
 
     * Register: 
-    +-------------------------+----+----+-----+-----------+
-    |           Name          | FF | LUT| Bits| Const Bits|
-    +-------------------------+----+----+-----+-----------+
-    |ap_CS_fsm                |   1|   0|    1|          0|
-    |ap_done_reg              |   1|   0|    1|          0|
-    |ap_enable_reg_pp0_iter1  |   1|   0|    1|          0|
-    |i_3_fu_80                |  10|   0|   10|          0|
-    |indvar_flatten_fu_84     |  19|   0|   19|          0|
-    |j_fu_76                  |  10|   0|   10|          0|
-    +-------------------------+----+----+-----+-----------+
-    |Total                    |  42|   0|   42|          0|
-    +-------------------------+----+----+-----+-----------+
+    +----------------------------------+----+----+-----+-----------+
+    |               Name               | FF | LUT| Bits| Const Bits|
+    +----------------------------------+----+----+-----+-----------+
+    |ap_CS_fsm                         |   1|   0|    1|          0|
+    |ap_done_reg                       |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter1           |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter2           |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter3           |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter4           |   1|   0|    1|          0|
+    |ap_loop_exit_ready_pp0_iter1_reg  |   1|   0|    1|          0|
+    |ap_loop_exit_ready_pp0_iter2_reg  |   1|   0|    1|          0|
+    |ap_loop_exit_ready_pp0_iter3_reg  |   1|   0|    1|          0|
+    |i_3_fu_80                         |  10|   0|   10|          0|
+    |indvar_flatten_fu_84              |  19|   0|   19|          0|
+    |j_fu_76                           |  10|   0|   10|          0|
+    |lshr_ln4_reg_420                  |   8|   0|    8|          0|
+    |lshr_ln4_reg_420_pp0_iter2_reg    |   8|   0|    8|          0|
+    |trunc_ln587_reg_407               |   1|   0|    1|          0|
+    |trunc_ln588_reg_416               |   2|   0|    2|          0|
+    |trunc_ln587_reg_407               |  64|  32|    1|          0|
+    |trunc_ln588_reg_416               |  64|  32|    2|          0|
+    +----------------------------------+----+----+-----+-----------+
+    |Total                             | 195|  64|   70|          0|
+    +----------------------------------+----+----+-----+-----------+
 
 
 
@@ -140,37 +156,37 @@
 |ap_done                           |  out|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_INIT_WEIGHT_OUTER_INIT_WEIGHT_INNER|  return value|
 |ap_idle                           |  out|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_INIT_WEIGHT_OUTER_INIT_WEIGHT_INNER|  return value|
 |ap_ready                          |  out|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_INIT_WEIGHT_OUTER_INIT_WEIGHT_INNER|  return value|
-|p_ZL13weight_memory_0_0_address1  |  out|   15|   ap_memory|                                   p_ZL13weight_memory_0_0|         array|
+|p_ZL13weight_memory_0_0_address1  |  out|   16|   ap_memory|                                   p_ZL13weight_memory_0_0|         array|
 |p_ZL13weight_memory_0_0_ce1       |  out|    1|   ap_memory|                                   p_ZL13weight_memory_0_0|         array|
 |p_ZL13weight_memory_0_0_we1       |  out|    1|   ap_memory|                                   p_ZL13weight_memory_0_0|         array|
-|p_ZL13weight_memory_0_0_d1        |  out|    8|   ap_memory|                                   p_ZL13weight_memory_0_0|         array|
-|p_ZL13weight_memory_0_1_address1  |  out|   15|   ap_memory|                                   p_ZL13weight_memory_0_1|         array|
+|p_ZL13weight_memory_0_0_d1        |  out|    4|   ap_memory|                                   p_ZL13weight_memory_0_0|         array|
+|p_ZL13weight_memory_0_1_address1  |  out|   16|   ap_memory|                                   p_ZL13weight_memory_0_1|         array|
 |p_ZL13weight_memory_0_1_ce1       |  out|    1|   ap_memory|                                   p_ZL13weight_memory_0_1|         array|
 |p_ZL13weight_memory_0_1_we1       |  out|    1|   ap_memory|                                   p_ZL13weight_memory_0_1|         array|
-|p_ZL13weight_memory_0_1_d1        |  out|    8|   ap_memory|                                   p_ZL13weight_memory_0_1|         array|
-|p_ZL13weight_memory_0_2_address1  |  out|   15|   ap_memory|                                   p_ZL13weight_memory_0_2|         array|
+|p_ZL13weight_memory_0_1_d1        |  out|    4|   ap_memory|                                   p_ZL13weight_memory_0_1|         array|
+|p_ZL13weight_memory_0_2_address1  |  out|   16|   ap_memory|                                   p_ZL13weight_memory_0_2|         array|
 |p_ZL13weight_memory_0_2_ce1       |  out|    1|   ap_memory|                                   p_ZL13weight_memory_0_2|         array|
 |p_ZL13weight_memory_0_2_we1       |  out|    1|   ap_memory|                                   p_ZL13weight_memory_0_2|         array|
-|p_ZL13weight_memory_0_2_d1        |  out|    8|   ap_memory|                                   p_ZL13weight_memory_0_2|         array|
-|p_ZL13weight_memory_0_3_address1  |  out|   15|   ap_memory|                                   p_ZL13weight_memory_0_3|         array|
+|p_ZL13weight_memory_0_2_d1        |  out|    4|   ap_memory|                                   p_ZL13weight_memory_0_2|         array|
+|p_ZL13weight_memory_0_3_address1  |  out|   16|   ap_memory|                                   p_ZL13weight_memory_0_3|         array|
 |p_ZL13weight_memory_0_3_ce1       |  out|    1|   ap_memory|                                   p_ZL13weight_memory_0_3|         array|
 |p_ZL13weight_memory_0_3_we1       |  out|    1|   ap_memory|                                   p_ZL13weight_memory_0_3|         array|
-|p_ZL13weight_memory_0_3_d1        |  out|    8|   ap_memory|                                   p_ZL13weight_memory_0_3|         array|
-|p_ZL13weight_memory_1_0_address1  |  out|   15|   ap_memory|                                   p_ZL13weight_memory_1_0|         array|
+|p_ZL13weight_memory_0_3_d1        |  out|    4|   ap_memory|                                   p_ZL13weight_memory_0_3|         array|
+|p_ZL13weight_memory_1_0_address1  |  out|   16|   ap_memory|                                   p_ZL13weight_memory_1_0|         array|
 |p_ZL13weight_memory_1_0_ce1       |  out|    1|   ap_memory|                                   p_ZL13weight_memory_1_0|         array|
 |p_ZL13weight_memory_1_0_we1       |  out|    1|   ap_memory|                                   p_ZL13weight_memory_1_0|         array|
-|p_ZL13weight_memory_1_0_d1        |  out|    8|   ap_memory|                                   p_ZL13weight_memory_1_0|         array|
-|p_ZL13weight_memory_1_1_address1  |  out|   15|   ap_memory|                                   p_ZL13weight_memory_1_1|         array|
+|p_ZL13weight_memory_1_0_d1        |  out|    4|   ap_memory|                                   p_ZL13weight_memory_1_0|         array|
+|p_ZL13weight_memory_1_1_address1  |  out|   16|   ap_memory|                                   p_ZL13weight_memory_1_1|         array|
 |p_ZL13weight_memory_1_1_ce1       |  out|    1|   ap_memory|                                   p_ZL13weight_memory_1_1|         array|
 |p_ZL13weight_memory_1_1_we1       |  out|    1|   ap_memory|                                   p_ZL13weight_memory_1_1|         array|
-|p_ZL13weight_memory_1_1_d1        |  out|    8|   ap_memory|                                   p_ZL13weight_memory_1_1|         array|
-|p_ZL13weight_memory_1_2_address1  |  out|   15|   ap_memory|                                   p_ZL13weight_memory_1_2|         array|
+|p_ZL13weight_memory_1_1_d1        |  out|    4|   ap_memory|                                   p_ZL13weight_memory_1_1|         array|
+|p_ZL13weight_memory_1_2_address1  |  out|   16|   ap_memory|                                   p_ZL13weight_memory_1_2|         array|
 |p_ZL13weight_memory_1_2_ce1       |  out|    1|   ap_memory|                                   p_ZL13weight_memory_1_2|         array|
 |p_ZL13weight_memory_1_2_we1       |  out|    1|   ap_memory|                                   p_ZL13weight_memory_1_2|         array|
-|p_ZL13weight_memory_1_2_d1        |  out|    8|   ap_memory|                                   p_ZL13weight_memory_1_2|         array|
-|p_ZL13weight_memory_1_3_address1  |  out|   15|   ap_memory|                                   p_ZL13weight_memory_1_3|         array|
+|p_ZL13weight_memory_1_2_d1        |  out|    4|   ap_memory|                                   p_ZL13weight_memory_1_2|         array|
+|p_ZL13weight_memory_1_3_address1  |  out|   16|   ap_memory|                                   p_ZL13weight_memory_1_3|         array|
 |p_ZL13weight_memory_1_3_ce1       |  out|    1|   ap_memory|                                   p_ZL13weight_memory_1_3|         array|
 |p_ZL13weight_memory_1_3_we1       |  out|    1|   ap_memory|                                   p_ZL13weight_memory_1_3|         array|
-|p_ZL13weight_memory_1_3_d1        |  out|    8|   ap_memory|                                   p_ZL13weight_memory_1_3|         array|
+|p_ZL13weight_memory_1_3_d1        |  out|    4|   ap_memory|                                   p_ZL13weight_memory_1_3|         array|
 +----------------------------------+-----+-----+------------+----------------------------------------------------------+--------------+
 

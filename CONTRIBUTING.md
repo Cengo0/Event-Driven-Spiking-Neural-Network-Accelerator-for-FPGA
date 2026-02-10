@@ -32,8 +32,8 @@ This project adheres to a code of conduct that all contributors are expected to 
 Before contributing, ensure you have:
 
 1. **For Software Development**:
-   - Python 3.13 or higher
-   - PyTorch 2.9 or higher
+   - Python 3.10 or higher
+   - PyTorch 2.5.1 or higher
    - NumPy, pytest, and other Python dependencies
 
 2. **For Hardware Development**:

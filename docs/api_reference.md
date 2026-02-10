@@ -329,7 +329,7 @@ verify_stdp_engine()  # Runs 5 tests, prints results
 | refractory_period | int | 0-255 | 5 | Cycles after spike |
 | reset_potential | int | 0-65535 | 0 | Post-spike reset |
 
-**Hardware Limits**: MAX_NEURONS = 512, MAX_SYNAPSES = 262,144 (512×512). Neuron IDs are 10-bit (`neuron_id_t`, range 0–511).
+**Hardware Limits**: MAX_NEURONS = 720, MAX_SYNAPSES = 518,400 (720×720). Neuron IDs are 10-bit (`neuron_id_t`, range 0–719).
 
 ### STDP Parameters
 
@@ -345,13 +345,13 @@ verify_stdp_engine()  # Runs 5 tests, prints results
 ### Spike Format
 
 Spikes represented as list of (neuron_id, timestamp) tuples.
-Neuron IDs are 10-bit (0–511 for hardware, higher for software-only simulation):
+Neuron IDs are 10-bit (0–719 for hardware, higher for software-only simulation):
 
 ```python
 spikes = [
     (0, 0.001),     # Neuron 0 fires at t=1ms
     (5, 0.003),     # Neuron 5 fires at t=3ms
-    (511, 0.010),   # Neuron 511 fires at t=10ms
+    (719, 0.010),   # Neuron 719 fires at t=10ms
 ]
 ```
 

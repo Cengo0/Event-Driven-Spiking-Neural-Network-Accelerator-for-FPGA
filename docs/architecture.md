@@ -16,7 +16,7 @@ System architecture of the Event-Driven SNN FPGA Accelerator.
 │                 FPGA (PYNQ-Z2)                          │
 │  ┌────────────┐  ┌────────────┐  ┌────────────────┐    │
 │  │ AXI        │→ │ Spike      │→ │ LIF Neurons    │    │
-│  │ Interface  │  │ Router     │  │ (512 neurons)  │    │
+│  │ Interface  │  │ Router     │  │ (720 neurons)  │    │
 │  └────────────┘  └────────────┘  └────────────────┘    │
 │         ↓               ↓                 ↓            │
 │  ┌──────────────────────────────────────────────────┐  │
@@ -42,12 +42,12 @@ System architecture of the Event-Driven SNN FPGA Accelerator.
 
 | Resource | Used | Available | % |
 |----------|------|-----------|---|
-| LUT | 15,030 | 53,200 | 28.25% |
-| FF | 15,970 | 106,400 | 15.01% |
+| LUT | 15,042 | 53,200 | 28.27% |
+| FF | 16,003 | 106,400 | 15.04% |
 | BRAM | 113 | 140 | 80.71% |
-| DSP | 29 | 220 | 13.18% |
+| DSP | 4 | 220 | 1.82% |
 
-**Timing**: WNS +0.372ns ✅, Clock 100 MHz
+**Timing**: WNS +0.338ns ✅, Clock 100 MHz
 
 ## LIF Neuron
 
@@ -140,8 +140,8 @@ $$\Delta w_{LTD} = -a^- \cdot \frac{(w - w_{min})^{\mu}}{scale}$$
 
 ```cpp
 // O(N+M) instead of O(N×M)
-static neuron_trace_t pre_traces[MAX_NEURONS];   // 512 entries
-static neuron_trace_t post_traces[MAX_NEURONS];  // 512 entries
+static neuron_trace_t pre_traces[MAX_NEURONS];   // 720 entries
+static neuron_trace_t post_traces[MAX_NEURONS];  // 720 entries
 
 struct neuron_trace_t {
     ap_uint<8> trace;              // 8-bit exponential trace
@@ -177,8 +177,8 @@ Stores connection weights.
 Address: [Src_Neuron_ID][Dst_Neuron_ID]
 Data:    8-bit signed weight (-127 to +127)
 
-Example: 512 neurons
-Total: 512 × 512 = 262,144 weights = 256 KB
+Example: 720 neurons
+Total: 720 × 720 = 518,400 weights × 4-bit = 259 KB
 ```
 
 **HLS Memory Optimization**:

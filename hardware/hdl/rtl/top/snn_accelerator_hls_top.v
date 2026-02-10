@@ -18,7 +18,7 @@ module snn_accelerator_hls_top #(
     parameter C_AXIS_DATA_WIDTH     = 32,
     
     // SNN Parameters
-    parameter NUM_NEURONS           = 512,
+    parameter NUM_NEURONS           = 720,
     parameter NUM_AXONS             = 1024,
     parameter NUM_PARALLEL_UNITS    = 8,
     parameter SPIKE_BUFFER_DEPTH    = 64,

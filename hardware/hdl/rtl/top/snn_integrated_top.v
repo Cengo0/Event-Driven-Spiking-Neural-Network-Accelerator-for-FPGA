@@ -22,7 +22,7 @@ module snn_integrated_top #(
     parameter NUM_PARALLEL_UNITS    = 4,
     parameter SPIKE_BUFFER_DEPTH    = 64,
     parameter HLS_NEURON_ID_WIDTH   = 10,     // Matches HLS neuron_id_t (10-bit)
-    parameter HLS_MAX_NEURONS       = 512,    // HLS weight_memory covers neurons 0..511
+    parameter HLS_MAX_NEURONS       = 720,    // HLS weight_memory covers neurons 0..719
     parameter NEURON_ID_WIDTH       = (NUM_NEURONS <= 256) ? 8 :
                                      (NUM_NEURONS <= 512) ? 9 : 10,
     parameter AXON_ID_WIDTH         = 10,

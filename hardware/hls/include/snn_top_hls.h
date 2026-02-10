@@ -19,15 +19,15 @@
 //=============================================================================
 // Configuration
 //=============================================================================
-const int MAX_NEURONS = 512;
-const int MAX_SYNAPSES = 262144;  // 512x512
+const int MAX_NEURONS = 720;
+const int MAX_SYNAPSES = 518400;  // 720x720
 
-const int WEIGHT_WIDTH = 8;
+const int WEIGHT_WIDTH = 4;
 const int NEURON_ID_WIDTH = 10;  // Supports up to 1024 encoded channels
 const int TIMESTAMP_WIDTH = 32;
 
 const int WEIGHT_SCALE = 128;
-const int VERSION_ID = 0x20251205;
+const int VERSION_ID = 0x20260210;
 
 //=============================================================================
 // Operation Modes (use #define for switch-case compatibility)
@@ -44,20 +44,20 @@ typedef ap_int<WEIGHT_WIDTH> weight_t;
 typedef ap_int<16> weight_delta_t;
 typedef ap_uint<TIMESTAMP_WIDTH> spike_time_t;
 
-const weight_t MAX_WEIGHT = 127;
-const weight_t MIN_WEIGHT = -128;
+const weight_t MAX_WEIGHT = 7;
+const weight_t MIN_WEIGHT = -8;
 
 //=============================================================================
 // AXI4-Stream Types
 //=============================================================================
 // Spike packet (AER over AXIS32):
-// [31:18] timestamp(14b), [17:10] weight(8b, two's complement), [9:0] neuron_id
+// [31:18] timestamp(14b), [17:10] weight(8b,wo's complement), [9:0] neuron_id
 typedef ap_axiu<32, 1, 1, 1> axis_spike_t;
 
 // Weight packet: [31:24] reserved, [23:16] weight, [15:8] post_id, [7:0] pre_id
 typedef ap_axiu<32, 1, 1, 1> axis_weight_t;
 
-// Data packet (for encoder input frames) - 32-bit wide
+// Data packet (for encoder input frames) - 32-bit wide (4 pixels per beat)
 typedef ap_axiu<32, 1, 1, 1> axis_data_t;
 
 //=============================================================================
@@ -100,23 +100,16 @@ struct input_data_t {
     pixel_t pixels[MAX_INPUT_CHANNELS];  // Complete input frame
 };
 
-// Encoding types (4-bit allocation for future expansion)
+// Encoding types
 #define ENC_NONE           0  // No encoding - direct spike input
-#define ENC_RATE_POISSON   1  // Rate coding (Poisson-like)
-#define ENC_LATENCY        2  // Latency coding (intensity to latency)
-#define ENC_DELTA_SIGMA    3  // Delta-sigma modulation
-// Reserved: 4-15 for future encoding methods
+#define ENC_DELTA_SIGMA    1  // Delta-sigma modulation (only HW encoder)
+// Removed: ENC_RATE_POISSON, ENC_LATENCY — encode on host PC for area savings
 
 struct encoder_config_t {
-    ap_uint<4> encoding_type;        // 4-bit: 0=none, 1=rate, 2=latency, 3=delta-sigma
-    bool two_neuron_enable;          // Enable two-neuron encoding (pos/neg split)
-    ap_uint<8> baseline;             // Baseline for two-neuron (default: 128 for unsigned)
-    ap_uint<16> num_steps;           // Total simulation time steps (for rate/latency normalization)
-    ap_uint<16> rate_scale;          // Rate coding: threshold scale
-    ap_uint<16> latency_window;      // Latency coding: time window (timesteps)
+    ap_uint<4> encoding_type;        // 0=none, 1=delta-sigma
     ap_uint<16> delta_threshold;     // Delta-sigma: threshold for integration
     ap_uint<16> delta_decay;         // Delta-sigma: decay rate
-    ap_uint<16> num_channels;        // Number of input channels (will be doubled if two_neuron_enable)
+    ap_uint<16> num_channels;        // Number of input channels
     weight_t default_weight;         // Default spike weight
 };
 

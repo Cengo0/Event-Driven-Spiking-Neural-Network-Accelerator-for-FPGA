@@ -26,17 +26,17 @@ python examples/pytorch/mnist_training_example.py
 - **AC-Based**: Accumulate-only ops (5x energy reduction vs MAC)
 - **STDP/R-STDP**: On-chip learning with per-neuron traces
 - **PyTorch Integration**: Direct model conversion
-- **Spike Encoders**: Rate, temporal, phase, delta-sigma
+- **Spike Encoders**: Delta-sigma modulator (on-chip); rate/latency encoding on host PC
 
 ## Architecture
 
 ```
-ARM PS (PyTorch) <--AXI--> FPGA PL (512 LIF neurons + STDP + Router)
+ARM PS (PyTorch) <--AXI--> FPGA PL (720 LIF neurons + STDP + Router)
 ```
 
 **Resources** (Integrated build @ 100MHz):
-- LUT: 15,030 (28%), FF: 15,970 (15%), BRAM: 113 (81%), DSP: 29 (13%)
-- Timing: WNS +0.372ns ✅
+- LUT: 15,042 (28%), FF: 16,003 (15%), BRAM: 113 (81%), DSP: 4 (2%)
+- Timing: WNS +0.338ns ✅
 
 ## Usage
 
@@ -98,13 +98,19 @@ python examples/pytorch/mozafari_rstdp_faithful.py
 
 ## Recent Changes (2026-02-10)
 
-### Pipelining & Scaling Optimization
-- **Neuron scaling**: MAX_NEURONS 256 → 512, MAX_SYNAPSES 65,536 → 262,144
-- **10-bit neuron IDs**: Spike ports widened from 8-bit to `neuron_id_t` (10-bit)
-- **HLS pipelining**: LTD/LTP loops achieve II=1, RSTDP_INNER UNROLL=4
+### Encoder Cleanup & Neuron Scaling
+- **Encoder cleanup**: Removed rate-Poisson, latency, two-neuron encoders from HLS
+  - Only delta-sigma modulator retained on-chip; other encodings done on host PC
+  - Saves ~2,500 LUTs, 8 DSPs, and encoder-related BRAM
+- **Neuron scaling**: MAX_NEURONS 512 → 720, MAX_SYNAPSES 262,144 → 518,400
+- **4-bit weights**: WEIGHT_WIDTH 8 → 4 (range -8..+7) for BRAM-efficient scaling
+- **ENCODER_LOOP simplified**: PIPELINE II=1 (was UNROLL=2 with switch branches)
+- **Verified**: C-sim (5/5 PASS), HLS Fmax 125 MHz, Vivado WNS +0.338ns
+
+### Previous: Pipelining & Scaling Optimization
+- **Neuron scaling**: MAX_NEURONS 256 → 512, 10-bit neuron IDs
+- **HLS pipelining**: LTD/LTP loops II=1, RSTDP_INNER UNROLL=4
 - **Memory partitioning**: Weight memory 8 banks, trace arrays factor=4
-- **RTL updated**: Width adapters removed, direct 10-bit connections
-- **Verified**: C-sim (5/5 PASS), HLS synthesis OK, Vivado build WNS +0.372ns
 
 ### Previous Fixes
 - RTL: leak_rate encoding, spike timing, parameterization, mu parameter

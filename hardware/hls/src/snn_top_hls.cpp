@@ -18,7 +18,8 @@
 #include "snn_top_hls.h"
 
 //=============================================================================
-// Simple On-Chip Spike Encoder
+// Delta-Sigma Spike Encoder (only HW encoder retained for area savings)
+// Rate/Latency/Two-Neuron encoders removed — do those on host PC instead
 //=============================================================================
 // Local axis word for encoder stream (avoid ap_axiu on non-port streams)
 typedef struct {
@@ -29,47 +30,8 @@ typedef struct {
 } encoder_axis_word_t;
 
 static ap_uint<16> encoder_phase_acc[MAX_INPUT_CHANNELS];
-static bool encoder_temporal_fired[MAX_INPUT_CHANNELS];
-static ap_uint<32> encoder_temporal_start[MAX_INPUT_CHANNELS];
 static input_data_t encoder_frame;
 static bool encoder_frame_loaded = false;
-static ap_uint<16> latency_window_counter = 0;  // Module-scope for system reset access
-
-static ap_uint<16> encoder_lfsr_random() {
-    #pragma HLS INLINE
-    static ap_uint<16> lfsr = 0xACE1;
-    bool bit = ((lfsr >> 0) ^ (lfsr >> 2) ^ (lfsr >> 3) ^ (lfsr >> 5)) & 1;
-    lfsr = (lfsr >> 1) | (bit << 15);
-    return lfsr;
-}
-
-static void encoder_reset_temporal_state(ap_uint<32> now) {
-    #pragma HLS INLINE off
-    for (int i = 0; i < MAX_INPUT_CHANNELS; i++) {
-        #pragma HLS PIPELINE II=1
-        encoder_temporal_fired[i] = false;
-        encoder_temporal_start[i] = now;
-    }
-}
-
-// Two-neuron encoding: split input into ON/OFF (positive/negative) channels
-// If input > baseline: ON channel gets (input - baseline), OFF gets 0
-// If input < baseline: ON gets 0, OFF channel gets (baseline - input)
-static void encoder_two_neuron_split(
-    pixel_t input,
-    ap_uint<8> baseline,
-    pixel_t &on_value,
-    pixel_t &off_value
-) {
-    #pragma HLS INLINE
-    if (input > baseline) {
-        on_value = input - baseline;
-        off_value = 0;
-    } else {
-        on_value = 0;
-        off_value = baseline - input;
-    }
-}
 
 static void encoder_write_axis_spike(
     int channel,
@@ -91,54 +53,6 @@ static void encoder_write_axis_spike(
     pkt.last = 1;
     fifo.write(pkt);
     counter++;
-}
-
-static void encoder_rate_poisson(
-    int channel,
-    pixel_t value,
-    ap_uint<32> time,
-    const encoder_config_t &config,
-    hls::stream<encoder_axis_word_t> &fifo,
-    ap_uint<32> &counter
-) {
-    #pragma HLS INLINE
-    // Poisson-like rate coding: higher intensity = higher spike probability
-    // Called once per timestep; config.num_steps determines overall spike rate
-    // Spike probability = (value / 255) * (rate_scale / 256)
-    ap_uint<16> spike_prob = (value * config.rate_scale) >> 8;
-    ap_uint<16> random = encoder_lfsr_random();
-    if (random < spike_prob) {
-        encoder_write_axis_spike(channel, config.default_weight, time, fifo, counter);
-    }
-}
-
-static void encoder_latency(
-    int channel,
-    pixel_t value,
-    ap_uint<32> time,
-    const encoder_config_t &config,
-    hls::stream<encoder_axis_word_t> &fifo,
-    ap_uint<32> &counter,
-    bool window_reset  // Pre-computed flag: replaces time % latency_window == 0
-) {
-    #pragma HLS INLINE
-    // Latency coding: higher intensity = earlier spike (shorter latency)
-    // Uses config.latency_window as the time window for spike timing
-    // Similar to snntorch.spikegen.latency: spike_time inversely proportional to intensity
-    if (window_reset) {
-        encoder_temporal_fired[channel] = false;
-        encoder_temporal_start[channel] = time;
-    }
-
-    if (!encoder_temporal_fired[channel]) {
-        // Inverse mapping: high value -> short delay, low value -> long delay
-        // spike_delay = (1 - intensity) * latency_window
-        ap_uint<32> spike_delay = ((255 - value) * config.latency_window) >> 8;
-        if (time >= encoder_temporal_start[channel] + spike_delay) {
-            encoder_write_axis_spike(channel, config.default_weight, time, fifo, counter);
-            encoder_temporal_fired[channel] = true;
-        }
-    }
 }
 
 static void encoder_delta_sigma(
@@ -176,85 +90,16 @@ static void run_encoder_once(
     #pragma HLS INLINE off
     if (!enable || !encoder_frame_loaded) return;
 
-    // Pre-compute latency window reset flag ONCE before loop
-    // Eliminates expensive urem/modulo hardware from being replicated per-unroll
-    bool latency_window_reset = false;
-    if (config.encoding_type == ENC_LATENCY && config.latency_window > 0) {
-        if (latency_window_counter == 0) {
-            latency_window_reset = true;
-        }
-        latency_window_counter++;
-        if (latency_window_counter >= config.latency_window) {
-            latency_window_counter = 0;
-        }
-    }
-
     ENCODER_LOOP: for (int ch = 0; ch < MAX_INPUT_CHANNELS; ch++) {
-        #pragma HLS UNROLL factor=2
+        #pragma HLS PIPELINE II=1
         if (ch >= config.num_channels) continue;
+
         pixel_t pixel_value = encoder_frame.pixels[ch];
-        
-        if (config.two_neuron_enable) {
-            // Two-neuron encoding: split into ON/OFF channels
-            pixel_t on_val, off_val;
-            encoder_two_neuron_split(pixel_value, config.baseline, on_val, off_val);
-            
-            int on_ch = ch * 2;      // Even indices for ON channels
-            int off_ch = ch * 2 + 1; // Odd indices for OFF channels
-            
-            // Process ON channel
-            switch (config.encoding_type) {
-                case ENC_NONE:
-                    break;
-                case ENC_RATE_POISSON:
-                    encoder_rate_poisson(on_ch, on_val, time, config, fifo, counter);
-                    break;
-                case ENC_LATENCY:
-                    encoder_latency(on_ch, on_val, time, config, fifo, counter, latency_window_reset);
-                    break;
-                case ENC_DELTA_SIGMA:
-                    encoder_delta_sigma(on_ch, on_val, time, config, fifo, counter);
-                    break;
-                default:
-                    break;
-            }
-            
-            // Process OFF channel
-            switch (config.encoding_type) {
-                case ENC_NONE:
-                    break;
-                case ENC_RATE_POISSON:
-                    encoder_rate_poisson(off_ch, off_val, time, config, fifo, counter);
-                    break;
-                case ENC_LATENCY:
-                    encoder_latency(off_ch, off_val, time, config, fifo, counter, latency_window_reset);
-                    break;
-                case ENC_DELTA_SIGMA:
-                    encoder_delta_sigma(off_ch, off_val, time, config, fifo, counter);
-                    break;
-                default:
-                    break;
-            }
-        } else {
-            // Standard single-neuron encoding
-            switch (config.encoding_type) {
-                case ENC_NONE:
-                    // No encoding - spikes come directly from s_axis_spikes
-                    break;
-                case ENC_RATE_POISSON:
-                    encoder_rate_poisson(ch, pixel_value, time, config, fifo, counter);
-                    break;
-                case ENC_LATENCY:
-                    encoder_latency(ch, pixel_value, time, config, fifo, counter, latency_window_reset);
-                    break;
-                case ENC_DELTA_SIGMA:
-                    encoder_delta_sigma(ch, pixel_value, time, config, fifo, counter);
-                    break;
-                default:
-                    // Reserved for future encoding methods (4-15)
-                    break;
-            }
+
+        if (config.encoding_type == ENC_DELTA_SIGMA) {
+            encoder_delta_sigma(ch, pixel_value, time, config, fifo, counter);
         }
+        // ENC_NONE: spikes come from s_axis_spikes, nothing to do here
     }
 }
 
@@ -667,13 +512,9 @@ void snn_top_hls(
     #pragma HLS BIND_STORAGE variable=post_traces type=RAM_2P impl=BRAM
     #pragma HLS ARRAY_PARTITION variable=post_traces cyclic factor=4
 
-    // Encoder state
+    // Encoder state (delta-sigma only)
     #pragma HLS BIND_STORAGE variable=encoder_phase_acc type=RAM_2P impl=BRAM
     #pragma HLS ARRAY_PARTITION variable=encoder_phase_acc cyclic factor=2
-    #pragma HLS BIND_STORAGE variable=encoder_temporal_fired type=RAM_2P impl=BRAM
-    #pragma HLS ARRAY_PARTITION variable=encoder_temporal_fired cyclic factor=2
-    #pragma HLS BIND_STORAGE variable=encoder_temporal_start type=RAM_2P impl=BRAM
-    #pragma HLS ARRAY_PARTITION variable=encoder_temporal_start cyclic factor=2
     
     //=========================================================================
     // Internal State
@@ -719,7 +560,6 @@ void snn_top_hls(
         checkpoint_row = 0;
         checkpoint_col = 0;
         encoder_frame_loaded = false;
-        encoder_reset_temporal_state(0);
         
         // Clear Per-Neuron eligibility traces (O(N+M) - much faster than O(N*M)!)
         RESET_ELIG: for (int i = 0; i < MAX_NEURONS; i++) {
@@ -741,7 +581,6 @@ void snn_top_hls(
             #pragma HLS PIPELINE II=1
             encoder_phase_acc[i] = 0;
         }
-        latency_window_counter = 0;  // Reset encoder window counter
         
         // Initialize weights
         if (!initialized) {
@@ -798,7 +637,6 @@ void snn_top_hls(
             if (beat.last) break;
         }
         encoder_frame_loaded = true;
-        encoder_reset_temporal_state(timestamp);
     }
 
     // Reset checkpoint iterator on mode transition into checkpoint

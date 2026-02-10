@@ -60,12 +60,7 @@ learning_params_t get_default_params() {
 
 encoder_config_t get_default_encoder_config() {
     encoder_config_t cfg;
-    cfg.encoding_type = ENC_RATE_POISSON;
-    cfg.two_neuron_enable = false;
-    cfg.baseline = 128;
-    cfg.num_steps = 100;
-    cfg.rate_scale = 128;
-    cfg.latency_window = 32;
+    cfg.encoding_type = ENC_NONE;
     cfg.delta_threshold = 1024;
     cfg.delta_decay = 1;
     cfg.num_channels = 0;
