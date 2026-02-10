@@ -27,7 +27,7 @@ module tb_lif_neuron_array;
     parameter THRESHOLD_WIDTH = 16;
     parameter LEAK_WIDTH = 8;
     parameter REFRAC_WIDTH = 8;
-    parameter NUM_PARALLEL_UNITS = 8;
+    parameter NUM_PARALLEL_UNITS = 4;   // Matches BRAM-optimized design
     parameter SPIKE_BUFFER_DEPTH = 32;
     parameter USE_BRAM = 1;
     parameter USE_DSP = 1;
@@ -514,8 +514,13 @@ module tb_lif_neuron_array;
         global_leak_rate = 8'h00;
         output_spikes_received = 0;
         
+        // Wait for initial leak cycle to complete before disabling
+        wait_idle(10);
+        output_spikes_received = 0;
+        
         // Disable array
         enable = 0;
+        #(CLK_PERIOD * 5);  // Let disable propagate
         send_spike(40, 8'd150, 1);
         #(CLK_PERIOD * 50);
         

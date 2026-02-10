@@ -1,0 +1,218 @@
+
+
+================================================================
+== Vitis HLS Report for 'run_encoder_once'
+================================================================
+* Date:           Tue Feb 10 18:59:26 2026
+
+* Version:        2025.2 (Build 6295257 on Nov 14 2025)
+* Project:        hls_csim_output
+* Solution:       hls (Vivado IP Flow Target)
+* Product family: zynq
+* Target device:  xc7z020-clg400-1
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+----------+----------+------------+
+    |  Clock |  Target  | Estimated| Uncertainty|
+    +--------+----------+----------+------------+
+    |ap_clk  |  10.00 ns|  7.036 ns|     2.70 ns|
+    +--------+----------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+-----------+-----------+-----+------+---------+
+    |  Latency (cycles) |   Latency (absolute)  |  Interval  | Pipeline|
+    |   min   |   max   |    min    |    max    | min |  max |   Type  |
+    +---------+---------+-----------+-----------+-----+------+---------+
+    |        1|     1576|  10.000 ns|  15.760 us|    1|  1576|       no|
+    +---------+---------+-----------+-----------+-----+------+---------+
+
+    + Detail: 
+        * Instance: 
+        +---------------------------------------------------+----------------------------------------+---------+---------+-----------+-----------+-----+-----+-------------------+
+        |                                                   |                                        |  Latency (cycles) |   Latency (absolute)  |  Interval |      Pipeline     |
+        |                      Instance                     |                 Module                 |   min   |   max   |    min    |    max    | min | max |        Type       |
+        +---------------------------------------------------+----------------------------------------+---------+---------+-----------+-----------+-----+-----+-------------------+
+        |grp_run_encoder_once_Pipeline_ENCODER_LOOP_fu_158  |run_encoder_once_Pipeline_ENCODER_LOOP  |     1574|     1574|  15.740 us|  15.740 us|    0|    0|  loop pipeline stp|
+        +---------------------------------------------------+----------------------------------------+---------+---------+-----------+-----------+-----+-----+-------------------+
+
+        * Loop: 
+        N/A
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++-----------------+---------+-----+--------+-------+-----+
+|       Name      | BRAM_18K| DSP |   FF   |  LUT  | URAM|
++-----------------+---------+-----+--------+-------+-----+
+|DSP              |        -|    -|       -|      -|    -|
+|Expression       |        -|    -|       0|    129|    -|
+|FIFO             |        -|    -|       -|      -|    -|
+|Instance         |        -|   12|    1044|   2496|    -|
+|Memory           |        -|    -|       -|      -|    -|
+|Multiplexer      |        -|    -|       0|     47|    -|
+|Register         |        -|    -|      37|      -|    -|
++-----------------+---------+-----+--------+-------+-----+
+|Total            |        0|   12|    1081|   2672|    0|
++-----------------+---------+-----+--------+-------+-----+
+|Available        |      280|  220|  106400|  53200|    0|
++-----------------+---------+-----+--------+-------+-----+
+|Utilization (%)  |        0|    5|       1|      5|    0|
++-----------------+---------+-----+--------+-------+-----+
+
++ Detail: 
+    * Instance: 
+    +---------------------------------------------------+----------------------------------------+---------+----+------+------+-----+
+    |                      Instance                     |                 Module                 | BRAM_18K| DSP|  FF  |  LUT | URAM|
+    +---------------------------------------------------+----------------------------------------+---------+----+------+------+-----+
+    |grp_run_encoder_once_Pipeline_ENCODER_LOOP_fu_158  |run_encoder_once_Pipeline_ENCODER_LOOP  |        0|  12|  1044|  2496|    0|
+    +---------------------------------------------------+----------------------------------------+---------+----+------+------+-----+
+    |Total                                              |                                        |        0|  12|  1044|  2496|    0|
+    +---------------------------------------------------+----------------------------------------+---------+----+------+------+-----+
+
+    * DSP: 
+    N/A
+
+    * Memory: 
+    N/A
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +---------------------------------+----------+----+---+----+------------+------------+
+    |          Variable Name          | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +---------------------------------+----------+----+---+----+------------+------------+
+    |add_ln186_fu_228_p2              |         +|   0|  0|  23|          16|           1|
+    |and_ln182_fu_212_p2              |       and|   0|  0|   2|           1|           1|
+    |ap_block_state3_on_subcall_done  |       and|   0|  0|   2|           1|           1|
+    |ap_condition_340                 |       and|   0|  0|   2|           1|           1|
+    |icmp_ln182_1_fu_206_p2           |      icmp|   0|  0|  23|          16|           1|
+    |icmp_ln182_fu_200_p2             |      icmp|   0|  0|  13|           4|           2|
+    |icmp_ln187_fu_234_p2             |      icmp|   0|  0|  23|          16|          16|
+    |latency_window_reset_fu_222_p2   |      icmp|   0|  0|  23|          16|           1|
+    |select_ln187_fu_246_p3           |    select|   0|  0|  16|           1|           1|
+    |xor_ln187_fu_240_p2              |       xor|   0|  0|   2|           1|           2|
+    +---------------------------------+----------+----+---+----+------------+------------+
+    |Total                            |          |   0|  0| 129|          73|          27|
+    +---------------------------------+----------+----+---+----+------------+------------+
+
+    * Multiplexer: 
+    +--------------------------------+----+-----------+-----+-----------+
+    |              Name              | LUT| Input Size| Bits| Total Bits|
+    +--------------------------------+----+-----------+-----+-----------+
+    |ap_NS_fsm                       |  20|          4|    1|          4|
+    |encoder_spike_counter_o         |   9|          2|   32|         64|
+    |latency_window_counter_o        |   9|          2|   16|         32|
+    |latency_window_reset_1_reg_146  |   9|          2|    1|          2|
+    +--------------------------------+----+-----------+-----+-----------+
+    |Total                           |  47|         10|   50|        102|
+    +--------------------------------+----+-----------+-----+-----------+
+
+    * Register: 
+    +----------------------------------------------------------------+----+----+-----+-----------+
+    |                              Name                              | FF | LUT| Bits| Const Bits|
+    +----------------------------------------------------------------+----+----+-----+-----------+
+    |ap_CS_fsm                                                       |   3|   0|    3|          0|
+    |encoder_spike_counter_o_reg                                     |  32|   0|   32|          0|
+    |grp_run_encoder_once_Pipeline_ENCODER_LOOP_fu_158_ap_start_reg  |   1|   0|    1|          0|
+    |latency_window_reset_1_reg_146                                  |   1|   0|    1|          0|
+    +----------------------------------------------------------------+----+----+-----+-----------+
+    |Total                                                           |  37|   0|   37|          0|
+    +----------------------------------------------------------------+----+----+-----+-----------+
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++-----------------------------------------+-----+-----+------------+--------------------------------+--------------+
+|                RTL Ports                | Dir | Bits|  Protocol  |          Source Object         |    C Type    |
++-----------------------------------------+-----+-----+------------+--------------------------------+--------------+
+|ap_clk                                   |   in|    1|  ap_ctrl_hs|                run_encoder_once|  return value|
+|ap_rst                                   |   in|    1|  ap_ctrl_hs|                run_encoder_once|  return value|
+|ap_start                                 |   in|    1|  ap_ctrl_hs|                run_encoder_once|  return value|
+|ap_done                                  |  out|    1|  ap_ctrl_hs|                run_encoder_once|  return value|
+|ap_idle                                  |  out|    1|  ap_ctrl_hs|                run_encoder_once|  return value|
+|ap_ready                                 |  out|    1|  ap_ctrl_hs|                run_encoder_once|  return value|
+|config_encoding_type_val                 |   in|    4|     ap_none|        config_encoding_type_val|        scalar|
+|config_two_neuron_enable_val             |   in|    1|     ap_none|    config_two_neuron_enable_val|        scalar|
+|config_baseline_val                      |   in|    8|     ap_none|             config_baseline_val|        scalar|
+|config_rate_scale_val                    |   in|   16|     ap_none|           config_rate_scale_val|        scalar|
+|config_latency_window_val                |   in|   16|     ap_none|       config_latency_window_val|        scalar|
+|config_delta_threshold_val               |   in|   16|     ap_none|      config_delta_threshold_val|        scalar|
+|config_delta_decay_val                   |   in|   16|     ap_none|          config_delta_decay_val|        scalar|
+|config_num_channels_val                  |   in|   16|     ap_none|         config_num_channels_val|        scalar|
+|config_default_weight_val                |   in|    8|     ap_none|       config_default_weight_val|        scalar|
+|time_r                                   |   in|   32|     ap_none|                          time_r|        scalar|
+|encoder_spikes_din                       |  out|   41|     ap_fifo|                  encoder_spikes|       pointer|
+|encoder_spikes_full_n                    |   in|    1|     ap_fifo|                  encoder_spikes|       pointer|
+|encoder_spikes_write                     |  out|    1|     ap_fifo|                  encoder_spikes|       pointer|
+|encoder_frame_loaded                     |   in|    1|     ap_none|            encoder_frame_loaded|       pointer|
+|latency_window_counter_i                 |   in|   16|     ap_ovld|          latency_window_counter|       pointer|
+|latency_window_counter_o                 |  out|   16|     ap_ovld|          latency_window_counter|       pointer|
+|latency_window_counter_o_ap_vld          |  out|    1|     ap_ovld|          latency_window_counter|       pointer|
+|p_ZL13encoder_frame_0_address0           |  out|    9|   ap_memory|           p_ZL13encoder_frame_0|         array|
+|p_ZL13encoder_frame_0_ce0                |  out|    1|   ap_memory|           p_ZL13encoder_frame_0|         array|
+|p_ZL13encoder_frame_0_q0                 |   in|    8|   ap_memory|           p_ZL13encoder_frame_0|         array|
+|encoder_spike_counter_i                  |   in|   32|     ap_ovld|           encoder_spike_counter|       pointer|
+|encoder_spike_counter_o                  |  out|   32|     ap_ovld|           encoder_spike_counter|       pointer|
+|encoder_spike_counter_o_ap_vld           |  out|    1|     ap_ovld|           encoder_spike_counter|       pointer|
+|p_ZL22encoder_temporal_fired_1_address0  |  out|    9|   ap_memory|  p_ZL22encoder_temporal_fired_1|         array|
+|p_ZL22encoder_temporal_fired_1_ce0       |  out|    1|   ap_memory|  p_ZL22encoder_temporal_fired_1|         array|
+|p_ZL22encoder_temporal_fired_1_q0        |   in|    1|   ap_memory|  p_ZL22encoder_temporal_fired_1|         array|
+|p_ZL22encoder_temporal_fired_1_address1  |  out|    9|   ap_memory|  p_ZL22encoder_temporal_fired_1|         array|
+|p_ZL22encoder_temporal_fired_1_ce1       |  out|    1|   ap_memory|  p_ZL22encoder_temporal_fired_1|         array|
+|p_ZL22encoder_temporal_fired_1_we1       |  out|    1|   ap_memory|  p_ZL22encoder_temporal_fired_1|         array|
+|p_ZL22encoder_temporal_fired_1_d1        |  out|    1|   ap_memory|  p_ZL22encoder_temporal_fired_1|         array|
+|p_ZL22encoder_temporal_fired_1_q1        |   in|    1|   ap_memory|  p_ZL22encoder_temporal_fired_1|         array|
+|p_ZL22encoder_temporal_fired_0_address0  |  out|    9|   ap_memory|  p_ZL22encoder_temporal_fired_0|         array|
+|p_ZL22encoder_temporal_fired_0_ce0       |  out|    1|   ap_memory|  p_ZL22encoder_temporal_fired_0|         array|
+|p_ZL22encoder_temporal_fired_0_q0        |   in|    1|   ap_memory|  p_ZL22encoder_temporal_fired_0|         array|
+|p_ZL22encoder_temporal_fired_0_address1  |  out|    9|   ap_memory|  p_ZL22encoder_temporal_fired_0|         array|
+|p_ZL22encoder_temporal_fired_0_ce1       |  out|    1|   ap_memory|  p_ZL22encoder_temporal_fired_0|         array|
+|p_ZL22encoder_temporal_fired_0_we1       |  out|    1|   ap_memory|  p_ZL22encoder_temporal_fired_0|         array|
+|p_ZL22encoder_temporal_fired_0_d1        |  out|    1|   ap_memory|  p_ZL22encoder_temporal_fired_0|         array|
+|p_ZL22encoder_temporal_fired_0_q1        |   in|    1|   ap_memory|  p_ZL22encoder_temporal_fired_0|         array|
+|p_ZL22encoder_temporal_start_0_address0  |  out|    9|   ap_memory|  p_ZL22encoder_temporal_start_0|         array|
+|p_ZL22encoder_temporal_start_0_ce0       |  out|    1|   ap_memory|  p_ZL22encoder_temporal_start_0|         array|
+|p_ZL22encoder_temporal_start_0_q0        |   in|   32|   ap_memory|  p_ZL22encoder_temporal_start_0|         array|
+|p_ZL22encoder_temporal_start_0_address1  |  out|    9|   ap_memory|  p_ZL22encoder_temporal_start_0|         array|
+|p_ZL22encoder_temporal_start_0_ce1       |  out|    1|   ap_memory|  p_ZL22encoder_temporal_start_0|         array|
+|p_ZL22encoder_temporal_start_0_we1       |  out|    1|   ap_memory|  p_ZL22encoder_temporal_start_0|         array|
+|p_ZL22encoder_temporal_start_0_d1        |  out|   32|   ap_memory|  p_ZL22encoder_temporal_start_0|         array|
+|p_ZL22encoder_temporal_start_1_address0  |  out|    9|   ap_memory|  p_ZL22encoder_temporal_start_1|         array|
+|p_ZL22encoder_temporal_start_1_ce0       |  out|    1|   ap_memory|  p_ZL22encoder_temporal_start_1|         array|
+|p_ZL22encoder_temporal_start_1_q0        |   in|   32|   ap_memory|  p_ZL22encoder_temporal_start_1|         array|
+|p_ZL22encoder_temporal_start_1_address1  |  out|    9|   ap_memory|  p_ZL22encoder_temporal_start_1|         array|
+|p_ZL22encoder_temporal_start_1_ce1       |  out|    1|   ap_memory|  p_ZL22encoder_temporal_start_1|         array|
+|p_ZL22encoder_temporal_start_1_we1       |  out|    1|   ap_memory|  p_ZL22encoder_temporal_start_1|         array|
+|p_ZL22encoder_temporal_start_1_d1        |  out|   32|   ap_memory|  p_ZL22encoder_temporal_start_1|         array|
+|p_ZL17encoder_phase_acc_1_address0       |  out|    9|   ap_memory|       p_ZL17encoder_phase_acc_1|         array|
+|p_ZL17encoder_phase_acc_1_ce0            |  out|    1|   ap_memory|       p_ZL17encoder_phase_acc_1|         array|
+|p_ZL17encoder_phase_acc_1_q0             |   in|   16|   ap_memory|       p_ZL17encoder_phase_acc_1|         array|
+|p_ZL17encoder_phase_acc_1_address1       |  out|    9|   ap_memory|       p_ZL17encoder_phase_acc_1|         array|
+|p_ZL17encoder_phase_acc_1_ce1            |  out|    1|   ap_memory|       p_ZL17encoder_phase_acc_1|         array|
+|p_ZL17encoder_phase_acc_1_we1            |  out|    1|   ap_memory|       p_ZL17encoder_phase_acc_1|         array|
+|p_ZL17encoder_phase_acc_1_d1             |  out|   16|   ap_memory|       p_ZL17encoder_phase_acc_1|         array|
+|p_ZL17encoder_phase_acc_0_address0       |  out|    9|   ap_memory|       p_ZL17encoder_phase_acc_0|         array|
+|p_ZL17encoder_phase_acc_0_ce0            |  out|    1|   ap_memory|       p_ZL17encoder_phase_acc_0|         array|
+|p_ZL17encoder_phase_acc_0_q0             |   in|   16|   ap_memory|       p_ZL17encoder_phase_acc_0|         array|
+|p_ZL17encoder_phase_acc_0_address1       |  out|    9|   ap_memory|       p_ZL17encoder_phase_acc_0|         array|
+|p_ZL17encoder_phase_acc_0_ce1            |  out|    1|   ap_memory|       p_ZL17encoder_phase_acc_0|         array|
+|p_ZL17encoder_phase_acc_0_we1            |  out|    1|   ap_memory|       p_ZL17encoder_phase_acc_0|         array|
+|p_ZL17encoder_phase_acc_0_d1             |  out|   16|   ap_memory|       p_ZL17encoder_phase_acc_0|         array|
+|p_ZL13encoder_frame_1_address0           |  out|    9|   ap_memory|           p_ZL13encoder_frame_1|         array|
+|p_ZL13encoder_frame_1_ce0                |  out|    1|   ap_memory|           p_ZL13encoder_frame_1|         array|
+|p_ZL13encoder_frame_1_q0                 |   in|    8|   ap_memory|           p_ZL13encoder_frame_1|         array|
++-----------------------------------------+-----+-----+------------+--------------------------------+--------------+
+

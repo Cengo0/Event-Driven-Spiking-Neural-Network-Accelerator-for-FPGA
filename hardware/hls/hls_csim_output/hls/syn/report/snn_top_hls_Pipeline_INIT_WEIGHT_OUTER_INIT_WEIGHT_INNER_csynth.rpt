@@ -1,0 +1,152 @@
+
+
+================================================================
+== Vitis HLS Report for 'snn_top_hls_Pipeline_INIT_WEIGHT_OUTER_INIT_WEIGHT_INNER'
+================================================================
+* Date:           Tue Feb 10 18:59:26 2026
+
+* Version:        2025.2 (Build 6295257 on Nov 14 2025)
+* Project:        hls_csim_output
+* Solution:       hls (Vivado IP Flow Target)
+* Product family: zynq
+* Target device:  xc7z020-clg400-1
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+----------+----------+------------+
+    |  Clock |  Target  | Estimated| Uncertainty|
+    +--------+----------+----------+------------+
+    |ap_clk  |  10.00 ns|  6.202 ns|     2.70 ns|
+    +--------+----------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+----------+----------+-----+-----+-------------------+
+    |  Latency (cycles) |  Latency (absolute) |  Interval |      Pipeline     |
+    |   min   |   max   |    min   |    max   | min | max |        Type       |
+    +---------+---------+----------+----------+-----+-----+-------------------+
+    |    65538|    65538|  0.655 ms|  0.655 ms|    0|    0|  loop pipeline stp|
+    +---------+---------+----------+----------+-----+-----+-------------------+
+
+    + Detail: 
+        * Instance: 
+        N/A
+
+        * Loop: 
+        +---------------------------------------+---------+---------+----------+-----------+-----------+-------+----------+
+        |                                       |  Latency (cycles) | Iteration|  Initiation Interval  |  Trip |          |
+        |               Loop Name               |   min   |   max   |  Latency |  achieved |   target  | Count | Pipelined|
+        +---------------------------------------+---------+---------+----------+-----------+-----------+-------+----------+
+        |- INIT_WEIGHT_OUTER_INIT_WEIGHT_INNER  |    65536|    65536|         2|          1|          1|  65536|       yes|
+        +---------------------------------------+---------+---------+----------+-----------+-----------+-------+----------+
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++-----------------+---------+-----+--------+-------+-----+
+|       Name      | BRAM_18K| DSP |   FF   |  LUT  | URAM|
++-----------------+---------+-----+--------+-------+-----+
+|DSP              |        -|    -|       -|      -|    -|
+|Expression       |        -|    -|       0|    110|    -|
+|FIFO             |        -|    -|       -|      -|    -|
+|Instance         |        -|    -|       -|      -|    -|
+|Memory           |        -|    -|       -|      -|    -|
+|Multiplexer      |        -|    -|       0|     54|    -|
+|Register         |        -|    -|      38|      -|    -|
++-----------------+---------+-----+--------+-------+-----+
+|Total            |        0|    0|      38|    164|    0|
++-----------------+---------+-----+--------+-------+-----+
+|Available        |      280|  220|  106400|  53200|    0|
++-----------------+---------+-----+--------+-------+-----+
+|Utilization (%)  |        0|    0|      ~0|     ~0|    0|
++-----------------+---------+-----+--------+-------+-----+
+
++ Detail: 
+    * Instance: 
+    N/A
+
+    * DSP: 
+    N/A
+
+    * Memory: 
+    N/A
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +--------------------------+----------+----+---+----+------------+------------+
+    |       Variable Name      | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +--------------------------+----------+----+---+----+------------+------------+
+    |add_ln746_1_fu_126_p2     |         +|   0|  0|  24|          17|           1|
+    |add_ln746_fu_143_p2       |         +|   0|  0|  14|           9|           1|
+    |add_ln747_fu_203_p2       |         +|   0|  0|  14|           9|           1|
+    |icmp_ln746_fu_120_p2      |      icmp|   0|  0|  25|          17|          18|
+    |icmp_ln747_fu_149_p2      |      icmp|   0|  0|  13|           9|          10|
+    |select_ln746_1_fu_163_p3  |    select|   0|  0|   9|           1|           9|
+    |select_ln746_fu_155_p3    |    select|   0|  0|   9|           1|           1|
+    |ap_enable_pp0             |       xor|   0|  0|   2|           1|           2|
+    +--------------------------+----------+----+---+----+------------+------------+
+    |Total                     |          |   0|  0| 110|          64|          43|
+    +--------------------------+----------+----+---+----+------------+------------+
+
+    * Multiplexer: 
+    +--------------------------------------+----+-----------+-----+-----------+
+    |                 Name                 | LUT| Input Size| Bits| Total Bits|
+    +--------------------------------------+----+-----------+-----+-----------+
+    |ap_done_int                           |   9|          2|    1|          2|
+    |ap_enable_reg_pp0_iter1               |   9|          2|    1|          2|
+    |ap_sig_allocacmp_indvar_flatten_load  |   9|          2|   17|         34|
+    |i_3_fu_58                             |   9|          2|    9|         18|
+    |indvar_flatten_fu_62                  |   9|          2|   17|         34|
+    |j_fu_54                               |   9|          2|    9|         18|
+    +--------------------------------------+----+-----------+-----+-----------+
+    |Total                                 |  54|         12|   54|        108|
+    +--------------------------------------+----+-----------+-----+-----------+
+
+    * Register: 
+    +-------------------------+----+----+-----+-----------+
+    |           Name          | FF | LUT| Bits| Const Bits|
+    +-------------------------+----+----+-----+-----------+
+    |ap_CS_fsm                |   1|   0|    1|          0|
+    |ap_done_reg              |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter1  |   1|   0|    1|          0|
+    |i_3_fu_58                |   9|   0|    9|          0|
+    |indvar_flatten_fu_62     |  17|   0|   17|          0|
+    |j_fu_54                  |   9|   0|    9|          0|
+    +-------------------------+----+----+-----+-----------+
+    |Total                    |  38|   0|   38|          0|
+    +-------------------------+----+----+-----+-----------+
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++--------------------------------+-----+-----+------------+----------------------------------------------------------+--------------+
+|            RTL Ports           | Dir | Bits|  Protocol  |                       Source Object                      |    C Type    |
++--------------------------------+-----+-----+------------+----------------------------------------------------------+--------------+
+|ap_clk                          |   in|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_INIT_WEIGHT_OUTER_INIT_WEIGHT_INNER|  return value|
+|ap_rst                          |   in|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_INIT_WEIGHT_OUTER_INIT_WEIGHT_INNER|  return value|
+|ap_start                        |   in|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_INIT_WEIGHT_OUTER_INIT_WEIGHT_INNER|  return value|
+|ap_done                         |  out|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_INIT_WEIGHT_OUTER_INIT_WEIGHT_INNER|  return value|
+|ap_idle                         |  out|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_INIT_WEIGHT_OUTER_INIT_WEIGHT_INNER|  return value|
+|ap_ready                        |  out|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_INIT_WEIGHT_OUTER_INIT_WEIGHT_INNER|  return value|
+|p_ZL13weight_memory_0_address1  |  out|   15|   ap_memory|                                     p_ZL13weight_memory_0|         array|
+|p_ZL13weight_memory_0_ce1       |  out|    1|   ap_memory|                                     p_ZL13weight_memory_0|         array|
+|p_ZL13weight_memory_0_we1       |  out|    1|   ap_memory|                                     p_ZL13weight_memory_0|         array|
+|p_ZL13weight_memory_0_d1        |  out|    8|   ap_memory|                                     p_ZL13weight_memory_0|         array|
+|p_ZL13weight_memory_1_address1  |  out|   15|   ap_memory|                                     p_ZL13weight_memory_1|         array|
+|p_ZL13weight_memory_1_ce1       |  out|    1|   ap_memory|                                     p_ZL13weight_memory_1|         array|
+|p_ZL13weight_memory_1_we1       |  out|    1|   ap_memory|                                     p_ZL13weight_memory_1|         array|
+|p_ZL13weight_memory_1_d1        |  out|    8|   ap_memory|                                     p_ZL13weight_memory_1|         array|
++--------------------------------+-----+-----+------------+----------------------------------------------------------+--------------+
+

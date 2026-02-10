@@ -21,7 +21,9 @@ module spike_router #(
                                  (NUM_NEURONS <= 16) ? 4 :
                                  (NUM_NEURONS <= 32) ? 5 :
                                  (NUM_NEURONS <= 64) ? 6 :
-                                 (NUM_NEURONS <= 128) ? 7 : 8,
+                                 (NUM_NEURONS <= 128) ? 7 :
+                                 (NUM_NEURONS <= 256) ? 8 :
+                                 (NUM_NEURONS <= 512) ? 9 : 10,
     parameter DELAY_WIDTH       = 8,
     parameter FIFO_DEPTH        = 256
 )(
@@ -71,9 +73,20 @@ module spike_router #(
     // Format: [valid(1), exc/inh(1), weight(8), delay(8), dest_id(NEURON_ID_WIDTH)]
     // Total width = 18 + NEURON_ID_WIDTH bits
     localparam CONN_WIDTH = 18 + NEURON_ID_WIDTH;
-    // Note: Using register array - Vivado will infer LUTRAM if beneficial
-    reg [CONN_WIDTH-1:0] conn_memory [0:(NUM_NEURONS * MAX_FANOUT)-1];
-    
+
+    //-------------------------------------------------------------------------
+    // Connection memory: True Dual-Port BRAM inference pattern
+    //   Port A: config write + config readback (same address)
+    //   Port B: data-path read (operational fetches)
+    // 1024 neurons * 32 fanout * 28 bits = 917 Kbit = ~32 BRAM18K
+    //-------------------------------------------------------------------------
+    (* ram_style = "block" *) reg [CONN_WIDTH-1:0] conn_memory [0:(NUM_NEURONS * MAX_FANOUT)-1];
+
+    // Port A registered output (config readback)
+    reg [CONN_WIDTH-1:0] conn_mem_dout_a;
+    // Port B registered output (data-path fetch)
+    reg [CONN_WIDTH-1:0] conn_mem_dout_b;
+
     // Initialize connection memory to 0 (for simulation)
     integer init_idx;
     initial begin
@@ -81,8 +94,8 @@ module spike_router #(
             conn_memory[init_idx] = {CONN_WIDTH{1'b0}};
         end
     end
-    
-    // Connection count per neuron
+
+    // Connection count per neuron (small enough for LUTRAM: 1024 * 8 = 8 Kbit)
     reg [7:0] conn_count [0:NUM_NEURONS-1];
     
     // Spike event FIFO
@@ -97,6 +110,7 @@ module spike_router #(
     reg [7:0] conn_index;
     reg [CONN_WIDTH-1:0] current_conn;
     reg [31:0] spike_timestamp;
+    reg [7:0] current_conn_count;
     
     // Output registers
     reg out_valid;
@@ -111,7 +125,7 @@ module spike_router #(
     //-------------------------------------------------------------------------
     // Input spike FIFO
     //-------------------------------------------------------------------------
-    wire fifo_almost_full;  // Can be used for backpressure
+    wire fifo_almost_full;
     wire fifo_almost_empty;
     wire [$clog2(FIFO_DEPTH):0] fifo_count;
     wire fifo_underflow;
@@ -145,7 +159,54 @@ module spike_router #(
         else
             current_time <= current_time + 1'b1;
     end
-    
+
+    //-------------------------------------------------------------------------
+    // conn_memory: True Dual-Port BRAM inference
+    //   Port A: config write + config read (always block A)
+    //   Port B: data-path read only   (always block B)
+    //-------------------------------------------------------------------------
+
+    // Port A — config write + config readback
+    always @(posedge clk) begin
+        if (config_we && config_addr[31:24] == 8'h00) begin
+            conn_memory[config_addr[15:0]] <= config_data[CONN_WIDTH-1:0];
+        end
+        conn_mem_dout_a <= conn_memory[config_addr[15:0]];
+    end
+
+    // Port B — data-path read (FETCH_CONN)
+    // Combinational address mux — address set in state BEFORE read is needed
+    reg [15:0] conn_rd_addr_b;
+    always @(*) begin
+        case (state)
+            IDLE:      conn_rd_addr_b = fifo_spike_id * MAX_FANOUT;        // prep for FETCH after WAIT_FIFO
+            WAIT_FIFO: conn_rd_addr_b = fifo_spike_id * MAX_FANOUT;        // read first connection
+            NEXT_CONN: conn_rd_addr_b = current_neuron * MAX_FANOUT + conn_index + 1'b1; // read next connection
+            default:   conn_rd_addr_b = current_neuron * MAX_FANOUT + conn_index;
+        endcase
+    end
+    always @(posedge clk) begin
+        conn_mem_dout_b <= conn_memory[conn_rd_addr_b];
+    end
+
+    // conn_count: direct access (small LUTRAM, 8 Kbit)
+    //   Write: config interface
+    //   Read: state machine (WAIT_FIFO) + config readback
+    reg [7:0] conn_count_dout_a;
+
+    // Config write + readback for conn_count
+    integer i;
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            for (i = 0; i < NUM_NEURONS; i = i + 1) begin
+                conn_count[i] <= 8'd0;
+            end
+        end else if (config_we && config_addr[31:24] == 8'h01) begin
+            conn_count[config_addr[NEURON_ID_WIDTH-1:0]] <= config_data[7:0];
+        end
+        conn_count_dout_a <= conn_count[config_addr[NEURON_ID_WIDTH-1:0]];
+    end
+
     //-------------------------------------------------------------------------
     // State machine
     //-------------------------------------------------------------------------
@@ -165,7 +226,7 @@ module spike_router #(
             end
             
             WAIT_FIFO: begin
-                // Wait one cycle for FIFO data to be valid
+                // Wait one cycle for FIFO data + conn_count BRAM read
                 next_state = FETCH_CONN;
             end
             
@@ -187,7 +248,7 @@ module spike_router #(
             end
             
             NEXT_CONN: begin
-                if (conn_index >= conn_count[current_neuron])
+                if (conn_index >= current_conn_count)
                     next_state = IDLE;
                 else
                     next_state = FETCH_CONN;
@@ -198,10 +259,8 @@ module spike_router #(
     end
     
     //-------------------------------------------------------------------------
-    // Connection processing
+    // Connection processing (drives Port B addresses, uses Port B outputs)
     //-------------------------------------------------------------------------
-    
-    // Internal signal for spike counter increment
     reg spike_counter_inc;
     
     always @(posedge clk) begin
@@ -212,8 +271,9 @@ module spike_router #(
             spike_timestamp <= 0;
             out_valid <= 1'b0;
             spike_counter_inc <= 1'b0;
+            current_conn_count <= 0;
         end else begin
-            spike_counter_inc <= 1'b0;  // Default
+            spike_counter_inc <= 1'b0;
             
             case (state)
                 IDLE: begin
@@ -222,13 +282,15 @@ module spike_router #(
                 end
                 
                 WAIT_FIFO: begin
-                    // FIFO data is now valid, capture it
+                    // FIFO data valid, capture it; direct sync read of conn_count
                     current_neuron <= fifo_spike_id;
                     spike_timestamp <= fifo_timestamp;
+                    current_conn_count <= conn_count[fifo_spike_id];
                 end
                 
                 FETCH_CONN: begin
-                    current_conn <= conn_memory[current_neuron * MAX_FANOUT + conn_index];
+                    // Port B BRAM read result available in conn_mem_dout_b
+                    current_conn <= conn_mem_dout_b;
                 end
                 
                 ROUTE_SPIKE: begin
@@ -237,7 +299,7 @@ module spike_router #(
                         out_dest_id <= current_conn[NEURON_ID_WIDTH-1:0];
                         out_weight <= current_conn[NEURON_ID_WIDTH+15:NEURON_ID_WIDTH+8];
                         out_exc_inh <= current_conn[CONN_WIDTH-2];
-                        spike_counter_inc <= 1'b1;  // Signal to increment counter
+                        spike_counter_inc <= 1'b1;
                     end
                 end
                 
@@ -256,52 +318,33 @@ module spike_router #(
     assign m_spike_exc_inh = out_exc_inh;
     
     //-------------------------------------------------------------------------
-    // Configuration interface and spike counter
+    // Spike counter management
     //-------------------------------------------------------------------------
-    // Loop variable for Verilog-2001 compatibility
-    integer i;
-    
     always @(posedge clk) begin
         if (!rst_n) begin
-            // Initialize connection counts
-            for (i = 0; i < NUM_NEURONS; i = i + 1) begin
-                conn_count[i] <= 8'd0;
-            end
-            // Note: conn_memory is not reset to save simulation time
-            // Software should ensure connections are properly configured
             spike_counter <= 32'd0;
         end else begin
-            // Handle configuration writes first (higher priority for reset)
             if (config_we && config_addr[31:24] == 8'h02 && config_data[0]) begin
-                // Reset statistics command - highest priority
                 spike_counter <= 32'd0;
-            end else if (config_we) begin
-                case (config_addr[31:24])
-                    8'h00: begin // Write connection
-                        conn_memory[config_addr[15:0]] <= config_data[CONN_WIDTH-1:0];
-                    end
-                    8'h01: begin // Write connection count
-                        conn_count[config_addr[7:0]] <= config_data[7:0];
-                    end
-                    default: ; // Do nothing
-                endcase
             end else if (spike_counter_inc) begin
-                // Only increment if not in reset command cycle
                 spike_counter <= spike_counter + 1'b1;
             end
         end
     end
     
-    // Configuration read
-    always @(*) begin
-        config_readdata = 32'd0;
-        case (config_addr[31:24])
-            8'h00: config_readdata = {{(32-CONN_WIDTH){1'b0}}, conn_memory[config_addr[15:0]]};
-            8'h01: config_readdata = {24'd0, conn_count[config_addr[7:0]]};
-            8'h10: config_readdata = spike_counter;
-            8'h11: config_readdata = {31'd0, fifo_overflow};
-            default: config_readdata = 32'hDEADBEEF;
-        endcase
+    // Configuration readback multiplexer (uses Port A outputs)
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            config_readdata <= 32'd0;
+        end else begin
+            case (config_addr[31:24])
+                8'h00: config_readdata <= {{(32-CONN_WIDTH){1'b0}}, conn_mem_dout_a};
+                8'h01: config_readdata <= {24'd0, conn_count_dout_a};
+                8'h10: config_readdata <= spike_counter;
+                8'h11: config_readdata <= {31'd0, fifo_overflow};
+                default: config_readdata <= 32'hDEADBEEF;
+            endcase
+        end
     end
     
     // Status outputs

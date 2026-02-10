@@ -17,16 +17,6 @@ module axi_hls_wrapper (
     input  wire         s_axis_spikes_TLAST,
     input  wire         s_axis_spikes_TID,
     input  wire         s_axis_spikes_TDEST,
-    // AXI4-Stream Raw Data Input (on-chip encoder)
-    input  wire [559:0] s_axis_data_TDATA,
-    input  wire         s_axis_data_TVALID,
-    output wire         s_axis_data_TREADY,
-    input  wire [69:0]  s_axis_data_TKEEP,
-    input  wire [69:0]  s_axis_data_TSTRB,
-    input  wire         s_axis_data_TUSER,
-    input  wire         s_axis_data_TLAST,
-    input  wire         s_axis_data_TID,
-    input  wire         s_axis_data_TDEST,
     // AXI4-Stream Spike Output
     output wire [31:0]  m_axis_spikes_TDATA,
     output wire         m_axis_spikes_TVALID,
@@ -91,11 +81,9 @@ module axi_hls_wrapper (
     // Tie-offs for unused optional ports
     assign reward_signal_unused = 8'd0;
 
-    // Width adapters between 10-bit RTL IDs and 8-bit HLS core IDs
-    wire [7:0]  spike_in_neuron_id_hls  = spike_in_neuron_id[7:0];
-    wire [7:0]  spike_out_neuron_id_hls;
-
-    assign spike_out_neuron_id = {2'b00, spike_out_neuron_id_hls};
+    // HLS IP now uses 10-bit neuron IDs natively - direct connection
+    wire [9:0]  spike_out_neuron_id_hls;
+    assign spike_out_neuron_id = spike_out_neuron_id_hls;
 
     snn_top_hls u_ip (
         .ap_clk(ap_clk),
@@ -109,15 +97,6 @@ module axi_hls_wrapper (
         .s_axis_spikes_TLAST(s_axis_spikes_TLAST),
         .s_axis_spikes_TID(s_axis_spikes_TID),
         .s_axis_spikes_TDEST(s_axis_spikes_TDEST),
-        .s_axis_data_TDATA(s_axis_data_TDATA),
-        .s_axis_data_TVALID(s_axis_data_TVALID),
-        .s_axis_data_TREADY(s_axis_data_TREADY),
-        .s_axis_data_TKEEP(s_axis_data_TKEEP),
-        .s_axis_data_TSTRB(s_axis_data_TSTRB),
-        .s_axis_data_TUSER(s_axis_data_TUSER),
-        .s_axis_data_TLAST(s_axis_data_TLAST),
-        .s_axis_data_TID(s_axis_data_TID),
-        .s_axis_data_TDEST(s_axis_data_TDEST),
         .m_axis_spikes_TDATA(m_axis_spikes_TDATA),
         .m_axis_spikes_TVALID(m_axis_spikes_TVALID),
         .m_axis_spikes_TREADY(m_axis_spikes_TREADY),
@@ -137,7 +116,7 @@ module axi_hls_wrapper (
         .m_axis_weights_TID(m_axis_weights_TID),
         .m_axis_weights_TDEST(m_axis_weights_TDEST),
         .spike_in_valid(spike_in_valid),
-        .spike_in_neuron_id(spike_in_neuron_id_hls),
+        .spike_in_neuron_id(spike_in_neuron_id),
         .spike_in_weight(spike_in_weight),
         .spike_in_ready(spike_in_ready),
         .spike_out_valid(spike_out_valid),

@@ -14,7 +14,7 @@ module snn_accelerator_top #(
     parameter C_S_AXI_DATA_WIDTH    = 32,
     parameter C_S_AXI_ADDR_WIDTH    = 32,
     parameter C_AXIS_DATA_WIDTH     = 32,
-    parameter NUM_NEURONS           = 256,
+    parameter NUM_NEURONS           = 512,
     parameter NUM_AXONS             = 1024,
     parameter NUM_PARALLEL_UNITS    = 8,
     parameter SPIKE_BUFFER_DEPTH    = 64,

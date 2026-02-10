@@ -42,34 +42,6 @@ module snn_top_hls_decay_eligibility_traces (
         p_ZL15pre_eligibility_3_ce1,
         p_ZL15pre_eligibility_3_we1,
         p_ZL15pre_eligibility_3_d1,
-        p_ZL15pre_eligibility_4_address0,
-        p_ZL15pre_eligibility_4_ce0,
-        p_ZL15pre_eligibility_4_q0,
-        p_ZL15pre_eligibility_4_address1,
-        p_ZL15pre_eligibility_4_ce1,
-        p_ZL15pre_eligibility_4_we1,
-        p_ZL15pre_eligibility_4_d1,
-        p_ZL15pre_eligibility_5_address0,
-        p_ZL15pre_eligibility_5_ce0,
-        p_ZL15pre_eligibility_5_q0,
-        p_ZL15pre_eligibility_5_address1,
-        p_ZL15pre_eligibility_5_ce1,
-        p_ZL15pre_eligibility_5_we1,
-        p_ZL15pre_eligibility_5_d1,
-        p_ZL15pre_eligibility_6_address0,
-        p_ZL15pre_eligibility_6_ce0,
-        p_ZL15pre_eligibility_6_q0,
-        p_ZL15pre_eligibility_6_address1,
-        p_ZL15pre_eligibility_6_ce1,
-        p_ZL15pre_eligibility_6_we1,
-        p_ZL15pre_eligibility_6_d1,
-        p_ZL15pre_eligibility_7_address0,
-        p_ZL15pre_eligibility_7_ce0,
-        p_ZL15pre_eligibility_7_q0,
-        p_ZL15pre_eligibility_7_address1,
-        p_ZL15pre_eligibility_7_ce1,
-        p_ZL15pre_eligibility_7_we1,
-        p_ZL15pre_eligibility_7_d1,
         p_ZL16post_eligibility_0_address0,
         p_ZL16post_eligibility_0_ce0,
         p_ZL16post_eligibility_0_q0,
@@ -97,35 +69,7 @@ module snn_top_hls_decay_eligibility_traces (
         p_ZL16post_eligibility_3_address1,
         p_ZL16post_eligibility_3_ce1,
         p_ZL16post_eligibility_3_we1,
-        p_ZL16post_eligibility_3_d1,
-        p_ZL16post_eligibility_4_address0,
-        p_ZL16post_eligibility_4_ce0,
-        p_ZL16post_eligibility_4_q0,
-        p_ZL16post_eligibility_4_address1,
-        p_ZL16post_eligibility_4_ce1,
-        p_ZL16post_eligibility_4_we1,
-        p_ZL16post_eligibility_4_d1,
-        p_ZL16post_eligibility_5_address0,
-        p_ZL16post_eligibility_5_ce0,
-        p_ZL16post_eligibility_5_q0,
-        p_ZL16post_eligibility_5_address1,
-        p_ZL16post_eligibility_5_ce1,
-        p_ZL16post_eligibility_5_we1,
-        p_ZL16post_eligibility_5_d1,
-        p_ZL16post_eligibility_6_address0,
-        p_ZL16post_eligibility_6_ce0,
-        p_ZL16post_eligibility_6_q0,
-        p_ZL16post_eligibility_6_address1,
-        p_ZL16post_eligibility_6_ce1,
-        p_ZL16post_eligibility_6_we1,
-        p_ZL16post_eligibility_6_d1,
-        p_ZL16post_eligibility_7_address0,
-        p_ZL16post_eligibility_7_ce0,
-        p_ZL16post_eligibility_7_q0,
-        p_ZL16post_eligibility_7_address1,
-        p_ZL16post_eligibility_7_ce1,
-        p_ZL16post_eligibility_7_we1,
-        p_ZL16post_eligibility_7_d1
+        p_ZL16post_eligibility_3_d1
 );
 
 parameter    ap_ST_fsm_state1 = 2'd1;
@@ -137,118 +81,62 @@ input   ap_start;
 output   ap_done;
 output   ap_idle;
 output   ap_ready;
-output  [4:0] p_ZL15pre_eligibility_0_address0;
+output  [6:0] p_ZL15pre_eligibility_0_address0;
 output   p_ZL15pre_eligibility_0_ce0;
 input  [7:0] p_ZL15pre_eligibility_0_q0;
-output  [4:0] p_ZL15pre_eligibility_0_address1;
+output  [6:0] p_ZL15pre_eligibility_0_address1;
 output   p_ZL15pre_eligibility_0_ce1;
 output   p_ZL15pre_eligibility_0_we1;
 output  [7:0] p_ZL15pre_eligibility_0_d1;
-output  [4:0] p_ZL15pre_eligibility_1_address0;
+output  [6:0] p_ZL15pre_eligibility_1_address0;
 output   p_ZL15pre_eligibility_1_ce0;
 input  [7:0] p_ZL15pre_eligibility_1_q0;
-output  [4:0] p_ZL15pre_eligibility_1_address1;
+output  [6:0] p_ZL15pre_eligibility_1_address1;
 output   p_ZL15pre_eligibility_1_ce1;
 output   p_ZL15pre_eligibility_1_we1;
 output  [7:0] p_ZL15pre_eligibility_1_d1;
-output  [4:0] p_ZL15pre_eligibility_2_address0;
+output  [6:0] p_ZL15pre_eligibility_2_address0;
 output   p_ZL15pre_eligibility_2_ce0;
 input  [7:0] p_ZL15pre_eligibility_2_q0;
-output  [4:0] p_ZL15pre_eligibility_2_address1;
+output  [6:0] p_ZL15pre_eligibility_2_address1;
 output   p_ZL15pre_eligibility_2_ce1;
 output   p_ZL15pre_eligibility_2_we1;
 output  [7:0] p_ZL15pre_eligibility_2_d1;
-output  [4:0] p_ZL15pre_eligibility_3_address0;
+output  [6:0] p_ZL15pre_eligibility_3_address0;
 output   p_ZL15pre_eligibility_3_ce0;
 input  [7:0] p_ZL15pre_eligibility_3_q0;
-output  [4:0] p_ZL15pre_eligibility_3_address1;
+output  [6:0] p_ZL15pre_eligibility_3_address1;
 output   p_ZL15pre_eligibility_3_ce1;
 output   p_ZL15pre_eligibility_3_we1;
 output  [7:0] p_ZL15pre_eligibility_3_d1;
-output  [4:0] p_ZL15pre_eligibility_4_address0;
-output   p_ZL15pre_eligibility_4_ce0;
-input  [7:0] p_ZL15pre_eligibility_4_q0;
-output  [4:0] p_ZL15pre_eligibility_4_address1;
-output   p_ZL15pre_eligibility_4_ce1;
-output   p_ZL15pre_eligibility_4_we1;
-output  [7:0] p_ZL15pre_eligibility_4_d1;
-output  [4:0] p_ZL15pre_eligibility_5_address0;
-output   p_ZL15pre_eligibility_5_ce0;
-input  [7:0] p_ZL15pre_eligibility_5_q0;
-output  [4:0] p_ZL15pre_eligibility_5_address1;
-output   p_ZL15pre_eligibility_5_ce1;
-output   p_ZL15pre_eligibility_5_we1;
-output  [7:0] p_ZL15pre_eligibility_5_d1;
-output  [4:0] p_ZL15pre_eligibility_6_address0;
-output   p_ZL15pre_eligibility_6_ce0;
-input  [7:0] p_ZL15pre_eligibility_6_q0;
-output  [4:0] p_ZL15pre_eligibility_6_address1;
-output   p_ZL15pre_eligibility_6_ce1;
-output   p_ZL15pre_eligibility_6_we1;
-output  [7:0] p_ZL15pre_eligibility_6_d1;
-output  [4:0] p_ZL15pre_eligibility_7_address0;
-output   p_ZL15pre_eligibility_7_ce0;
-input  [7:0] p_ZL15pre_eligibility_7_q0;
-output  [4:0] p_ZL15pre_eligibility_7_address1;
-output   p_ZL15pre_eligibility_7_ce1;
-output   p_ZL15pre_eligibility_7_we1;
-output  [7:0] p_ZL15pre_eligibility_7_d1;
-output  [4:0] p_ZL16post_eligibility_0_address0;
+output  [6:0] p_ZL16post_eligibility_0_address0;
 output   p_ZL16post_eligibility_0_ce0;
 input  [7:0] p_ZL16post_eligibility_0_q0;
-output  [4:0] p_ZL16post_eligibility_0_address1;
+output  [6:0] p_ZL16post_eligibility_0_address1;
 output   p_ZL16post_eligibility_0_ce1;
 output   p_ZL16post_eligibility_0_we1;
 output  [7:0] p_ZL16post_eligibility_0_d1;
-output  [4:0] p_ZL16post_eligibility_1_address0;
+output  [6:0] p_ZL16post_eligibility_1_address0;
 output   p_ZL16post_eligibility_1_ce0;
 input  [7:0] p_ZL16post_eligibility_1_q0;
-output  [4:0] p_ZL16post_eligibility_1_address1;
+output  [6:0] p_ZL16post_eligibility_1_address1;
 output   p_ZL16post_eligibility_1_ce1;
 output   p_ZL16post_eligibility_1_we1;
 output  [7:0] p_ZL16post_eligibility_1_d1;
-output  [4:0] p_ZL16post_eligibility_2_address0;
+output  [6:0] p_ZL16post_eligibility_2_address0;
 output   p_ZL16post_eligibility_2_ce0;
 input  [7:0] p_ZL16post_eligibility_2_q0;
-output  [4:0] p_ZL16post_eligibility_2_address1;
+output  [6:0] p_ZL16post_eligibility_2_address1;
 output   p_ZL16post_eligibility_2_ce1;
 output   p_ZL16post_eligibility_2_we1;
 output  [7:0] p_ZL16post_eligibility_2_d1;
-output  [4:0] p_ZL16post_eligibility_3_address0;
+output  [6:0] p_ZL16post_eligibility_3_address0;
 output   p_ZL16post_eligibility_3_ce0;
 input  [7:0] p_ZL16post_eligibility_3_q0;
-output  [4:0] p_ZL16post_eligibility_3_address1;
+output  [6:0] p_ZL16post_eligibility_3_address1;
 output   p_ZL16post_eligibility_3_ce1;
 output   p_ZL16post_eligibility_3_we1;
 output  [7:0] p_ZL16post_eligibility_3_d1;
-output  [4:0] p_ZL16post_eligibility_4_address0;
-output   p_ZL16post_eligibility_4_ce0;
-input  [7:0] p_ZL16post_eligibility_4_q0;
-output  [4:0] p_ZL16post_eligibility_4_address1;
-output   p_ZL16post_eligibility_4_ce1;
-output   p_ZL16post_eligibility_4_we1;
-output  [7:0] p_ZL16post_eligibility_4_d1;
-output  [4:0] p_ZL16post_eligibility_5_address0;
-output   p_ZL16post_eligibility_5_ce0;
-input  [7:0] p_ZL16post_eligibility_5_q0;
-output  [4:0] p_ZL16post_eligibility_5_address1;
-output   p_ZL16post_eligibility_5_ce1;
-output   p_ZL16post_eligibility_5_we1;
-output  [7:0] p_ZL16post_eligibility_5_d1;
-output  [4:0] p_ZL16post_eligibility_6_address0;
-output   p_ZL16post_eligibility_6_ce0;
-input  [7:0] p_ZL16post_eligibility_6_q0;
-output  [4:0] p_ZL16post_eligibility_6_address1;
-output   p_ZL16post_eligibility_6_ce1;
-output   p_ZL16post_eligibility_6_we1;
-output  [7:0] p_ZL16post_eligibility_6_d1;
-output  [4:0] p_ZL16post_eligibility_7_address0;
-output   p_ZL16post_eligibility_7_ce0;
-input  [7:0] p_ZL16post_eligibility_7_q0;
-output  [4:0] p_ZL16post_eligibility_7_address1;
-output   p_ZL16post_eligibility_7_ce1;
-output   p_ZL16post_eligibility_7_we1;
-output  [7:0] p_ZL16post_eligibility_7_d1;
 
 reg ap_done;
 reg ap_idle;
@@ -256,113 +144,65 @@ reg ap_ready;
 
 (* fsm_encoding = "none" *) reg   [1:0] ap_CS_fsm;
 wire    ap_CS_fsm_state1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_ap_start;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_ap_done;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_ap_idle;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_ap_ready;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_0_address0;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_0_ce0;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_0_address1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_0_ce1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_0_we1;
-wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_0_d1;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_1_address0;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_1_ce0;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_1_address1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_1_ce1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_1_we1;
-wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_1_d1;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_2_address0;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_2_ce0;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_2_address1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_2_ce1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_2_we1;
-wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_2_d1;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_3_address0;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_3_ce0;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_3_address1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_3_ce1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_3_we1;
-wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_3_d1;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_4_address0;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_4_ce0;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_4_address1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_4_ce1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_4_we1;
-wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_4_d1;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_5_address0;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_5_ce0;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_5_address1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_5_ce1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_5_we1;
-wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_5_d1;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_6_address0;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_6_ce0;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_6_address1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_6_ce1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_6_we1;
-wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_6_d1;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_7_address0;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_7_ce0;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_7_address1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_7_ce1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_7_we1;
-wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_7_d1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_ap_start;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_ap_done;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_ap_idle;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_ap_ready;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_0_address0;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_0_ce0;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_0_address1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_0_ce1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_0_we1;
-wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_0_d1;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_1_address0;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_1_ce0;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_1_address1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_1_ce1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_1_we1;
-wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_1_d1;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_2_address0;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_2_ce0;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_2_address1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_2_ce1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_2_we1;
-wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_2_d1;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_3_address0;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_3_ce0;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_3_address1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_3_ce1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_3_we1;
-wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_3_d1;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_4_address0;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_4_ce0;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_4_address1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_4_ce1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_4_we1;
-wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_4_d1;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_5_address0;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_5_ce0;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_5_address1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_5_ce1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_5_we1;
-wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_5_d1;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_6_address0;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_6_ce0;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_6_address1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_6_ce1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_6_we1;
-wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_6_d1;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_7_address0;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_7_ce0;
-wire   [4:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_7_address1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_7_ce1;
-wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_7_we1;
-wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_7_d1;
-reg    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_ap_start_reg;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_ap_start;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_ap_done;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_ap_idle;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_ap_ready;
+wire   [6:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_0_address0;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_0_ce0;
+wire   [6:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_0_address1;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_0_ce1;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_0_we1;
+wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_0_d1;
+wire   [6:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_1_address0;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_1_ce0;
+wire   [6:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_1_address1;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_1_ce1;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_1_we1;
+wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_1_d1;
+wire   [6:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_2_address0;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_2_ce0;
+wire   [6:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_2_address1;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_2_ce1;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_2_we1;
+wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_2_d1;
+wire   [6:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_3_address0;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_3_ce0;
+wire   [6:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_3_address1;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_3_ce1;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_3_we1;
+wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_3_d1;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_ap_start;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_ap_done;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_ap_idle;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_ap_ready;
+wire   [6:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_0_address0;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_0_ce0;
+wire   [6:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_0_address1;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_0_ce1;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_0_we1;
+wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_0_d1;
+wire   [6:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_1_address0;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_1_ce0;
+wire   [6:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_1_address1;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_1_ce1;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_1_we1;
+wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_1_d1;
+wire   [6:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_2_address0;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_2_ce0;
+wire   [6:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_2_address1;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_2_ce1;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_2_we1;
+wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_2_d1;
+wire   [6:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_3_address0;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_3_ce0;
+wire   [6:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_3_address1;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_3_ce1;
+wire    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_3_we1;
+wire   [7:0] grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_3_d1;
+reg    grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_ap_start_reg;
 wire    ap_CS_fsm_state2;
-reg    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_ap_start_reg;
+reg    grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_ap_start_reg;
 reg    ap_block_state2_on_subcall_done;
 reg   [1:0] ap_NS_fsm;
 reg    ap_ST_fsm_state1_blk;
@@ -372,138 +212,82 @@ wire    ap_ce_reg;
 // power-on initialization
 initial begin
 #0 ap_CS_fsm = 2'd1;
-#0 grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_ap_start_reg = 1'b0;
-#0 grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_ap_start_reg = 1'b0;
+#0 grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_ap_start_reg = 1'b0;
+#0 grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_ap_start_reg = 1'b0;
 end
 
-snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_PRE grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46(
+snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_PRE grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30(
     .ap_clk(ap_clk),
     .ap_rst(ap_rst),
-    .ap_start(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_ap_start),
-    .ap_done(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_ap_done),
-    .ap_idle(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_ap_idle),
-    .ap_ready(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_ap_ready),
-    .p_ZL15pre_eligibility_0_address0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_0_address0),
-    .p_ZL15pre_eligibility_0_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_0_ce0),
+    .ap_start(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_ap_start),
+    .ap_done(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_ap_done),
+    .ap_idle(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_ap_idle),
+    .ap_ready(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_ap_ready),
+    .p_ZL15pre_eligibility_0_address0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_0_address0),
+    .p_ZL15pre_eligibility_0_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_0_ce0),
     .p_ZL15pre_eligibility_0_q0(p_ZL15pre_eligibility_0_q0),
-    .p_ZL15pre_eligibility_0_address1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_0_address1),
-    .p_ZL15pre_eligibility_0_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_0_ce1),
-    .p_ZL15pre_eligibility_0_we1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_0_we1),
-    .p_ZL15pre_eligibility_0_d1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_0_d1),
-    .p_ZL15pre_eligibility_1_address0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_1_address0),
-    .p_ZL15pre_eligibility_1_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_1_ce0),
+    .p_ZL15pre_eligibility_0_address1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_0_address1),
+    .p_ZL15pre_eligibility_0_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_0_ce1),
+    .p_ZL15pre_eligibility_0_we1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_0_we1),
+    .p_ZL15pre_eligibility_0_d1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_0_d1),
+    .p_ZL15pre_eligibility_1_address0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_1_address0),
+    .p_ZL15pre_eligibility_1_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_1_ce0),
     .p_ZL15pre_eligibility_1_q0(p_ZL15pre_eligibility_1_q0),
-    .p_ZL15pre_eligibility_1_address1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_1_address1),
-    .p_ZL15pre_eligibility_1_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_1_ce1),
-    .p_ZL15pre_eligibility_1_we1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_1_we1),
-    .p_ZL15pre_eligibility_1_d1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_1_d1),
-    .p_ZL15pre_eligibility_2_address0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_2_address0),
-    .p_ZL15pre_eligibility_2_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_2_ce0),
+    .p_ZL15pre_eligibility_1_address1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_1_address1),
+    .p_ZL15pre_eligibility_1_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_1_ce1),
+    .p_ZL15pre_eligibility_1_we1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_1_we1),
+    .p_ZL15pre_eligibility_1_d1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_1_d1),
+    .p_ZL15pre_eligibility_2_address0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_2_address0),
+    .p_ZL15pre_eligibility_2_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_2_ce0),
     .p_ZL15pre_eligibility_2_q0(p_ZL15pre_eligibility_2_q0),
-    .p_ZL15pre_eligibility_2_address1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_2_address1),
-    .p_ZL15pre_eligibility_2_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_2_ce1),
-    .p_ZL15pre_eligibility_2_we1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_2_we1),
-    .p_ZL15pre_eligibility_2_d1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_2_d1),
-    .p_ZL15pre_eligibility_3_address0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_3_address0),
-    .p_ZL15pre_eligibility_3_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_3_ce0),
+    .p_ZL15pre_eligibility_2_address1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_2_address1),
+    .p_ZL15pre_eligibility_2_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_2_ce1),
+    .p_ZL15pre_eligibility_2_we1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_2_we1),
+    .p_ZL15pre_eligibility_2_d1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_2_d1),
+    .p_ZL15pre_eligibility_3_address0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_3_address0),
+    .p_ZL15pre_eligibility_3_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_3_ce0),
     .p_ZL15pre_eligibility_3_q0(p_ZL15pre_eligibility_3_q0),
-    .p_ZL15pre_eligibility_3_address1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_3_address1),
-    .p_ZL15pre_eligibility_3_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_3_ce1),
-    .p_ZL15pre_eligibility_3_we1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_3_we1),
-    .p_ZL15pre_eligibility_3_d1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_3_d1),
-    .p_ZL15pre_eligibility_4_address0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_4_address0),
-    .p_ZL15pre_eligibility_4_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_4_ce0),
-    .p_ZL15pre_eligibility_4_q0(p_ZL15pre_eligibility_4_q0),
-    .p_ZL15pre_eligibility_4_address1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_4_address1),
-    .p_ZL15pre_eligibility_4_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_4_ce1),
-    .p_ZL15pre_eligibility_4_we1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_4_we1),
-    .p_ZL15pre_eligibility_4_d1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_4_d1),
-    .p_ZL15pre_eligibility_5_address0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_5_address0),
-    .p_ZL15pre_eligibility_5_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_5_ce0),
-    .p_ZL15pre_eligibility_5_q0(p_ZL15pre_eligibility_5_q0),
-    .p_ZL15pre_eligibility_5_address1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_5_address1),
-    .p_ZL15pre_eligibility_5_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_5_ce1),
-    .p_ZL15pre_eligibility_5_we1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_5_we1),
-    .p_ZL15pre_eligibility_5_d1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_5_d1),
-    .p_ZL15pre_eligibility_6_address0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_6_address0),
-    .p_ZL15pre_eligibility_6_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_6_ce0),
-    .p_ZL15pre_eligibility_6_q0(p_ZL15pre_eligibility_6_q0),
-    .p_ZL15pre_eligibility_6_address1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_6_address1),
-    .p_ZL15pre_eligibility_6_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_6_ce1),
-    .p_ZL15pre_eligibility_6_we1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_6_we1),
-    .p_ZL15pre_eligibility_6_d1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_6_d1),
-    .p_ZL15pre_eligibility_7_address0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_7_address0),
-    .p_ZL15pre_eligibility_7_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_7_ce0),
-    .p_ZL15pre_eligibility_7_q0(p_ZL15pre_eligibility_7_q0),
-    .p_ZL15pre_eligibility_7_address1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_7_address1),
-    .p_ZL15pre_eligibility_7_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_7_ce1),
-    .p_ZL15pre_eligibility_7_we1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_7_we1),
-    .p_ZL15pre_eligibility_7_d1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_7_d1)
+    .p_ZL15pre_eligibility_3_address1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_3_address1),
+    .p_ZL15pre_eligibility_3_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_3_ce1),
+    .p_ZL15pre_eligibility_3_we1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_3_we1),
+    .p_ZL15pre_eligibility_3_d1(grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_3_d1)
 );
 
-snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_POST grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66(
+snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_POST grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42(
     .ap_clk(ap_clk),
     .ap_rst(ap_rst),
-    .ap_start(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_ap_start),
-    .ap_done(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_ap_done),
-    .ap_idle(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_ap_idle),
-    .ap_ready(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_ap_ready),
-    .p_ZL16post_eligibility_0_address0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_0_address0),
-    .p_ZL16post_eligibility_0_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_0_ce0),
+    .ap_start(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_ap_start),
+    .ap_done(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_ap_done),
+    .ap_idle(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_ap_idle),
+    .ap_ready(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_ap_ready),
+    .p_ZL16post_eligibility_0_address0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_0_address0),
+    .p_ZL16post_eligibility_0_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_0_ce0),
     .p_ZL16post_eligibility_0_q0(p_ZL16post_eligibility_0_q0),
-    .p_ZL16post_eligibility_0_address1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_0_address1),
-    .p_ZL16post_eligibility_0_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_0_ce1),
-    .p_ZL16post_eligibility_0_we1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_0_we1),
-    .p_ZL16post_eligibility_0_d1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_0_d1),
-    .p_ZL16post_eligibility_1_address0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_1_address0),
-    .p_ZL16post_eligibility_1_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_1_ce0),
+    .p_ZL16post_eligibility_0_address1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_0_address1),
+    .p_ZL16post_eligibility_0_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_0_ce1),
+    .p_ZL16post_eligibility_0_we1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_0_we1),
+    .p_ZL16post_eligibility_0_d1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_0_d1),
+    .p_ZL16post_eligibility_1_address0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_1_address0),
+    .p_ZL16post_eligibility_1_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_1_ce0),
     .p_ZL16post_eligibility_1_q0(p_ZL16post_eligibility_1_q0),
-    .p_ZL16post_eligibility_1_address1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_1_address1),
-    .p_ZL16post_eligibility_1_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_1_ce1),
-    .p_ZL16post_eligibility_1_we1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_1_we1),
-    .p_ZL16post_eligibility_1_d1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_1_d1),
-    .p_ZL16post_eligibility_2_address0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_2_address0),
-    .p_ZL16post_eligibility_2_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_2_ce0),
+    .p_ZL16post_eligibility_1_address1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_1_address1),
+    .p_ZL16post_eligibility_1_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_1_ce1),
+    .p_ZL16post_eligibility_1_we1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_1_we1),
+    .p_ZL16post_eligibility_1_d1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_1_d1),
+    .p_ZL16post_eligibility_2_address0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_2_address0),
+    .p_ZL16post_eligibility_2_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_2_ce0),
     .p_ZL16post_eligibility_2_q0(p_ZL16post_eligibility_2_q0),
-    .p_ZL16post_eligibility_2_address1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_2_address1),
-    .p_ZL16post_eligibility_2_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_2_ce1),
-    .p_ZL16post_eligibility_2_we1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_2_we1),
-    .p_ZL16post_eligibility_2_d1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_2_d1),
-    .p_ZL16post_eligibility_3_address0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_3_address0),
-    .p_ZL16post_eligibility_3_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_3_ce0),
+    .p_ZL16post_eligibility_2_address1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_2_address1),
+    .p_ZL16post_eligibility_2_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_2_ce1),
+    .p_ZL16post_eligibility_2_we1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_2_we1),
+    .p_ZL16post_eligibility_2_d1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_2_d1),
+    .p_ZL16post_eligibility_3_address0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_3_address0),
+    .p_ZL16post_eligibility_3_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_3_ce0),
     .p_ZL16post_eligibility_3_q0(p_ZL16post_eligibility_3_q0),
-    .p_ZL16post_eligibility_3_address1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_3_address1),
-    .p_ZL16post_eligibility_3_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_3_ce1),
-    .p_ZL16post_eligibility_3_we1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_3_we1),
-    .p_ZL16post_eligibility_3_d1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_3_d1),
-    .p_ZL16post_eligibility_4_address0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_4_address0),
-    .p_ZL16post_eligibility_4_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_4_ce0),
-    .p_ZL16post_eligibility_4_q0(p_ZL16post_eligibility_4_q0),
-    .p_ZL16post_eligibility_4_address1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_4_address1),
-    .p_ZL16post_eligibility_4_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_4_ce1),
-    .p_ZL16post_eligibility_4_we1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_4_we1),
-    .p_ZL16post_eligibility_4_d1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_4_d1),
-    .p_ZL16post_eligibility_5_address0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_5_address0),
-    .p_ZL16post_eligibility_5_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_5_ce0),
-    .p_ZL16post_eligibility_5_q0(p_ZL16post_eligibility_5_q0),
-    .p_ZL16post_eligibility_5_address1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_5_address1),
-    .p_ZL16post_eligibility_5_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_5_ce1),
-    .p_ZL16post_eligibility_5_we1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_5_we1),
-    .p_ZL16post_eligibility_5_d1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_5_d1),
-    .p_ZL16post_eligibility_6_address0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_6_address0),
-    .p_ZL16post_eligibility_6_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_6_ce0),
-    .p_ZL16post_eligibility_6_q0(p_ZL16post_eligibility_6_q0),
-    .p_ZL16post_eligibility_6_address1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_6_address1),
-    .p_ZL16post_eligibility_6_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_6_ce1),
-    .p_ZL16post_eligibility_6_we1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_6_we1),
-    .p_ZL16post_eligibility_6_d1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_6_d1),
-    .p_ZL16post_eligibility_7_address0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_7_address0),
-    .p_ZL16post_eligibility_7_ce0(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_7_ce0),
-    .p_ZL16post_eligibility_7_q0(p_ZL16post_eligibility_7_q0),
-    .p_ZL16post_eligibility_7_address1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_7_address1),
-    .p_ZL16post_eligibility_7_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_7_ce1),
-    .p_ZL16post_eligibility_7_we1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_7_we1),
-    .p_ZL16post_eligibility_7_d1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_7_d1)
+    .p_ZL16post_eligibility_3_address1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_3_address1),
+    .p_ZL16post_eligibility_3_ce1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_3_ce1),
+    .p_ZL16post_eligibility_3_we1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_3_we1),
+    .p_ZL16post_eligibility_3_d1(grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_3_d1)
 );
 
 always @ (posedge ap_clk) begin
@@ -516,24 +300,24 @@ end
 
 always @ (posedge ap_clk) begin
     if (ap_rst == 1'b1) begin
-        grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_ap_start_reg <= 1'b0;
+        grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_ap_start_reg <= 1'b0;
     end else begin
         if (((ap_start == 1'b1) & (1'b1 == ap_CS_fsm_state1))) begin
-            grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_ap_start_reg <= 1'b1;
-        end else if ((grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_ap_ready == 1'b1)) begin
-            grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_ap_start_reg <= 1'b0;
+            grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_ap_start_reg <= 1'b1;
+        end else if ((grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_ap_ready == 1'b1)) begin
+            grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_ap_start_reg <= 1'b0;
         end
     end
 end
 
 always @ (posedge ap_clk) begin
     if (ap_rst == 1'b1) begin
-        grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_ap_start_reg <= 1'b0;
+        grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_ap_start_reg <= 1'b0;
     end else begin
         if (((ap_start == 1'b1) & (1'b1 == ap_CS_fsm_state1))) begin
-            grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_ap_start_reg <= 1'b1;
-        end else if ((grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_ap_ready == 1'b1)) begin
-            grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_ap_start_reg <= 1'b0;
+            grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_ap_start_reg <= 1'b1;
+        end else if ((grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_ap_ready == 1'b1)) begin
+            grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_ap_start_reg <= 1'b0;
         end
     end
 end
@@ -605,203 +389,107 @@ assign ap_CS_fsm_state1 = ap_CS_fsm[32'd0];
 assign ap_CS_fsm_state2 = ap_CS_fsm[32'd1];
 
 always @ (*) begin
-    ap_block_state2_on_subcall_done = ((grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_ap_done == 1'b0) | (grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_ap_done == 1'b0));
+    ap_block_state2_on_subcall_done = ((grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_ap_done == 1'b0) | (grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_ap_done == 1'b0));
 end
 
-assign grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_ap_start = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_ap_start_reg;
+assign grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_ap_start = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_ap_start_reg;
 
-assign grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_ap_start = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_ap_start_reg;
+assign grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_ap_start = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_ap_start_reg;
 
-assign p_ZL15pre_eligibility_0_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_0_address0;
+assign p_ZL15pre_eligibility_0_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_0_address0;
 
-assign p_ZL15pre_eligibility_0_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_0_address1;
+assign p_ZL15pre_eligibility_0_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_0_address1;
 
-assign p_ZL15pre_eligibility_0_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_0_ce0;
+assign p_ZL15pre_eligibility_0_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_0_ce0;
 
-assign p_ZL15pre_eligibility_0_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_0_ce1;
+assign p_ZL15pre_eligibility_0_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_0_ce1;
 
-assign p_ZL15pre_eligibility_0_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_0_d1;
+assign p_ZL15pre_eligibility_0_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_0_d1;
 
-assign p_ZL15pre_eligibility_0_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_0_we1;
+assign p_ZL15pre_eligibility_0_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_0_we1;
 
-assign p_ZL15pre_eligibility_1_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_1_address0;
+assign p_ZL15pre_eligibility_1_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_1_address0;
 
-assign p_ZL15pre_eligibility_1_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_1_address1;
+assign p_ZL15pre_eligibility_1_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_1_address1;
 
-assign p_ZL15pre_eligibility_1_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_1_ce0;
+assign p_ZL15pre_eligibility_1_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_1_ce0;
 
-assign p_ZL15pre_eligibility_1_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_1_ce1;
+assign p_ZL15pre_eligibility_1_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_1_ce1;
 
-assign p_ZL15pre_eligibility_1_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_1_d1;
+assign p_ZL15pre_eligibility_1_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_1_d1;
 
-assign p_ZL15pre_eligibility_1_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_1_we1;
+assign p_ZL15pre_eligibility_1_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_1_we1;
 
-assign p_ZL15pre_eligibility_2_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_2_address0;
+assign p_ZL15pre_eligibility_2_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_2_address0;
 
-assign p_ZL15pre_eligibility_2_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_2_address1;
+assign p_ZL15pre_eligibility_2_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_2_address1;
 
-assign p_ZL15pre_eligibility_2_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_2_ce0;
+assign p_ZL15pre_eligibility_2_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_2_ce0;
 
-assign p_ZL15pre_eligibility_2_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_2_ce1;
+assign p_ZL15pre_eligibility_2_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_2_ce1;
 
-assign p_ZL15pre_eligibility_2_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_2_d1;
+assign p_ZL15pre_eligibility_2_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_2_d1;
 
-assign p_ZL15pre_eligibility_2_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_2_we1;
+assign p_ZL15pre_eligibility_2_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_2_we1;
 
-assign p_ZL15pre_eligibility_3_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_3_address0;
+assign p_ZL15pre_eligibility_3_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_3_address0;
 
-assign p_ZL15pre_eligibility_3_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_3_address1;
+assign p_ZL15pre_eligibility_3_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_3_address1;
 
-assign p_ZL15pre_eligibility_3_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_3_ce0;
+assign p_ZL15pre_eligibility_3_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_3_ce0;
 
-assign p_ZL15pre_eligibility_3_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_3_ce1;
+assign p_ZL15pre_eligibility_3_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_3_ce1;
 
-assign p_ZL15pre_eligibility_3_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_3_d1;
+assign p_ZL15pre_eligibility_3_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_3_d1;
 
-assign p_ZL15pre_eligibility_3_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_3_we1;
+assign p_ZL15pre_eligibility_3_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30_p_ZL15pre_eligibility_3_we1;
 
-assign p_ZL15pre_eligibility_4_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_4_address0;
+assign p_ZL16post_eligibility_0_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_0_address0;
 
-assign p_ZL15pre_eligibility_4_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_4_address1;
+assign p_ZL16post_eligibility_0_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_0_address1;
 
-assign p_ZL15pre_eligibility_4_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_4_ce0;
+assign p_ZL16post_eligibility_0_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_0_ce0;
 
-assign p_ZL15pre_eligibility_4_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_4_ce1;
+assign p_ZL16post_eligibility_0_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_0_ce1;
 
-assign p_ZL15pre_eligibility_4_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_4_d1;
+assign p_ZL16post_eligibility_0_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_0_d1;
 
-assign p_ZL15pre_eligibility_4_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_4_we1;
+assign p_ZL16post_eligibility_0_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_0_we1;
 
-assign p_ZL15pre_eligibility_5_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_5_address0;
+assign p_ZL16post_eligibility_1_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_1_address0;
 
-assign p_ZL15pre_eligibility_5_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_5_address1;
+assign p_ZL16post_eligibility_1_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_1_address1;
 
-assign p_ZL15pre_eligibility_5_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_5_ce0;
+assign p_ZL16post_eligibility_1_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_1_ce0;
 
-assign p_ZL15pre_eligibility_5_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_5_ce1;
+assign p_ZL16post_eligibility_1_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_1_ce1;
 
-assign p_ZL15pre_eligibility_5_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_5_d1;
+assign p_ZL16post_eligibility_1_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_1_d1;
 
-assign p_ZL15pre_eligibility_5_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_5_we1;
+assign p_ZL16post_eligibility_1_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_1_we1;
 
-assign p_ZL15pre_eligibility_6_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_6_address0;
+assign p_ZL16post_eligibility_2_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_2_address0;
 
-assign p_ZL15pre_eligibility_6_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_6_address1;
+assign p_ZL16post_eligibility_2_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_2_address1;
 
-assign p_ZL15pre_eligibility_6_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_6_ce0;
+assign p_ZL16post_eligibility_2_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_2_ce0;
 
-assign p_ZL15pre_eligibility_6_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_6_ce1;
+assign p_ZL16post_eligibility_2_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_2_ce1;
 
-assign p_ZL15pre_eligibility_6_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_6_d1;
+assign p_ZL16post_eligibility_2_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_2_d1;
 
-assign p_ZL15pre_eligibility_6_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_6_we1;
+assign p_ZL16post_eligibility_2_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_2_we1;
 
-assign p_ZL15pre_eligibility_7_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_7_address0;
+assign p_ZL16post_eligibility_3_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_3_address0;
 
-assign p_ZL15pre_eligibility_7_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_7_address1;
+assign p_ZL16post_eligibility_3_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_3_address1;
 
-assign p_ZL15pre_eligibility_7_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_7_ce0;
+assign p_ZL16post_eligibility_3_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_3_ce0;
 
-assign p_ZL15pre_eligibility_7_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_7_ce1;
+assign p_ZL16post_eligibility_3_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_3_ce1;
 
-assign p_ZL15pre_eligibility_7_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_7_d1;
+assign p_ZL16post_eligibility_3_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_3_d1;
 
-assign p_ZL15pre_eligibility_7_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_46_p_ZL15pre_eligibility_7_we1;
-
-assign p_ZL16post_eligibility_0_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_0_address0;
-
-assign p_ZL16post_eligibility_0_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_0_address1;
-
-assign p_ZL16post_eligibility_0_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_0_ce0;
-
-assign p_ZL16post_eligibility_0_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_0_ce1;
-
-assign p_ZL16post_eligibility_0_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_0_d1;
-
-assign p_ZL16post_eligibility_0_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_0_we1;
-
-assign p_ZL16post_eligibility_1_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_1_address0;
-
-assign p_ZL16post_eligibility_1_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_1_address1;
-
-assign p_ZL16post_eligibility_1_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_1_ce0;
-
-assign p_ZL16post_eligibility_1_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_1_ce1;
-
-assign p_ZL16post_eligibility_1_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_1_d1;
-
-assign p_ZL16post_eligibility_1_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_1_we1;
-
-assign p_ZL16post_eligibility_2_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_2_address0;
-
-assign p_ZL16post_eligibility_2_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_2_address1;
-
-assign p_ZL16post_eligibility_2_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_2_ce0;
-
-assign p_ZL16post_eligibility_2_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_2_ce1;
-
-assign p_ZL16post_eligibility_2_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_2_d1;
-
-assign p_ZL16post_eligibility_2_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_2_we1;
-
-assign p_ZL16post_eligibility_3_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_3_address0;
-
-assign p_ZL16post_eligibility_3_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_3_address1;
-
-assign p_ZL16post_eligibility_3_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_3_ce0;
-
-assign p_ZL16post_eligibility_3_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_3_ce1;
-
-assign p_ZL16post_eligibility_3_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_3_d1;
-
-assign p_ZL16post_eligibility_3_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_3_we1;
-
-assign p_ZL16post_eligibility_4_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_4_address0;
-
-assign p_ZL16post_eligibility_4_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_4_address1;
-
-assign p_ZL16post_eligibility_4_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_4_ce0;
-
-assign p_ZL16post_eligibility_4_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_4_ce1;
-
-assign p_ZL16post_eligibility_4_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_4_d1;
-
-assign p_ZL16post_eligibility_4_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_4_we1;
-
-assign p_ZL16post_eligibility_5_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_5_address0;
-
-assign p_ZL16post_eligibility_5_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_5_address1;
-
-assign p_ZL16post_eligibility_5_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_5_ce0;
-
-assign p_ZL16post_eligibility_5_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_5_ce1;
-
-assign p_ZL16post_eligibility_5_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_5_d1;
-
-assign p_ZL16post_eligibility_5_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_5_we1;
-
-assign p_ZL16post_eligibility_6_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_6_address0;
-
-assign p_ZL16post_eligibility_6_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_6_address1;
-
-assign p_ZL16post_eligibility_6_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_6_ce0;
-
-assign p_ZL16post_eligibility_6_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_6_ce1;
-
-assign p_ZL16post_eligibility_6_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_6_d1;
-
-assign p_ZL16post_eligibility_6_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_6_we1;
-
-assign p_ZL16post_eligibility_7_address0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_7_address0;
-
-assign p_ZL16post_eligibility_7_address1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_7_address1;
-
-assign p_ZL16post_eligibility_7_ce0 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_7_ce0;
-
-assign p_ZL16post_eligibility_7_ce1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_7_ce1;
-
-assign p_ZL16post_eligibility_7_d1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_7_d1;
-
-assign p_ZL16post_eligibility_7_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_66_p_ZL16post_eligibility_7_we1;
+assign p_ZL16post_eligibility_3_we1 = grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42_p_ZL16post_eligibility_3_we1;
 
 endmodule //snn_top_hls_decay_eligibility_traces

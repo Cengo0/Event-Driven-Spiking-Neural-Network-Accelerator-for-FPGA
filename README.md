@@ -31,12 +31,12 @@ python examples/pytorch/mnist_training_example.py
 ## Architecture
 
 ```
-ARM PS (PyTorch) <--AXI--> FPGA PL (256 LIF neurons + STDP + Router)
+ARM PS (PyTorch) <--AXI--> FPGA PL (512 LIF neurons + STDP + Router)
 ```
 
 **Resources** (Integrated build @ 100MHz):
-- LUT: 26.7K (50%), FF: 24.3K (23%), BRAM: 16.5 (12%), DSP: 38 (17%)
-- Timing: WNS +0.845ns ✅
+- LUT: 15,030 (28%), FF: 15,970 (15%), BRAM: 113 (81%), DSP: 29 (13%)
+- Timing: WNS +0.372ns ✅
 
 ## Usage
 
@@ -98,7 +98,15 @@ python examples/pytorch/mozafari_rstdp_faithful.py
 
 ## Recent Changes (2026-02-10)
 
-Fixed 8 critical bugs across all layers:
+### Pipelining & Scaling Optimization
+- **Neuron scaling**: MAX_NEURONS 256 → 512, MAX_SYNAPSES 65,536 → 262,144
+- **10-bit neuron IDs**: Spike ports widened from 8-bit to `neuron_id_t` (10-bit)
+- **HLS pipelining**: LTD/LTP loops achieve II=1, RSTDP_INNER UNROLL=4
+- **Memory partitioning**: Weight memory 8 banks, trace arrays factor=4
+- **RTL updated**: Width adapters removed, direct 10-bit connections
+- **Verified**: C-sim (5/5 PASS), HLS synthesis OK, Vivado build WNS +0.372ns
+
+### Previous Fixes
 - RTL: leak_rate encoding, spike timing, parameterization, mu parameter
 - HLS: neuron_id width, STDP algorithm alignment
 - Python: bit-accurate simulator, 3-layer network

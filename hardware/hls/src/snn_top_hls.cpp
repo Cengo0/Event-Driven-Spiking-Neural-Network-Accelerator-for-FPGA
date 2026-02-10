@@ -33,6 +33,7 @@ static bool encoder_temporal_fired[MAX_INPUT_CHANNELS];
 static ap_uint<32> encoder_temporal_start[MAX_INPUT_CHANNELS];
 static input_data_t encoder_frame;
 static bool encoder_frame_loaded = false;
+static ap_uint<16> latency_window_counter = 0;  // Module-scope for system reset access
 
 static ap_uint<16> encoder_lfsr_random() {
     #pragma HLS INLINE
@@ -117,13 +118,14 @@ static void encoder_latency(
     ap_uint<32> time,
     const encoder_config_t &config,
     hls::stream<encoder_axis_word_t> &fifo,
-    ap_uint<32> &counter
+    ap_uint<32> &counter,
+    bool window_reset  // Pre-computed flag: replaces time % latency_window == 0
 ) {
     #pragma HLS INLINE
     // Latency coding: higher intensity = earlier spike (shorter latency)
     // Uses config.latency_window as the time window for spike timing
     // Similar to snntorch.spikegen.latency: spike_time inversely proportional to intensity
-    if (time % config.latency_window == 0) {
+    if (window_reset) {
         encoder_temporal_fired[channel] = false;
         encoder_temporal_start[channel] = time;
     }
@@ -174,8 +176,21 @@ static void run_encoder_once(
     #pragma HLS INLINE off
     if (!enable || !encoder_frame_loaded) return;
 
+    // Pre-compute latency window reset flag ONCE before loop
+    // Eliminates expensive urem/modulo hardware from being replicated per-unroll
+    bool latency_window_reset = false;
+    if (config.encoding_type == ENC_LATENCY && config.latency_window > 0) {
+        if (latency_window_counter == 0) {
+            latency_window_reset = true;
+        }
+        latency_window_counter++;
+        if (latency_window_counter >= config.latency_window) {
+            latency_window_counter = 0;
+        }
+    }
+
     ENCODER_LOOP: for (int ch = 0; ch < MAX_INPUT_CHANNELS; ch++) {
-        #pragma HLS UNROLL factor=8
+        #pragma HLS UNROLL factor=2
         if (ch >= config.num_channels) continue;
         pixel_t pixel_value = encoder_frame.pixels[ch];
         
@@ -195,7 +210,7 @@ static void run_encoder_once(
                     encoder_rate_poisson(on_ch, on_val, time, config, fifo, counter);
                     break;
                 case ENC_LATENCY:
-                    encoder_latency(on_ch, on_val, time, config, fifo, counter);
+                    encoder_latency(on_ch, on_val, time, config, fifo, counter, latency_window_reset);
                     break;
                 case ENC_DELTA_SIGMA:
                     encoder_delta_sigma(on_ch, on_val, time, config, fifo, counter);
@@ -212,7 +227,7 @@ static void run_encoder_once(
                     encoder_rate_poisson(off_ch, off_val, time, config, fifo, counter);
                     break;
                 case ENC_LATENCY:
-                    encoder_latency(off_ch, off_val, time, config, fifo, counter);
+                    encoder_latency(off_ch, off_val, time, config, fifo, counter, latency_window_reset);
                     break;
                 case ENC_DELTA_SIGMA:
                     encoder_delta_sigma(off_ch, off_val, time, config, fifo, counter);
@@ -230,7 +245,7 @@ static void run_encoder_once(
                     encoder_rate_poisson(ch, pixel_value, time, config, fifo, counter);
                     break;
                 case ENC_LATENCY:
-                    encoder_latency(ch, pixel_value, time, config, fifo, counter);
+                    encoder_latency(ch, pixel_value, time, config, fifo, counter, latency_window_reset);
                     break;
                 case ENC_DELTA_SIGMA:
                     encoder_delta_sigma(ch, pixel_value, time, config, fifo, counter);
@@ -350,7 +365,7 @@ static void process_pre_spike_aer(
     // Mozafari rule: Δw = -a_minus * (w - w_min)^μ  (weight-dependent)
     // Matches stdp_engine.v: delta_w = (cfg_a_minus * (w - w_min)) >> 8
     LTD_LOOP: for (int j = 0; j < MAX_NEURONS; j++) {
-        #pragma HLS PIPELINE II=2
+        #pragma HLS PIPELINE II=1
         #pragma HLS UNROLL factor=4
         
         // Get decayed post-trace (lazy update)
@@ -401,8 +416,8 @@ static void process_post_spike_aer(
     // Mozafari rule: Δw = +a_plus * (w_max - w)^μ  (weight-dependent)
     // Matches stdp_engine.v: delta_w = (cfg_a_plus * (w_max - w)) >> 8
     LTP_LOOP: for (int i = 0; i < MAX_NEURONS; i++) {
-        #pragma HLS PIPELINE II=2
-        #pragma HLS UNROLL factor=4
+        #pragma HLS PIPELINE II=1
+        #pragma HLS UNROLL factor=2
         
         // Get decayed pre-trace (lazy update)
         neuron_trace_t pre_t = pre_traces[i];
@@ -463,6 +478,7 @@ static void apply_rstdp_reward(
         
         RSTDP_INNER: for (int j = 0; j < MAX_NEURONS; j++) {
             #pragma HLS PIPELINE II=1
+            #pragma HLS UNROLL factor=4
             
             ap_int<8> post_elig = post_eligibility[j];
             if (post_elig == 0) continue;  // Skip inactive post-neurons
@@ -499,7 +515,7 @@ static void decay_eligibility_traces(const learning_params_t &params) {
     // Decay pre-neuron eligibility traces
     DECAY_PRE: for (int i = 0; i < MAX_NEURONS; i++) {
         #pragma HLS PIPELINE II=1
-        #pragma HLS UNROLL factor=8
+        #pragma HLS UNROLL factor=4
         
         // Simple shift-based decay: trace = trace - (trace >> 3) ≈ 0.875
         ap_int<8> trace = pre_eligibility[i];
@@ -509,7 +525,7 @@ static void decay_eligibility_traces(const learning_params_t &params) {
     // Decay post-neuron eligibility traces
     DECAY_POST: for (int j = 0; j < MAX_NEURONS; j++) {
         #pragma HLS PIPELINE II=1
-        #pragma HLS UNROLL factor=8
+        #pragma HLS UNROLL factor=4
         
         ap_int<8> trace = post_eligibility[j];
         post_eligibility[j] = trace - (trace >> 3);
@@ -553,8 +569,8 @@ void snn_top_hls(
     // AXI4-Stream Spike Input (from PS)
     hls::stream<axis_spike_t> &s_axis_spikes,
 
-    // AXI4-Stream Raw Data Input (for on-chip encoder)
-    hls::stream<input_data_t> &s_axis_data,
+    // AXI4-Stream Raw Data Input (for on-chip encoder) - 32-bit streaming
+    hls::stream<axis_data_t> &s_axis_data,
     
     // AXI4-Stream Weight Write (for loading weights)
     hls::stream<axis_weight_t> &s_axis_weights,
@@ -570,13 +586,13 @@ void snn_top_hls(
     
     // Verilog Interface - Spike Input (to SNN core)
     ap_uint<1> &spike_in_valid,
-    ap_uint<8> &spike_in_neuron_id,
+    neuron_id_t &spike_in_neuron_id,
     ap_int<8> &spike_in_weight,
     ap_uint<1> spike_in_ready,
     
     // Verilog Interface - Spike Output (from SNN core)
     ap_uint<1> spike_out_valid,
-    ap_uint<8> spike_out_neuron_id,
+    neuron_id_t spike_out_neuron_id,
     ap_int<8> spike_out_weight,
     ap_uint<1> &spike_out_ready,
     
@@ -636,27 +652,28 @@ void snn_top_hls(
     //=========================================================================
     // Weight Memory - BRAM is more resource-efficient than LUTRAM for large arrays
     #pragma HLS BIND_STORAGE variable=weight_memory type=RAM_2P impl=BRAM
+    #pragma HLS ARRAY_PARTITION variable=weight_memory cyclic factor=2 dim=1
     #pragma HLS ARRAY_PARTITION variable=weight_memory cyclic factor=4 dim=2
     
     // Per-Neuron Eligibility (O(N+M) vs O(N*M)) - Major memory savings!
     #pragma HLS BIND_STORAGE variable=pre_eligibility type=RAM_2P impl=BRAM
-    #pragma HLS ARRAY_PARTITION variable=pre_eligibility cyclic factor=8
+    #pragma HLS ARRAY_PARTITION variable=pre_eligibility cyclic factor=4
     #pragma HLS BIND_STORAGE variable=post_eligibility type=RAM_2P impl=BRAM
-    #pragma HLS ARRAY_PARTITION variable=post_eligibility cyclic factor=8
+    #pragma HLS ARRAY_PARTITION variable=post_eligibility cyclic factor=4
     
     // Per-Neuron Traces for Lazy Update (includes timestamp)
     #pragma HLS BIND_STORAGE variable=pre_traces type=RAM_2P impl=BRAM
-    #pragma HLS ARRAY_PARTITION variable=pre_traces cyclic factor=8
+    #pragma HLS ARRAY_PARTITION variable=pre_traces cyclic factor=4
     #pragma HLS BIND_STORAGE variable=post_traces type=RAM_2P impl=BRAM
-    #pragma HLS ARRAY_PARTITION variable=post_traces cyclic factor=8
+    #pragma HLS ARRAY_PARTITION variable=post_traces cyclic factor=4
 
     // Encoder state
     #pragma HLS BIND_STORAGE variable=encoder_phase_acc type=RAM_2P impl=BRAM
-    #pragma HLS ARRAY_PARTITION variable=encoder_phase_acc cyclic factor=8
+    #pragma HLS ARRAY_PARTITION variable=encoder_phase_acc cyclic factor=2
     #pragma HLS BIND_STORAGE variable=encoder_temporal_fired type=RAM_2P impl=BRAM
-    #pragma HLS ARRAY_PARTITION variable=encoder_temporal_fired cyclic factor=8
+    #pragma HLS ARRAY_PARTITION variable=encoder_temporal_fired cyclic factor=2
     #pragma HLS BIND_STORAGE variable=encoder_temporal_start type=RAM_2P impl=BRAM
-    #pragma HLS ARRAY_PARTITION variable=encoder_temporal_start cyclic factor=8
+    #pragma HLS ARRAY_PARTITION variable=encoder_temporal_start cyclic factor=2
     
     //=========================================================================
     // Internal State
@@ -666,8 +683,8 @@ void snn_top_hls(
     static ap_uint<32> update_counter = 0;
     static bool initialized = false;
     static ap_uint<2> last_mode = MODE_INFERENCE;
-    static ap_uint<8> checkpoint_row = 0;
-    static ap_uint<8> checkpoint_col = 0;
+    static neuron_id_t checkpoint_row = 0;
+    static neuron_id_t checkpoint_col = 0;
     static ap_uint<32> encoder_spike_counter = 0;
     
     //=========================================================================
@@ -724,6 +741,7 @@ void snn_top_hls(
             #pragma HLS PIPELINE II=1
             encoder_phase_acc[i] = 0;
         }
+        latency_window_counter = 0;  // Reset encoder window counter
         
         // Initialize weights
         if (!initialized) {
@@ -743,9 +761,9 @@ void snn_top_hls(
     // Format: axis_weight_t.data[23:16] = weight, [15:8] = col, [7:0] = row
     if (weight_load_mode && !s_axis_weights.empty()) {
         axis_weight_t w_pkt = s_axis_weights.read();
-        ap_uint<8> row = w_pkt.data(7, 0);
-        ap_uint<8> col = w_pkt.data(15, 8);
-        weight_t weight_val = w_pkt.data(23, 16);
+        neuron_id_t row = w_pkt.data(9, 0);
+        neuron_id_t col = w_pkt.data(19, 10);
+        weight_t weight_val = w_pkt.data(27, 20);
         
         if (row < MAX_NEURONS && col < MAX_NEURONS) {
             weight_memory[row][col] = weight_val;
@@ -766,9 +784,19 @@ void snn_top_hls(
     threshold_out = threshold;
     leak_rate_out = leak_rate;
     
-    // Preload encoder frame if requested
+    // Preload encoder frame via 32-bit AXI-Stream (4 pixels per beat, 196 beats)
     if (encoder_enable && !encoder_frame_loaded && !s_axis_data.empty()) {
-        encoder_frame = s_axis_data.read();
+        LOAD_FRAME: for (int i = 0; i < FRAME_LOAD_BEATS; i++) {
+            #pragma HLS PIPELINE II=1
+            if (s_axis_data.empty()) break;
+            axis_data_t beat = s_axis_data.read();
+            int base = i * 4;
+            if (base < MAX_INPUT_CHANNELS) encoder_frame.pixels[base] = beat.data(7, 0);
+            if (base+1 < MAX_INPUT_CHANNELS) encoder_frame.pixels[base+1] = beat.data(15, 8);
+            if (base+2 < MAX_INPUT_CHANNELS) encoder_frame.pixels[base+2] = beat.data(23, 16);
+            if (base+3 < MAX_INPUT_CHANNELS) encoder_frame.pixels[base+3] = beat.data(31, 24);
+            if (beat.last) break;
+        }
         encoder_frame_loaded = true;
         encoder_reset_temporal_state(timestamp);
     }
@@ -869,9 +897,9 @@ void snn_top_hls(
         if ((weight_read_mode || checkpoint_mode) && !m_axis_weights.full()) {
             axis_weight_t w_pkt;
             w_pkt.data = 0;
-            w_pkt.data(7, 0) = checkpoint_row;
-            w_pkt.data(15, 8) = checkpoint_col;
-            w_pkt.data(23, 16) = weight_memory[checkpoint_row][checkpoint_col];
+            w_pkt.data(9, 0) = checkpoint_row;
+            w_pkt.data(19, 10) = checkpoint_col;
+            w_pkt.data(27, 20) = weight_memory[checkpoint_row][checkpoint_col];
             w_pkt.keep = 0xF;
             w_pkt.strb = 0xF;
             w_pkt.last = (checkpoint_row == MAX_NEURONS-1 && checkpoint_col == MAX_NEURONS-1) ? 1 : 0;

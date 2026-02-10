@@ -1,0 +1,10 @@
+{
+  "name": "hls_csim_output",
+  "type": "HLS",
+  "configuration": {
+    "componentType": "HLS",
+    "configFiles": ["..\/hls_csim_config.cfg"],
+    "work_dir": ".",
+    "csyn_args": "--part=xc7z020clg400-1 --hls.csim=run"
+  }
+}

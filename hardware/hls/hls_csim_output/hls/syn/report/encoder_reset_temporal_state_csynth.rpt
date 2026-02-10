@@ -1,0 +1,149 @@
+
+
+================================================================
+== Vitis HLS Report for 'encoder_reset_temporal_state'
+================================================================
+* Date:           Tue Feb 10 18:59:25 2026
+
+* Version:        2025.2 (Build 6295257 on Nov 14 2025)
+* Project:        hls_csim_output
+* Solution:       hls (Vivado IP Flow Target)
+* Product family: zynq
+* Target device:  xc7z020-clg400-1
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+----------+----------+------------+
+    |  Clock |  Target  | Estimated| Uncertainty|
+    +--------+----------+----------+------------+
+    |ap_clk  |  10.00 ns|  6.573 ns|     2.70 ns|
+    +--------+----------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+----------+----------+-----+-----+-------------------+
+    |  Latency (cycles) |  Latency (absolute) |  Interval |      Pipeline     |
+    |   min   |   max   |    min   |    max   | min | max |        Type       |
+    +---------+---------+----------+----------+-----+-----+-------------------+
+    |      786|      786|  7.860 us|  7.860 us|    0|    0|  loop pipeline stp|
+    +---------+---------+----------+----------+-----+-----+-------------------+
+
+    + Detail: 
+        * Instance: 
+        N/A
+
+        * Loop: 
+        +-------------------+---------+---------+----------+-----------+-----------+------+----------+
+        |                   |  Latency (cycles) | Iteration|  Initiation Interval  | Trip |          |
+        |     Loop Name     |   min   |   max   |  Latency |  achieved |   target  | Count| Pipelined|
+        +-------------------+---------+---------+----------+-----------+-----------+------+----------+
+        |- VITIS_LOOP_48_1  |      784|      784|         1|          1|          1|   784|       yes|
+        +-------------------+---------+---------+----------+-----------+-----------+------+----------+
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++-----------------+---------+-----+--------+-------+-----+
+|       Name      | BRAM_18K| DSP |   FF   |  LUT  | URAM|
++-----------------+---------+-----+--------+-------+-----+
+|DSP              |        -|    -|       -|      -|    -|
+|Expression       |        -|    -|       0|     26|    -|
+|FIFO             |        -|    -|       -|      -|    -|
+|Instance         |        -|    -|       -|      -|    -|
+|Memory           |        -|    -|       -|      -|    -|
+|Multiplexer      |        -|    -|       0|     27|    -|
+|Register         |        -|    -|      12|      -|    -|
++-----------------+---------+-----+--------+-------+-----+
+|Total            |        0|    0|      12|     53|    0|
++-----------------+---------+-----+--------+-------+-----+
+|Available        |      280|  220|  106400|  53200|    0|
++-----------------+---------+-----+--------+-------+-----+
+|Utilization (%)  |        0|    0|      ~0|     ~0|    0|
++-----------------+---------+-----+--------+-------+-----+
+
++ Detail: 
+    * Instance: 
+    N/A
+
+    * DSP: 
+    N/A
+
+    * Memory: 
+    N/A
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +---------------------+----------+----+---+----+------------+------------+
+    |    Variable Name    | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +---------------------+----------+----+---+----+------------+------------+
+    |add_ln48_fu_148_p2   |         +|   0|  0|  13|          10|           1|
+    |icmp_ln48_fu_142_p2  |      icmp|   0|  0|  13|          10|           9|
+    +---------------------+----------+----+---+----+------------+------------+
+    |Total                |          |   0|  0|  26|          20|          10|
+    +---------------------+----------+----+---+----+------------+------------+
+
+    * Multiplexer: 
+    +----------------------+----+-----------+-----+-----------+
+    |         Name         | LUT| Input Size| Bits| Total Bits|
+    +----------------------+----+-----------+-----+-----------+
+    |ap_done_int           |   9|          2|    1|          2|
+    |ap_sig_allocacmp_i_6  |   9|          2|   10|         20|
+    |i_fu_52               |   9|          2|   10|         20|
+    +----------------------+----+-----------+-----+-----------+
+    |Total                 |  27|          6|   21|         42|
+    +----------------------+----+-----------+-----+-----------+
+
+    * Register: 
+    +-------------+----+----+-----+-----------+
+    |     Name    | FF | LUT| Bits| Const Bits|
+    +-------------+----+----+-----+-----------+
+    |ap_CS_fsm    |   1|   0|    1|          0|
+    |ap_done_reg  |   1|   0|    1|          0|
+    |i_fu_52      |  10|   0|   10|          0|
+    +-------------+----+----+-----+-----------+
+    |Total        |  12|   0|   12|          0|
+    +-------------+----+----+-----+-----------+
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++-----------------------------------------+-----+-----+------------+--------------------------------+--------------+
+|                RTL Ports                | Dir | Bits|  Protocol  |          Source Object         |    C Type    |
++-----------------------------------------+-----+-----+------------+--------------------------------+--------------+
+|ap_clk                                   |   in|    1|  ap_ctrl_hs|    encoder_reset_temporal_state|  return value|
+|ap_rst                                   |   in|    1|  ap_ctrl_hs|    encoder_reset_temporal_state|  return value|
+|ap_start                                 |   in|    1|  ap_ctrl_hs|    encoder_reset_temporal_state|  return value|
+|ap_done                                  |  out|    1|  ap_ctrl_hs|    encoder_reset_temporal_state|  return value|
+|ap_idle                                  |  out|    1|  ap_ctrl_hs|    encoder_reset_temporal_state|  return value|
+|ap_ready                                 |  out|    1|  ap_ctrl_hs|    encoder_reset_temporal_state|  return value|
+|now_val                                  |   in|   32|     ap_none|                         now_val|        scalar|
+|p_ZL22encoder_temporal_fired_0_address1  |  out|    9|   ap_memory|  p_ZL22encoder_temporal_fired_0|         array|
+|p_ZL22encoder_temporal_fired_0_ce1       |  out|    1|   ap_memory|  p_ZL22encoder_temporal_fired_0|         array|
+|p_ZL22encoder_temporal_fired_0_we1       |  out|    1|   ap_memory|  p_ZL22encoder_temporal_fired_0|         array|
+|p_ZL22encoder_temporal_fired_0_d1        |  out|    1|   ap_memory|  p_ZL22encoder_temporal_fired_0|         array|
+|p_ZL22encoder_temporal_start_0_address1  |  out|    9|   ap_memory|  p_ZL22encoder_temporal_start_0|         array|
+|p_ZL22encoder_temporal_start_0_ce1       |  out|    1|   ap_memory|  p_ZL22encoder_temporal_start_0|         array|
+|p_ZL22encoder_temporal_start_0_we1       |  out|    1|   ap_memory|  p_ZL22encoder_temporal_start_0|         array|
+|p_ZL22encoder_temporal_start_0_d1        |  out|   32|   ap_memory|  p_ZL22encoder_temporal_start_0|         array|
+|p_ZL22encoder_temporal_fired_1_address1  |  out|    9|   ap_memory|  p_ZL22encoder_temporal_fired_1|         array|
+|p_ZL22encoder_temporal_fired_1_ce1       |  out|    1|   ap_memory|  p_ZL22encoder_temporal_fired_1|         array|
+|p_ZL22encoder_temporal_fired_1_we1       |  out|    1|   ap_memory|  p_ZL22encoder_temporal_fired_1|         array|
+|p_ZL22encoder_temporal_fired_1_d1        |  out|    1|   ap_memory|  p_ZL22encoder_temporal_fired_1|         array|
+|p_ZL22encoder_temporal_start_1_address1  |  out|    9|   ap_memory|  p_ZL22encoder_temporal_start_1|         array|
+|p_ZL22encoder_temporal_start_1_ce1       |  out|    1|   ap_memory|  p_ZL22encoder_temporal_start_1|         array|
+|p_ZL22encoder_temporal_start_1_we1       |  out|    1|   ap_memory|  p_ZL22encoder_temporal_start_1|         array|
+|p_ZL22encoder_temporal_start_1_d1        |  out|   32|   ap_memory|  p_ZL22encoder_temporal_start_1|         array|
++-----------------------------------------+-----+-----+------------+--------------------------------+--------------+
+

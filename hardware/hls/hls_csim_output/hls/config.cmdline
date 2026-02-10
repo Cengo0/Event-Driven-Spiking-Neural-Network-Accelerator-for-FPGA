@@ -1,0 +1,7 @@
+part=xc7z020clg400-1
+relativeroot=/mnt/workspace/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls
+original_argv=-c --mode hls --part xc7z020clg400-1 --work_dir ./hls_csim_output --config hls_csim_config.cfg --hls.csim run 
+
+[hls]
+csim=run
+

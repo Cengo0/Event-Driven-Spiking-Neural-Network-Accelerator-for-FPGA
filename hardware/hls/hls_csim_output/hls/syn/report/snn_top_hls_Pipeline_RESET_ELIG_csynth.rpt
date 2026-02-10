@@ -1,0 +1,148 @@
+
+
+================================================================
+== Vitis HLS Report for 'snn_top_hls_Pipeline_RESET_ELIG'
+================================================================
+* Date:           Tue Feb 10 18:59:25 2026
+
+* Version:        2025.2 (Build 6295257 on Nov 14 2025)
+* Project:        hls_csim_output
+* Solution:       hls (Vivado IP Flow Target)
+* Product family: zynq
+* Target device:  xc7z020-clg400-1
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+----------+----------+------------+
+    |  Clock |  Target  | Estimated| Uncertainty|
+    +--------+----------+----------+------------+
+    |ap_clk  |  10.00 ns|  6.665 ns|     2.70 ns|
+    +--------+----------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+----------+----------+-----+-----+-------------------+
+    |  Latency (cycles) |  Latency (absolute) |  Interval |      Pipeline     |
+    |   min   |   max   |    min   |    max   | min | max |        Type       |
+    +---------+---------+----------+----------+-----+-----+-------------------+
+    |      258|      258|  2.580 us|  2.580 us|    0|    0|  loop pipeline stp|
+    +---------+---------+----------+----------+-----+-----+-------------------+
+
+    + Detail: 
+        * Instance: 
+        N/A
+
+        * Loop: 
+        +--------------+---------+---------+----------+-----------+-----------+------+----------+
+        |              |  Latency (cycles) | Iteration|  Initiation Interval  | Trip |          |
+        |   Loop Name  |   min   |   max   |  Latency |  achieved |   target  | Count| Pipelined|
+        +--------------+---------+---------+----------+-----------+-----------+------+----------+
+        |- RESET_ELIG  |      256|      256|         1|          1|          1|   256|       yes|
+        +--------------+---------+---------+----------+-----------+-----------+------+----------+
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++-----------------+---------+-----+--------+-------+-----+
+|       Name      | BRAM_18K| DSP |   FF   |  LUT  | URAM|
++-----------------+---------+-----+--------+-------+-----+
+|DSP              |        -|    -|       -|      -|    -|
+|Expression       |        -|    -|       0|     27|    -|
+|FIFO             |        -|    -|       -|      -|    -|
+|Instance         |        -|    -|       -|      -|    -|
+|Memory           |        -|    -|       -|      -|    -|
+|Multiplexer      |        -|    -|       0|     27|    -|
+|Register         |        -|    -|      11|      -|    -|
++-----------------+---------+-----+--------+-------+-----+
+|Total            |        0|    0|      11|     54|    0|
++-----------------+---------+-----+--------+-------+-----+
+|Available        |      280|  220|  106400|  53200|    0|
++-----------------+---------+-----+--------+-------+-----+
+|Utilization (%)  |        0|    0|      ~0|     ~0|    0|
++-----------------+---------+-----+--------+-------+-----+
+
++ Detail: 
+    * Instance: 
+    N/A
+
+    * DSP: 
+    N/A
+
+    * Memory: 
+    N/A
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +----------------------+----------+----+---+----+------------+------------+
+    |     Variable Name    | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +----------------------+----------+----+---+----+------------+------------+
+    |add_ln723_fu_140_p2   |         +|   0|  0|  14|           9|           1|
+    |icmp_ln723_fu_134_p2  |      icmp|   0|  0|  13|           9|          10|
+    +----------------------+----------+----+---+----+------------+------------+
+    |Total                 |          |   0|  0|  27|          18|          11|
+    +----------------------+----------+----+---+----+------------+------------+
+
+    * Multiplexer: 
+    +----------------------+----+-----------+-----+-----------+
+    |         Name         | LUT| Input Size| Bits| Total Bits|
+    +----------------------+----+-----------+-----+-----------+
+    |ap_done_int           |   9|          2|    1|          2|
+    |ap_sig_allocacmp_i_3  |   9|          2|    9|         18|
+    |i_fu_50               |   9|          2|    9|         18|
+    +----------------------+----+-----------+-----+-----------+
+    |Total                 |  27|          6|   19|         38|
+    +----------------------+----+-----------+-----+-----------+
+
+    * Register: 
+    +-------------+---+----+-----+-----------+
+    |     Name    | FF| LUT| Bits| Const Bits|
+    +-------------+---+----+-----+-----------+
+    |ap_CS_fsm    |  1|   0|    1|          0|
+    |ap_done_reg  |  1|   0|    1|          0|
+    |i_fu_50      |  9|   0|    9|          0|
+    +-------------+---+----+-----+-----------+
+    |Total        | 11|   0|   11|          0|
+    +-------------+---+----+-----+-----------+
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++-----------------------------------+-----+-----+------------+---------------------------------+--------------+
+|             RTL Ports             | Dir | Bits|  Protocol  |          Source Object          |    C Type    |
++-----------------------------------+-----+-----+------------+---------------------------------+--------------+
+|ap_clk                             |   in|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_RESET_ELIG|  return value|
+|ap_rst                             |   in|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_RESET_ELIG|  return value|
+|ap_start                           |   in|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_RESET_ELIG|  return value|
+|ap_done                            |  out|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_RESET_ELIG|  return value|
+|ap_idle                            |  out|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_RESET_ELIG|  return value|
+|ap_ready                           |  out|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_RESET_ELIG|  return value|
+|p_ZL15pre_eligibility_0_address1   |  out|    7|   ap_memory|          p_ZL15pre_eligibility_0|         array|
+|p_ZL15pre_eligibility_0_ce1        |  out|    1|   ap_memory|          p_ZL15pre_eligibility_0|         array|
+|p_ZL15pre_eligibility_0_we1        |  out|    1|   ap_memory|          p_ZL15pre_eligibility_0|         array|
+|p_ZL15pre_eligibility_0_d1         |  out|    8|   ap_memory|          p_ZL15pre_eligibility_0|         array|
+|p_ZL16post_eligibility_0_address1  |  out|    7|   ap_memory|         p_ZL16post_eligibility_0|         array|
+|p_ZL16post_eligibility_0_ce1       |  out|    1|   ap_memory|         p_ZL16post_eligibility_0|         array|
+|p_ZL16post_eligibility_0_we1       |  out|    1|   ap_memory|         p_ZL16post_eligibility_0|         array|
+|p_ZL16post_eligibility_0_d1        |  out|    8|   ap_memory|         p_ZL16post_eligibility_0|         array|
+|p_ZL15pre_eligibility_1_address1   |  out|    7|   ap_memory|          p_ZL15pre_eligibility_1|         array|
+|p_ZL15pre_eligibility_1_ce1        |  out|    1|   ap_memory|          p_ZL15pre_eligibility_1|         array|
+|p_ZL15pre_eligibility_1_we1        |  out|    1|   ap_memory|          p_ZL15pre_eligibility_1|         array|
+|p_ZL15pre_eligibility_1_d1         |  out|    8|   ap_memory|          p_ZL15pre_eligibility_1|         array|
+|p_ZL16post_eligibility_1_address1  |  out|    7|   ap_memory|         p_ZL16post_eligibility_1|         array|
+|p_ZL16post_eligibility_1_ce1       |  out|    1|   ap_memory|         p_ZL16post_eligibility_1|         array|
+|p_ZL16post_eligibility_1_we1       |  out|    1|   ap_memory|         p_ZL16post_eligibility_1|         array|
+|p_ZL16post_eligibility_1_d1        |  out|    8|   ap_memory|         p_ZL16post_eligibility_1|         array|
++-----------------------------------+-----+-----+------------+---------------------------------+--------------+
+

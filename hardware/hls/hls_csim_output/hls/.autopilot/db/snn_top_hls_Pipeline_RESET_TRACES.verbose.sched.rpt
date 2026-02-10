@@ -1,0 +1,159 @@
+
+
+================================================================
+== Vitis HLS Report for 'snn_top_hls_Pipeline_RESET_TRACES'
+================================================================
+* Date:           Tue Feb 10 18:59:24 2026
+
+* Version:        2025.2 (Build 6295257 on Nov 14 2025)
+* Project:        hls_csim_output
+* Solution:       hls (Vivado IP Flow Target)
+* Product family: zynq
+* Target device:  xc7z020-clg400-1
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+----------+----------+------------+
+    |  Clock |  Target  | Estimated| Uncertainty|
+    +--------+----------+----------+------------+
+    |ap_clk  |  10.00 ns|  6.665 ns|     2.70 ns|
+    +--------+----------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+----------+----------+-----+-----+-------------------+
+    |  Latency (cycles) |  Latency (absolute) |  Interval |      Pipeline     |
+    |   min   |   max   |    min   |    max   | min | max |        Type       |
+    +---------+---------+----------+----------+-----+-----+-------------------+
+    |      258|      258|  2.580 us|  2.580 us|    0|    0|  loop pipeline stp|
+    +---------+---------+----------+----------+-----+-----+-------------------+
+
+    + Detail: 
+        * Instance: 
+        N/A
+
+        * Loop: 
+        +----------------+---------+---------+----------+-----------+-----------+------+----------+
+        |                |  Latency (cycles) | Iteration|  Initiation Interval  | Trip |          |
+        |    Loop Name   |   min   |   max   |  Latency |  achieved |   target  | Count| Pipelined|
+        +----------------+---------+---------+----------+-----------+-----------+------+----------+
+        |- RESET_TRACES  |      256|      256|         1|          1|          1|   256|       yes|
+        +----------------+---------+---------+----------+-----------+-----------+------+----------+
+
+============================================================
++ Verbose Summary: Synthesis Manager
+============================================================
+InlineROM: 1
+ExposeGlobal: 0
+============================================================
++ Verbose Summary: CDFG Model
+============================================================
+IsTopModel: 0
+ResetActiveHigh: 1
+IsCombinational: 0
+IsDatapathOnly: 0
+HasWiredReturn: 1
+HasMFsm: 2
+HasVarLatency: 1
+IsPipeline: 0
+IsRtlPipelined: 0
+IsInstanceOverlapped: 0
+IsDontTouch: 0
+HasImplIP: 0
+IsGatedGlobalClock: 0
+
++ Individual pipeline summary: 
+  * Pipeline-0: initiation interval (II) = 1, depth = 1
+
+
+============================================================
++ Verbose Summary: Schedule
+============================================================
+* Number of FSM states : 1
+* Pipeline : 1
+  Pipeline-0 : II = 1, D = 1, States = { 1 }
+* Dataflow Pipeline: 0
+
+* FSM state transitions: 
+1 --> 
+
+* FSM state operations: 
+
+State 1 <SV = 0> <Delay = 6.66>
+ST_1 : Operation 4 [1/1] (0.00ns)   --->   "%i_1 = alloca i32 1" [src/snn_top_hls.cpp:730]   --->   Operation 4 'alloca' 'i_1' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 5 [1/1] (0.00ns)   --->   "%specmemcore_ln0 = specmemcore void @_ssdm_op_SpecMemCore, i16 %post_traces_last_spike_time_0, i64 666, i64 22, i64 18446744073709551615, i1 0"   --->   Operation 5 'specmemcore' 'specmemcore_ln0' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 6 [1/1] (0.00ns)   --->   "%specmemcore_ln0 = specmemcore void @_ssdm_op_SpecMemCore, i16 %post_traces_last_spike_time_1, i64 666, i64 22, i64 18446744073709551615, i1 0"   --->   Operation 6 'specmemcore' 'specmemcore_ln0' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 7 [1/1] (0.00ns)   --->   "%specmemcore_ln0 = specmemcore void @_ssdm_op_SpecMemCore, i8 %post_traces_trace_0, i64 666, i64 22, i64 18446744073709551615, i1 0"   --->   Operation 7 'specmemcore' 'specmemcore_ln0' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 8 [1/1] (0.00ns)   --->   "%specmemcore_ln0 = specmemcore void @_ssdm_op_SpecMemCore, i8 %post_traces_trace_1, i64 666, i64 22, i64 18446744073709551615, i1 0"   --->   Operation 8 'specmemcore' 'specmemcore_ln0' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 9 [1/1] (0.00ns)   --->   "%specmemcore_ln0 = specmemcore void @_ssdm_op_SpecMemCore, i16 %pre_traces_last_spike_time_0, i64 666, i64 22, i64 18446744073709551615, i1 0"   --->   Operation 9 'specmemcore' 'specmemcore_ln0' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 10 [1/1] (0.00ns)   --->   "%specmemcore_ln0 = specmemcore void @_ssdm_op_SpecMemCore, i16 %pre_traces_last_spike_time_1, i64 666, i64 22, i64 18446744073709551615, i1 0"   --->   Operation 10 'specmemcore' 'specmemcore_ln0' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 11 [1/1] (0.00ns)   --->   "%specmemcore_ln0 = specmemcore void @_ssdm_op_SpecMemCore, i8 %pre_traces_trace_0, i64 666, i64 22, i64 18446744073709551615, i1 0"   --->   Operation 11 'specmemcore' 'specmemcore_ln0' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 12 [1/1] (0.00ns)   --->   "%specmemcore_ln0 = specmemcore void @_ssdm_op_SpecMemCore, i8 %pre_traces_trace_1, i64 666, i64 22, i64 18446744073709551615, i1 0"   --->   Operation 12 'specmemcore' 'specmemcore_ln0' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 13 [1/1] (1.58ns)   --->   "%store_ln730 = store i9 0, i9 %i_1" [src/snn_top_hls.cpp:730]   --->   Operation 13 'store' 'store_ln730' <Predicate = true> <Delay = 1.58>
+ST_1 : Operation 14 [1/1] (0.00ns)   --->   "%br_ln0 = br void %for.inc82"   --->   Operation 14 'br' 'br_ln0' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 15 [1/1] (0.00ns)   --->   "%i = load i9 %i_1" [src/snn_top_hls.cpp:730]   --->   Operation 15 'load' 'i' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 16 [1/1] (1.82ns)   --->   "%icmp_ln730 = icmp_eq  i9 %i, i9 256" [src/snn_top_hls.cpp:730]   --->   Operation 16 'icmp' 'icmp_ln730' <Predicate = true> <Delay = 1.82> <CoreInst = "Cmp">   --->   Core 9 'Cmp' <Latency = 0> <II = 1> <Delay = 1.82> <FuncUnit> <Opcode : 'seteq' 'setne' 'setle' 'setge' 'setlt' 'setgt'> <InPorts = 2> <OutPorts = 1>
+ST_1 : Operation 17 [1/1] (1.82ns)   --->   "%add_ln730 = add i9 %i, i9 1" [src/snn_top_hls.cpp:730]   --->   Operation 17 'add' 'add_ln730' <Predicate = true> <Delay = 1.82> <CoreInst = "Adder">   --->   Core 1 'Adder' <Latency = 0> <II = 1> <Delay = 1.82> <FuncUnit> <Opcode : 'add' 'sub'> <InPorts = 2> <OutPorts = 1>
+ST_1 : Operation 18 [1/1] (0.00ns)   --->   "%br_ln730 = br i1 %icmp_ln730, void %for.inc82.split, void %for.inc93.preheader.exitStub" [src/snn_top_hls.cpp:730]   --->   Operation 18 'br' 'br_ln730' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 19 [1/1] (0.00ns)   --->   "%trunc_ln730 = trunc i9 %i" [src/snn_top_hls.cpp:730]   --->   Operation 19 'trunc' 'trunc_ln730' <Predicate = (!icmp_ln730)> <Delay = 0.00>
+ST_1 : Operation 20 [1/1] (0.00ns)   --->   "%specpipeline_ln731 = specpipeline void @_ssdm_op_SpecPipeline, i32 1, i32 0, i32 0, i32 0, i32 4294967295, void @empty_3" [src/snn_top_hls.cpp:731]   --->   Operation 20 'specpipeline' 'specpipeline_ln731' <Predicate = (!icmp_ln730)> <Delay = 0.00>
+ST_1 : Operation 21 [1/1] (0.00ns)   --->   "%speclooptripcount_ln732 = speclooptripcount void @_ssdm_op_SpecLoopTripCount, i64 256, i64 256, i64 256" [src/snn_top_hls.cpp:732]   --->   Operation 21 'speclooptripcount' 'speclooptripcount_ln732' <Predicate = (!icmp_ln730)> <Delay = 0.00>
+ST_1 : Operation 22 [1/1] (0.00ns)   --->   "%specloopname_ln730 = specloopname void @_ssdm_op_SpecLoopName, void @empty_16" [src/snn_top_hls.cpp:730]   --->   Operation 22 'specloopname' 'specloopname_ln730' <Predicate = (!icmp_ln730)> <Delay = 0.00>
+ST_1 : Operation 23 [1/1] (0.00ns)   --->   "%lshr_ln1 = partselect i7 @_ssdm_op_PartSelect.i7.i9.i32.i32, i9 %i, i32 1, i32 7" [src/snn_top_hls.cpp:732]   --->   Operation 23 'partselect' 'lshr_ln1' <Predicate = (!icmp_ln730)> <Delay = 0.00>
+ST_1 : Operation 24 [1/1] (0.00ns)   --->   "%zext_ln732 = zext i7 %lshr_ln1" [src/snn_top_hls.cpp:732]   --->   Operation 24 'zext' 'zext_ln732' <Predicate = (!icmp_ln730)> <Delay = 0.00>
+ST_1 : Operation 25 [1/1] (0.00ns)   --->   "%pre_traces_trace_0_addr = getelementptr i8 %pre_traces_trace_0, i64 0, i64 %zext_ln732" [src/snn_top_hls.cpp:732]   --->   Operation 25 'getelementptr' 'pre_traces_trace_0_addr' <Predicate = (!icmp_ln730)> <Delay = 0.00>
+ST_1 : Operation 26 [1/1] (0.00ns)   --->   "%pre_traces_trace_1_addr = getelementptr i8 %pre_traces_trace_1, i64 0, i64 %zext_ln732" [src/snn_top_hls.cpp:732]   --->   Operation 26 'getelementptr' 'pre_traces_trace_1_addr' <Predicate = (!icmp_ln730)> <Delay = 0.00>
+ST_1 : Operation 27 [1/1] (0.00ns)   --->   "%pre_traces_last_spike_time_0_addr = getelementptr i16 %pre_traces_last_spike_time_0, i64 0, i64 %zext_ln732" [src/snn_top_hls.cpp:733]   --->   Operation 27 'getelementptr' 'pre_traces_last_spike_time_0_addr' <Predicate = (!icmp_ln730)> <Delay = 0.00>
+ST_1 : Operation 28 [1/1] (0.00ns)   --->   "%pre_traces_last_spike_time_1_addr = getelementptr i16 %pre_traces_last_spike_time_1, i64 0, i64 %zext_ln732" [src/snn_top_hls.cpp:733]   --->   Operation 28 'getelementptr' 'pre_traces_last_spike_time_1_addr' <Predicate = (!icmp_ln730)> <Delay = 0.00>
+ST_1 : Operation 29 [1/1] (0.00ns)   --->   "%post_traces_trace_0_addr = getelementptr i8 %post_traces_trace_0, i64 0, i64 %zext_ln732" [src/snn_top_hls.cpp:734]   --->   Operation 29 'getelementptr' 'post_traces_trace_0_addr' <Predicate = (!icmp_ln730)> <Delay = 0.00>
+ST_1 : Operation 30 [1/1] (0.00ns)   --->   "%post_traces_trace_1_addr = getelementptr i8 %post_traces_trace_1, i64 0, i64 %zext_ln732" [src/snn_top_hls.cpp:734]   --->   Operation 30 'getelementptr' 'post_traces_trace_1_addr' <Predicate = (!icmp_ln730)> <Delay = 0.00>
+ST_1 : Operation 31 [1/1] (0.00ns)   --->   "%post_traces_last_spike_time_0_addr = getelementptr i16 %post_traces_last_spike_time_0, i64 0, i64 %zext_ln732" [src/snn_top_hls.cpp:735]   --->   Operation 31 'getelementptr' 'post_traces_last_spike_time_0_addr' <Predicate = (!icmp_ln730)> <Delay = 0.00>
+ST_1 : Operation 32 [1/1] (0.00ns)   --->   "%post_traces_last_spike_time_1_addr = getelementptr i16 %post_traces_last_spike_time_1, i64 0, i64 %zext_ln732" [src/snn_top_hls.cpp:735]   --->   Operation 32 'getelementptr' 'post_traces_last_spike_time_1_addr' <Predicate = (!icmp_ln730)> <Delay = 0.00>
+ST_1 : Operation 33 [1/1] (0.00ns)   --->   "%br_ln732 = br i1 %trunc_ln730, void %last_spike_time8112.case.0, void %last_spike_time8112.case.1" [src/snn_top_hls.cpp:732]   --->   Operation 33 'br' 'br_ln732' <Predicate = (!icmp_ln730)> <Delay = 0.00>
+ST_1 : Operation 34 [1/1] ( I:3.25ns O:3.25ns )   --->   "%store_ln732 = store i8 0, i7 %pre_traces_trace_0_addr" [src/snn_top_hls.cpp:732]   --->   Operation 34 'store' 'store_ln732' <Predicate = (!icmp_ln730 & !trunc_ln730)> <Delay = 3.25> <CoreInst = "RAM_2P_BRAM">   --->   Core 90 'RAM_2P_BRAM' <Latency = 1> <II = 1> <Delay = 3.25> <Storage> <Opcode : 'load' 'store'> <Ports = 2> <Width = 8> <Depth = 128> <RAM>
+ST_1 : Operation 35 [1/1] ( I:3.25ns O:3.25ns )   --->   "%store_ln733 = store i16 0, i7 %pre_traces_last_spike_time_0_addr" [src/snn_top_hls.cpp:733]   --->   Operation 35 'store' 'store_ln733' <Predicate = (!icmp_ln730 & !trunc_ln730)> <Delay = 3.25> <CoreInst = "RAM_2P_BRAM">   --->   Core 90 'RAM_2P_BRAM' <Latency = 1> <II = 1> <Delay = 3.25> <Storage> <Opcode : 'load' 'store'> <Ports = 2> <Width = 16> <Depth = 128> <RAM>
+ST_1 : Operation 36 [1/1] ( I:3.25ns O:3.25ns )   --->   "%store_ln734 = store i8 0, i7 %post_traces_trace_0_addr" [src/snn_top_hls.cpp:734]   --->   Operation 36 'store' 'store_ln734' <Predicate = (!icmp_ln730 & !trunc_ln730)> <Delay = 3.25> <CoreInst = "RAM_2P_BRAM">   --->   Core 90 'RAM_2P_BRAM' <Latency = 1> <II = 1> <Delay = 3.25> <Storage> <Opcode : 'load' 'store'> <Ports = 2> <Width = 8> <Depth = 128> <RAM>
+ST_1 : Operation 37 [1/1] ( I:3.25ns O:3.25ns )   --->   "%store_ln735 = store i16 0, i7 %post_traces_last_spike_time_0_addr" [src/snn_top_hls.cpp:735]   --->   Operation 37 'store' 'store_ln735' <Predicate = (!icmp_ln730 & !trunc_ln730)> <Delay = 3.25> <CoreInst = "RAM_2P_BRAM">   --->   Core 90 'RAM_2P_BRAM' <Latency = 1> <II = 1> <Delay = 3.25> <Storage> <Opcode : 'load' 'store'> <Ports = 2> <Width = 16> <Depth = 128> <RAM>
+ST_1 : Operation 38 [1/1] (0.00ns)   --->   "%br_ln735 = br void %last_spike_time8112.exit" [src/snn_top_hls.cpp:735]   --->   Operation 38 'br' 'br_ln735' <Predicate = (!icmp_ln730 & !trunc_ln730)> <Delay = 0.00>
+ST_1 : Operation 39 [1/1] ( I:3.25ns O:3.25ns )   --->   "%store_ln732 = store i8 0, i7 %pre_traces_trace_1_addr" [src/snn_top_hls.cpp:732]   --->   Operation 39 'store' 'store_ln732' <Predicate = (!icmp_ln730 & trunc_ln730)> <Delay = 3.25> <CoreInst = "RAM_2P_BRAM">   --->   Core 90 'RAM_2P_BRAM' <Latency = 1> <II = 1> <Delay = 3.25> <Storage> <Opcode : 'load' 'store'> <Ports = 2> <Width = 8> <Depth = 128> <RAM>
+ST_1 : Operation 40 [1/1] ( I:3.25ns O:3.25ns )   --->   "%store_ln733 = store i16 0, i7 %pre_traces_last_spike_time_1_addr" [src/snn_top_hls.cpp:733]   --->   Operation 40 'store' 'store_ln733' <Predicate = (!icmp_ln730 & trunc_ln730)> <Delay = 3.25> <CoreInst = "RAM_2P_BRAM">   --->   Core 90 'RAM_2P_BRAM' <Latency = 1> <II = 1> <Delay = 3.25> <Storage> <Opcode : 'load' 'store'> <Ports = 2> <Width = 16> <Depth = 128> <RAM>
+ST_1 : Operation 41 [1/1] ( I:3.25ns O:3.25ns )   --->   "%store_ln734 = store i8 0, i7 %post_traces_trace_1_addr" [src/snn_top_hls.cpp:734]   --->   Operation 41 'store' 'store_ln734' <Predicate = (!icmp_ln730 & trunc_ln730)> <Delay = 3.25> <CoreInst = "RAM_2P_BRAM">   --->   Core 90 'RAM_2P_BRAM' <Latency = 1> <II = 1> <Delay = 3.25> <Storage> <Opcode : 'load' 'store'> <Ports = 2> <Width = 8> <Depth = 128> <RAM>
+ST_1 : Operation 42 [1/1] ( I:3.25ns O:3.25ns )   --->   "%store_ln735 = store i16 0, i7 %post_traces_last_spike_time_1_addr" [src/snn_top_hls.cpp:735]   --->   Operation 42 'store' 'store_ln735' <Predicate = (!icmp_ln730 & trunc_ln730)> <Delay = 3.25> <CoreInst = "RAM_2P_BRAM">   --->   Core 90 'RAM_2P_BRAM' <Latency = 1> <II = 1> <Delay = 3.25> <Storage> <Opcode : 'load' 'store'> <Ports = 2> <Width = 16> <Depth = 128> <RAM>
+ST_1 : Operation 43 [1/1] (0.00ns)   --->   "%br_ln735 = br void %last_spike_time8112.exit" [src/snn_top_hls.cpp:735]   --->   Operation 43 'br' 'br_ln735' <Predicate = (!icmp_ln730 & trunc_ln730)> <Delay = 0.00>
+ST_1 : Operation 44 [1/1] (1.58ns)   --->   "%store_ln730 = store i9 %add_ln730, i9 %i_1" [src/snn_top_hls.cpp:730]   --->   Operation 44 'store' 'store_ln730' <Predicate = (!icmp_ln730)> <Delay = 1.58>
+ST_1 : Operation 45 [1/1] (0.00ns)   --->   "%br_ln730 = br void %for.inc82" [src/snn_top_hls.cpp:730]   --->   Operation 45 'br' 'br_ln730' <Predicate = (!icmp_ln730)> <Delay = 0.00>
+ST_1 : Operation 46 [1/1] (1.58ns)   --->   "%ret_ln0 = ret"   --->   Operation 46 'ret' 'ret_ln0' <Predicate = (icmp_ln730)> <Delay = 1.58>
+
+
+============================================================
++ Verbose Summary: Timing violations
+============================================================
+Target clock period: 10.000ns, clock uncertainty: 2.700ns.
+
+ <State 1>: 6.665ns
+The critical path consists of the following:
+	'store' operation ('store_ln730', src/snn_top_hls.cpp:730) of constant 0 9 bit on local variable 'i', src/snn_top_hls.cpp:730 [18]  (1.588 ns)
+	'load' operation 9 bit ('i', src/snn_top_hls.cpp:730) on local variable 'i', src/snn_top_hls.cpp:730 [21]  (0.000 ns)
+	'icmp' operation 1 bit ('icmp_ln730', src/snn_top_hls.cpp:730) [22]  (1.823 ns)
+	'store' operation ('store_ln732', src/snn_top_hls.cpp:732) of constant 0 8 bit on array 'pre_traces_trace_0' [42]  (3.254 ns)
+
+
+============================================================
++ Verbose Summary: Binding
+============================================================
+N/A
+* FSMD analyzer results:
+  - Output states:
+ - Input state : 
+  - Chain level:
+	State 1
+
+
+============================================================
++ Verbose Summary: Datapath Resource usage 
+============================================================
+N/A

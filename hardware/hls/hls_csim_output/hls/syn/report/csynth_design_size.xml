@@ -1,0 +1,75 @@
+<design_size title="Design Size Report">
+    <item name="Total Instructions per Compilation Phase">
+        <table>
+            <keys size="4">Phase, Step, Instructions, Description</keys>
+            <column name="Compile/Link">, 21525, After all functions are compiled and linked into a single design</column>
+            <column name="">, , </column>
+            <column name="Unroll/Inline">, , After user unroll and inline pragmas are applied</column>
+            <column name="">(1) unroll,  2591, user unroll pragmas are applied</column>
+            <column name="">(2) simplification,  2016, simplification of applied user unroll pragmas</column>
+            <column name="">(3) inline,  1945, user inline pragmas are applied</column>
+            <column name="">(4) simplification,  1791, simplification of applied user inline pragmas</column>
+            <column name="">, , </column>
+            <column name="Array/Struct">, , After user array partition and struct aggregate/disaggregate pragmas are applied</column>
+            <column name="">(1) array partition,  2589, user array partition pragmas are applied</column>
+            <column name="">(2) simplification,  2003, simplification of applied user array partition &amp; struct aggregate/disaggregate pragmas</column>
+            <column name="">(3) aggregate/disaggregate,  2023, user struct aggregate/disaggregate pragmas are applied</column>
+            <column name="">(4) array reshape,  2530, apply array reshape pragmas</column>
+            <column name="">(5) access patterns,  2683, array access pattern optmizations</column>
+            <column name="">, , </column>
+            <column name="Performance">, , After transformations are applied to meet performance pragma targets</column>
+            <column name="">(1) loop simplification,  2642, loop and instruction simplification</column>
+            <column name="">(2) parallelization,  2554, loops are unrolled or pipelined to meet performance targets</column>
+            <column name="">(3) array partition,  2527, arrays are partitioned to meet performance targets</column>
+            <column name="">(4) simplification,  2471, simplification of design after performance transformations</column>
+            <column name="">, , </column>
+            <column name="HW Transforms">, , After hardware transfomations</column>
+            <column name="">(1) lowering,  2304, initial conversion to HW specific instructions</column>
+            <column name="">(2) optimizations,  2177, high level synthesis optimizations</column>
+        </table>
+    </item>
+    <item name="Instructions per Function for each Compilation Phase">
+        <hiertable>
+            <header size="7" col0="Function" col1="Location" col2="Compile/Link" col3="Unroll/Inline" col4="Array/Struct" col5="Performance" col6="HW Transforms"/>
+            <rows>
+                <row id="0" col0="snn_top_hls" col1="snn_top_hls.cpp:555" col2="21525" col3="1791" col4="2683" col5="2471" col6="2177">
+                    <row id="2" col0="encoder_reset_temporal_state" col1="snn_top_hls.cpp:46" col2="34" col2_disp="   34 (2 calls)" col3="22" col3_disp="  22 (2 calls)" col4="54" col4_disp="  54 (2 calls)" col5="52" col5_disp="  52 (2 calls)" col6="62" col6_disp="  62 (2 calls)"/>
+                    <row id="7" col0="run_encoder_once" col1="snn_top_hls.cpp:169" col2="8782" col3="731" col4="1226" col5="1214" col6="988">
+                        <row id="5" col0="encoder_two_neuron_split" col1="snn_top_hls.cpp:58" col2="325" col3="" col4="" col5="" col6=""/>
+                        <row id="4" col0="encoder_rate_poisson" col1="snn_top_hls.cpp:96" col2="3903" col2_disp="3,903 (3 calls)" col3="" col4="" col5="" col6="">
+                            <row id="14" col0="encoder_lfsr_random" col1="snn_top_hls.cpp:38" col2="1992" col2_disp="1,992 (3 calls)" col3="" col4="" col5="" col6=""/>
+                            <row id="11" col0="encoder_write_axis_spike" col1="snn_top_hls.cpp:74" col2="1287" col2_disp="1,287 (3 calls)" col3="" col4="" col5="" col6=""/>
+                        </row>
+                        <row id="12" col0="encoder_latency" col1="snn_top_hls.cpp:115" col2="2505" col2_disp="2,505 (3 calls)" col3="" col4="" col5="" col6="">
+                            <row id="11" col0="encoder_write_axis_spike" col1="snn_top_hls.cpp:74" col2="1287" col2_disp="1,287 (3 calls)" col3="" col4="" col5="" col6=""/>
+                        </row>
+                        <row id="6" col0="encoder_delta_sigma" col1="snn_top_hls.cpp:144" col2="1692" col2_disp="1,692 (3 calls)" col3="" col4="" col5="" col6="">
+                            <row id="11" col0="encoder_write_axis_spike" col1="snn_top_hls.cpp:74" col2="1287" col2_disp="1,287 (3 calls)" col3="" col4="" col5="" col6=""/>
+                        </row>
+                    </row>
+                    <row id="8" col0="process_pre_spike_aer" col1="snn_top_hls.cpp:348" col2="2182" col3="114" col4="134" col5="134" col6="139">
+                        <row id="10" col0="compute_decayed_trace" col1="snn_top_hls.cpp:308" col2="960" col2_disp="  960 (2 calls)" col3="" col4="" col5="" col6=""/>
+                        <row id="16" col0="clip_weight" col1="snn_top_hls.cpp:333" col2="74" col3="" col4="" col5="" col6=""/>
+                    </row>
+                    <row id="9" col0="update_eligibility_on_pre_spike" col1="snn_top_hls.cpp:538" col2="306" col3="" col4="" col5="" col6=""/>
+                    <row id="13" col0="apply_rstdp_reward" col1="snn_top_hls.cpp:451" col2="1463" col3="65" col4="89" col5="86" col6="96">
+                        <row id="16" col0="clip_weight" col1="snn_top_hls.cpp:333" col2="74" col3="" col4="" col5="" col6=""/>
+                    </row>
+                    <row id="15" col0="decay_eligibility_traces" col1="snn_top_hls.cpp:511" col2="415" col3="33" col4="37" col5="37" col6="46"/>
+                    <row id="3" col0="process_post_spike_aer" col1="snn_top_hls.cpp:399" col2="2077" col3="112" col4="150" col5="149" col6="154">
+                        <row id="10" col0="compute_decayed_trace" col1="snn_top_hls.cpp:308" col2="960" col2_disp="  960 (2 calls)" col3="" col4="" col5="" col6=""/>
+                        <row id="16" col0="clip_weight" col1="snn_top_hls.cpp:333" col2="74" col3="" col4="" col5="" col6=""/>
+                    </row>
+                    <row id="1" col0="update_eligibility_on_post_spike" col1="snn_top_hls.cpp:545" col2="306" col3="" col4="" col5="" col6=""/>
+                </row>
+            </rows>
+            <notes/>
+        </hiertable>
+    </item>
+    <item name="Design Size Message Settings">
+        <table>
+            <keys size="3">Message Setting, Value, Description</keys>
+            <column name="config_compile -design_size_maximum_warning">100000, Show a warning when total design instructions exceeds this value</column>
+        </table>
+    </item>
+</design_size>

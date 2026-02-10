@@ -1,0 +1,70 @@
+================================================================
+== Design Size Report
+================================================================
+
+* Total Instructions per Compilation Phase
++---------------+----------------------------+--------------+----------------------------------------------------------------------------------------+
+| Phase         | Step                       | Instructions | Description                                                                            |
++---------------+----------------------------+--------------+----------------------------------------------------------------------------------------+
+| Compile/Link  |                            | 21,525       | After all functions are compiled and linked into a single design                       |
+|               |                            |              |                                                                                        |
+| Unroll/Inline |                            |              | After user unroll and inline pragmas are applied                                       |
+|               | (1) unroll                 |  2,591       | user unroll pragmas are applied                                                        |
+|               | (2) simplification         |  2,016       | simplification of applied user unroll pragmas                                          |
+|               | (3) inline                 |  1,945       | user inline pragmas are applied                                                        |
+|               | (4) simplification         |  1,791       | simplification of applied user inline pragmas                                          |
+|               |                            |              |                                                                                        |
+| Array/Struct  |                            |              | After user array partition and struct aggregate/disaggregate pragmas are applied       |
+|               | (1) array partition        |  2,589       | user array partition pragmas are applied                                               |
+|               | (2) simplification         |  2,003       | simplification of applied user array partition & struct aggregate/disaggregate pragmas |
+|               | (3) aggregate/disaggregate |  2,023       | user struct aggregate/disaggregate pragmas are applied                                 |
+|               | (4) array reshape          |  2,530       | apply array reshape pragmas                                                            |
+|               | (5) access patterns        |  2,683       | array access pattern optmizations                                                      |
+|               |                            |              |                                                                                        |
+| Performance   |                            |              | After transformations are applied to meet performance pragma targets                   |
+|               | (1) loop simplification    |  2,642       | loop and instruction simplification                                                    |
+|               | (2) parallelization        |  2,554       | loops are unrolled or pipelined to meet performance targets                            |
+|               | (3) array partition        |  2,527       | arrays are partitioned to meet performance targets                                     |
+|               | (4) simplification         |  2,471       | simplification of design after performance transformations                             |
+|               |                            |              |                                                                                        |
+| HW Transforms |                            |              | After hardware transfomations                                                          |
+|               | (1) lowering               |  2,304       | initial conversion to HW specific instructions                                         |
+|               | (2) optimizations          |  2,177       | high level synthesis optimizations                                                     |
++---------------+----------------------------+--------------+----------------------------------------------------------------------------------------+
+
+* Instructions per Function for each Compilation Phase
++------------------------------------+---------------------+-----------------+----------------+----------------+----------------+----------------+
+| Function                           | Location            | Compile/Link    | Unroll/Inline  | Array/Struct   | Performance    | HW Transforms  |
++------------------------------------+---------------------+-----------------+----------------+----------------+----------------+----------------+
+| + snn_top_hls                      | snn_top_hls.cpp:555 | 21,525          | 1,791          | 2,683          | 2,471          | 2,177          |
+|    encoder_reset_temporal_state... | snn_top_hls.cpp:46  |    34 (2 calls) |   22 (2 calls) |   54 (2 calls) |   52 (2 calls) |   62 (2 calls) |
+|  + run_encoder_once                | snn_top_hls.cpp:169 | 8,782           |  731           | 1,226          | 1,214          |  988           |
+|     encoder_two_neuron_split       | snn_top_hls.cpp:58  |   325           |                |                |                |                |
+|   + encoder_rate_poisson           | snn_top_hls.cpp:96  | 3,903 (3 calls) |                |                |                |                |
+|      encoder_lfsr_random           | snn_top_hls.cpp:38  | 1,992 (3 calls) |                |                |                |                |
+|      encoder_write_axis_spike      | snn_top_hls.cpp:74  | 1,287 (3 calls) |                |                |                |                |
+|   + encoder_latency                | snn_top_hls.cpp:115 | 2,505 (3 calls) |                |                |                |                |
+|      encoder_write_axis_spike      | snn_top_hls.cpp:74  | 1,287 (3 calls) |                |                |                |                |
+|   + encoder_delta_sigma            | snn_top_hls.cpp:144 | 1,692 (3 calls) |                |                |                |                |
+|      encoder_write_axis_spike      | snn_top_hls.cpp:74  | 1,287 (3 calls) |                |                |                |                |
+|  + process_pre_spike_aer           | snn_top_hls.cpp:348 | 2,182           |  114           |  134           |  134           |  139           |
+|     compute_decayed_trace          | snn_top_hls.cpp:308 |   960 (2 calls) |                |                |                |                |
+|     clip_weight                    | snn_top_hls.cpp:333 |    74           |                |                |                |                |
+|    update_eligibility_on_pre_sp... | snn_top_hls.cpp:538 |   306           |                |                |                |                |
+|  + apply_rstdp_reward              | snn_top_hls.cpp:451 | 1,463           |   65           |   89           |   86           |   96           |
+|     clip_weight                    | snn_top_hls.cpp:333 |    74           |                |                |                |                |
+|    decay_eligibility_traces        | snn_top_hls.cpp:511 |   415           |   33           |   37           |   37           |   46           |
+|  + process_post_spike_aer          | snn_top_hls.cpp:399 | 2,077           |  112           |  150           |  149           |  154           |
+|     compute_decayed_trace          | snn_top_hls.cpp:308 |   960 (2 calls) |                |                |                |                |
+|     clip_weight                    | snn_top_hls.cpp:333 |    74           |                |                |                |                |
+|    update_eligibility_on_post_s... | snn_top_hls.cpp:545 |   306           |                |                |                |                |
++------------------------------------+---------------------+-----------------+----------------+----------------+----------------+----------------+
+
+* Design Size Message Settings
++---------------------------------------------+--------+------------------------------------------------------------------+
+| Message Setting                             | Value  | Description                                                      |
++---------------------------------------------+--------+------------------------------------------------------------------+
+| config_compile -design_size_maximum_warning | 100000 | Show a warning when total design instructions exceeds this value |
++---------------------------------------------+--------+------------------------------------------------------------------+
+
+

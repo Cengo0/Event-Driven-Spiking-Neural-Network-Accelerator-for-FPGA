@@ -19,8 +19,8 @@
 //=============================================================================
 // Configuration
 //=============================================================================
-const int MAX_NEURONS = 256;
-const int MAX_SYNAPSES = 65536;  // 256x256
+const int MAX_NEURONS = 512;
+const int MAX_SYNAPSES = 262144;  // 512x512
 
 const int WEIGHT_WIDTH = 8;
 const int NEURON_ID_WIDTH = 10;  // Supports up to 1024 encoded channels
@@ -92,6 +92,7 @@ struct weight_update_t {
 // Encoder Configuration
 //=============================================================================
 const int MAX_INPUT_CHANNELS = 784;  // 28x28 MNIST default
+const int FRAME_LOAD_BEATS = (MAX_INPUT_CHANNELS + 3) / 4;  // 196 beats for 784 pixels (4 per beat)
 
 typedef ap_uint<8> pixel_t;          // Single pixel value (0-255)
 
@@ -138,8 +139,8 @@ void snn_top_hls(
     // AXI4-Stream Spike Input (from PS)
     hls::stream<axis_spike_t> &s_axis_spikes,
     
-    // AXI4-Stream Raw Data Input (for on-chip encoder)
-    hls::stream<input_data_t> &s_axis_data,
+    // AXI4-Stream Raw Data Input (for on-chip encoder) - 32-bit streaming
+    hls::stream<axis_data_t> &s_axis_data,
     
     // AXI4-Stream Weight Write (for loading weights)
     hls::stream<axis_weight_t> &s_axis_weights,
@@ -155,13 +156,13 @@ void snn_top_hls(
     
     // Verilog Interface - Spike Input (to SNN core)
     ap_uint<1> &spike_in_valid,
-    ap_uint<8> &spike_in_neuron_id,
+    neuron_id_t &spike_in_neuron_id,
     ap_int<8> &spike_in_weight,
     ap_uint<1> spike_in_ready,
     
     // Verilog Interface - Spike Output (from SNN core)
     ap_uint<1> spike_out_valid,
-    ap_uint<8> spike_out_neuron_id,
+    neuron_id_t spike_out_neuron_id,
     ap_int<8> spike_out_weight,
     ap_uint<1> &spike_out_ready,
     

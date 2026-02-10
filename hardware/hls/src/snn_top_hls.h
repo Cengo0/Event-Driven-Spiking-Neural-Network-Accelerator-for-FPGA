@@ -19,15 +19,15 @@
 //=============================================================================
 // Configuration
 //=============================================================================
-const int MAX_NEURONS = 256;
-const int MAX_SYNAPSES = 65536;  // 256x256
+const int MAX_NEURONS = 512;
+const int MAX_SYNAPSES = 262144;  // 512x512
 
 const int WEIGHT_WIDTH = 8;
 const int NEURON_ID_WIDTH = 10;  // Supports up to 1024 encoded channels
 const int TIMESTAMP_WIDTH = 32;
 
 const int WEIGHT_SCALE = 128;
-const int VERSION_ID = 0x20251205;
+const int VERSION_ID = 0x20260210;
 
 //=============================================================================
 // Operation Modes (use #define for switch-case compatibility)
@@ -51,11 +51,14 @@ const weight_t MIN_WEIGHT = -128;
 // AXI4-Stream Types
 //=============================================================================
 // Spike packet (AER over AXIS32):
-// [31:18] timestamp(14b), [17:10] weight(8b, two's complement), [9:0] neuron_id
+// [31:18] timestamp(14b), [17:10] weight(8b,wo's complement), [9:0] neuron_id
 typedef ap_axiu<32, 1, 1, 1> axis_spike_t;
 
 // Weight packet: [31:24] reserved, [23:16] weight, [15:8] post_id, [7:0] pre_id
 typedef ap_axiu<32, 1, 1, 1> axis_weight_t;
+
+// Data packet (for encoder input frames) - 32-bit wide (4 pixels per beat)
+typedef ap_axiu<32, 1, 1, 1> axis_data_t;
 
 //=============================================================================
 // Learning Parameters Structure
@@ -89,6 +92,7 @@ struct weight_update_t {
 // Encoder Configuration
 //=============================================================================
 const int MAX_INPUT_CHANNELS = 784;  // 28x28 MNIST default
+const int FRAME_LOAD_BEATS = (MAX_INPUT_CHANNELS + 3) / 4;  // 196 beats for 784 pixels (4 per beat)
 
 typedef ap_uint<8> pixel_t;          // Single pixel value (0-255)
 
@@ -135,8 +139,8 @@ void snn_top_hls(
     // AXI4-Stream Spike Input (from PS)
     hls::stream<axis_spike_t> &s_axis_spikes,
     
-    // AXI4-Stream Raw Data Input (for on-chip encoder)
-    hls::stream<input_data_t> &s_axis_data,
+    // AXI4-Stream Raw Data Input (for on-chip encoder) - 32-bit streaming
+    hls::stream<axis_data_t> &s_axis_data,
     
     // AXI4-Stream Weight Write (for loading weights)
     hls::stream<axis_weight_t> &s_axis_weights,
@@ -152,13 +156,13 @@ void snn_top_hls(
     
     // Verilog Interface - Spike Input (to SNN core)
     ap_uint<1> &spike_in_valid,
-    ap_uint<8> &spike_in_neuron_id,
+    neuron_id_t &spike_in_neuron_id,
     ap_int<8> &spike_in_weight,
     ap_uint<1> spike_in_ready,
     
     // Verilog Interface - Spike Output (from SNN core)
     ap_uint<1> spike_out_valid,
-    ap_uint<8> spike_out_neuron_id,
+    neuron_id_t spike_out_neuron_id,
     ap_int<8> spike_out_weight,
     ap_uint<1> &spike_out_ready,
     

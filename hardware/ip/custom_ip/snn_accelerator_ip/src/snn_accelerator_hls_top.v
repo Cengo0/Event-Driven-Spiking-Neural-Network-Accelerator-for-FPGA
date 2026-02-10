@@ -18,7 +18,7 @@ module snn_accelerator_hls_top #(
     parameter C_AXIS_DATA_WIDTH     = 32,
     
     // SNN Parameters
-    parameter NUM_NEURONS           = 256,
+    parameter NUM_NEURONS           = 512,
     parameter NUM_AXONS             = 1024,
     parameter NUM_PARALLEL_UNITS    = 8,
     parameter SPIKE_BUFFER_DEPTH    = 64,
@@ -113,17 +113,6 @@ module snn_accelerator_hls_top #(
     wire                         sys_clk;
     wire                         sys_rst_n;
 
-    // Optional raw data stream for on-chip encoder (tied off by default)
-    wire [559:0]                 s_axis_data_tdata  = {560{1'b0}};
-    wire                         s_axis_data_tvalid = 1'b0;
-    wire [69:0]                  s_axis_data_tkeep  = {70{1'b0}};
-    wire [69:0]                  s_axis_data_tstrb  = {70{1'b0}};
-    wire                         s_axis_data_tuser  = 1'b0;
-    wire                         s_axis_data_tlast  = 1'b0;
-    wire                         s_axis_data_tid    = 1'b0;
-    wire                         s_axis_data_tdest  = 1'b0;
-    wire                         s_axis_data_tready;
-    
     // HLS wrapper outputs (control signals to SNN core)
     wire                         snn_enable;
     wire                         snn_reset;
@@ -221,16 +210,6 @@ module snn_accelerator_hls_top #(
         .s_axis_spikes_TLAST(s_axis_tlast),
         .s_axis_spikes_TID(s_axis_tid),
         .s_axis_spikes_TDEST(s_axis_tdest),
-        // Raw data stream (tied off here; PS can drive via AXI DMA when enabled)
-        .s_axis_data_TDATA(s_axis_data_tdata),
-        .s_axis_data_TVALID(s_axis_data_tvalid),
-        .s_axis_data_TREADY(s_axis_data_tready),
-        .s_axis_data_TKEEP(s_axis_data_tkeep),
-        .s_axis_data_TSTRB(s_axis_data_tstrb),
-        .s_axis_data_TUSER(s_axis_data_tuser),
-        .s_axis_data_TLAST(s_axis_data_tlast),
-        .s_axis_data_TID(s_axis_data_tid),
-        .s_axis_data_TDEST(s_axis_data_tdest),
         
         // AXI4-Stream Spike Output
         .m_axis_spikes_TREADY(m_axis_tready),

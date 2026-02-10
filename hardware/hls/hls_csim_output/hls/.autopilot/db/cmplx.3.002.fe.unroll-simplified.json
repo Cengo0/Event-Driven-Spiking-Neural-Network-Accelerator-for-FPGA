@@ -1,0 +1,133 @@
+{
+  "0": {
+    "basicblocks": 72,
+    "calls": "3 3 4 6 2 5 1",
+    "control_depth": 3,
+    "def_use_depth": 9,
+    "file": "snn_top_hls.cpp",
+    "fileloc": 555,
+    "instructions": 854,
+    "loads": {
+      "G": 27,
+      "L": 15
+    },
+    "memory_accesses": 28,
+    "name": "snn_top_hls",
+    "stores": {
+      "G": 36,
+      "L": 55,
+      "T": 12
+    },
+    "total_instructions": 2016
+  },
+  "1": {
+    "basicblocks": 16,
+    "calls": "",
+    "control_depth": 5,
+    "def_use_depth": 15,
+    "file": "snn_top_hls.cpp",
+    "fileloc": 348,
+    "instructions": 116,
+    "loads": {
+      "G": 11
+    },
+    "memory_accesses": 10,
+    "name": "process_pre_spike_aer",
+    "stores": {
+      "G": 4
+    },
+    "total_instructions": 116
+  },
+  "2": {
+    "basicblocks": 5,
+    "calls": "",
+    "control_depth": 0,
+    "def_use_depth": 5,
+    "file": "snn_top_hls.cpp",
+    "fileloc": 511,
+    "instructions": 37,
+    "loads": {
+      "G": 4
+    },
+    "memory_accesses": 8,
+    "name": "decay_eligibility_traces",
+    "stores": {
+      "G": 4
+    },
+    "total_instructions": 37
+  },
+  "3": {
+    "basicblocks": 3,
+    "calls": "",
+    "control_depth": 0,
+    "def_use_depth": 3,
+    "file": "snn_top_hls.cpp",
+    "fileloc": 46,
+    "instructions": 12,
+    "loads": {
+      "L": 1
+    },
+    "memory_accesses": 2,
+    "name": "encoder_reset_temporal_state",
+    "stores": {
+      "G": 2
+    },
+    "total_instructions": 12
+  },
+  "4": {
+    "basicblocks": 148,
+    "calls": "",
+    "control_depth": 10,
+    "def_use_depth": 12,
+    "file": "snn_top_hls.cpp",
+    "fileloc": 169,
+    "instructions": 764,
+    "loads": {
+      "G": 52,
+      "L": 9
+    },
+    "memory_accesses": 146,
+    "name": "run_encoder_once",
+    "stores": {
+      "G": 61
+    },
+    "total_instructions": 764
+  },
+  "5": {
+    "basicblocks": 16,
+    "calls": "",
+    "control_depth": 5,
+    "def_use_depth": 14,
+    "file": "snn_top_hls.cpp",
+    "fileloc": 399,
+    "instructions": 114,
+    "loads": {
+      "G": 11
+    },
+    "memory_accesses": 10,
+    "name": "process_post_spike_aer",
+    "stores": {
+      "G": 4
+    },
+    "total_instructions": 114
+  },
+  "6": {
+    "basicblocks": 19,
+    "calls": "",
+    "control_depth": 2,
+    "def_use_depth": 11,
+    "file": "snn_top_hls.cpp",
+    "fileloc": 451,
+    "instructions": 65,
+    "loads": {
+      "G": 3,
+      "L": 1
+    },
+    "memory_accesses": 3,
+    "name": "apply_rstdp_reward",
+    "stores": {
+      "G": 1
+    },
+    "total_instructions": 65
+  }
+}

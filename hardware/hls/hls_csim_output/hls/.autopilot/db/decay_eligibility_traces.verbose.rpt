@@ -1,0 +1,453 @@
+
+
+================================================================
+== Vitis HLS Report for 'decay_eligibility_traces'
+================================================================
+* Date:           Tue Feb 10 18:59:27 2026
+
+* Version:        2025.2 (Build 6295257 on Nov 14 2025)
+* Project:        hls_csim_output
+* Solution:       hls (Vivado IP Flow Target)
+* Product family: zynq
+* Target device:  xc7z020-clg400-1
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+----------+----------+------------+
+    |  Clock |  Target  | Estimated| Uncertainty|
+    +--------+----------+----------+------------+
+    |ap_clk  |  10.00 ns|  5.169 ns|     2.70 ns|
+    +--------+----------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+----------+----------+-----+-----+---------+
+    |  Latency (cycles) |  Latency (absolute) |  Interval | Pipeline|
+    |   min   |   max   |    min   |    max   | min | max |   Type  |
+    +---------+---------+----------+----------+-----+-----+---------+
+    |      132|      132|  1.320 us|  1.320 us|  132|  132|       no|
+    +---------+---------+----------+----------+-----+-----+---------+
+
+    + Detail: 
+        * Instance: 
+        +--------------------------------------------------------+----------------------------------------------+---------+---------+----------+----------+-----+-----+-------------------+
+        |                                                        |                                              |  Latency (cycles) |  Latency (absolute) |  Interval |      Pipeline     |
+        |                        Instance                        |                    Module                    |   min   |   max   |    min   |    max   | min | max |        Type       |
+        +--------------------------------------------------------+----------------------------------------------+---------+---------+----------+----------+-----+-----+-------------------+
+        |grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_22   |decay_eligibility_traces_Pipeline_DECAY_PRE   |      131|      131|  1.310 us|  1.310 us|    0|    0|  loop pipeline stp|
+        |grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_30  |decay_eligibility_traces_Pipeline_DECAY_POST  |      131|      131|  1.310 us|  1.310 us|    0|    0|  loop pipeline stp|
+        +--------------------------------------------------------+----------------------------------------------+---------+---------+----------+----------+-----+-----+-------------------+
+
+        * Loop: 
+        N/A
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++-----------------+---------+-----+--------+-------+-----+
+|       Name      | BRAM_18K| DSP |   FF   |  LUT  | URAM|
++-----------------+---------+-----+--------+-------+-----+
+|DSP              |        -|    -|       -|      -|    -|
+|Expression       |        -|    -|       0|      2|    -|
+|FIFO             |        -|    -|       -|      -|    -|
+|Instance         |        -|    -|     116|    164|    -|
+|Memory           |        -|    -|       -|      -|    -|
+|Multiplexer      |        -|    -|       0|     14|    -|
+|Register         |        -|    -|       4|      -|    -|
++-----------------+---------+-----+--------+-------+-----+
+|Total            |        0|    0|     120|    180|    0|
++-----------------+---------+-----+--------+-------+-----+
+|Available        |      280|  220|  106400|  53200|    0|
++-----------------+---------+-----+--------+-------+-----+
+|Utilization (%)  |        0|    0|      ~0|     ~0|    0|
++-----------------+---------+-----+--------+-------+-----+
+
++ Detail: 
+    * Instance: 
+    +--------------------------------------------------------+----------------------------------------------+---------+----+----+----+-----+
+    |                        Instance                        |                    Module                    | BRAM_18K| DSP| FF | LUT| URAM|
+    +--------------------------------------------------------+----------------------------------------------+---------+----+----+----+-----+
+    |grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_30  |decay_eligibility_traces_Pipeline_DECAY_POST  |        0|   0|  58|  82|    0|
+    |grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_22   |decay_eligibility_traces_Pipeline_DECAY_PRE   |        0|   0|  58|  82|    0|
+    +--------------------------------------------------------+----------------------------------------------+---------+----+----+----+-----+
+    |Total                                                   |                                              |        0|   0| 116| 164|    0|
+    +--------------------------------------------------------+----------------------------------------------+---------+----+----+----+-----+
+
+    * DSP: 
+    N/A
+
+    * Memory: 
+    N/A
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +---------------------------------+----------+----+---+----+------------+------------+
+    |          Variable Name          | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +---------------------------------+----------+----+---+----+------------+------------+
+    |ap_block_state2_on_subcall_done  |        or|   0|  0|   2|           1|           1|
+    +---------------------------------+----------+----+---+----+------------+------------+
+    |Total                            |          |   0|  0|   2|           1|           1|
+    +---------------------------------+----------+----+---+----+------------+------------+
+
+    * Multiplexer: 
+    +-----------+----+-----------+-----+-----------+
+    |    Name   | LUT| Input Size| Bits| Total Bits|
+    +-----------+----+-----------+-----+-----------+
+    |ap_NS_fsm  |  14|          3|    1|          3|
+    +-----------+----+-----------+-----+-----------+
+    |Total      |  14|          3|    1|          3|
+    +-----------+----+-----------+-----+-----------+
+
+    * Register: 
+    +---------------------------------------------------------------------+---+----+-----+-----------+
+    |                                 Name                                | FF| LUT| Bits| Const Bits|
+    +---------------------------------------------------------------------+---+----+-----+-----------+
+    |ap_CS_fsm                                                            |  2|   0|    2|          0|
+    |grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_30_ap_start_reg  |  1|   0|    1|          0|
+    |grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_22_ap_start_reg   |  1|   0|    1|          0|
+    +---------------------------------------------------------------------+---+----+-----+-----------+
+    |Total                                                                |  4|   0|    4|          0|
+    +---------------------------------------------------------------------+---+----+-----+-----------+
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++-----------------------------------+-----+-----+------------+--------------------------+--------------+
+|             RTL Ports             | Dir | Bits|  Protocol  |       Source Object      |    C Type    |
++-----------------------------------+-----+-----+------------+--------------------------+--------------+
+|ap_clk                             |   in|    1|  ap_ctrl_hs|  decay_eligibility_traces|  return value|
+|ap_rst                             |   in|    1|  ap_ctrl_hs|  decay_eligibility_traces|  return value|
+|ap_start                           |   in|    1|  ap_ctrl_hs|  decay_eligibility_traces|  return value|
+|ap_done                            |  out|    1|  ap_ctrl_hs|  decay_eligibility_traces|  return value|
+|ap_idle                            |  out|    1|  ap_ctrl_hs|  decay_eligibility_traces|  return value|
+|ap_ready                           |  out|    1|  ap_ctrl_hs|  decay_eligibility_traces|  return value|
+|p_ZL15pre_eligibility_0_address0   |  out|    7|   ap_memory|   p_ZL15pre_eligibility_0|         array|
+|p_ZL15pre_eligibility_0_ce0        |  out|    1|   ap_memory|   p_ZL15pre_eligibility_0|         array|
+|p_ZL15pre_eligibility_0_q0         |   in|    8|   ap_memory|   p_ZL15pre_eligibility_0|         array|
+|p_ZL15pre_eligibility_0_address1   |  out|    7|   ap_memory|   p_ZL15pre_eligibility_0|         array|
+|p_ZL15pre_eligibility_0_ce1        |  out|    1|   ap_memory|   p_ZL15pre_eligibility_0|         array|
+|p_ZL15pre_eligibility_0_we1        |  out|    1|   ap_memory|   p_ZL15pre_eligibility_0|         array|
+|p_ZL15pre_eligibility_0_d1         |  out|    8|   ap_memory|   p_ZL15pre_eligibility_0|         array|
+|p_ZL15pre_eligibility_1_address0   |  out|    7|   ap_memory|   p_ZL15pre_eligibility_1|         array|
+|p_ZL15pre_eligibility_1_ce0        |  out|    1|   ap_memory|   p_ZL15pre_eligibility_1|         array|
+|p_ZL15pre_eligibility_1_q0         |   in|    8|   ap_memory|   p_ZL15pre_eligibility_1|         array|
+|p_ZL15pre_eligibility_1_address1   |  out|    7|   ap_memory|   p_ZL15pre_eligibility_1|         array|
+|p_ZL15pre_eligibility_1_ce1        |  out|    1|   ap_memory|   p_ZL15pre_eligibility_1|         array|
+|p_ZL15pre_eligibility_1_we1        |  out|    1|   ap_memory|   p_ZL15pre_eligibility_1|         array|
+|p_ZL15pre_eligibility_1_d1         |  out|    8|   ap_memory|   p_ZL15pre_eligibility_1|         array|
+|p_ZL16post_eligibility_0_address0  |  out|    7|   ap_memory|  p_ZL16post_eligibility_0|         array|
+|p_ZL16post_eligibility_0_ce0       |  out|    1|   ap_memory|  p_ZL16post_eligibility_0|         array|
+|p_ZL16post_eligibility_0_q0        |   in|    8|   ap_memory|  p_ZL16post_eligibility_0|         array|
+|p_ZL16post_eligibility_0_address1  |  out|    7|   ap_memory|  p_ZL16post_eligibility_0|         array|
+|p_ZL16post_eligibility_0_ce1       |  out|    1|   ap_memory|  p_ZL16post_eligibility_0|         array|
+|p_ZL16post_eligibility_0_we1       |  out|    1|   ap_memory|  p_ZL16post_eligibility_0|         array|
+|p_ZL16post_eligibility_0_d1        |  out|    8|   ap_memory|  p_ZL16post_eligibility_0|         array|
+|p_ZL16post_eligibility_1_address0  |  out|    7|   ap_memory|  p_ZL16post_eligibility_1|         array|
+|p_ZL16post_eligibility_1_ce0       |  out|    1|   ap_memory|  p_ZL16post_eligibility_1|         array|
+|p_ZL16post_eligibility_1_q0        |   in|    8|   ap_memory|  p_ZL16post_eligibility_1|         array|
+|p_ZL16post_eligibility_1_address1  |  out|    7|   ap_memory|  p_ZL16post_eligibility_1|         array|
+|p_ZL16post_eligibility_1_ce1       |  out|    1|   ap_memory|  p_ZL16post_eligibility_1|         array|
+|p_ZL16post_eligibility_1_we1       |  out|    1|   ap_memory|  p_ZL16post_eligibility_1|         array|
+|p_ZL16post_eligibility_1_d1        |  out|    8|   ap_memory|  p_ZL16post_eligibility_1|         array|
++-----------------------------------+-----+-----+------------+--------------------------+--------------+
+
+============================================================
++ Verbose Summary: Synthesis Manager
+============================================================
+InlineROM: 1
+ExposeGlobal: 0
+============================================================
++ Verbose Summary: CDFG Model
+============================================================
+IsTopModel: 0
+ResetActiveHigh: 1
+IsCombinational: 2
+IsDatapathOnly: 2
+HasWiredReturn: 1
+HasMFsm: 0
+HasVarLatency: 1
+IsPipeline: 0
+IsRtlPipelined: 0
+IsInstanceOverlapped: 0
+IsDontTouch: 0
+HasImplIP: 0
+IsGatedGlobalClock: 0
+
+
+============================================================
++ Verbose Summary: Schedule
+============================================================
+* Number of FSM states : 2
+* Pipeline : 0
+* Dataflow Pipeline: 0
+
+* FSM state transitions: 
+1 --> 2 
+2 --> 
+
+* FSM state operations: 
+
+State 1 <SV = 0> <Delay = 0.00>
+ST_1 : Operation 3 [2/2] (0.00ns)   --->   "%call_ln0 = call void @decay_eligibility_traces_Pipeline_DECAY_PRE, i8 %p_ZL15pre_eligibility_0, i8 %p_ZL15pre_eligibility_1"   --->   Operation 3 'call' 'call_ln0' <Predicate = true> <Delay = 0.00> <CoreType = "Generic">   --->   Generic Core
+ST_1 : Operation 4 [2/2] (0.00ns)   --->   "%call_ln0 = call void @decay_eligibility_traces_Pipeline_DECAY_POST, i8 %p_ZL16post_eligibility_0, i8 %p_ZL16post_eligibility_1"   --->   Operation 4 'call' 'call_ln0' <Predicate = true> <Delay = 0.00> <CoreType = "Generic">   --->   Generic Core
+
+State 2 <SV = 1> <Delay = 0.00>
+ST_2 : Operation 5 [1/1] (0.00ns)   --->   "%specmemcore_ln0 = specmemcore void @_ssdm_op_SpecMemCore, i8 %p_ZL16post_eligibility_0, i64 666, i64 22, i64 18446744073709551615, i1 0"   --->   Operation 5 'specmemcore' 'specmemcore_ln0' <Predicate = true> <Delay = 0.00>
+ST_2 : Operation 6 [1/1] (0.00ns)   --->   "%specmemcore_ln0 = specmemcore void @_ssdm_op_SpecMemCore, i8 %p_ZL16post_eligibility_1, i64 666, i64 22, i64 18446744073709551615, i1 0"   --->   Operation 6 'specmemcore' 'specmemcore_ln0' <Predicate = true> <Delay = 0.00>
+ST_2 : Operation 7 [1/1] (0.00ns)   --->   "%specmemcore_ln0 = specmemcore void @_ssdm_op_SpecMemCore, i8 %p_ZL15pre_eligibility_0, i64 666, i64 22, i64 18446744073709551615, i1 0"   --->   Operation 7 'specmemcore' 'specmemcore_ln0' <Predicate = true> <Delay = 0.00>
+ST_2 : Operation 8 [1/1] (0.00ns)   --->   "%specmemcore_ln0 = specmemcore void @_ssdm_op_SpecMemCore, i8 %p_ZL15pre_eligibility_1, i64 666, i64 22, i64 18446744073709551615, i1 0"   --->   Operation 8 'specmemcore' 'specmemcore_ln0' <Predicate = true> <Delay = 0.00>
+ST_2 : Operation 9 [1/2] (0.00ns)   --->   "%call_ln0 = call void @decay_eligibility_traces_Pipeline_DECAY_PRE, i8 %p_ZL15pre_eligibility_0, i8 %p_ZL15pre_eligibility_1"   --->   Operation 9 'call' 'call_ln0' <Predicate = true> <Delay = 0.00> <CoreType = "Generic">   --->   Generic Core
+ST_2 : Operation 10 [1/2] (0.00ns)   --->   "%call_ln0 = call void @decay_eligibility_traces_Pipeline_DECAY_POST, i8 %p_ZL16post_eligibility_0, i8 %p_ZL16post_eligibility_1"   --->   Operation 10 'call' 'call_ln0' <Predicate = true> <Delay = 0.00> <CoreType = "Generic">   --->   Generic Core
+ST_2 : Operation 11 [1/1] (0.00ns)   --->   "%ret_ln532 = ret" [src/snn_top_hls.cpp:532]   --->   Operation 11 'ret' 'ret_ln532' <Predicate = true> <Delay = 0.00>
+
+
+============================================================
++ Verbose Summary: Binding
+============================================================
+STG Binding: 
+---------------- STG Properties BEGIN ----------------
+- Is combinational: 0
+- Is one-state seq: 0
+- Is datapath-only: 0
+- Is pipelined: 0
+- Is top level: 0
+Port [ Return ] is wired: 1; IO mode=ap_ctrl_hs:ce=0
+Port [ p_ZL15pre_eligibility_0]:  wired=1; compound=1; hidden=0; nouse=0; global=1; static=1; extern=0; dir=2; type=1; pingpong=0; private_global=0; MemPort=[10]; IO mode=ap_memory:ce=0
+Port [ p_ZL15pre_eligibility_1]:  wired=1; compound=1; hidden=0; nouse=0; global=1; static=1; extern=0; dir=2; type=1; pingpong=0; private_global=0; MemPort=[10]; IO mode=ap_memory:ce=0
+Port [ p_ZL16post_eligibility_0]:  wired=1; compound=1; hidden=0; nouse=0; global=1; static=1; extern=0; dir=2; type=1; pingpong=0; private_global=0; MemPort=[10]; IO mode=ap_memory:ce=0
+Port [ p_ZL16post_eligibility_1]:  wired=1; compound=1; hidden=0; nouse=0; global=1; static=1; extern=0; dir=2; type=1; pingpong=0; private_global=0; MemPort=[10]; IO mode=ap_memory:ce=0
+---------------- STG Properties END ------------------
+
+---------------- Datapath Model BEGIN ----------------
+
+<LifeTime>
+<method=bitvector/>
+specmemcore_ln0 (specmemcore) [ 000]
+specmemcore_ln0 (specmemcore) [ 000]
+specmemcore_ln0 (specmemcore) [ 000]
+specmemcore_ln0 (specmemcore) [ 000]
+call_ln0        (call       ) [ 000]
+call_ln0        (call       ) [ 000]
+ret_ln532       (ret        ) [ 000]
+</LifeTime>
+
+<model>
+
+<comp_list>
+<comp id="0" class="1000" name="p_ZL15pre_eligibility_0">
+<pin_list>
+<pin id="1" dir="1" index="0" bw="1" slack="0"/>
+</pin_list>
+<bind>
+<StgValue><ssdm name="p_ZL15pre_eligibility_0"/><MemPortTyVec>1 0 </MemPortTyVec>
+</StgValue>
+</bind>
+</comp>
+
+<comp id="2" class="1000" name="p_ZL15pre_eligibility_1">
+<pin_list>
+<pin id="3" dir="1" index="0" bw="1" slack="0"/>
+</pin_list>
+<bind>
+<StgValue><ssdm name="p_ZL15pre_eligibility_1"/><MemPortTyVec>1 0 </MemPortTyVec>
+</StgValue>
+</bind>
+</comp>
+
+<comp id="4" class="1000" name="p_ZL16post_eligibility_0">
+<pin_list>
+<pin id="5" dir="1" index="0" bw="1" slack="0"/>
+</pin_list>
+<bind>
+<StgValue><ssdm name="p_ZL16post_eligibility_0"/><MemPortTyVec>1 0 </MemPortTyVec>
+</StgValue>
+</bind>
+</comp>
+
+<comp id="6" class="1000" name="p_ZL16post_eligibility_1">
+<pin_list>
+<pin id="7" dir="1" index="0" bw="1" slack="0"/>
+</pin_list>
+<bind>
+<StgValue><ssdm name="p_ZL16post_eligibility_1"/><MemPortTyVec>1 0 </MemPortTyVec>
+</StgValue>
+</bind>
+</comp>
+
+<comp id="8" class="1001" name="const_8">
+<pin_list>
+<pin id="9" dir="1" index="0" bw="1" slack="0"/>
+</pin_list>
+<bind>
+<StgValue><ssdm name="decay_eligibility_traces_Pipeline_DECAY_PRE"/></StgValue>
+</bind>
+</comp>
+
+<comp id="10" class="1001" name="const_10">
+<pin_list>
+<pin id="11" dir="1" index="0" bw="1" slack="0"/>
+</pin_list>
+<bind>
+<StgValue><ssdm name="decay_eligibility_traces_Pipeline_DECAY_POST"/></StgValue>
+</bind>
+</comp>
+
+<comp id="12" class="1001" name="const_12">
+<pin_list>
+<pin id="13" dir="1" index="0" bw="1" slack="2147483647"/>
+</pin_list>
+<bind>
+<StgValue><ssdm name="_ssdm_op_SpecMemCore"/></StgValue>
+</bind>
+</comp>
+
+<comp id="14" class="1001" name="const_14">
+<pin_list>
+<pin id="15" dir="1" index="0" bw="1" slack="2147483647"/>
+</pin_list>
+<bind>
+<StgValue><ssdm name=""/></StgValue>
+</bind>
+</comp>
+
+<comp id="16" class="1001" name="const_16">
+<pin_list>
+<pin id="17" dir="1" index="0" bw="1" slack="2147483647"/>
+</pin_list>
+<bind>
+<StgValue><ssdm name=""/></StgValue>
+</bind>
+</comp>
+
+<comp id="18" class="1001" name="const_18">
+<pin_list>
+<pin id="19" dir="1" index="0" bw="1" slack="2147483647"/>
+</pin_list>
+<bind>
+<StgValue><ssdm name=""/></StgValue>
+</bind>
+</comp>
+
+<comp id="20" class="1001" name="const_20">
+<pin_list>
+<pin id="21" dir="1" index="0" bw="1" slack="2147483647"/>
+</pin_list>
+<bind>
+<StgValue><ssdm name=""/></StgValue>
+</bind>
+</comp>
+
+<comp id="22" class="1004" name="grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_22">
+<pin_list>
+<pin id="23" dir="0" index="0" bw="0" slack="0"/>
+<pin id="24" dir="0" index="1" bw="8" slack="0"/>
+<pin id="25" dir="0" index="2" bw="8" slack="0"/>
+<pin id="26" dir="1" index="3" bw="0" slack="2147483647"/>
+</pin_list>
+<bind>
+<opcode="call(48) " fcode="call"/>
+<opset="call_ln0/1 "/>
+</bind>
+</comp>
+
+<comp id="30" class="1004" name="grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_30">
+<pin_list>
+<pin id="31" dir="0" index="0" bw="0" slack="0"/>
+<pin id="32" dir="0" index="1" bw="8" slack="0"/>
+<pin id="33" dir="0" index="2" bw="8" slack="0"/>
+<pin id="34" dir="1" index="3" bw="0" slack="2147483647"/>
+</pin_list>
+<bind>
+<opcode="call(48) " fcode="call"/>
+<opset="call_ln0/1 "/>
+</bind>
+</comp>
+
+</comp_list>
+
+<net_list>
+<net id="27"><net_src comp="8" pin="0"/><net_sink comp="22" pin=0"/></net>
+
+<net id="28"><net_src comp="0" pin="0"/><net_sink comp="22" pin=1"/></net>
+
+<net id="29"><net_src comp="2" pin="0"/><net_sink comp="22" pin=2"/></net>
+
+<net id="35"><net_src comp="10" pin="0"/><net_sink comp="30" pin=0"/></net>
+
+<net id="36"><net_src comp="4" pin="0"/><net_sink comp="30" pin=1"/></net>
+
+<net id="37"><net_src comp="6" pin="0"/><net_sink comp="30" pin=2"/></net>
+
+</net_list>
+
+</model> 
+---------------- Datapath Model END ------------------
+
+* FSMD analyzer results:
+  - Output states:
+	Port: p_ZL15pre_eligibility_0 | {1 2 }
+	Port: p_ZL15pre_eligibility_1 | {1 2 }
+	Port: p_ZL16post_eligibility_0 | {1 2 }
+	Port: p_ZL16post_eligibility_1 | {1 2 }
+ - Input state : 
+	Port: decay_eligibility_traces : p_ZL15pre_eligibility_0 | {1 2 }
+	Port: decay_eligibility_traces : p_ZL15pre_eligibility_1 | {1 2 }
+	Port: decay_eligibility_traces : p_ZL16post_eligibility_0 | {1 2 }
+	Port: decay_eligibility_traces : p_ZL16post_eligibility_1 | {1 2 }
+  - Chain level:
+	State 1
+	State 2
+
+
+============================================================
++ Verbose Summary: Datapath Resource usage 
+============================================================
+
+* Functional unit list:
+|----------|--------------------------------------------------------|---------|---------|---------|
+| Operation|                     Functional Unit                    |  Delay  |    FF   |   LUT   |
+|----------|--------------------------------------------------------|---------|---------|---------|
+|   call   |  grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_22 |  3.176  |    40   |    62   |
+|          | grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_30 |  3.176  |    40   |    62   |
+|----------|--------------------------------------------------------|---------|---------|---------|
+|   Total  |                                                        |  6.352  |    80   |   124   |
+|----------|--------------------------------------------------------|---------|---------|---------|
+
+Memories:
+N/A
+
+* Register list:
+N/A
+
+* Multiplexer (MUX) list: 
+|--------|------|------|------|--------|
+|  Comp  |  Pin | Size |  BW  | S x BW |
+|--------|------|------|------|--------|
+|  Total |      |      |      |    0   |
+|--------|------|------|------|--------|
+
+
+
+* Summary:
++-----------+--------+--------+--------+
+|           |  Delay |   FF   |   LUT  |
++-----------+--------+--------+--------+
+|  Function |    6   |   80   |   124  |
+|   Memory  |    -   |    -   |    -   |
+|Multiplexer|    -   |    -   |    -   |
+|  Register |    -   |    -   |    -   |
++-----------+--------+--------+--------+
+|   Total   |    6   |   80   |   124  |
++-----------+--------+--------+--------+

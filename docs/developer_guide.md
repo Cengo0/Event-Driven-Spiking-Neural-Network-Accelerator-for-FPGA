@@ -174,12 +174,19 @@ v++ -c --mode hls \
 
 ### Optimization
 
-- **Pipeline**: `#pragma HLS PIPELINE II=1` for throughput
-- **Loop unroll**: `#pragma HLS UNROLL factor=4`
-- **Array partition**: `#pragma HLS ARRAY_PARTITION variable=array cyclic factor=4`
+Current HLS design targets 512 neurons with aggressive pipelining:
+
+- **Pipeline**: `#pragma HLS PIPELINE II=1` — all major loops (LTD, LTP, WEIGHT_SUM) run at II=1
+- **Loop unroll**: `#pragma HLS UNROLL factor=4` — used on LTD_LOOP, RSTDP_INNER, DECAY loops
+- **Array partition**: Weight memory uses 8 banks (cyclic factor=2 on dim=1, factor=4 on dim=2). Trace arrays use cyclic factor=4.
 - **Dataflow**: `#pragma HLS DATAFLOW` for parallelism
 
 Avoid DSP usage: Use shifts instead of multiplies when possible.
+
+**Key constants** (in `snn_top_hls.h`):
+- `MAX_NEURONS = 512`, `MAX_SYNAPSES = 262144`
+- `NEURON_ID_WIDTH = 10` (10-bit neuron IDs via `neuron_id_t`)
+- `WEIGHT_WIDTH = 8`, `MAX_INPUT_CHANNELS = 784`
 
 ## Python Development
 

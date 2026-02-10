@@ -16,8 +16,8 @@
 #include <hls_stream.h>
 
 // System parameters
-const int MAX_NEURONS = 256;              // Expanded neuron count
-const int MAX_SYNAPSES = 65536;           // 256x256
+const int MAX_NEURONS = 1024;             // 1024 neurons (BRAM-backed, ~1 RAMB18 for neuron state)
+const int MAX_SYNAPSES = 1048576;         // 1024x1024
 const int MAX_INPUT_CHANNELS = 784;       // 28x28 MNIST default (matches snn_top_hls.h)
 const int MAX_OUTPUT_NEURONS = 64;        // More output classes
 

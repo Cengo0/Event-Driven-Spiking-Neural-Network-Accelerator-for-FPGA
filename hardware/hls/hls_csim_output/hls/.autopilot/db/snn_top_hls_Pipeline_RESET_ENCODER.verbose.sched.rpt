@@ -1,0 +1,141 @@
+
+
+================================================================
+== Vitis HLS Report for 'snn_top_hls_Pipeline_RESET_ENCODER'
+================================================================
+* Date:           Tue Feb 10 18:59:24 2026
+
+* Version:        2025.2 (Build 6295257 on Nov 14 2025)
+* Project:        hls_csim_output
+* Solution:       hls (Vivado IP Flow Target)
+* Product family: zynq
+* Target device:  xc7z020-clg400-1
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+----------+----------+------------+
+    |  Clock |  Target  | Estimated| Uncertainty|
+    +--------+----------+----------+------------+
+    |ap_clk  |  10.00 ns|  6.573 ns|     2.70 ns|
+    +--------+----------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+----------+----------+-----+-----+-------------------+
+    |  Latency (cycles) |  Latency (absolute) |  Interval |      Pipeline     |
+    |   min   |   max   |    min   |    max   | min | max |        Type       |
+    +---------+---------+----------+----------+-----+-----+-------------------+
+    |      786|      786|  7.860 us|  7.860 us|    0|    0|  loop pipeline stp|
+    +---------+---------+----------+----------+-----+-----+-------------------+
+
+    + Detail: 
+        * Instance: 
+        N/A
+
+        * Loop: 
+        +-----------------+---------+---------+----------+-----------+-----------+------+----------+
+        |                 |  Latency (cycles) | Iteration|  Initiation Interval  | Trip |          |
+        |    Loop Name    |   min   |   max   |  Latency |  achieved |   target  | Count| Pipelined|
+        +-----------------+---------+---------+----------+-----------+-----------+------+----------+
+        |- RESET_ENCODER  |      784|      784|         1|          1|          1|   784|       yes|
+        +-----------------+---------+---------+----------+-----------+-----------+------+----------+
+
+============================================================
++ Verbose Summary: Synthesis Manager
+============================================================
+InlineROM: 1
+ExposeGlobal: 0
+============================================================
++ Verbose Summary: CDFG Model
+============================================================
+IsTopModel: 0
+ResetActiveHigh: 1
+IsCombinational: 0
+IsDatapathOnly: 0
+HasWiredReturn: 1
+HasMFsm: 2
+HasVarLatency: 1
+IsPipeline: 0
+IsRtlPipelined: 0
+IsInstanceOverlapped: 0
+IsDontTouch: 0
+HasImplIP: 0
+IsGatedGlobalClock: 0
+
++ Individual pipeline summary: 
+  * Pipeline-0: initiation interval (II) = 1, depth = 1
+
+
+============================================================
++ Verbose Summary: Schedule
+============================================================
+* Number of FSM states : 1
+* Pipeline : 1
+  Pipeline-0 : II = 1, D = 1, States = { 1 }
+* Dataflow Pipeline: 0
+
+* FSM state transitions: 
+1 --> 
+
+* FSM state operations: 
+
+State 1 <SV = 0> <Delay = 6.57>
+ST_1 : Operation 4 [1/1] (0.00ns)   --->   "%i = alloca i32 1" [src/snn_top_hls.cpp:738]   --->   Operation 4 'alloca' 'i' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 5 [1/1] (0.00ns)   --->   "%specmemcore_ln0 = specmemcore void @_ssdm_op_SpecMemCore, i16 %p_ZL17encoder_phase_acc_0, i64 666, i64 22, i64 18446744073709551615, i1 0"   --->   Operation 5 'specmemcore' 'specmemcore_ln0' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 6 [1/1] (0.00ns)   --->   "%specmemcore_ln0 = specmemcore void @_ssdm_op_SpecMemCore, i16 %p_ZL17encoder_phase_acc_1, i64 666, i64 22, i64 18446744073709551615, i1 0"   --->   Operation 6 'specmemcore' 'specmemcore_ln0' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 7 [1/1] (1.58ns)   --->   "%store_ln738 = store i10 0, i10 %i" [src/snn_top_hls.cpp:738]   --->   Operation 7 'store' 'store_ln738' <Predicate = true> <Delay = 1.58>
+ST_1 : Operation 8 [1/1] (0.00ns)   --->   "%br_ln0 = br void %for.inc93"   --->   Operation 8 'br' 'br_ln0' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 9 [1/1] (0.00ns)   --->   "%i_2 = load i10 %i" [src/snn_top_hls.cpp:738]   --->   Operation 9 'load' 'i_2' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 10 [1/1] (1.73ns)   --->   "%icmp_ln738 = icmp_eq  i10 %i_2, i10 784" [src/snn_top_hls.cpp:738]   --->   Operation 10 'icmp' 'icmp_ln738' <Predicate = true> <Delay = 1.73> <CoreInst = "Cmp">   --->   Core 9 'Cmp' <Latency = 0> <II = 1> <Delay = 1.73> <FuncUnit> <Opcode : 'seteq' 'setne' 'setle' 'setge' 'setlt' 'setgt'> <InPorts = 2> <OutPorts = 1>
+ST_1 : Operation 11 [1/1] (1.73ns)   --->   "%add_ln738 = add i10 %i_2, i10 1" [src/snn_top_hls.cpp:738]   --->   Operation 11 'add' 'add_ln738' <Predicate = true> <Delay = 1.73> <CoreInst = "Adder">   --->   Core 1 'Adder' <Latency = 0> <II = 1> <Delay = 1.73> <FuncUnit> <Opcode : 'add' 'sub'> <InPorts = 2> <OutPorts = 1>
+ST_1 : Operation 12 [1/1] (0.00ns)   --->   "%br_ln738 = br i1 %icmp_ln738, void %for.inc93.split, void %for.end95.exitStub" [src/snn_top_hls.cpp:738]   --->   Operation 12 'br' 'br_ln738' <Predicate = true> <Delay = 0.00>
+ST_1 : Operation 13 [1/1] (0.00ns)   --->   "%trunc_ln738 = trunc i10 %i_2" [src/snn_top_hls.cpp:738]   --->   Operation 13 'trunc' 'trunc_ln738' <Predicate = (!icmp_ln738)> <Delay = 0.00>
+ST_1 : Operation 14 [1/1] (0.00ns)   --->   "%specpipeline_ln739 = specpipeline void @_ssdm_op_SpecPipeline, i32 1, i32 0, i32 0, i32 0, i32 4294967295, void @empty_3" [src/snn_top_hls.cpp:739]   --->   Operation 14 'specpipeline' 'specpipeline_ln739' <Predicate = (!icmp_ln738)> <Delay = 0.00>
+ST_1 : Operation 15 [1/1] (0.00ns)   --->   "%speclooptripcount_ln738 = speclooptripcount void @_ssdm_op_SpecLoopTripCount, i64 784, i64 784, i64 784" [src/snn_top_hls.cpp:738]   --->   Operation 15 'speclooptripcount' 'speclooptripcount_ln738' <Predicate = (!icmp_ln738)> <Delay = 0.00>
+ST_1 : Operation 16 [1/1] (0.00ns)   --->   "%specloopname_ln738 = specloopname void @_ssdm_op_SpecLoopName, void @empty_17" [src/snn_top_hls.cpp:738]   --->   Operation 16 'specloopname' 'specloopname_ln738' <Predicate = (!icmp_ln738)> <Delay = 0.00>
+ST_1 : Operation 17 [1/1] (0.00ns)   --->   "%lshr_ln2 = partselect i9 @_ssdm_op_PartSelect.i9.i10.i32.i32, i10 %i_2, i32 1, i32 9" [src/snn_top_hls.cpp:738]   --->   Operation 17 'partselect' 'lshr_ln2' <Predicate = (!icmp_ln738)> <Delay = 0.00>
+ST_1 : Operation 18 [1/1] (0.00ns)   --->   "%zext_ln738 = zext i9 %lshr_ln2" [src/snn_top_hls.cpp:738]   --->   Operation 18 'zext' 'zext_ln738' <Predicate = (!icmp_ln738)> <Delay = 0.00>
+ST_1 : Operation 19 [1/1] (0.00ns)   --->   "%p_ZL17encoder_phase_acc_0_addr = getelementptr i16 %p_ZL17encoder_phase_acc_0, i64 0, i64 %zext_ln738" [src/snn_top_hls.cpp:740]   --->   Operation 19 'getelementptr' 'p_ZL17encoder_phase_acc_0_addr' <Predicate = (!icmp_ln738)> <Delay = 0.00>
+ST_1 : Operation 20 [1/1] (0.00ns)   --->   "%p_ZL17encoder_phase_acc_1_addr = getelementptr i16 %p_ZL17encoder_phase_acc_1, i64 0, i64 %zext_ln738" [src/snn_top_hls.cpp:740]   --->   Operation 20 'getelementptr' 'p_ZL17encoder_phase_acc_1_addr' <Predicate = (!icmp_ln738)> <Delay = 0.00>
+ST_1 : Operation 21 [1/1] (0.00ns)   --->   "%br_ln740 = br i1 %trunc_ln738, void %arrayidx92.case.0, void %arrayidx92.case.1" [src/snn_top_hls.cpp:740]   --->   Operation 21 'br' 'br_ln740' <Predicate = (!icmp_ln738)> <Delay = 0.00>
+ST_1 : Operation 22 [1/1] ( I:3.25ns O:3.25ns )   --->   "%store_ln740 = store i16 0, i9 %p_ZL17encoder_phase_acc_0_addr" [src/snn_top_hls.cpp:740]   --->   Operation 22 'store' 'store_ln740' <Predicate = (!icmp_ln738 & !trunc_ln738)> <Delay = 3.25> <CoreInst = "RAM_2P_BRAM">   --->   Core 90 'RAM_2P_BRAM' <Latency = 1> <II = 1> <Delay = 3.25> <Storage> <Opcode : 'load' 'store'> <Ports = 2> <Width = 16> <Depth = 392> <RAM>
+ST_1 : Operation 23 [1/1] (0.00ns)   --->   "%br_ln740 = br void %arrayidx92.exit" [src/snn_top_hls.cpp:740]   --->   Operation 23 'br' 'br_ln740' <Predicate = (!icmp_ln738 & !trunc_ln738)> <Delay = 0.00>
+ST_1 : Operation 24 [1/1] ( I:3.25ns O:3.25ns )   --->   "%store_ln740 = store i16 0, i9 %p_ZL17encoder_phase_acc_1_addr" [src/snn_top_hls.cpp:740]   --->   Operation 24 'store' 'store_ln740' <Predicate = (!icmp_ln738 & trunc_ln738)> <Delay = 3.25> <CoreInst = "RAM_2P_BRAM">   --->   Core 90 'RAM_2P_BRAM' <Latency = 1> <II = 1> <Delay = 3.25> <Storage> <Opcode : 'load' 'store'> <Ports = 2> <Width = 16> <Depth = 392> <RAM>
+ST_1 : Operation 25 [1/1] (0.00ns)   --->   "%br_ln740 = br void %arrayidx92.exit" [src/snn_top_hls.cpp:740]   --->   Operation 25 'br' 'br_ln740' <Predicate = (!icmp_ln738 & trunc_ln738)> <Delay = 0.00>
+ST_1 : Operation 26 [1/1] (1.58ns)   --->   "%store_ln738 = store i10 %add_ln738, i10 %i" [src/snn_top_hls.cpp:738]   --->   Operation 26 'store' 'store_ln738' <Predicate = (!icmp_ln738)> <Delay = 1.58>
+ST_1 : Operation 27 [1/1] (0.00ns)   --->   "%br_ln738 = br void %for.inc93" [src/snn_top_hls.cpp:738]   --->   Operation 27 'br' 'br_ln738' <Predicate = (!icmp_ln738)> <Delay = 0.00>
+ST_1 : Operation 28 [1/1] (1.58ns)   --->   "%ret_ln0 = ret"   --->   Operation 28 'ret' 'ret_ln0' <Predicate = (icmp_ln738)> <Delay = 1.58>
+
+
+============================================================
++ Verbose Summary: Timing violations
+============================================================
+Target clock period: 10.000ns, clock uncertainty: 2.700ns.
+
+ <State 1>: 6.573ns
+The critical path consists of the following:
+	'store' operation ('store_ln738', src/snn_top_hls.cpp:738) of constant 0 10 bit on local variable 'i', src/snn_top_hls.cpp:738 [6]  (1.588 ns)
+	'load' operation 10 bit ('i', src/snn_top_hls.cpp:738) on local variable 'i', src/snn_top_hls.cpp:738 [9]  (0.000 ns)
+	'icmp' operation 1 bit ('icmp_ln738', src/snn_top_hls.cpp:738) [10]  (1.731 ns)
+	'store' operation ('store_ln740', src/snn_top_hls.cpp:740) of constant 0 16 bit on array 'p_ZL17encoder_phase_acc_0' [24]  (3.254 ns)
+
+
+============================================================
++ Verbose Summary: Binding
+============================================================
+N/A
+* FSMD analyzer results:
+  - Output states:
+ - Input state : 
+  - Chain level:
+	State 1
+
+
+============================================================
++ Verbose Summary: Datapath Resource usage 
+============================================================
+N/A

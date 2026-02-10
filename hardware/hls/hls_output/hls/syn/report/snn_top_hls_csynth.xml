@@ -18,18 +18,18 @@
 <PipelineType>no</PipelineType>
 <SummaryOfTimingAnalysis>
 <unit>ns</unit>
-<EstimatedClockPeriod>7.241</EstimatedClockPeriod>
+<EstimatedClockPeriod>7.984</EstimatedClockPeriod>
 </SummaryOfTimingAnalysis>
 <SummaryOfOverallLatency>
 <unit>clock cycles</unit>
-<Best-caseLatency>30</Best-caseLatency>
-<Average-caseLatency>294428598</Average-caseLatency>
-<Worst-caseLatency>4590401072</Worst-caseLatency>
-<Best-caseRealTimeLatency>0.300 us</Best-caseRealTimeLatency>
-<Average-caseRealTimeLatency>2.944 sec</Average-caseRealTimeLatency>
-<Worst-caseRealTimeLatency>45.904 sec</Worst-caseRealTimeLatency>
-<Interval-min>31</Interval-min>
-<Interval-max>4590401073</Interval-max>
+<Best-caseLatency>28</Best-caseLatency>
+<Average-caseLatency>307060178</Average-caseLatency>
+<Worst-caseLatency>4703448559</Worst-caseLatency>
+<Best-caseRealTimeLatency>0.280 us</Best-caseRealTimeLatency>
+<Average-caseRealTimeLatency>3.071 sec</Average-caseRealTimeLatency>
+<Worst-caseRealTimeLatency>47.034 sec</Worst-caseRealTimeLatency>
+<Interval-min>29</Interval-min>
+<Interval-max>4703448560</Interval-max>
 <PerformancePragma>-</PerformancePragma>
 </SummaryOfOverallLatency>
 <SummaryOfLoopLatency>
@@ -45,19 +45,19 @@
 <Latency>
 <range>
 <min>0</min>
-<max>4590333540</max>
+<max>4703184810</max>
 </range>
 </Latency>
 <AbsoluteTimeLatency>
 <range>
 <min>0</min>
-<max>45903335400</max>
+<max>47031848100</max>
 </range>
 </AbsoluteTimeLatency>
 <IterationLatency>
 <range>
 <min>6</min>
-<max>70044</max>
+<max>71766</max>
 </range>
 </IterationLatency>
 <PerformancePragma>-</PerformancePragma>
@@ -66,15 +66,15 @@
 </TIME_LOOP>
 </SummaryOfLoopLatency>
 <SummaryOfViolations>
-<IssueType>-</IssueType>
+<IssueType>Timing Violation</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:534</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:556</SourceLocation>
 <SummaryOfLoopViolations>
 <TIME_LOOP>
 <Name>TIME_LOOP</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:782</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:816</SourceLocation>
 </TIME_LOOP>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>
@@ -82,10 +82,10 @@
 
 <AreaEstimates>
 <Resources>
-<BRAM_18K>108</BRAM_18K>
-<DSP>48</DSP>
-<FF>25793</FF>
-<LUT>40537</LUT>
+<BRAM_18K>163</BRAM_18K>
+<DSP>12</DSP>
+<FF>6412</FF>
+<LUT>13880</LUT>
 <URAM>0</URAM>
 </Resources>
 <AvailableResources>
@@ -428,19 +428,19 @@
 </RtlPorts>
 <RtlPorts>
 <name>s_axis_data_TDATA</name>
-<Object>s_axis_data</Object>
+<Object>s_axis_data_V_data_V</Object>
 <Type>pointer</Type>
 <Scope></Scope>
 <IOProtocol>axis</IOProtocol>
 <IOConfig>register, both mode</IOConfig>
 <Dir>in</Dir>
-<Bits>6272</Bits>
+<Bits>32</Bits>
 <Attribute>data</Attribute>
 <CType>int</CType>
 </RtlPorts>
 <RtlPorts>
 <name>s_axis_data_TVALID</name>
-<Object>s_axis_data</Object>
+<Object>s_axis_data_V_dest_V</Object>
 <Type>pointer</Type>
 <Scope></Scope>
 <IOProtocol>axis</IOProtocol>
@@ -452,7 +452,7 @@
 </RtlPorts>
 <RtlPorts>
 <name>s_axis_data_TREADY</name>
-<Object>s_axis_data</Object>
+<Object>s_axis_data_V_dest_V</Object>
 <Type>pointer</Type>
 <Scope></Scope>
 <IOProtocol>axis</IOProtocol>
@@ -460,6 +460,78 @@
 <Dir>out</Dir>
 <Bits>1</Bits>
 <Attribute>control</Attribute>
+<CType>int</CType>
+</RtlPorts>
+<RtlPorts>
+<name>s_axis_data_TDEST</name>
+<Object>s_axis_data_V_dest_V</Object>
+<Type>pointer</Type>
+<Scope></Scope>
+<IOProtocol>axis</IOProtocol>
+<IOConfig>register, both mode</IOConfig>
+<Dir>in</Dir>
+<Bits>1</Bits>
+<Attribute>data</Attribute>
+<CType>int</CType>
+</RtlPorts>
+<RtlPorts>
+<name>s_axis_data_TKEEP</name>
+<Object>s_axis_data_V_keep_V</Object>
+<Type>pointer</Type>
+<Scope></Scope>
+<IOProtocol>axis</IOProtocol>
+<IOConfig>register, both mode</IOConfig>
+<Dir>in</Dir>
+<Bits>4</Bits>
+<Attribute>data</Attribute>
+<CType>int</CType>
+</RtlPorts>
+<RtlPorts>
+<name>s_axis_data_TSTRB</name>
+<Object>s_axis_data_V_strb_V</Object>
+<Type>pointer</Type>
+<Scope></Scope>
+<IOProtocol>axis</IOProtocol>
+<IOConfig>register, both mode</IOConfig>
+<Dir>in</Dir>
+<Bits>4</Bits>
+<Attribute>data</Attribute>
+<CType>int</CType>
+</RtlPorts>
+<RtlPorts>
+<name>s_axis_data_TUSER</name>
+<Object>s_axis_data_V_user_V</Object>
+<Type>pointer</Type>
+<Scope></Scope>
+<IOProtocol>axis</IOProtocol>
+<IOConfig>register, both mode</IOConfig>
+<Dir>in</Dir>
+<Bits>1</Bits>
+<Attribute>data</Attribute>
+<CType>int</CType>
+</RtlPorts>
+<RtlPorts>
+<name>s_axis_data_TLAST</name>
+<Object>s_axis_data_V_last_V</Object>
+<Type>pointer</Type>
+<Scope></Scope>
+<IOProtocol>axis</IOProtocol>
+<IOConfig>register, both mode</IOConfig>
+<Dir>in</Dir>
+<Bits>1</Bits>
+<Attribute>data</Attribute>
+<CType>int</CType>
+</RtlPorts>
+<RtlPorts>
+<name>s_axis_data_TID</name>
+<Object>s_axis_data_V_id_V</Object>
+<Type>pointer</Type>
+<Scope></Scope>
+<IOProtocol>axis</IOProtocol>
+<IOConfig>register, both mode</IOConfig>
+<Dir>in</Dir>
+<Bits>1</Bits>
+<Attribute>data</Attribute>
 <CType>int</CType>
 </RtlPorts>
 <RtlPorts>
@@ -806,7 +878,7 @@
 <IOProtocol>ap_none</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>8</Bits>
+<Bits>10</Bits>
 <Attribute>data</Attribute>
 <CType>int</CType>
 </RtlPorts>
@@ -854,7 +926,7 @@
 <IOProtocol>ap_none</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>in</Dir>
-<Bits>8</Bits>
+<Bits>10</Bits>
 <Attribute>data</Attribute>
 <CType>int</CType>
 </RtlPorts>

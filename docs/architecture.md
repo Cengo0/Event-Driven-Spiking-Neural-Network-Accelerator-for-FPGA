@@ -16,7 +16,7 @@ System architecture of the Event-Driven SNN FPGA Accelerator.
 │                 FPGA (PYNQ-Z2)                          │
 │  ┌────────────┐  ┌────────────┐  ┌────────────────┐    │
 │  │ AXI        │→ │ Spike      │→ │ LIF Neurons    │    │
-│  │ Interface  │  │ Router     │  │ (256 neurons)  │    │
+│  │ Interface  │  │ Router     │  │ (512 neurons)  │    │
 │  └────────────┘  └────────────┘  └────────────────┘    │
 │         ↓               ↓                 ↓            │
 │  ┌──────────────────────────────────────────────────┐  │
@@ -42,12 +42,12 @@ System architecture of the Event-Driven SNN FPGA Accelerator.
 
 | Resource | Used | Available | % |
 |----------|------|-----------|---|
-| LUT | 27.2K | 53.2K | 51% |
-| FF | 24.6K | 106K | 23% |
-| BRAM | 16.5 | 140 | 12% |
-| DSP | 38 | 220 | 17% |
+| LUT | 15,030 | 53,200 | 28.25% |
+| FF | 15,970 | 106,400 | 15.01% |
+| BRAM | 113 | 140 | 80.71% |
+| DSP | 29 | 220 | 13.18% |
 
-**Timing**: WNS +0.845ns ✅, Clock 100 MHz
+**Timing**: WNS +0.372ns ✅, Clock 100 MHz
 
 ## LIF Neuron
 
@@ -140,8 +140,8 @@ $$\Delta w_{LTD} = -a^- \cdot \frac{(w - w_{min})^{\mu}}{scale}$$
 
 ```cpp
 // O(N+M) instead of O(N×M)
-static neuron_trace_t pre_traces[MAX_NEURONS];   // 256 entries
-static neuron_trace_t post_traces[MAX_NEURONS];  // 256 entries
+static neuron_trace_t pre_traces[MAX_NEURONS];   // 512 entries
+static neuron_trace_t post_traces[MAX_NEURONS];  // 512 entries
 
 struct neuron_trace_t {
     ap_uint<8> trace;              // 8-bit exponential trace
@@ -177,9 +177,14 @@ Stores connection weights.
 Address: [Src_Neuron_ID][Dst_Neuron_ID]
 Data:    8-bit signed weight (-127 to +127)
 
-Example: 256 neurons
-Total: 256 × 256 = 65,536 weights = 64 KB
+Example: 512 neurons
+Total: 512 × 512 = 262,144 weights = 256 KB
 ```
+
+**HLS Memory Optimization**:
+- Weight array partitioned: cyclic factor=2 on dim=1, cyclic factor=4 on dim=2 (8 banks total)
+- Pre/post traces and eligibility: cyclic partition factor=4
+- Enables parallel read/write for improved loop throughput
 
 **Access Pattern**:
 - Read on spike arrival (get weight)
@@ -235,12 +240,19 @@ Continuous tracking with feedback.
 
 Spike streaming.
 
-**Format**:
+**Spike Format** (10-bit neuron IDs):
 ```
 [31:24] - Flags
-[23:16] - Weight/data
-[15:8]  - Source ID
-[7:0]   - Destination ID
+[23:20] - Reserved
+[19:10] - Source neuron ID (10-bit, supports up to 1024 neurons)
+[9:0]   - Destination neuron ID (10-bit)
+```
+
+**Weight Packet Format** (10-bit IDs):
+```
+[27:20] - Weight (8-bit)
+[19:10] - Column neuron ID (10-bit)
+[9:0]   - Row neuron ID (10-bit)
 ```
 
 ## Data Flow
@@ -259,6 +271,20 @@ Spike streaming.
 2. Post-spike: Update post-trace, apply LTP
 3. Weight update: Apply delta, clamp to bounds
 4. (R-STDP) Modulate by reward signal
+
+## HLS Pipelining Optimizations
+
+The HLS learning engine has been aggressively optimized for throughput:
+
+| Loop | Before | After | Improvement |
+|------|--------|-------|-------------|
+| LTD_LOOP | II=2, UNROLL=2 | II=1, UNROLL=4 | 2× throughput |
+| LTP_LOOP | II=2 | II=1 | 2× throughput |
+| RSTDP_INNER | No unroll | UNROLL=4 | 4× throughput |
+| DECAY_PRE/POST | UNROLL=2 | UNROLL=4 | 2× throughput |
+| WEIGHT_SUM | II=2 | II=1 | 2× throughput |
+
+**Net Result**: With 512 neurons (4× more synapses than 256), the total RSTDP computation time increased only ~3% (69,632 vs 67,584 cycles) thanks to pipelining improvements.
 
 ## Power Efficiency
 

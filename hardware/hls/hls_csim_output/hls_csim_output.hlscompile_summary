@@ -1,0 +1,249 @@
+<ENTRY>
+{
+ "thisFile": "/mnt/workspace/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_csim_output/hls_csim_output.hlscompile_summary",
+ "connectId": "",
+ "serverToken": "",
+ "timestamp": "0"
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_CmdStep",
+ "dateTimestamp": "Tue Feb 10 18:59:02 2026",
+ "timestampMillis": "1770717542576",
+ "buildStep": {
+  "cmdId": "c28c2b3c-2744-48dd-9ffd-69e564a4beda",
+  "name": "v++",
+  "logFile": "/mnt/workspace/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_csim_output/logs/hls_csim_output.steps.log",
+  "commandLine": "/tools/Xilinx/2025.2/Vitis/bin/unwrapped/lnx64.o/v++  -c --mode hls --part xc7z020clg400-1 --work_dir ./hls_csim_output --config hls_csim_config.cfg --hls.csim run ",
+  "args": [
+   "-c",
+   "--mode",
+   "hls",
+   "--part",
+   "xc7z020clg400-1",
+   "--work_dir",
+   "./hls_csim_output",
+   "--config",
+   "hls_csim_config.cfg",
+   "--hls.csim",
+   "run"
+  ],
+  "iniFiles": [
+   {
+    "path": "/mnt/workspace/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_csim_config.cfg",
+    "content": "[hls]\nsyn.file=src/snn_top_hls.cpp\nsyn.top=snn_top_hls\ntb.file=test/tb_snn_top_hls.cpp\nflow_target=vivado\nclock=10ns\ncsim.code_analyzer=0\n"
+   }
+  ],
+  "cwd": "/mnt/workspace/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Tue Feb 10 18:59:02 2026",
+ "timestampMillis": "1770717542576",
+ "status": {
+  "cmdId": "c28c2b3c-2744-48dd-9ffd-69e564a4beda",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_FlowMetaData",
+ "dateTimestamp": "Tue Feb 10 18:59:05 2026",
+ "timestampMillis": "1770717545512",
+ "buildSummary": {
+  "hardwarePlatform": "",
+  "hardwareDsa": "",
+  "platformDirectory": "",
+  "runtime": "",
+  "systemConfig": "",
+  "flow": "BF_COMPILE",
+  "target": "TT_HW",
+  "kernels": [
+   {
+    "base": {
+     "type": "KERNEL",
+     "name": "snn_top_hls",
+     "file": "/mnt/workspace/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_csim_output/snn_top_hls.zip",
+     "reports": [],
+     "uuid": ""
+    },
+    "sources": [
+     "/mnt/workspace/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp"
+    ],
+    "psSources": [],
+    "cuNames": [],
+    "type": "HLS",
+    "frequency": 0,
+    "freqUnits": ""
+   }
+  ],
+  "toolVersion": "2025.2"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_SubCmdStep",
+ "dateTimestamp": "Tue Feb 10 18:59:05 2026",
+ "timestampMillis": "1770717545512",
+ "buildStep": {
+  "cmdId": "a1b8872e-3c4a-4637-b4a3-fa1410bf5a57",
+  "name": "",
+  "logFile": "/mnt/workspace/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_csim_output/hls/hls.log",
+  "commandLine": "",
+  "args": [],
+  "iniFiles": [],
+  "cwd": "/mnt/workspace/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Tue Feb 10 18:59:05 2026",
+ "timestampMillis": "1770717545513",
+ "status": {
+  "cmdId": "a1b8872e-3c4a-4637-b4a3-fa1410bf5a57",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Tue Feb 10 18:59:05 2026",
+ "timestampMillis": "1770717545513",
+ "report": {
+  "path": "/mnt/workspace/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_csim_output/hls/hls_data.json",
+  "name": "",
+  "fileType": "JSON",
+  "reportType": "HLS_SYNTHESIS",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Tue Feb 10 18:59:05 2026",
+ "timestampMillis": "1770717545513",
+ "report": {
+  "path": "/mnt/workspace/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_csim_output/hls/syn/report/csynth.rpt",
+  "name": "",
+  "fileType": "TEXT",
+  "reportType": "HLS_SYNTHESIS",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Tue Feb 10 18:59:05 2026",
+ "timestampMillis": "1770717545513",
+ "report": {
+  "path": "/mnt/workspace/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_csim_output/hls/syn/report/csynth.xml",
+  "name": "",
+  "fileType": "XML",
+  "reportType": "HLS_SYNTHESIS",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Tue Feb 10 18:59:29 2026",
+ "timestampMillis": "1770717569318",
+ "report": {
+  "path": "/mnt/workspace/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_csim_output/hls",
+  "name": "",
+  "fileType": "DIR",
+  "reportType": "HLS_DATAFLOW",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Tue Feb 10 18:59:29 2026",
+ "timestampMillis": "1770717569319",
+ "report": {
+  "path": "/mnt/workspace/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_csim_output/hls",
+  "name": "",
+  "fileType": "DIR",
+  "reportType": "HLS_FUNCTION_CALL_GRAPH",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Tue Feb 10 18:59:29 2026",
+ "timestampMillis": "1770717569319",
+ "report": {
+  "path": "/mnt/workspace/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_csim_output/hls",
+  "name": "",
+  "fileType": "DIR",
+  "reportType": "HLS_SCHEDULE",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Tue Feb 10 18:59:29 2026",
+ "timestampMillis": "1770717569319",
+ "status": {
+  "cmdId": "a1b8872e-3c4a-4637-b4a3-fa1410bf5a57",
+  "state": "CS_PASSED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Tue Feb 10 18:59:36 2026",
+ "timestampMillis": "1770717576916",
+ "status": {
+  "cmdId": "c28c2b3c-2744-48dd-9ffd-69e564a4beda",
+  "state": "CS_PASSED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Tue Feb 10 18:59:36 2026",
+ "timestampMillis": "1770717576948",
+ "report": {
+  "path": "/mnt/workspace/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_csim_output/reports/v++_compile_hls_csim_output_guidance.html",
+  "name": "",
+  "fileType": "HTML",
+  "reportType": "GLOBAL_RULECHECK_GUIDANCE",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Tue Feb 10 18:59:36 2026",
+ "timestampMillis": "1770717576948",
+ "report": {
+  "path": "/mnt/workspace/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_csim_output/reports/.db/v++_compile_hls_csim_output_guidance.pb3",
+  "name": "",
+  "fileType": "BINARY_PROTOBUF",
+  "reportType": "GLOBAL_RULECHECK_GUIDANCE",
+  "cmdId": ""
+ }
+}
+</ENTRY>
