@@ -71,8 +71,11 @@ ol = Overlay('snn_integrated.bit')
 # HLS learning engine
 cd hardware/hls && ./scripts/build_hls.sh
 
-# Complete system (HLS + RTL)
-cd hardware/scripts && ./build_integrated.sh
+# RTL testbenches (55 checks)
+cd hardware/scripts && ./run_testbenches.sh
+
+# Vivado synthesis check
+cd hardware/scripts && vivado -mode batch -source synth_core_group.tcl
 ```
 
 Output: `outputs/snn_integrated.bit`
@@ -126,17 +129,15 @@ All verification tests pass (RTL ↔ Python bit-match).
 hardware/
 ├── hdl/
 │   ├── rtl/          # Verilog RTL
-│   │   ├── common/   # FIFO, utilities
 │   │   ├── core/     # Core group, event router, connectivity table
-│   │   ├── layers/   # Conv1D/2D, pooling
-│   │   ├── learning/ # STDP engine
-│   │   ├── neurons/  # LIF neuron implementations
-│   │   ├── router/   # Legacy spike routing
-│   │   ├── synapses/ # Synaptic arrays
-│   │   └── top/      # Top-level integration
-│   └── tb/           # Testbenches (19 + 2 comprehensive)
+│   │   └── top/      # Top-level integration (snn_core_group_top)
+│   └── tb/           # Testbenches (3 active: core_group, router_ct, integration)
 ├── hls/              # Vitis HLS (learning engine)
-└── scripts/          # Build scripts (TCL)
+│   ├── src/          # snn_top_hls.cpp
+│   ├── include/      # snn_top_hls.h
+│   ├── test/         # HLS testbenches
+│   └── scripts/      # HLS build scripts
+└── scripts/          # Build & simulation scripts
 
 software/python/      # Python package (19 modules)
 examples/             # Usage examples

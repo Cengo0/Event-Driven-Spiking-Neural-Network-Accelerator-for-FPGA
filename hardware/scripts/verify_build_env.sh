@@ -51,17 +51,17 @@ fi
 echo ""
 echo "Checking scripts..."
 
-if [ -f "hardware/scripts/build_bitstream.sh" ]; then
-    log_info "Bitstream build script found"
+if [ -f "hardware/scripts/synth_core_group.tcl" ]; then
+    log_info "Synthesis script found"
 else
-    log_error "Bitstream build script NOT found"
+    log_error "Synthesis script NOT found"
     exit 1
 fi
 
-if [ -f "hardware/scripts/create_block_design.tcl" ]; then
-    log_info "Block design script found"
+if [ -f "hardware/scripts/run_testbenches.sh" ]; then
+    log_info "Testbench runner script found"
 else
-    log_error "Block design script NOT found"
+    log_error "Testbench runner script NOT found"
     exit 1
 fi
 
@@ -116,8 +116,12 @@ echo ""
 echo "=============================================="
 log_info "Build environment ready!"
 echo ""
-echo "To build bitstream, run:"
+echo "To run RTL testbenches:"
 echo "  cd hardware/scripts"
-echo "  ./build_bitstream.sh"
+echo "  ./run_testbenches.sh"
+echo ""
+echo "To run synthesis:"
+echo "  cd hardware/scripts"
+echo "  vivado -mode batch -source synth_core_group.tcl"
 echo ""
 echo "Estimated build time: 20-40 minutes"

@@ -74,16 +74,9 @@ hardware/hls/_x/
 hardware/hls/vitis_journal.py
 
 # HLS test binaries
-hardware/hls/test/tb_active_tracking
-hardware/hls/test/tb_baseline
-hardware/hls/test/tb_cam_lookup
-hardware/hls/test/tb_dataflow
-hardware/hls/test/tb_hierarchical
-hardware/hls/test/tb_decoder
-hardware/hls/test/tb_encoder
-hardware/hls/test/tb_learning
 hardware/hls/test/tb_snn_top
-hardware/hls/test/tb_weight
+hardware/hls/test/tb_*
+!hardware/hls/test/tb_*.cpp
 
 # ============================================================
 # RTL Simulation
@@ -91,19 +84,18 @@ hardware/hls/test/tb_weight
 
 # Simulation work directories
 hardware/sim_work/
-hardware/hdl/sim/work/
-hardware/hdl/sim/test_results/
-hardware/hdl/sim/results/
+hardware/hdl/sim/
 hardware/hdl/build/
 
 # Simulation outputs
-hardware/hdl/sim/*.dat
 *.vvp
 
 # ============================================================
 # Build outputs (Vivado projects)
 # ============================================================
 build/
+hardware/build/
+hardware/ip_repo/
 
 # ============================================================
 # Data / Models / Outputs

@@ -24,22 +24,16 @@ export LC_ALL=en_US.UTF-8
 ```
 hardware/
 ├── hdl/rtl/            # Verilog RTL
-│   ├── common/         # FIFO, utilities
 │   ├── core/           # Core group, event router, connectivity table
-│   ├── layers/         # Conv1D/2D, pooling
-│   ├── learning/       # STDP engine
-│   ├── neurons/        # LIF neuron implementations
-│   ├── router/         # Legacy spike routing
-│   ├── synapses/       # Weight memory
-│   └── top/            # Integration
-├── hdl/tb/             # Testbenches (19 + 2 comprehensive)
-├── hdl/sim/            # Simulation scripts
+│   └── top/            # Top-level integration (snn_core_group_top)
+├── hdl/tb/             # Testbenches (3 active)
 ├── hls/                # Vitis HLS
-│   ├── src/            # HLS source
+│   ├── src/            # HLS source (snn_top_hls)
 │   ├── include/        # Headers
-│   └── test/           # HLS testbenches
+│   ├── test/           # HLS testbenches
+│   └── scripts/        # HLS build scripts
 ├── constraints/        # Timing and pin constraints
-└── scripts/            # Build scripts (TCL)
+└── scripts/            # Build & simulation scripts
 
 software/python/        # Python package
 examples/               # Usage examples
@@ -51,8 +45,8 @@ docs/                   # Documentation
 ### RTL Simulation
 
 ```bash
-cd hardware/hdl/sim
-./run_all_tests.sh  # Run all 19 testbenches (+2 comprehensive)
+cd hardware/scripts
+./run_testbenches.sh  # Run all 3 core group testbenches (55 checks)
 ```
 
 ### HLS Build
@@ -62,13 +56,13 @@ cd hardware/hls
 ./scripts/build_hls.sh --clean
 ```
 
-### Integrated Bitstream
+### Vivado Synthesis Check
 
 ```bash
 cd hardware/scripts
 source ~/tools/2025.2/Vivado/settings64.sh
 export LC_ALL=en_US.UTF-8
-vivado -mode batch -source build_integrated_system.tcl
+vivado -mode batch -source synth_core_group.tcl
 ```
 
 Output: `outputs/snn_integrated.bit`

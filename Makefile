@@ -108,12 +108,11 @@ hls:
 
 .PHONY: vivado
 vivado:
-	@echo "$(YELLOW)Building Vivado project...$(RESET)"
+	@echo "$(YELLOW)Running Vivado synthesis check...$(RESET)"
 	@if command -v $(VIVADO) >/dev/null 2>&1; then \
 		cd $(HARDWARE_DIR)/scripts && \
-		chmod +x run_all.sh && \
-		./run_all.sh; \
-		echo "$(GREEN)✅ Vivado build completed$(RESET)"; \
+		$(VIVADO) -mode batch -source synth_core_group.tcl; \
+		echo "$(GREEN)✅ Vivado synthesis completed$(RESET)"; \
 	else \
 		echo "$(RED)❌ Vivado not found$(RESET)"; \
 		exit 1; \
@@ -125,11 +124,11 @@ hardware: hls vivado
 
 .PHONY: sim
 sim:
-	@echo "$(YELLOW)Running hardware simulation...$(RESET)"
-	@cd $(HARDWARE_DIR)/hdl/sim && \
-	chmod +x run_sim.sh && \
-	./run_sim.sh
-	@echo "$(GREEN)✅ Hardware simulation completed$(RESET)"
+	@echo "$(YELLOW)Running RTL testbenches...$(RESET)"
+	@cd $(HARDWARE_DIR)/scripts && \
+	chmod +x run_testbenches.sh && \
+	./run_testbenches.sh
+	@echo "$(GREEN)✅ RTL simulation completed$(RESET)"
 
 # Software build targets
 .PHONY: python
@@ -166,11 +165,4 @@ software: install
 .PHONY: program
 program:
 	@echo "$(YELLOW)Programming FPGA...$(RESET)"
-	@cd hardware/scripts && $(VIVADO) -mode batch -source program_fpga.tcl || echo "$(YELLOW)Program script not available$(RESET)"
-	cd hls && rm -rf solution*
-	find . -name "*.log" -delete
-	find . -name "*.jou" -delete
-
-test:
-	cd hdl/tb && vsim -do run_all_tests.do
-	cd software/python && pytest tests/
+	@cd hardware/scripts && $(VIVADO) -mode batch -source program_board.tcl || echo "$(YELLOW)Program script not available$(RESET)"
