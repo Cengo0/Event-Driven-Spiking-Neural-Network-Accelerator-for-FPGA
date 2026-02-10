@@ -299,7 +299,7 @@ class SpikingNeuron(nn.Module):
         # HW constraints
         if hw_mode:
             self.mem_bits = 16
-            self.weight_bits = 8
+            self.weight_bits = 4     # 4-bit unsigned weights (core_group.v)
             self.mem_max = 65535  # 16-bit unsigned max
             self.mem_min = 0
     
