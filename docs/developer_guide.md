@@ -24,13 +24,22 @@ export LC_ALL=en_US.UTF-8
 ```
 hardware/
 ├── hdl/rtl/            # Verilog RTL
+│   ├── common/         # FIFO, utilities
+│   ├── core/           # Core group, event router, connectivity table
+│   ├── layers/         # Conv1D/2D, pooling
+│   ├── learning/       # STDP engine
 │   ├── neurons/        # LIF neuron implementations
-│   ├── router/         # Spike routing
+│   ├── router/         # Legacy spike routing
 │   ├── synapses/       # Weight memory
 │   └── top/            # Integration
+├── hdl/tb/             # Testbenches (19 + 2 comprehensive)
+├── hdl/sim/            # Simulation scripts
 ├── hls/                # Vitis HLS
-│   └── src/            # HLS source
-└── scripts/            # Build scripts
+│   ├── src/            # HLS source
+│   ├── include/        # Headers
+│   └── test/           # HLS testbenches
+├── constraints/        # Timing and pin constraints
+└── scripts/            # Build scripts (TCL)
 
 software/python/        # Python package
 examples/               # Usage examples
@@ -43,7 +52,7 @@ docs/                   # Documentation
 
 ```bash
 cd hardware/hdl/sim
-./run_all_tests.sh  # Run all 12 testbenches
+./run_all_tests.sh  # Run all 19 testbenches (+2 comprehensive)
 ```
 
 ### HLS Build
@@ -196,10 +205,23 @@ Avoid DSP usage: Use shifts instead of multiplies when possible.
 software/python/snn_fpga_accelerator/
 ├── __init__.py
 ├── accelerator.py          # Main API
-├── spike_encoding.py       # Encoders
+├── cli.py                  # Command-line interface
+├── deploy.py               # Deployment utilities
+├── encoder.py              # Delta-sigma encoder
+├── exceptions.py           # Custom exceptions
+├── fpga_controller.py      # FPGA control interface
+├── hw_accurate_simulator.py  # Bit-accurate sim (LIF, STDP)
+├── layer.py                # SNN layer abstraction
 ├── learning.py             # STDP/R-STDP
-├── hw_accurate_simulator.py  # Bit-accurate sim
-└── utils.py
+├── neuron.py               # HW-accurate core group sim
+├── pytorch_interface.py    # PyTorch integration
+├── pytorch_snn_layers.py   # Custom PyTorch layers
+├── rtl_simulator.py        # RTL simulation driver
+├── spike_encoding.py       # Spike encoders (Poisson, Temporal, Phase)
+├── spyketorch_compat.py    # SpykeTorch compatibility
+├── training.py             # Training loop utilities
+├── utils.py                # Utilities (tau conversion, visualization)
+└── xrt_backend.py          # XRT/Vitis backend
 ```
 
 ### Testing

@@ -104,14 +104,15 @@ Understanding the project structure will help you navigate and contribute effect
 │   ├── hdl/                    # Hardware Description Language
 │   │   ├── rtl/                # Synthesizable Verilog-2001/SystemVerilog
 │   │   │   ├── common/         # Utilities (FIFO, synchronizers)
+│   │   │   ├── core/           # Core group, event router, connectivity table
 │   │   │   ├── neurons/        # LIF neuron implementations
 │   │   │   ├── synapses/       # Synaptic arrays
-│   │   │   ├── router/         # Spike routing logic
-│   │   │   ├── layers/         # Conv1D, pooling, etc.
-│   │   │   ├── interfaces/     # AXI wrapper
+│   │   │   ├── router/         # Legacy spike routing logic
+│   │   │   ├── layers/         # Conv1D/2D, pooling
+│   │   │   ├── learning/       # STDP engine
 │   │   │   └── top/            # Top-level modules
 │   │   ├── sim/                # Simulation scripts
-│   │   └── tb/                 # Testbenches
+│   │   └── tb/                 # Testbenches (19 + 2 comprehensive)
 │   ├── hls/                    # High-Level Synthesis (C++)
 │   │   ├── src/                # HLS source files
 │   │   ├── include/            # Headers
@@ -121,18 +122,20 @@ Understanding the project structure will help you navigate and contribute effect
 │   └── scripts/                # Build scripts (TCL)
 │
 ├── software/python/            # Python software stack
-│   └── snn_fpga_accelerator/   # Main package
-│       ├── accelerator.py      # FPGA interface
-│       ├── pytorch_interface.py # PyTorch integration
-│       ├── spike_encoding.py   # Spike encoders/decoders
-│       ├── learning.py         # STDP/R-STDP
-│       └── pytorch_snn_layers.py # Custom PyTorch layers
+│   ├── snn_fpga_accelerator/   # Main package (19 modules)
+│   │   ├── accelerator.py      # FPGA interface
+│   │   ├── neuron.py           # HW-accurate core group sim
+│   │   ├── hw_accurate_simulator.py # Bit-accurate LIF/STDP/CoreGroup sim
+│   │   ├── pytorch_interface.py # PyTorch integration
+│   │   ├── spike_encoding.py   # Spike encoders/decoders
+│   │   ├── learning.py         # STDP/R-STDP
+│   │   ├── pytorch_snn_layers.py # Custom PyTorch layers
+│   │   └── ...                 # + 12 more modules
+│   └── tests/                  # Test suite (15 test files)
 │
 ├── examples/                   # Usage examples
-│   ├── pytorch/                # PyTorch training examples
-│   └── notebooks/              # Jupyter notebooks
+│   └── pytorch/                # PyTorch training examples
 │
-├── tests/                      # Test suite
 └── docs/                       # Documentation
 ```
 

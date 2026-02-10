@@ -31,7 +31,8 @@ python examples/pytorch/mnist_training_example.py
 ## Architecture
 
 ```
-ARM PS (PyTorch) <--AXI--> FPGA PL (720 LIF neurons + STDP + Router)
+ARM PS (PyTorch) <--AXI--> FPGA PL (2,048 LIF neurons + STDP + Router)
+                              16 Core Groups × 128 neurons, 4-bit weights
 ```
 
 **Resources** (Integrated build @ 100MHz):
@@ -98,19 +99,19 @@ python examples/pytorch/mozafari_rstdp_faithful.py
 
 ## Recent Changes (2026-02-10)
 
-### Encoder Cleanup & Neuron Scaling
-- **Encoder cleanup**: Removed rate-Poisson, latency, two-neuron encoders from HLS
-  - Only delta-sigma modulator retained on-chip; other encodings done on host PC
-  - Saves ~2,500 LUTs, 8 DSPs, and encoder-related BRAM
-- **Neuron scaling**: MAX_NEURONS 512 → 720, MAX_SYNAPSES 262,144 → 518,400
-- **4-bit weights**: WEIGHT_WIDTH 8 → 4 (range -8..+7) for BRAM-efficient scaling
-- **ENCODER_LOOP simplified**: PIPELINE II=1 (was UNROLL=2 with switch branches)
-- **Verified**: C-sim (5/5 PASS), HLS Fmax 125 MHz, Vivado WNS +0.338ns
+### Core Group Architecture
+- **Hierarchical design**: 16 core groups × 128 LIF neurons = 2,048 total neurons
+- **Event Router NG**: Round-robin arbiter with 16 group ports + external source
+- **Synaptic Connectivity Table**: Sparse inter-group connections (32K × 17b BRAM)
+- **Dense intra-group**: 128×128 × 5b weight matrix per group (4-bit weight + exc/inh)
+- **Verified**: 55/55 RTL tests pass, Vivado synthesis clean, Python bit-accurate
 
-### Previous: Pipelining & Scaling Optimization
-- **Neuron scaling**: MAX_NEURONS 256 → 512, 10-bit neuron IDs
-- **HLS pipelining**: LTD/LTP loops II=1, RSTDP_INNER UNROLL=4
-- **Memory partitioning**: Weight memory 8 banks, trace arrays factor=4
+### HLS Learning Engine
+- **Encoder cleanup**: Only delta-sigma modulator on-chip; other encodings on host PC
+- **HLS capacity**: MAX_NEURONS=720, MAX_SYNAPSES=518,400, 4-bit weights
+- **Pipelining**: LTD/LTP loops II=1, RSTDP_INNER UNROLL=4
+- **Memory**: Weight memory 8 banks, trace arrays factor=4
+- **Verified**: C-sim (5/5 PASS), HLS Fmax 125 MHz, Vivado WNS +0.338ns
 
 ### Previous Fixes
 - RTL: leak_rate encoding, spike timing, parameterization, mu parameter
@@ -123,14 +124,24 @@ All verification tests pass (RTL ↔ Python bit-match).
 
 ```
 hardware/
-├── hdl/rtl/      # Verilog RTL (neurons, router, synapses)
-├── hls/          # Vitis HLS (learning engine)
-└── scripts/      # Build scripts
+├── hdl/
+│   ├── rtl/          # Verilog RTL
+│   │   ├── common/   # FIFO, utilities
+│   │   ├── core/     # Core group, event router, connectivity table
+│   │   ├── layers/   # Conv1D/2D, pooling
+│   │   ├── learning/ # STDP engine
+│   │   ├── neurons/  # LIF neuron implementations
+│   │   ├── router/   # Legacy spike routing
+│   │   ├── synapses/ # Synaptic arrays
+│   │   └── top/      # Top-level integration
+│   └── tb/           # Testbenches (19 + 2 comprehensive)
+├── hls/              # Vitis HLS (learning engine)
+└── scripts/          # Build scripts (TCL)
 
-software/python/  # Python package
-examples/         # Usage examples
-docs/             # Documentation
-outputs/          # Generated bitstreams
+software/python/      # Python package (19 modules)
+examples/             # Usage examples
+docs/                 # Documentation
+outputs/              # Build reports & bitstreams
 ```
 
 ## Citation

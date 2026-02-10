@@ -88,7 +88,7 @@ module snn_core_group_top #(
     // HLS Compatibility
     parameter HLS_NEURON_ID_WIDTH   = 11,       // Match GLOBAL_ID_WIDTH
     parameter HLS_MAX_NEURONS       = 2048,     // 16 groups × 128 neurons
-    parameter HLS_WEIGHT_WIDTH      = 8         // HLS uses 8-bit weights
+    parameter HLS_WEIGHT_WIDTH      = 8         // HLS interface width (HLS internal: 4-bit)
 )(
     //-------------------------------------------------------------------------
     // DDR Interface (directly from PS)
@@ -422,7 +422,7 @@ module snn_core_group_top #(
     assign rtl_spike_out_valid     = learn_spike_valid;
     assign rtl_spike_out_neuron_id = learn_spike_src_id;
     assign rtl_spike_out_weight    = {{(HLS_WEIGHT_WIDTH-WEIGHT_WIDTH){1'b0}},
-                                       ct_result_weight};  // Extend to 8-bit
+                                       ct_result_weight};  // Zero-extend 4-bit to HLS_WEIGHT_WIDTH
     assign learn_spike_ready       = hls_spike_in_ready;
 
     // HLS ready/busy
@@ -431,7 +431,7 @@ module snn_core_group_top #(
     assign rtl_snn_busy       = router_busy | (grp_busy != {NUM_GROUPS{1'b0}});
 
     //=========================================================================
-    // Core Group Instantiations (8 groups × 128 neurons = 1024 total)
+    // Core Group Instantiations (16 groups × 128 neurons = 2048 total)
     //=========================================================================
 
     // Mux write enable: AXI config writes OR event router weight updates

@@ -252,9 +252,13 @@ def test_refractory_period():
     all_passed = all_passed and (neuron.state.refrac_counter == 5)
     
     # Tick through refractory period
+    # NOTE: refrac_counter only decrements during LEAK cycles (syn_valid=False),
+    # not during spike processing (syn_valid=True). This matches core_group.v
+    # where refrac decrement happens in ST_LEAK_WR, not ST_SPIKE_WR.
     for i in range(5):
         old_refrac = neuron.state.refrac_counter
-        spike = neuron.tick(syn_valid=True, syn_weight=200, syn_excitatory=True, enable=True)
+        # Send leak cycle (syn_valid=False) to decrement refractory counter
+        spike = neuron.tick(syn_valid=False, enable=True)
         
         # Should not spike during refractory
         passed = (spike == False) and (neuron.state.v_mem == 0)
@@ -263,7 +267,7 @@ def test_refractory_period():
         
         print(f"  Tick {i+1}: spike={spike}, refrac={neuron.state.refrac_counter}, v_mem={neuron.state.v_mem}")
     
-    # Now should be able to spike again
+    # Now refrac_counter should be 0, neuron can spike again
     spike = neuron.tick(syn_valid=True, syn_weight=200, syn_excitatory=True, enable=True)
     print(f"  After refractory: spike={spike} (expected True)")
     all_passed = all_passed and (spike == True)

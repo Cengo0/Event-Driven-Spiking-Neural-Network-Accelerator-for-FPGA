@@ -6,6 +6,11 @@
 // Organization  : Kwangwoon University, Seoul, South Korea
 // Contact       : jwlee@linux.com
 // Description   : Common type definitions for SNN HLS modules
+//                 NOTE: snn_top_hls.h defines different values for the main
+//                 accelerator path (MAX_NEURONS=720, WEIGHT_WIDTH=4).
+//                 This file is used by standalone utility modules
+//                 (encoders, weight updater, network controller).
+//                 When SNN_TOP_HLS_H is defined, its values take precedence.
 //-----------------------------------------------------------------------------
 
 #ifndef SNN_TYPES_H
@@ -16,12 +21,18 @@
 #include <hls_stream.h>
 
 // System parameters
-const int MAX_NEURONS = 1024;             // 1024 neurons (BRAM-backed, ~1 RAMB18 for neuron state)
+// NOTE: snn_top_hls.h uses MAX_NEURONS=720, WEIGHT_WIDTH=4 for the main path.
+// These values are used by standalone utility modules only.
+#ifndef SNN_TOP_HLS_H
+const int MAX_NEURONS = 1024;             // 1024 neurons (standalone modules)
 const int MAX_SYNAPSES = 1048576;         // 1024x1024
+#endif
 const int MAX_INPUT_CHANNELS = 784;       // 28x28 MNIST default (matches snn_top_hls.h)
 const int MAX_OUTPUT_NEURONS = 64;        // More output classes
 
-// Basic data types - unified with snn_top_hls.h
+// Basic data types
+// NOTE: snn_top_hls.h uses ap_int<4> for weight_t in the main accelerator.
+#ifndef SNN_TOP_HLS_H
 typedef ap_uint<10> neuron_id_t;           // 10-bit: supports up to 1024 encoded channels
 typedef ap_uint<8> axon_id_t;
 typedef ap_uint<32> spike_time_t;
@@ -39,6 +50,7 @@ const weight_t MAX_WEIGHT = 127;
 const weight_t MIN_WEIGHT = -128;
 const weight_delta_t MAX_WEIGHT_DELTA = 127;
 const int WEIGHT_SCALE = 128;
+#endif
 
 // Spike event structure
 struct spike_event_t {

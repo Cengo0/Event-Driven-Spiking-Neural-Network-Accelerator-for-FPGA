@@ -112,8 +112,6 @@ build/
 # Keep directory structure with .gitkeep
 data/*
 !data/.gitkeep
-!data/MNIST/
-!data/cache/
 models/*
 !models/.gitkeep
 

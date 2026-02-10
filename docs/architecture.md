@@ -310,8 +310,8 @@ $$\Delta w_{LTD} = -a^- \cdot \frac{(w - w_{min})^{\mu}}{scale}$$
 
 ```cpp
 // O(N+M) instead of O(N×M)
-static neuron_trace_t pre_traces[MAX_NEURONS];   // 2048 entries
-static neuron_trace_t post_traces[MAX_NEURONS];  // 2048 entries
+static neuron_trace_t pre_traces[MAX_NEURONS];   // 720 entries (HLS limit)
+static neuron_trace_t post_traces[MAX_NEURONS];  // 720 entries (HLS limit)
 
 struct neuron_trace_t {
     ap_uint<8> trace;              // 8-bit exponential trace
@@ -474,4 +474,3 @@ See [developer_guide.md](developer_guide.md) for detailed build instructions.
 - [User Guide](user_guide.md) - Usage examples
 - [Developer Guide](developer_guide.md) - Development workflow
 - [API Reference](api_reference.md) - Python API
-- [RTL Bugfix Summary](RTL_BUGFIX_SUMMARY.md) - Bug fixes applied

@@ -43,13 +43,17 @@ prediction = np.argmax(output.sum(axis=1))
 
 ## Network Configuration
 
-**Hardware Capacity**: Up to 720 LIF neurons (10-bit neuron IDs) and 518,400 synapses (720×720 weight matrix). The FPGA bitstream is `outputs/snn_integrated.bit`.
+**Hardware Capacity**:
+- **RTL (Core Group)**: Up to 2,048 LIF neurons (16 groups × 128, 11-bit global IDs) with dense intra-group and sparse inter-group connectivity
+- **HLS (Learning Engine)**: Up to 720 neurons (10-bit neuron IDs) and 518,400 synapses (720×720 weight matrix)
+
+The FPGA bitstream is `outputs/snn_integrated.bit`.
 
 ### Basic Setup
 
 ```python
 config = {
-    'num_neurons': 200,     # Max 720 on hardware
+    'num_neurons': 200,     # Max 720 (HLS) / 2048 (RTL)
     'threshold': 1000,
     'tau': 0.9,  # Use tau for intuitive decay control
     'refractory_period': 5,

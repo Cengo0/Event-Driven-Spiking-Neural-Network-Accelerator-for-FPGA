@@ -13,7 +13,7 @@ Usage:
     lif = snn.LIF(thresh=1.0, tau=0.9, learn_thresh=True)
     
     # HW-constrained mode
-    lif = snn.LIF(hw_mode=True)  # Uses 8-bit weights, 16-bit membrane
+    lif = snn.LIF(hw_mode=True)  # Uses 4-bit weights, 16-bit membrane
 
 Author: Jiwoon Lee (@metr0jw)
 """
@@ -267,9 +267,9 @@ class SpikingNeuron(nn.Module):
     
     Hardware Mode (hw_mode=True):
         - Uses 16-bit unsigned membrane potential [0, 65535]
-        - Uses 8-bit signed weights [-128, 127]
+        - Uses 4-bit weights (unsigned weight + exc/inh flag)
         - Uses shift-based exponential leak (no multiplier)
-        - Matches lif_neuron.v exactly
+        - Matches core_group.v exactly
     """
     
     def __init__(

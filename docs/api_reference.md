@@ -317,6 +317,88 @@ from snn_fpga_accelerator.hw_accurate_simulator import verify_stdp_engine
 verify_stdp_engine()  # Runs 5 tests, prints results
 ```
 
+### HWAccurateSNNSimulator
+
+Complete hardware-accurate SNN simulator matching the Core Group RTL architecture.
+
+```python
+from snn_fpga_accelerator.hw_accurate_simulator import (
+    HWAccurateSNNSimulator, LIFNeuronParams, STDPConfig
+)
+
+# Create simulator (16 groups × 128 neurons = 2,048 total)
+sim = HWAccurateSNNSimulator(
+    num_groups=16,
+    neurons_per_group=128,
+    neuron_params=LIFNeuronParams(threshold=1000, leak_rate=0x2C),
+    clock_period_ns=10  # 100 MHz
+)
+
+# Set inter-group connections
+sim.ct.add_entry(src_group=0, src_neuron=5, dst_group=1, dst_neuron=10,
+                 weight=7, exc_inh=True)
+
+# Inject spikes and step
+sim.inject_external_spike(global_neuron_id=5)
+output_spikes = sim.step_cycle()
+
+# Reset
+sim.reset()
+```
+
+### HWCoreGroup
+
+Bit-accurate simulator for a single core group (128 LIF neurons).
+
+```python
+from snn_fpga_accelerator.hw_accurate_simulator import HWCoreGroup, LIFNeuronParams
+
+group = HWCoreGroup(
+    group_id=0,
+    neurons_per_group=128,
+    params=LIFNeuronParams(threshold=1000, leak_rate=0x2C)
+)
+
+# Load intra-group weights
+group.set_weight(src=5, dst=10, weight=7, exc=True)  # 4-bit weight + exc flag
+
+# Inject spike and process
+group.inject_spike(neuron_id=5, weight=7, exc=True)
+fired_neurons = group.process_spikes()
+group.process_leak()
+```
+
+### HWConnectivityTable
+
+Sparse inter-group connection storage (matches synaptic_connectivity_table.v).
+
+```python
+from snn_fpga_accelerator.hw_accurate_simulator import HWConnectivityTable
+
+ct = HWConnectivityTable(num_groups=16, neurons_per_group=128)
+
+# Add connection (max 16 fanout entries per source neuron)
+ct.add_entry(src_group=0, src_neuron=5, dst_group=1, dst_neuron=10,
+             weight=7, exc_inh=True)
+
+# Lookup destinations for a spike
+destinations = ct.lookup(src_group=0, src_neuron=5)
+# Returns list of (dst_group, dst_neuron, weight, exc_inh)
+```
+
+### HWEventRouter
+
+Central spike routing hub (matches event_router_ng.v).
+
+```python
+from snn_fpga_accelerator.hw_accurate_simulator import HWEventRouter
+
+router = HWEventRouter(num_groups=16, connectivity_table=ct)
+
+# Route a spike through the connectivity table
+delivered = router.route_spike(src_group=0, src_neuron=5, groups=sim.groups)
+```
+
 ## Configuration
 
 ### Neuron Parameters
@@ -329,7 +411,9 @@ verify_stdp_engine()  # Runs 5 tests, prints results
 | refractory_period | int | 0-255 | 5 | Cycles after spike |
 | reset_potential | int | 0-65535 | 0 | Post-spike reset |
 
-**Hardware Limits**: MAX_NEURONS = 720, MAX_SYNAPSES = 518,400 (720×720). Neuron IDs are 10-bit (`neuron_id_t`, range 0–719).
+**Hardware Limits**:
+- **HLS Learning Engine**: MAX_NEURONS = 720, MAX_SYNAPSES = 518,400 (720×720). Neuron IDs are 10-bit (`neuron_id_t`, range 0–719).
+- **RTL Core Groups**: 2,048 neurons (16 groups × 128). Neuron IDs are 11-bit (range 0–2047). Global ID = `{group_id[3:0], local_id[6:0]}`.
 
 ### STDP Parameters
 
