@@ -14,18 +14,18 @@ System architecture of the Event-Driven SNN FPGA Accelerator.
                         │ AXI Bus
 ┌───────────────────────┴─────────────────────────────────┐
 │                 FPGA (PYNQ-Z2)                          │
-│  ┌────────────┐  ┌──────────────────┐  ┌───────────┐  │
-│  │ AXI        │→ │  Event Router    │→ │ Core Group│  │
-│  │ Interface  │  │  (NG, 16-port)   │  │ ×16       │  │
-│  └────────────┘  └──────┬───────────┘  │ (128 LIF  │  │
-│         ↓               │              │  neurons)  │  │
-│  ┌──────────────┐  ┌────┴────────┐     └───────────┘  │
-│  │ STDP/R-STDP  │  │ Synaptic    │                     │
-│  │ Learning     │  │ Connectivity│                     │
-│  │ Engine (HLS) │  │ Table (BRAM)│                     │
-│  └──────────────┘  └─────────────┘                     │
+│  ┌────────────┐  ┌──────────────────┐  ┌───────────┐    │
+│  │ AXI        │→ │  Event Router    │→ │ Core Group│    │
+│  │ Interface  │  │  (NG, 16-port)   │  │ ×16       │    │
+│  └────────────┘  └──────┬───────────┘  │ (128 LIF  │    │
+│         ↓               │              │  neurons) │    │
+│  ┌──────────────┐  ┌────┴────────┐     └───────────┘    │
+│  │ STDP/R-STDP  │  │ Synaptic    │                      │
+│  │ Learning     │  │ Connectivity│                      │
+│  │ Engine (HLS) │  │ Table (BRAM)│                      │
+│  └──────────────┘  └─────────────┘                      │
 │                                                         │
-│  Total: 2,048 neurons, ~65 BRAM36, ~10K LUT            │
+│  Total: 2,048 neurons, ~65 BRAM36, ~10K LUT             │
 └─────────────────────────────────────────────────────────┘
 ```
 

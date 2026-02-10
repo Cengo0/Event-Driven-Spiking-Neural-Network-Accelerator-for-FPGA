@@ -131,3 +131,6 @@ build/
 outputs/
 *.bit
 *.hwh
+
+# Simulation directory
+hardware/sim_work/
