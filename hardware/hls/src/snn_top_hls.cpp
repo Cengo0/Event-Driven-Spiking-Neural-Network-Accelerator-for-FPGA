@@ -323,11 +323,12 @@ static weight_t clip_weight(ap_int<16> w) {
 }
 
 //=============================================================================
-// Process Pre-Synaptic Spike (Input Spike) - Per-Neuron Trace STDP
+// Process Pre-Synaptic Spike (Input Spike) - Mozafari Weight-Dependent STDP
 // When pre-neuron i fires:
 //   1. Update pre_trace[i] with lazy decay + spike
-//   2. For all post-neurons j: Apply LTD using post_trace[j]
-//      W[i][j] -= A_neg * post_trace[j]
+//   2. For all post-neurons j with existing post_trace[j]:
+//      Apply LTD: Δw = -a_minus * (w - w_min)^μ
+//      (Mozafari multiplicative rule, matching stdp_engine.v)
 //=============================================================================
 static void process_pre_spike_aer(
     neuron_id_t pre_id,
@@ -346,7 +347,8 @@ static void process_pre_spike_aer(
     pre_traces[pre_id].last_spike_time = current_time;
     
     // Step 2: Apply LTD to all synapses from this pre-neuron
-    // W[pre_id][j] -= A_neg * post_trace[j]
+    // Mozafari rule: Δw = -a_minus * (w - w_min)^μ  (weight-dependent)
+    // Matches stdp_engine.v: delta_w = (cfg_a_minus * (w - w_min)) >> 8
     LTD_LOOP: for (int j = 0; j < MAX_NEURONS; j++) {
         #pragma HLS PIPELINE II=2
         #pragma HLS UNROLL factor=4
@@ -358,12 +360,13 @@ static void process_pre_spike_aer(
         // Skip if no recent post-synaptic activity
         if (post_trace_val == 0) continue;
         
-        // Compute LTD: delta = -A_neg * post_trace (using shifts)
-        // A_neg ≈ 0.01 -> post_trace >> 7 (approximately)
-        ap_int<16> delta = -((ap_int<16>)post_trace_val >> 6);  // ~0.015
-        
         // Read current weight
         weight_t current_w = weight_memory[pre_id][j];
+        
+        // Mozafari weight-dependent LTD: Δw = -a_minus * (w - w_min)
+        // Scale: (post_trace_val / 256) acts as timing modulation
+        ap_int<16> distance = (ap_int<16>)current_w - (ap_int<16>)MIN_WEIGHT;
+        ap_int<16> delta = -((distance * (ap_int<16>)post_trace_val) >> 8);
         
         // Apply update
         weight_memory[pre_id][j] = clip_weight((ap_int<16>)current_w + delta);
@@ -371,11 +374,12 @@ static void process_pre_spike_aer(
 }
 
 //=============================================================================
-// Process Post-Synaptic Spike (Output Spike) - Per-Neuron Trace STDP
+// Process Post-Synaptic Spike (Output Spike) - Mozafari Weight-Dependent STDP
 // When post-neuron j fires:
 //   1. Update post_trace[j] with lazy decay + spike
-//   2. For all pre-neurons i: Apply LTP using pre_trace[i]
-//      W[i][j] += A_pos * pre_trace[i]
+//   2. For all pre-neurons i with existing pre_trace[i]:
+//      Apply LTP: Δw = +a_plus * (w_max - w)^μ
+//      (Mozafari multiplicative rule, matching stdp_engine.v)
 //=============================================================================
 static void process_post_spike_aer(
     neuron_id_t post_id,
@@ -394,7 +398,8 @@ static void process_post_spike_aer(
     post_traces[post_id].last_spike_time = current_time;
     
     // Step 2: Apply LTP to all synapses to this post-neuron
-    // W[i][post_id] += A_pos * pre_trace[i]
+    // Mozafari rule: Δw = +a_plus * (w_max - w)^μ  (weight-dependent)
+    // Matches stdp_engine.v: delta_w = (cfg_a_plus * (w_max - w)) >> 8
     LTP_LOOP: for (int i = 0; i < MAX_NEURONS; i++) {
         #pragma HLS PIPELINE II=2
         #pragma HLS UNROLL factor=4
@@ -406,12 +411,13 @@ static void process_post_spike_aer(
         // Skip if no recent pre-synaptic activity
         if (pre_trace_val == 0) continue;
         
-        // Compute LTP: delta = +A_pos * pre_trace (using shifts)
-        // A_pos ≈ 0.01 -> pre_trace >> 6 (slightly larger than LTD)
-        ap_int<16> delta = (ap_int<16>)pre_trace_val >> 5;  // ~0.03
-        
         // Read current weight
         weight_t current_w = weight_memory[i][post_id];
+        
+        // Mozafari weight-dependent LTP: Δw = +a_plus * (w_max - w)
+        // Scale: (pre_trace_val / 256) acts as timing modulation
+        ap_int<16> distance = (ap_int<16>)MAX_WEIGHT - (ap_int<16>)current_w;
+        ap_int<16> delta = (distance * (ap_int<16>)pre_trace_val) >> 8;
         
         // Apply update
         weight_memory[i][post_id] = clip_weight((ap_int<16>)current_w + delta);

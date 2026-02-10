@@ -183,6 +183,26 @@ from .hw_accurate_simulator import (
 )
 
 # =============================================================================
+# SpykeTorch Compatibility (for Mozafari et al. style networks)
+# =============================================================================
+from .spyketorch_compat import (
+    # Filters
+    DoGKernel, GaborKernel, Filter,
+    # Transforms
+    Intensity2Latency, LateralIntensityInhibition,
+    # Functional
+    local_normalization, pointwise_inhibition, fire,
+    get_k_winners, pooling, pad,
+    # STDP Layer
+    STDPConvolution, STDP,
+    # Complete transforms
+    S1C1Transform, CacheDataset,
+)
+
+# SpykeTorch-like functional module
+from . import spyketorch_compat as sf
+
+# =============================================================================
 # Legacy/Compatibility (will be deprecated)
 # =============================================================================
 from .accelerator import SNNAccelerator
@@ -296,6 +316,15 @@ __all__ = [
     
     # Functional
     'functional', 'F',
+    
+    # SpykeTorch compatibility
+    'DoGKernel', 'GaborKernel', 'Filter',
+    'Intensity2Latency', 'LateralIntensityInhibition',
+    'local_normalization', 'pointwise_inhibition', 'fire',
+    'get_k_winners', 'pooling', 'pad',
+    'STDPConvolution', 'STDP',
+    'S1C1Transform', 'CacheDataset',
+    'sf',  # SpykeTorch-like functional module
     
     # Legacy (compatibility)
     'SNNAccelerator', 'pytorch_to_snn', 'SNNLayer', 'SNNModel',

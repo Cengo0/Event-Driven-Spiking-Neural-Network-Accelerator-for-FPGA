@@ -12,10 +12,15 @@ Key features:
 4. Adaptive learning rates based on performance
 5. R-STDP (Reward/Anti-STDP) for classification
 
-Architecture (Shallow network - MozafariShallow):
-    Input (28x28) -> DoG filters (6 channels) -> Local norm -> 
-    Intensity2Latency -> Pooling -> STDP Conv (features_per_class * n_classes) -> 
-    WTA Decision
+Architectures:
+  MozafariDeepRSTDP (3-layer, faithful to original MozafariDeep.py):
+    Input (28x28) -> DoG filters (6 channels) ->
+    Conv1 (6->30, 5x5) -> Pooling 2x2 ->
+    Conv2 (30->250, 3x3) -> Pooling 3x3 ->
+    Conv3 (250->200, 5x5, R-STDP) -> Decision
+
+  MozafariRSTDP (shallow single-layer variant):
+    Input (28x28) -> DoG/Gabor filters -> STDP Conv -> WTA Decision
 
 Reference:
     Mozafari, M., et al. "First-spike-based visual categorization using 
@@ -44,7 +49,208 @@ from snn_fpga_accelerator import sf  # SpykeTorch-like functional module
 
 
 # =============================================================================
-# Mozafari R-STDP Network
+# Mozafari Deep R-STDP Network (3-layer, faithful to MozafariDeep.py)
+# =============================================================================
+
+class MozafariDeepRSTDP(nn.Module):
+    """
+    Mozafari et al. (2018) Deep R-STDP Network.
+    
+    Faithful 3-layer reimplementation matching original MozafariDeep.py:
+      Layer 1: Conv(6->30, 5x5), unsupervised STDP, k=5 winners, r=3
+      Layer 2: Conv(30->250, 3x3), unsupervised STDP, k=8 winners, r=1
+      Layer 3: Conv(250->200, 5x5), R-STDP (reward/anti-STDP)
+    
+    Training procedure:
+      1. Train layer 1 unsupervised (2 epochs)
+      2. Train layer 2 unsupervised (4 epochs)
+      3. Train layer 3 with R-STDP (reward-modulated)
+    """
+    
+    def __init__(self):
+        super().__init__()
+        
+        # Layer 1: 6 -> 30 features, 5x5 kernel
+        self.conv1 = snn.STDPConvolution(6, 30, 5, weight_mean=0.8, weight_std=0.05)
+        self.conv1_t = 15   # Firing threshold
+        self.k1 = 5         # k-winners
+        self.r1 = 3         # Inhibition radius
+        
+        # Layer 2: 30 -> 250 features, 3x3 kernel
+        self.conv2 = snn.STDPConvolution(30, 250, 3, weight_mean=0.8, weight_std=0.05)
+        self.conv2_t = 10
+        self.k2 = 8
+        self.r2 = 1
+        
+        # Layer 3: 250 -> 200 features (20 per class * 10 classes), 5x5 kernel
+        self.conv3 = snn.STDPConvolution(250, 200, 5, weight_mean=0.8, weight_std=0.05)
+        
+        # STDP learners
+        self.stdp1 = snn.STDP(self.conv1, (0.004, -0.003))
+        self.stdp2 = snn.STDP(self.conv2, (0.004, -0.003))
+        self.stdp3 = snn.STDP(self.conv3, (0.004, -0.003), False, 0.2, 0.8)
+        self.anti_stdp3 = snn.STDP(self.conv3, (-0.004, 0.0005), False, 0.2, 0.8)
+        
+        self.max_ap = nn.Parameter(torch.tensor([0.15]))
+        
+        # Decision map: 20 features per class, 10 classes
+        self.decision_map = []
+        for i in range(10):
+            self.decision_map.extend([i] * 20)
+        
+        self.ctx = {"input_spikes": None, "potentials": None,
+                    "output_spikes": None, "winners": None}
+        self.spk_cnt1 = 0
+        self.spk_cnt2 = 0
+    
+    def forward(self, input: Tensor, max_layer: int) -> Tensor:
+        """
+        Forward pass through layers up to max_layer.
+        
+        Args:
+            input: Input spike tensor (T, C, H, W)
+            max_layer: Maximum layer to process (1, 2, or 3)
+            
+        Returns:
+            For layer 1,2: (spikes, potentials)
+            For layer 3: predicted class (-1 if no winner)
+        """
+        x = input.float()
+        
+        # Pad input (2 on each side, matching original)
+        x = F.pad(x, (2, 2, 2, 2), value=0)
+        
+        if self.training:
+            return self._forward_train(x, max_layer)
+        else:
+            return self._forward_eval(x, max_layer)
+    
+    def _forward_train(self, x: Tensor, max_layer: int):
+        """Training forward with STDP context saving."""
+        # Layer 1
+        pot = self.conv1(x)
+        spk, pot = self._fire(pot, self.conv1_t, return_pot=True)
+        
+        if max_layer == 1:
+            # Adaptive LR for layer 1
+            self.spk_cnt1 += 1
+            if self.spk_cnt1 >= 500:
+                self.spk_cnt1 = 0
+                ap = torch.tensor(self.stdp1.learning_rate[0][0].item(),
+                                  device=self.stdp1.learning_rate[0][0].device) * 2
+                ap = torch.min(ap, self.max_ap)
+                an = ap * -0.75
+                self.stdp1.update_all_learning_rate(ap.item(), an.item())
+            
+            pot = sf.pointwise_inhibition(pot)
+            spk = pot.sign()
+            winners = sf.get_k_winners(pot, self.k1, self.r1, spk)
+            self._save_ctx(x, pot, spk, winners)
+            return spk, pot
+        
+        # Pool and pad for layer 2
+        spk_in = F.pad(sf.pooling(spk, 2, 2), (1, 1, 1, 1))
+        
+        # Layer 2
+        pot = self.conv2(spk_in)
+        spk, pot = self._fire(pot, self.conv2_t, return_pot=True)
+        
+        if max_layer == 2:
+            # Adaptive LR for layer 2
+            self.spk_cnt2 += 1
+            if self.spk_cnt2 >= 500:
+                self.spk_cnt2 = 0
+                ap = torch.tensor(self.stdp2.learning_rate[0][0].item(),
+                                  device=self.stdp2.learning_rate[0][0].device) * 2
+                ap = torch.min(ap, self.max_ap)
+                an = ap * -0.75
+                self.stdp2.update_all_learning_rate(ap.item(), an.item())
+            
+            pot = sf.pointwise_inhibition(pot)
+            spk = pot.sign()
+            winners = sf.get_k_winners(pot, self.k2, self.r2, spk)
+            self._save_ctx(spk_in, pot, spk, winners)
+            return spk, pot
+        
+        # Pool and pad for layer 3
+        spk_in = F.pad(sf.pooling(spk, 3, 3), (2, 2, 2, 2))
+        
+        # Layer 3 (R-STDP)
+        pot = self.conv3(spk_in)
+        spk = (pot >= 0).float() * pot.sign()  # fire without threshold
+        winners = sf.get_k_winners(pot, 1, 0, spk)
+        self._save_ctx(spk_in, pot, spk, winners)
+        
+        output = -1
+        if len(winners) != 0:
+            output = self.decision_map[winners[0][0]]
+        return output
+    
+    def _forward_eval(self, x: Tensor, max_layer: int):
+        """Evaluation forward without context saving."""
+        pot = self.conv1(x)
+        spk, pot = self._fire(pot, self.conv1_t, return_pot=True)
+        if max_layer == 1:
+            return spk, pot
+        
+        pot = self.conv2(F.pad(sf.pooling(spk, 2, 2), (1, 1, 1, 1)))
+        spk, pot = self._fire(pot, self.conv2_t, return_pot=True)
+        if max_layer == 2:
+            return spk, pot
+        
+        pot = self.conv3(F.pad(sf.pooling(spk, 3, 3), (2, 2, 2, 2)))
+        spk = (pot >= 0).float() * pot.sign()
+        winners = sf.get_k_winners(pot, 1, 0, spk)
+        
+        output = -1
+        if len(winners) != 0:
+            output = self.decision_map[winners[0][0]]
+        return output
+    
+    @staticmethod
+    def _fire(pot: Tensor, threshold: float, return_pot: bool = False):
+        """Fire neurons exceeding threshold (zeroes sub-threshold potentials)."""
+        thresholded = pot.clone()
+        thresholded[pot < threshold] = 0
+        spk = thresholded.sign()
+        if return_pot:
+            return spk, thresholded
+        return spk
+    
+    def _save_ctx(self, inp, pot, spk, winners):
+        """Save learning context."""
+        self.ctx["input_spikes"] = inp
+        self.ctx["potentials"] = pot
+        self.ctx["output_spikes"] = spk
+        self.ctx["winners"] = winners
+    
+    def stdp(self, layer_idx: int):
+        """Apply unsupervised STDP for layer 1 or 2."""
+        if layer_idx == 1:
+            self.stdp1(self.ctx["input_spikes"], self.ctx["potentials"],
+                       self.ctx["output_spikes"], self.ctx["winners"])
+        elif layer_idx == 2:
+            self.stdp2(self.ctx["input_spikes"], self.ctx["potentials"],
+                       self.ctx["output_spikes"], self.ctx["winners"])
+    
+    def update_learning_rates(self, stdp_ap, stdp_an, anti_stdp_ap, anti_stdp_an):
+        """Update R-STDP learning rates for layer 3."""
+        self.stdp3.update_all_learning_rate(stdp_ap, stdp_an)
+        self.anti_stdp3.update_all_learning_rate(anti_stdp_an, anti_stdp_ap)
+    
+    def reward(self):
+        """Apply STDP (reward) to layer 3."""
+        self.stdp3(self.ctx["input_spikes"], self.ctx["potentials"],
+                   self.ctx["output_spikes"], self.ctx["winners"])
+    
+    def punish(self):
+        """Apply Anti-STDP (punishment) to layer 3."""
+        self.anti_stdp3(self.ctx["input_spikes"], self.ctx["potentials"],
+                        self.ctx["output_spikes"], self.ctx["winners"])
+
+
+# =============================================================================
+# Mozafari Shallow R-STDP Network (single-layer variant)
 # =============================================================================
 
 class MozafariRSTDP(nn.Module):
@@ -670,38 +876,202 @@ def main():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"Device: {device}\n")
     
-    # Option 1: Simple 2-class classification (fast training, good for testing)
-    # Using parameters closer to original SpykeTorch
+    # =========================================================================
+    # Deep 3-Layer Network (faithful to original MozafariDeep.py)
+    # =========================================================================
     print("=" * 60)
-    print("2-Class Classification (digits 0 vs 1)")
-    print("=" * 60)
-    
-    network_2class, best_2class = train_mozafari_network(
-        digits=[0, 1],
-        features_per_class=10,
-        kernel_size=5,           # 5x5 kernel for 14x14 feature maps
-        threshold=8.0,           # Lower threshold for MNIST (small images)
-        max_epochs=100,
-        device=device
-    )
-    
-    print(f"\n2-Class Final Accuracy: {best_2class[0]*100:.1f}%")
-    
-    # Option 2: Full 10-class classification (slower, more challenging)
-    print("\n" + "=" * 60)
-    print("10-Class Classification (all digits)")
+    print("Deep 3-Layer Mozafari R-STDP Network")
     print("=" * 60)
     
-    network_10class, best_10class = train_mozafari_network(
-        digits=list(range(10)),
-        features_per_class=20,
-        kernel_size=5,
-        threshold=20.0,
-        max_epochs=200,
-        device=device
-    )
+    train_deep_mozafari_network(device=device)
+
+
+def train_deep_mozafari_network(device: str = 'cpu'):
+    """
+    Train the deep 3-layer Mozafari network, matching original MozafariDeep.py.
     
-    print(f"\n10-Class Final Accuracy: {best_10class[0]*100:.1f}%")
+    Procedure:
+      1. Train layer 1 unsupervised with STDP (2 epochs)
+      2. Train layer 2 unsupervised with STDP (4 epochs)
+      3. Train layer 3 with R-STDP (reward-modulated, 680 epochs)
+    """
+    from torchvision import transforms as T
+    
+    # S1-C1 transform (DoG filters, matching original)
+    kernels = [
+        snn.DoGKernel(3, 3/9, 6/9),
+        snn.DoGKernel(3, 6/9, 3/9),
+        snn.DoGKernel(7, 7/9, 14/9),
+        snn.DoGKernel(7, 14/9, 7/9),
+        snn.DoGKernel(13, 13/9, 26/9),
+        snn.DoGKernel(13, 26/9, 13/9),
+    ]
+    filt = snn.Filter(kernels, padding=6, thresholds=50)
+    
+    class DeepS1C1Transform:
+        def __init__(self):
+            self.to_tensor = T.ToTensor()
+            self.temporal_transform = snn.Intensity2Latency(15)
+            self.cnt = 0
+        
+        def __call__(self, image):
+            self.cnt += 1
+            if self.cnt % 5000 == 0:
+                print(f"  Transform: {self.cnt} images processed")
+            image = self.to_tensor(image) * 255
+            image = image.unsqueeze(0)
+            image = filt(image)
+            image = sf.local_normalization(image, 8)
+            temporal_image = self.temporal_transform(image)
+            return temporal_image.sign().byte()
+    
+    transform = T.Compose([DeepS1C1Transform()])
+    
+    print("Loading MNIST...")
+    train_dataset = datasets.MNIST('./data', train=True, download=True, transform=transform)
+    test_dataset = datasets.MNIST('./data', train=False, download=True, transform=transform)
+    
+    # Cache for efficiency
+    print("Caching train data...")
+    train_data, train_targets = _cache_deep(train_dataset, train=True)
+    print("Caching test data...")
+    test_data, test_targets = _cache_deep(test_dataset, train=False)
+    
+    # Create network
+    network = MozafariDeepRSTDP().to(device)
+    
+    batch_size = 1000
+    
+    # ---- Train Layer 1 (unsupervised STDP) ----
+    print("\nTraining Layer 1 (unsupervised STDP, 2 epochs)...")
+    for epoch in range(2):
+        print(f"  Layer 1 Epoch {epoch}")
+        for batch_start in range(0, len(train_data), batch_size):
+            batch_end = min(batch_start + batch_size, len(train_data))
+            network.train()
+            for i in range(batch_start, batch_end):
+                data_in = train_data[i].to(device)
+                network(data_in, max_layer=1)
+                network.stdp(1)
+            print(f"    Batch {batch_start//batch_size + 1} done")
+    
+    # ---- Train Layer 2 (unsupervised STDP) ----
+    print("\nTraining Layer 2 (unsupervised STDP, 4 epochs)...")
+    for epoch in range(4):
+        print(f"  Layer 2 Epoch {epoch}")
+        for batch_start in range(0, len(train_data), batch_size):
+            batch_end = min(batch_start + batch_size, len(train_data))
+            network.train()
+            for i in range(batch_start, batch_end):
+                data_in = train_data[i].to(device)
+                network(data_in, max_layer=2)
+                network.stdp(2)
+            print(f"    Batch {batch_start//batch_size + 1} done")
+    
+    # ---- Train Layer 3 (R-STDP) ----
+    print("\nTraining Layer 3 (R-STDP)...")
+    
+    apr = 0.004
+    anr = -0.003
+    app = 0.0005
+    anp = -0.004
+    
+    adaptive_min = 0
+    adaptive_int = 1
+    
+    best_train = np.array([0.0, 0.0, 0.0, 0.0])
+    best_test = np.array([0.0, 0.0, 0.0, 0.0])
+    
+    for epoch in range(680):
+        perf_train = np.array([0.0, 0.0, 0.0])
+        
+        for batch_start in range(0, len(train_data), batch_size):
+            batch_end = min(batch_start + batch_size, len(train_data))
+            network.train()
+            perf_batch = np.array([0.0, 0.0, 0.0])
+            
+            for i in range(batch_start, batch_end):
+                data_in = train_data[i].to(device)
+                target_in = train_targets[i].item()
+                
+                d = network(data_in, max_layer=3)
+                if d != -1:
+                    if d == target_in:
+                        perf_batch[0] += 1
+                        network.reward()
+                    else:
+                        perf_batch[1] += 1
+                        network.punish()
+                else:
+                    perf_batch[2] += 1
+            
+            perf_batch_norm = perf_batch / (batch_end - batch_start)
+            
+            # Adaptive learning rates
+            apr_adapt = apr * (perf_batch_norm[1] * adaptive_int + adaptive_min)
+            anr_adapt = anr * (perf_batch_norm[1] * adaptive_int + adaptive_min)
+            app_adapt = app * (perf_batch_norm[0] * adaptive_int + adaptive_min)
+            anp_adapt = anp * (perf_batch_norm[0] * adaptive_int + adaptive_min)
+            network.update_learning_rates(apr_adapt, anr_adapt, app_adapt, anp_adapt)
+            
+            perf_train += perf_batch
+        
+        perf_train_norm = perf_train / len(train_data)
+        if best_train[0] <= perf_train_norm[0]:
+            best_train = np.append(perf_train_norm, epoch)
+        
+        # Test
+        network.eval()
+        perf_test = np.array([0.0, 0.0, 0.0])
+        with torch.no_grad():
+            for i in range(len(test_data)):
+                data_in = test_data[i].to(device)
+                target_in = test_targets[i].item()
+                d = network(data_in, max_layer=3)
+                if d != -1:
+                    if d == target_in:
+                        perf_test[0] += 1
+                    else:
+                        perf_test[1] += 1
+                else:
+                    perf_test[2] += 1
+        
+        perf_test_norm = perf_test / len(test_data)
+        if best_test[0] <= perf_test_norm[0]:
+            best_test = np.append(perf_test_norm, epoch)
+            torch.save(network.state_dict(), "mozafari_deep_best.pth")
+        
+        if epoch % 10 == 0:
+            print(f"  Epoch {epoch:3d}: Train={perf_train_norm[0]*100:.1f}% "
+                  f"Test={perf_test_norm[0]*100:.1f}% "
+                  f"Best={best_test[0]*100:.1f}%")
+    
+    print(f"\nBest Train: {best_train[0]*100:.1f}% @ epoch {int(best_train[3])}")
+    print(f"Best Test:  {best_test[0]*100:.1f}% @ epoch {int(best_test[3])}")
+    return network, best_test
+
+
+def _cache_deep(dataset, train: bool):
+    """Cache deep network dataset."""
+    split = 'train' if train else 'test'
+    cache_path = f'./data/cache/mnist_deep_{split}.pt'
+    os.makedirs('./data/cache', exist_ok=True)
+    
+    if os.path.exists(cache_path):
+        print(f"  Loading cached {split} data...")
+        cached = torch.load(cache_path)
+        return cached['data'], cached['targets']
+    
+    print(f"  Computing {split} transforms...")
+    data_list = []
+    target_list = []
+    for i in range(len(dataset)):
+        sample, target = dataset[i]
+        data_list.append(sample)
+        target_list.append(target)
+    targets_tensor = torch.tensor(target_list)
+    torch.save({'data': data_list, 'targets': targets_tensor}, cache_path)
+    return data_list, targets_tensor
 
 
 if __name__ == "__main__":

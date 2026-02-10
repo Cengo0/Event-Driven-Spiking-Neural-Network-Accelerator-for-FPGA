@@ -59,7 +59,7 @@ module lif_neuron_array #(
     
     // Global neuron parameters
     input  wire [THRESHOLD_WIDTH-1:0]   global_threshold,
-    input  wire [LEAK_WIDTH-1:0]        global_leak_rate,  // [7:4]=shift2, [3:0]=shift1
+    input  wire [LEAK_WIDTH-1:0]        global_leak_rate,  // [2:0]=shift1, [7:3]=shift2 (matches lif_neuron.v)
     input  wire [REFRAC_WIDTH-1:0]      global_refrac_period,
     
     // Status outputs
@@ -150,10 +150,14 @@ module lif_neuron_array #(
     //=========================================================================
     // Shift-based Leak Parameters (Hardware-accurate)
     //=========================================================================
-    // leak_rate encoding: [7:4] = shift2, [3:0] = shift1
+    // leak_rate encoding matches lif_neuron.v:
+    //   [2:0] = shift1 (primary, 1-7)
+    //   [7:3] = shift2 config (0=disabled, else [2:0]=shift value)
     // tau = 1 - 2^(-shift1) - 2^(-shift2)
-    wire [3:0] shift1 = global_leak_rate[3:0];
-    wire [3:0] shift2 = global_leak_rate[7:4];
+    wire [2:0] shift1 = global_leak_rate[2:0];
+    wire [4:0] shift2_cfg = global_leak_rate[7:3];
+    wire [2:0] shift2 = shift2_cfg[2:0];
+    wire       shift2_en = (shift2_cfg != 5'd0);
 
     //=========================================================================
     // FIFO Write (Input Spikes)
@@ -279,8 +283,8 @@ module lif_neuron_array #(
             wire [DATA_WIDTH-1:0] leak_secondary_w;
             wire [DATA_WIDTH-1:0] leak_total_w;
             
-            assign leak_primary_w = membrane_s2[pu] >> shift1;
-            assign leak_secondary_w = membrane_s2[pu] >> shift2;
+            assign leak_primary_w = (shift1 != 3'd0) ? (membrane_s2[pu] >> shift1) : {DATA_WIDTH{1'b0}};
+            assign leak_secondary_w = (shift2_en && shift2 != 3'd0) ? (membrane_s2[pu] >> shift2) : {DATA_WIDTH{1'b0}};
             assign leak_total_w = leak_primary_w + leak_secondary_w;
             
             always @(posedge clk) begin

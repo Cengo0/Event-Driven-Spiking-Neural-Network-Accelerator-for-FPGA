@@ -18,11 +18,11 @@
 // System parameters
 const int MAX_NEURONS = 256;              // Expanded neuron count
 const int MAX_SYNAPSES = 65536;           // 256x256
-const int MAX_INPUT_CHANNELS = 1024;      // Up to 1K input channels for on-chip encoder
+const int MAX_INPUT_CHANNELS = 784;       // 28x28 MNIST default (matches snn_top_hls.h)
 const int MAX_OUTPUT_NEURONS = 64;        // More output classes
 
-// Basic data types
-typedef ap_uint<8> neuron_id_t;
+// Basic data types - unified with snn_top_hls.h
+typedef ap_uint<10> neuron_id_t;           // 10-bit: supports up to 1024 encoded channels
 typedef ap_uint<8> axon_id_t;
 typedef ap_uint<32> spike_time_t;
 typedef ap_int<8> weight_t;
@@ -48,19 +48,25 @@ struct spike_event_t {
 };
 
 // Weight update structure
+// Note: snn_top_hls.h has its own weight_update_t; use #ifndef guard
+#ifndef SNN_TOP_HLS_H
 struct weight_update_t {
     neuron_id_t pre_id;
     neuron_id_t post_id;
     weight_delta_t delta;
     spike_time_t timestamp;
 };
+#endif
 
 // Input data structure (e.g., for image processing)
+// Note: snn_top_hls.h has its own input_data_t; use #ifndef guard
+#ifndef SNN_TOP_HLS_H
 struct input_data_t {
     pixel_t pixels[MAX_INPUT_CHANNELS];
     ap_uint<16> label;  // For supervised learning
     ap_uint<32> frame_id;
 };
+#endif
 
 // Output data structure
 struct output_data_t {

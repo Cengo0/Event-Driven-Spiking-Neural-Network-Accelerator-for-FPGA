@@ -68,15 +68,17 @@ module spike_router #(
     reg [2:0] state, next_state;
     
     // Connection memory structure
-    // Format: [valid(1), exc/inh(1), weight(8), delay(8), dest_id(6)] = 24 bits
+    // Format: [valid(1), exc/inh(1), weight(8), delay(8), dest_id(NEURON_ID_WIDTH)]
+    // Total width = 18 + NEURON_ID_WIDTH bits
+    localparam CONN_WIDTH = 18 + NEURON_ID_WIDTH;
     // Note: Using register array - Vivado will infer LUTRAM if beneficial
-    reg [23:0] conn_memory [0:(NUM_NEURONS * MAX_FANOUT)-1];
+    reg [CONN_WIDTH-1:0] conn_memory [0:(NUM_NEURONS * MAX_FANOUT)-1];
     
     // Initialize connection memory to 0 (for simulation)
     integer init_idx;
     initial begin
         for (init_idx = 0; init_idx < NUM_NEURONS * MAX_FANOUT; init_idx = init_idx + 1) begin
-            conn_memory[init_idx] = 24'd0;
+            conn_memory[init_idx] = {CONN_WIDTH{1'b0}};
         end
     end
     
@@ -93,7 +95,7 @@ module spike_router #(
     // Processing registers
     reg [NEURON_ID_WIDTH-1:0] current_neuron;
     reg [7:0] conn_index;
-    reg [23:0] current_conn;
+    reg [CONN_WIDTH-1:0] current_conn;
     reg [31:0] spike_timestamp;
     
     // Output registers
@@ -172,8 +174,8 @@ module spike_router #(
             end
             
             CHECK_DELAY: begin
-                if (current_conn[23] && // valid connection
-                    ((current_time - spike_timestamp) >= current_conn[13:6])) // delay expired
+                if (current_conn[CONN_WIDTH-1] && // valid connection
+                    ((current_time - spike_timestamp) >= current_conn[NEURON_ID_WIDTH+7:NEURON_ID_WIDTH])) // delay expired
                     next_state = ROUTE_SPIKE;
                 else
                     next_state = NEXT_CONN;
@@ -232,9 +234,9 @@ module spike_router #(
                 ROUTE_SPIKE: begin
                     if (!out_valid || m_spike_ready) begin
                         out_valid <= 1'b1;
-                        out_dest_id <= current_conn[5:0];
-                        out_weight <= current_conn[21:14];
-                        out_exc_inh <= current_conn[22];
+                        out_dest_id <= current_conn[NEURON_ID_WIDTH-1:0];
+                        out_weight <= current_conn[NEURON_ID_WIDTH+15:NEURON_ID_WIDTH+8];
+                        out_exc_inh <= current_conn[CONN_WIDTH-2];
                         spike_counter_inc <= 1'b1;  // Signal to increment counter
                     end
                 end
@@ -276,7 +278,7 @@ module spike_router #(
             end else if (config_we) begin
                 case (config_addr[31:24])
                     8'h00: begin // Write connection
-                        conn_memory[config_addr[15:0]] <= config_data[23:0];
+                        conn_memory[config_addr[15:0]] <= config_data[CONN_WIDTH-1:0];
                     end
                     8'h01: begin // Write connection count
                         conn_count[config_addr[7:0]] <= config_data[7:0];
@@ -294,7 +296,7 @@ module spike_router #(
     always @(*) begin
         config_readdata = 32'd0;
         case (config_addr[31:24])
-            8'h00: config_readdata = {8'd0, conn_memory[config_addr[15:0]]};
+            8'h00: config_readdata = {{(32-CONN_WIDTH){1'b0}}, conn_memory[config_addr[15:0]]};
             8'h01: config_readdata = {24'd0, conn_count[config_addr[7:0]]};
             8'h10: config_readdata = spike_counter;
             8'h11: config_readdata = {31'd0, fifo_overflow};

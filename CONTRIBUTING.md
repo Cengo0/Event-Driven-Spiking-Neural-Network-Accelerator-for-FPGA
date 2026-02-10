@@ -32,13 +32,13 @@ This project adheres to a code of conduct that all contributors are expected to 
 Before contributing, ensure you have:
 
 1. **For Software Development**:
-   - Python 3.11 or higher
-   - PyTorch 2.8.0 or higher
+   - Python 3.13 or higher
+   - PyTorch 2.9 or higher
    - NumPy, pytest, and other Python dependencies
 
 2. **For Hardware Development**:
-   - Xilinx Vivado 2025.1 or compatible version
-   - Xilinx Vitis HLS 2025.1 or compatible version
+   - Xilinx Vivado 2025.2 or compatible version
+   - Xilinx Vitis HLS 2025.2 or compatible version
    - Icarus Verilog 11.0+ (for open-source simulation)
    - PYNQ-Z2 board (for hardware testing)
 

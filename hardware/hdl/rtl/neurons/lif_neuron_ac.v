@@ -101,6 +101,31 @@ module lif_neuron_ac #(
     assign v_mem_after_leak = v_mem - leak_amount;
     
     //=========================================================================
+    // Combinational: compute next membrane potential (for immediate spike check)
+    //=========================================================================
+    wire signed [DATA_WIDTH-1:0] v_mem_next;
+    wire v_mem_next_valid;
+
+    // Saturated synaptic result
+    wire signed [DATA_WIDTH-1:0] v_mem_spike_sat;
+    assign v_mem_spike_sat = (v_mem_after_spike[DATA_WIDTH] != v_mem_after_spike[DATA_WIDTH-1]) ?
+                             (v_mem_after_spike[DATA_WIDTH] ? {1'b1, {(DATA_WIDTH-1){1'b0}}} :
+                                                              {1'b0, {(DATA_WIDTH-1){1'b1}}}) :
+                             v_mem_after_spike[DATA_WIDTH-1:0];
+
+    // Saturated leak result
+    wire signed [DATA_WIDTH-1:0] v_mem_leak_sat;
+    assign v_mem_leak_sat = (v_mem_after_leak[DATA_WIDTH] != v_mem_after_leak[DATA_WIDTH-1]) ?
+                            {DATA_WIDTH{1'b0}} :
+                            v_mem_after_leak[DATA_WIDTH-1:0];
+
+    // Select next membrane based on spike_valid (same as lif_neuron.v pattern)
+    assign v_mem_next = spike_valid ? v_mem_spike_sat : v_mem_leak_sat;
+
+    // Spike condition: compare v_mem_next (immediate, not 1-cycle delayed)
+    wire spike_condition = ($signed(v_mem_next) >= $signed(threshold)) && (refrac_counter == 0);
+
+    //=========================================================================
     // Main Neuron Dynamics
     //=========================================================================
     always @(posedge clk or negedge rst_n) begin
@@ -127,53 +152,28 @@ module lif_neuron_ac #(
                 // Active State: Process incoming spikes
                 //=============================================================
                 
+                // Update statistics
                 if (spike_valid) begin
-                    //=========================================================
-                    // ENERGY-EFFICIENT AC OPERATION
-                    // Only executed when spike_valid=1
-                    // Sparse spikes mean most cycles skip this entirely!
-                    //=========================================================
                     ac_operation_count <= ac_operation_count + 1;
-                    
-                    // Saturating addition/subtraction
-                    if (v_mem_after_spike[DATA_WIDTH] != v_mem_after_spike[DATA_WIDTH-1]) begin
-                        // Overflow detected - saturate
-                        if (v_mem_after_spike[DATA_WIDTH]) begin
-                            v_mem <= {1'b1, {(DATA_WIDTH-1){1'b0}}};  // Min value
-                        end else begin
-                            v_mem <= {1'b0, {(DATA_WIDTH-1){1'b1}}};  // Max value
-                        end
-                    end else begin
-                        v_mem <= v_mem_after_spike[DATA_WIDTH-1:0];
-                    end
-                    
                 end else begin
-                    //=========================================================
-                    // NO SPIKE - Apply leak only (energy saved!)
-                    // This is the sparsity benefit of SNNs
-                    //=========================================================
                     spike_skip_count <= spike_skip_count + 1;
-                    
-                    // Apply leak using shift (no multiply)
-                    if (v_mem_after_leak[DATA_WIDTH] != v_mem_after_leak[DATA_WIDTH-1]) begin
-                        v_mem <= 0;  // Saturate at zero for leak
-                    end else begin
-                        v_mem <= v_mem_after_leak[DATA_WIDTH-1:0];
-                    end
                 end
                 
                 //=============================================================
-                // Spike Generation (Threshold comparison - no multiply)
+                // Spike Generation (immediate, using v_mem_next)
                 //=============================================================
-                if ($signed(v_mem) >= $signed(threshold)) begin
+                if (spike_condition) begin
                     spike_out <= 1'b1;
                     refrac_counter <= REFRAC_CYCLES;
                     v_mem <= reset_potential;
+                end else begin
+                    v_mem <= v_mem_next;
                 end
             end
             
             // Update output
-            membrane_potential <= v_mem;
+            membrane_potential <= spike_condition ? reset_potential : 
+                                 (refrac_counter > 0) ? reset_potential : v_mem_next;
         end
     end
 

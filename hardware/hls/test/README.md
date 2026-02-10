@@ -9,14 +9,34 @@ cd hardware/hls/test
 ./run_tests.sh
 ```
 
-## 테스트 결과 (2025-12-09)
+## 테스트 결과
 
-### 전체 요약
-- **총 테스트:** 20개
-- **통과:** 17개 (85%)
-- **실패:** 3개 (파라미터 튜닝 이슈)
+**Last Test Run:** 2026-02-10  
+**Status:** All tests passing ✅
 
-### 모듈별 결과
+### Integration Tests Summary
+- **총 테스트:** 3개
+- **통과:** 3개 (100%)
+- **실패:** 0개
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Learning Engine | ✅ PASS | STDP learning with Mozafari algorithm |
+| Spike Encoder | ✅ PASS | Rate/temporal/phase encoding |
+| Weight Updater | ✅ PASS | Synaptic weight management |
+
+### Changes from 2026-02-10 Bug Fixes
+- ✅ `neuron_id_t` extended to 10-bit (supports up to 1024 neurons)
+- ✅ STDP algorithm updated to Mozafari weight-dependent rule
+- ✅ `MAX_INPUT_CHANNELS` set to 784 (MNIST input size)
+
+---
+
+## Detailed Test Results (Historical - 2025-12-09)
+
+> **Note:** The following detailed unit test results are from manual testing on 2025-12-09, before integration tests were standardized. The current `run_tests.sh` runs higher-level integration tests that now all pass.
+
+### 모듈별 결과 (Historical)
 
 #### 1. Learning Engine (snn_learning_engine.cpp)
 **통과율:** 6/7 (85.7%) ✅
@@ -132,6 +152,5 @@ g++ -std=c++11 \
 
 ## 참고 문서
 
-- [Implementation Status](../../docs/IMPLEMENTATION_STATUS.md)
-- [HLS Implementation](../docs/IMPLEMENTATION_COMPLETE.md)
-- [Learning Engine Optimization](../docs/LEARNING_ENGINE_OPTIMIZATION.md)
+- [Developer Guide](../../../docs/developer_guide.md) - Build and test instructions
+- [Architecture](../../../docs/architecture.md) - System design
