@@ -5,8 +5,8 @@ Energy-efficient spiking neural network accelerator on FPGA with PyTorch integra
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Target**: Xilinx Zynq-7020 (PYNQ-Z2)  
-**Tools**: Vivado 2025.2, Python 3.13, PyTorch 2.9  
-**Status**: Bitstream ready (`outputs/snn_integrated.bit`)
+**Tools**: Vivado 2025.2, Python 3.12, PyTorch 2.9  
+**Status**: v2 Bitstream deployed & verified on FPGA — **100% HW-SW match on MNIST**
 
 ## Quick Start
 
@@ -32,12 +32,12 @@ python examples/pytorch/mnist_training_example.py
 
 ```
 ARM PS (PyTorch) <--AXI--> FPGA PL (2,048 LIF neurons + STDP + Router)
-                              16 Core Groups × 128 neurons, 4-bit weights
+                              16 Core Groups × 128 neurons, 8-bit weights
 ```
 
-**Resources** (Integrated build @ 100MHz):
-- LUT: 15,042 (28%), FF: 16,003 (15%), BRAM: 113 (81%), DSP: 4 (2%)
-- Timing: WNS +0.338ns ✅
+**Resources** (Integrated v2 build @ 100MHz):
+- LUT: 15,042 (28.76%), FF: 16,003 (15.35%), BRAM: 113 (80.71%), DSP: 4 (1.82%)
+- Timing: WNS +0.353ns, WHS +0.020ns, WPWS +3.750ns ✅ (0 failing endpoints)
 
 ## Usage
 
@@ -60,9 +60,17 @@ output = accel.infer(input_spikes)
 
 For hardware deployment:
 ```python
-# On PYNQ-Z2
-from pynq import Overlay
-ol = Overlay('snn_integrated.bit')
+# On PYNQ-Z2 (via fpga_manager + /dev/mem mmap)
+import subprocess, mmap, os, struct
+
+# Program FPGA
+subprocess.run(['sudo', 'cp', 'snn_integrated_v2.bit', '/lib/firmware/'], check=True)
+subprocess.run(['sudo', 'bash', '-c',
+    'echo snn_integrated_v2.bit > /sys/class/fpga_manager/fpga0/firmware'], check=True)
+
+# Access registers via /dev/mem mmap
+fd = os.open('/dev/mem', os.O_RDWR | os.O_SYNC)
+mem = mmap.mmap(fd, 0x10000, offset=0x43C00000)
 ```
 
 ## Build
@@ -78,7 +86,7 @@ cd hardware/scripts && ./run_testbenches.sh
 cd hardware/scripts && vivado -mode batch -source synth_core_group.tcl
 ```
 
-Output: `outputs/snn_integrated.bit`
+Output: `outputs/snn_integrated_v2.bit` (v2, current), `outputs/snn_integrated.bit` (v1)
 
 ## Examples
 
@@ -100,18 +108,32 @@ python examples/pytorch/mozafari_rstdp_faithful.py
 - [API Reference](docs/api_reference.md) - Python API
 - [Architecture](docs/architecture.md) - System design
 
-## Recent Changes (2026-02-10)
+## Verified Results (2026-02-11)
+
+### FPGA Deployment — v2 Bitstream
+- **MNIST STDP Inference**: 20/20 SW accuracy, 20/20 HW accuracy, **20/20 HW-SW match (100%)**
+- **Co-verification**: 11/11 PASS (bit-accurate neuron spike count HW=2, SW=2)
+- **Unit Tests**: 192 passed, 6 skipped
+- **Bitstream**: `outputs/snn_integrated_v2.bit` (4.0MB), deployed via `fpga_manager`
+- **Model**: Dense SNN 784→20 neurons, STDP training, binary MNIST (digits 0/1)
+  - Float accuracy: 89.2%, Int8 quantized: 89.6%
+
+### RTL Fixes (v2)
+- **Edge detector** on `spike_in_valid` — prevents FIFO duplication on held-high valid
+- **Hold register** on `rtl_spike_out_valid` — captures transient output spikes
+
+### Recent Changes (2026-02-10)
 
 ### Core Group Architecture
 - **Hierarchical design**: 16 core groups × 128 LIF neurons = 2,048 total neurons
 - **Event Router NG**: Round-robin arbiter with 16 group ports + external source
 - **Synaptic Connectivity Table**: Sparse inter-group connections (32K × 17b BRAM)
-- **Dense intra-group**: 128×128 × 5b weight matrix per group (4-bit weight + exc/inh)
+- **Dense intra-group**: 128×128 × 9b weight matrix per group (8-bit weight + exc/inh)
 - **Verified**: 55/55 RTL tests pass, Vivado synthesis clean, Python bit-accurate
 
 ### HLS Learning Engine
 - **Encoder cleanup**: Only delta-sigma modulator on-chip; other encodings on host PC
-- **HLS capacity**: MAX_NEURONS=720, MAX_SYNAPSES=518,400, 4-bit weights
+- **HLS capacity**: MAX_NEURONS=720, MAX_SYNAPSES=518,400, 8-bit weights
 - **Pipelining**: LTD/LTP loops II=1, RSTDP_INNER UNROLL=4
 - **Memory**: Weight memory 8 banks, trace arrays factor=4
 - **Verified**: C-sim (5/5 PASS), HLS Fmax 125 MHz, Vivado WNS +0.338ns
