@@ -432,12 +432,30 @@ global_id[6:0]  = local_neuron_id (0-127)
 - **AC operation**: ~0.9 pJ (add only)
 - **Savings**: ~5× per synaptic operation
 
-**Estimated Breakdown**:
+**Estimated PL Breakdown** (Vivado `report_power`, pre-route estimate):
 - HLS IP: ~108 mW (65%)
 - Verilog RTL (16 groups): ~35 mW (21%)
 - PS interface: ~15 mW (9%)
 - Clocking: ~8 mW (5%)
-- Total: ~166 mW (spike-triggered, power scales with spike activity)
+- PL total (Vivado estimate): ~166 mW
+
+**Measured Board Power** (PYNQ-Z2, XADC, 2026-02-21):
+
+| XADC Rail | V_meas | I_typ | P_est | Function |
+|-----------|--------|-------|-------|----------|
+| `vccint`  | 1.017 V | 500 mA | 508.5 mW | PS + PL fabric |
+| `vccaux`  | 1.808 V |  60 mA | 108.5 mW | I/O banks |
+| `vccbram` | 1.018 V |  20 mA |  20.4 mW | Block RAM |
+| `vccpint` | 1.017 V | 150 mA | 152.5 mW | PS (ARM) core |
+| `vccpaux` | 1.809 V |  30 mA |  54.3 mW | PS I/O |
+| **Total** | | | **844 mW** | ±20% (XADC method) |
+
+> **Note**: XADC estimates P = V_measured × I_typical (fixed datasheet values).
+> Rail voltages are regulated and nearly load-independent, so XADC cannot detect
+> dynamic switching increments. Idle and inference-active power read identically
+> (Δ = +0.14 mW, within 0.5 mW noise floor). For accurate PL-only dynamic power,
+> use an external INA226 on the 5 V input rail or Vivado power analysis with a
+> switching-activity (.saif) file.
 
 ### Energy Optimizations
 

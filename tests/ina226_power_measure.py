@@ -739,7 +739,9 @@ def main():
         print(f"  Dynamic:     {pdyn:.1f} mW  (busy - idle)")
 
     # Save results
-    os.makedirs(os.path.dirname(args.output), exist_ok=True)
+    out_dir = os.path.dirname(args.output)
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
     with open(args.output, 'w') as f:
         json.dump(result, f, indent=2)
     print(f"\nSaved: {args.output}")

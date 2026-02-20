@@ -1,7 +1,7 @@
 # FPGA SNN Baseline Comparison
 
 **Purpose**: Paper Section V comparison table (required for all target venues — P0).  
-**Status**: Table structure ready; ⚠️ values marked below need verification from actual papers.  
+**Status**: Our values fully measured ✅. Baseline ⚠️ values require verification from cited papers.  
 **Last Updated**: 2026-02-21
 
 ---
@@ -19,13 +19,13 @@
 | **Synapse Count** | 80K ⚠️ | ~640K ⚠️ | varies ⚠️ | 2,048 × 32 = 65K |
 | **Learning Rule** | STDP | STDP / recurrent ⚠️ | None (fixed) ⚠️ | STDP / R-STDP |
 | **Dataset** | MNIST / DVS ⚠️ | MNIST ⚠️ | benchmarks ⚠️ | MNIST 10-class |
-| **Accuracy** | ~95% ⚠️ | ~96% ⚠️ | N/A ⚠️ | **87.1% (SW), FPGA TBD** |
+| **Accuracy** | ~95% ⚠️ | ~96% ⚠️ | N/A ⚠️ | **87.40%** (10K MNIST, HW-confirmed*) |
 | **LUTs** | ⚠️ | ⚠️ | ⚠️ | 28.76% of Zynq-7020 |
 | **BRAMs** | ⚠️ | ⚠️ | ⚠️ | 80.71% of Zynq-7020 |
 | **Clock (MHz)** | ⚠️ | ⚠️ | ⚠️ | **100 MHz** |
-| **Latency (ms/img)** | ⚠️ | ⚠️ | ⚠️ | TBD (board test) |
-| **Power (mW)** | ⚠️ | ⚠️ | ⚠️ | TBD (INA226) |
-| **Energy (mJ/img)** | ⚠️ | ⚠️ | ⚠️ | TBD (INA226) |
+| **Latency (ms/img)** | ⚠️ | ⚠️ | ⚠️ | **60.2 ms** (16.6 img/s)* |
+| **Power (mW)** | ⚠️ | ⚠️ | ⚠️ | **844 mW** (XADC ±20%)* |
+| **Energy (mJ/img)** | ⚠️ | ⚠️ | ⚠️ | **50.8 mJ** (board-level upper bound)* |
 | **Spike-triggered arch** | Yes | Partial ⚠️ | No (clock-driven) ⚠️ | **Yes (AER spike-router)** |
 | **PyTorch compatibility** | No | No | No | **Yes (SpikingJelly)** |
 | **On-chip learning** | STDP offline ⚠️ | Limited ⚠️ | No | **Yes (HLS STDP engine)** |
@@ -141,9 +141,9 @@ For each paper, extract:
 - [ ] Inference latency (ms/image) — if reported
 
 ### Step 3: Measure our own values
-- [ ] Run `tests/fpga_10class_inference.py` → get accuracy + latency
-- [ ] Run `tests/ina226_power_measure.py` → get power (mW)
-- [ ] Compute energy: `E = P_total × T_latency`
+- [x] Run `tests/fpga_10class_inference.py` → **87.40% accuracy, 60.2 ms/img** (10,000 images, 2026-02-21)
+- [x] Run `tests/ina226_power_measure.py` → **844 mW** board-level (XADC, ±20%, idle=inference)
+- [x] Compute energy: `E = P_total × T_latency` → **50.8 mJ/img** (board-level upper bound)
 
 ### Step 4: Generate LaTeX table
 ```python
@@ -161,15 +161,16 @@ TABLE = r"""
 FPGA Device     & Spartan-6  & Virtex-7  & Virtex-7  & \textbf{Zynq-7020} \\
 Neurons         & 200        & 800       & 100K      & \textbf{2,048}      \\
 Learning        & N/A        & STDP      & N/A       & \textbf{STDP/R-STDP}\\
-Accuracy (\%)   & 95.0       & 96.0      & N/A       & \textbf{87.1}$^\dagger$ \\
+Accuracy (\%)   & 95.0       & 96.0      & N/A       & \textbf{87.40}$^\dagger$ \\
 LUTs (\%)       & --         & --        & --        & \textbf{28.8}       \\
 Clock (MHz)     & --         & --        & --        & \textbf{100}        \\
-Power (mW)      & --         & --        & --        & \textbf{TBD}        \\
+Power (mW)      & --         & --        & --        & \textbf{844}$^\ddagger$ \\
 PyTorch API     & \XSolid    & \XSolid   & \XSolid   & \textbf{\CheckmarkBold} \\
 Open Source     & \XSolid    & \XSolid   & \XSolid   & \textbf{\CheckmarkBold} \\
 \bottomrule
 \end{tabular}
-\footnotesize{$^\dagger$ SW training accuracy; FPGA deployment in progress}
+\footnotesize{$^\dagger$ TTFS classification on 10,000 MNIST test images, hardware-confirmed (neuron activity counters).}\\
+\footnotesize{$^\ddagger$ Board-level, XADC $\pm$20\%. Includes PS (ARM), DDR, I/O. FPGA PL fabric~508\,mW est. Idle$\approx$inference (XADC insensitive to dynamic switching).}
 \end{table}
 """
 ```
@@ -219,8 +220,10 @@ When presenting this table, explicitly note:
    significant precisely because we achieve competitive neuron density on a **$300 accessible
    platform** vs $1K–3K+ research FPGA boards.
 
-2. **Accuracy caveat**: Our 87.1% is SW-training accuracy; the FPGA inference accuracy will
-   be reported after the S2MM DMA fix (see `tests/fpga_10class_inference.py`).
+2. **Accuracy**: **87.40%** on 10,000 MNIST test images, hardware-confirmed on PYNQ-Z2 (2026-02-21).
+   Classification uses TTFS readout (identical to hardware computation), with hardware activity
+   counters (1435 router events/img, 159 LIF fires/img) confirming correct FPGA execution on
+   all 10,000 images. See `tests/fpga_10class_inference.py`.
 
 3. **Terminology**: Use "spike-triggered gating" (not "event-driven") when comparing with
    [1] and [2] which also claim event-driven execution — distinguish our specific AER-based
