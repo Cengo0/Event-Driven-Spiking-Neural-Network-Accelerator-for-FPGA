@@ -88,6 +88,22 @@ def _xadc_read_voltage(channel_name: str) -> Optional[float]:
     return None
 
 
+def _resolve_xadc_path(channel_name: str) -> Optional[str]:
+    """
+    Find the IIO sysfs file for one XADC supply channel.
+    Called once at init time; result is cached.
+    """
+    try:
+        entries = os.listdir(_IIO_BASE)
+    except OSError:
+        return None
+    # Prefer exact match, then substring
+    for e in entries:
+        if channel_name.lower() in e.lower() and e.endswith('_raw'):
+            return os.path.join(_IIO_BASE, e)
+    return None
+
+
 class XADCPowerEstimator:
     """
     Pseudo-power-sensor backed by Zynq XADC voltage readings.
@@ -95,46 +111,71 @@ class XADCPowerEstimator:
     Power is estimated as P = V_measured × I_typical (datasheet).
     Good enough for ±20 % accuracy — acceptable for a conference paper
     where the key claim is order-of-magnitude efficiency, not exact mW.
+
+    File handles are opened once at init and reused (seek(0) per read)
+    to avoid the sysfs open/close storm that causes a segfault on tight
+    sampling loops.
     """
 
     CHANNELS = ['vccint', 'vccaux', 'vccbram', 'vccpint', 'vccpaux']
+    # Minimum recommended interval between power() calls (sysfs is slow)
+    MIN_INTERVAL_S = 0.050
 
     def __init__(self):
-        available = {}
+        self._handles: Dict[str, object] = {}  # channel -> open file object
+        self._i_typ:   Dict[str, float]  = {}
+
         for ch in self.CHANNELS:
-            v = _xadc_read_voltage(ch)
-            if v is not None:
-                available[ch] = v
-        if not available:
+            path = _resolve_xadc_path(ch)
+            if path is None:
+                continue
+            try:
+                fh = open(path, 'r')   # keep open; seek(0) per read
+                fh.seek(0)
+                raw = int(fh.read().strip())
+                v = raw * _XADC_SCALE
+                self._handles[ch] = fh
+                self._i_typ[ch]   = XADC_TYPICAL_CURRENTS.get(ch, 0)
+            except (OSError, ValueError) as e:
+                print(f'    XADC: could not open {path}: {e}')
+
+        if not self._handles:
             raise RuntimeError(
                 f'XADC IIO sysfs not found at {_IIO_BASE}. '
-                'Is the kernel iio_hwmon / xilinx-xadc driver loaded?'
+                'Is the xilinx-xadc driver loaded?'
             )
-        self._available = available
-        print(f'  XADC backend: {len(available)} channels — '
-              f'{list(available.keys())}')
-        for ch, v in available.items():
-            i = XADC_TYPICAL_CURRENTS.get(ch, 0)
+        print(f'  XADC backend: {len(self._handles)} channels — '
+              f'{list(self._handles.keys())}')
+        for ch, fh in self._handles.items():
+            fh.seek(0)
+            raw = int(fh.read().strip())
+            v = raw * _XADC_SCALE
+            i = self._i_typ[ch]
             print(f'    {ch:10s}  V={v:.3f}V  '
                   f'I_typ={i:.3f}A  P_est={v*i*1000:.1f}mW')
         print('  NOTE: Power is estimated from V_measured × I_typical (datasheet).')
         print('        Accuracy ≈ ±20 %  (acceptable for paper energy claim).')
 
+    def _read_voltage(self, ch: str) -> float:
+        """Read voltage for one channel using cached file handle."""
+        fh = self._handles[ch]
+        fh.seek(0)
+        return int(fh.read().strip()) * _XADC_SCALE
+
     def power(self) -> float:
         """Total estimated board power in Watts."""
         total = 0.0
-        for ch in self._available:
-            v = _xadc_read_voltage(ch) or self._available[ch]
-            i_typ = XADC_TYPICAL_CURRENTS.get(ch, 0)
-            total += v * i_typ
+        for ch, fh in self._handles.items():
+            v = self._read_voltage(ch)
+            total += v * self._i_typ[ch]
         return total
 
     def read_all(self) -> Dict[str, float]:
         result = {}
         total = 0.0
-        for ch in self._available:
-            v = _xadc_read_voltage(ch) or self._available[ch]
-            i_typ = XADC_TYPICAL_CURRENTS.get(ch, 0)
+        for ch in self._handles:
+            v = self._read_voltage(ch)
+            i_typ = self._i_typ[ch]
             p = v * i_typ
             result[ch] = {'voltage_V': round(v, 4), 'current_A_typ': i_typ, 'power_W': round(p, 4)}
             total += p
@@ -142,7 +183,12 @@ class XADCPowerEstimator:
         return result
 
     def close(self) -> None:
-        pass  # nothing to close
+        for fh in self._handles.values():
+            try:
+                fh.close()
+            except OSError:
+                pass
+        self._handles.clear()
 
 
 # =====================================================================
@@ -371,8 +417,8 @@ def run_i2c_diagnose():
                 with open(path) as f:
                     raw = int(f.read().strip())
                 v = raw * _XADC_SCALE
-                ch = fname.replace('in_voltage', '').replace('_raw', '').strip('_')
-                i_typ = XADC_TYPICAL_CURRENTS.get(ch.lower(), 0)
+                ch = fname.replace('in_voltage', '').replace('_raw', '').strip('_').lower()
+                i_typ = XADC_TYPICAL_CURRENTS.get(ch, 0)
                 print(f'  {fname:40s}  raw={raw:5d}  V={v:.4f}V  '
                       f'P_est={v*i_typ*1000:.1f}mW')
         else:
@@ -642,7 +688,12 @@ def main():
           f"{[n for n, _ in sensors]}")
     using_xadc = any(n == 'XADC_TOTAL' for n, _ in sensors)
     if using_xadc:
-        print('  (Using XADC estimated power — ±20% accuracy)')
+        print('  (Using XADC estimated power \u2014 \u00b120% accuracy)')
+        min_iv = getattr(sensors[0][1], 'MIN_INTERVAL_S', 0.050)
+        if args.interval < min_iv:
+            print(f'  NOTE: Clamping --interval from {args.interval*1000:.0f}ms '
+                  f'to {min_iv*1000:.0f}ms (XADC sysfs minimum).')
+            args.interval = min_iv
 
     result: Dict = {'mode': args.mode}
 
