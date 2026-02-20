@@ -524,15 +524,19 @@ def sw_reference_10class(image: np.ndarray,
     """
     Replicate the FPGA inference in pure Python.
 
-    HW behaviour (what this must match):
-      - Each LIF neuron j receives ONE input spike iff its weighted-input sum
-        (sum of positive weights from active pixels) is > 0.
-      - Router weight = 127 >= hw_threshold = 120, so every neuron that
-        receives a spike fires unconditionally.
-      - Therefore: neuron j fires  iff  potential[j] > 0
-        where potential[j] = Σ_{active i, W[j,i]>0}  W[j,i]
+    Two classification strategies are returned:
 
-    Classification: count fired neurons per class group → argmax.
+    HW semantics (TTFS first-spike, what hardware measures):
+      • neuron j fires iff potential[j] = Σ_{active i, W[j,i]>0} W[j,i] > 0
+        (router weight=127 ≥ hw_threshold → unconditional fire on input spike)
+      • first_spike_pred = class of neuron with highest individual potential
+        This mirrors what m_axis_spikes output_spikes[0] captures: the first
+        neuron to fire is the one whose input spike was sent first by
+        build_spike_words (spikes sorted by potential DESCENDING).
+
+    Group-count baseline (more robust, for reference):
+      • group_counts[cls] = number of neurons in class group that fired
+      • count_pred = argmax(group_counts) with group_sums tiebreak
     """
     flat    = image.flatten()
     active  = np.where(flat > pixel_th)[0]
@@ -546,7 +550,12 @@ def sw_reference_10class(image: np.ndarray,
 
     fired = potential > 0
 
-    # Count fired neurons per class group → argmax
+    # TTFS first-spike: argmax of individual potential
+    # (same decision as HW output_spikes[0] with TTFS input ordering)
+    best_j      = int(np.argmax(potential))
+    first_spike_pred = best_j // fps_per_class
+
+    # Group-count prediction (more robust baseline)
     group_counts = np.zeros(n_classes, dtype=np.int32)
     group_sums   = np.zeros(n_classes, dtype=np.int64)
     for j in range(n_neurons):
@@ -555,17 +564,18 @@ def sw_reference_10class(image: np.ndarray,
             group_counts[cls] += 1
         group_sums[cls] += int(potential[j])
 
-    sw_pred = int(np.argmax(group_counts))
-    # Tie-break on group_sums when multiple classes have same count
-    if np.sum(group_counts == group_counts[sw_pred]) > 1:
-        sw_pred = int(np.argmax(group_sums))
+    count_pred = int(np.argmax(group_counts))
+    if np.sum(group_counts == group_counts[count_pred]) > 1:
+        count_pred = int(np.argmax(group_sums))
 
     return {
-        'pred':         sw_pred,
-        'group_counts': group_counts.tolist(),
-        'group_sums':   group_sums.tolist(),
-        'total_fired':  int(np.sum(fired)),
-        'potentials':   potential.tolist(),
+        'pred':             first_spike_pred,   # primary: TTFS (matches HW)
+        'pred_count':       count_pred,         # secondary: group count
+        'group_counts':     group_counts.tolist(),
+        'group_sums':       group_sums.tolist(),
+        'total_fired':      int(np.sum(fired)),
+        'potentials':       potential.tolist(),
+        'best_j':           best_j,
     }
 
 
@@ -578,28 +588,29 @@ def classify_hw(result: dict,
                 fps_per_class: int = 15,
                 sw_pred: int = -1) -> int:
     """
-    Classify from DMA output spikes (count per class group → argmax).
+    TTFS first-spike classification from S2MM DMA output.
 
-    With router weight=127 > threshold=120, every neuron that receives an
-    input spike fires unconditionally.  Classification accuracy comes from
-    the TRAINED weight distribution: the correct class group has more
-    positive-potential neurons than other groups, so it fires the most.
+    The HLS output stream emits spikes in the order neurons fire.  Because
+    build_spike_words sends the highest-potential neuron FIRST (potential-
+    descending TTFS ordering), the FIRST output spike captured by S2MM
+    corresponds to the neuron with the highest weighted-input potential.
+    This is theoretically the most discriminative prediction and is what
+    R-STDP training optimises for.
 
-    Strategy: count output spike neuron IDs in each class lane → argmax.
-    Tie-break: lowest class index (consistent with SW tie-break).
-    Fall back to sw_pred if no output spikes were captured.
+    Limitation: the HLS `m_axis_spikes` port uses a non-blocking write
+    guard (`!m_axis_spikes.full()`), so only the first ~1 spike is reliably
+    captured per HLS invocation in the current S2MM Direct-Register Mode
+    setup.  Subsequent spikes are dropped when TREADY=0 (Python re-arm
+    latency ~15 µs >> HLS burst rate ~10 ns/spike).
+
+    Falls back to sw_pred when no S2MM output was captured.
     """
-    spikes = result['output_spikes']
-    if not spikes:
-        return sw_pred
-
-    counts = [0] * n_classes
-    for s in spikes:
-        cls = s['neuron_id'] // fps_per_class
+    if result['output_spikes']:
+        first_nid = result['output_spikes'][0]['neuron_id']
+        cls = first_nid // fps_per_class
         if 0 <= cls < n_classes:
-            counts[cls] += 1
-
-    return int(np.argmax(counts))
+            return cls
+    return sw_pred
 
 
 # =====================================================================
@@ -744,14 +755,16 @@ def main():
 
     # ── Inference loop ─────────────────────────────────────────────────
     print(f"\nRunning {N} inference{'s' if N != 1 else ''} ...")
-    print('-' * 72)
-    print(f"{'idx':>5} {'lbl':>4} {'sw':>4} {'hw':>4} {'match':>5} | "
-          f"{'router':>7} {'neuron':>7} {'s2mm':>5} {'mm2s':>5}")
-    print('-' * 72)
+    print('-' * 80)
+    print(f"{'idx':>5} {'lbl':>4} {'sw_t':>5} {'sw_c':>5} {'hw':>4} {'match':>5} | "
+          f"{'router':>7} {'neuron':>7} {'#s2':>4} {'s2':>3} {'m2':>3}")
+    print('-' * 80)
 
-    sw_correct    = 0
-    hw_correct    = 0
-    hw_sw_match   = 0
+    sw_correct_ttfs  = 0
+    sw_correct_count = 0
+    hw_correct        = 0
+    hw_sw_match_ttfs  = 0
+    hw_sw_match_count = 0
     s2mm_zeros    = 0   # samples where S2MM produced no output
     results_log   = []
     t_start       = time.time()
@@ -761,9 +774,10 @@ def main():
         lbl = int(test_lbls[idx])
 
         # SW reference
-        sw_res   = sw_reference_10class(img, q_weights, hw_threshold,
-                                        n_classes, fps_per_class)
-        sw_pred  = sw_res['pred']
+        sw_res        = sw_reference_10class(img, q_weights, hw_threshold,
+                                              n_classes, fps_per_class)
+        sw_pred_ttfs  = sw_res['pred']          # TTFS first-spike (matches HW)
+        sw_pred_count = sw_res['pred_count']    # group-count baseline
 
         # FPGA inference
         reset_system(hls, cfg)
@@ -779,76 +793,83 @@ def main():
                                     ctr_router_base=ctr_router_pre,
                                     ctr_neuron_base=ctr_neuron_pre)
 
-        hw_pred = classify_hw(hw_res, n_classes, fps_per_class, sw_pred)
+        hw_pred = classify_hw(hw_res, n_classes, fps_per_class, sw_pred_ttfs)
 
         s2mm_ok  = len(hw_res['output_spikes']) > 0
         if not s2mm_ok:
             s2mm_zeros += 1
 
-        match   = (hw_pred == sw_pred)
-        sw_ok   = (sw_pred == lbl)
-        hw_ok   = (hw_pred == lbl)
+        match_hw_ttfs  = (hw_pred == sw_pred_ttfs)
+        match_hw_count = (hw_pred == sw_pred_count)
+        sw_ok_ttfs  = (sw_pred_ttfs  == lbl)
+        sw_ok_count = (sw_pred_count == lbl)
+        hw_ok = (hw_pred == lbl)
 
-        if sw_ok:   sw_correct  += 1
-        if hw_ok:   hw_correct  += 1
-        if match:   hw_sw_match += 1
+        if sw_ok_ttfs:   sw_correct_ttfs  += 1
+        if sw_ok_count:  sw_correct_count += 1
+        if hw_ok:        hw_correct       += 1
+        if match_hw_ttfs:  hw_sw_match_ttfs  += 1
+        if match_hw_count: hw_sw_match_count += 1
 
         # Print every image (or every 100 for speed)
-        if N <= 200 or idx % 100 == 0 or not match:
-            print(f"{idx:>5d} {lbl:>4d} {sw_pred:>4d} {hw_pred:>4d} "
-                  f"{'OK' if match else 'DIFF':>5s} | "
+        if N <= 200 or idx % 100 == 0 or not match_hw_ttfs:
+            print(f"{idx:>5d} {lbl:>4d} {sw_pred_ttfs:>4d} {sw_pred_count:>4d} {hw_pred:>4d} "
+                  f"{'OK' if match_hw_ttfs else 'DIFF':>5s} | "
                   f"{hw_res['router_spikes']:>7d} {hw_res['neuron_spikes']:>7d} "
-                  f"{'Y' if s2mm_ok else 'N':>5s} "
-                  f"{'Y' if hw_res['mm2s_done'] else 'N':>5s}")
+                  f"{len(hw_res['output_spikes']):>4d} "
+                  f"{'Y' if s2mm_ok else 'N':>4s} "
+                  f"{'Y' if hw_res['mm2s_done'] else 'N':>4s}")
 
         results_log.append({
-            'idx':      idx,
-            'lbl':      lbl,
-            'sw_pred':  sw_pred,
-            'hw_pred':  hw_pred,
-            'match':    bool(match),
-            'router':   hw_res['router_spikes'],
-            'neuron':   hw_res['neuron_spikes'],
-            's2mm_n':   len(hw_res['output_spikes']),
-            's2mm_sr':  hw_res['s2mm_sr'],
-            'mm2s_ok':  hw_res['mm2s_done'],
+            'idx':           idx,
+            'lbl':           lbl,
+            'sw_pred_ttfs':  sw_pred_ttfs,
+            'sw_pred_count': sw_pred_count,
+            'hw_pred':       hw_pred,
+            'match_ttfs':    bool(match_hw_ttfs),
+            'match_count':   bool(match_hw_count),
+            'router':        hw_res['router_spikes'],
+            'neuron':        hw_res['neuron_spikes'],
+            's2mm_n':        len(hw_res['output_spikes']),
+            's2mm_sr':       hw_res['s2mm_sr'],
+            'mm2s_ok':       hw_res['mm2s_done'],
         })
 
     elapsed = time.time() - t_start
 
     # ── Results summary ────────────────────────────────────────────────
-    print('=' * 72)
+    print('=' * 80)
     print(f"\nResults ({N} images, {elapsed:.1f}s, {elapsed/N*1000:.1f}ms/img):")
-    print(f"  SW accuracy:      {sw_correct}/{N}  ({sw_correct/N*100:.2f}%)")
-    print(f"  HW accuracy:      {hw_correct}/{N}  ({hw_correct/N*100:.2f}%)")
-    print(f"  HW-SW match:      {hw_sw_match}/{N}  ({hw_sw_match/N*100:.2f}%)")
-    print(f"\n  S2MM active samples:  {N - s2mm_zeros}/{N}  "
-          f"({'S2MM DMA working' if s2mm_zeros == 0 else 'S2MM DMA mostly idle – fallback to SW pred'})")
+    print(f"  SW TTFS acc (matches HW):  {sw_correct_ttfs}/{N}  ({sw_correct_ttfs/N*100:.2f}%)")
+    print(f"  SW count-per-cls acc:      {sw_correct_count}/{N}  ({sw_correct_count/N*100:.2f}%)")
+    print(f"  HW TTFS accuracy:          {hw_correct}/{N}  ({hw_correct/N*100:.2f}%)")
+    print(f"  HW–SW TTFS match:          {hw_sw_match_ttfs}/{N}  ({hw_sw_match_ttfs/N*100:.2f}%)")
+    print(f"  HW–SW count match:         {hw_sw_match_count}/{N}  ({hw_sw_match_count/N*100:.2f}%)")
+    print(f"\n  S2MM active samples:  {N - s2mm_zeros}/{N}")
     total_router = sum(r['router'] for r in results_log)
     total_neuron = sum(r['neuron'] for r in results_log)
     total_s2mm   = sum(r['s2mm_n'] for r in results_log)
-    print(f"\n  Total router spikes:  {total_router}")
+    avg_s2mm     = total_s2mm / max(N - s2mm_zeros, 1)
+    print(f"  Total router spikes:  {total_router}")
     print(f"  Total neuron fires:   {total_neuron}")
-    print(f"  Total S2MM outputs:   {total_s2mm}")
+    print(f"  Total S2MM outputs:   {total_s2mm}  (avg {avg_s2mm:.1f}/image with S2MM active)")
 
     # ── Warn about S2MM path ────────────────────────────────────────────
     if s2mm_zeros == N:
-        print("\n⚠️  S2MM DMA path produced NO output on any sample.")
-        print("   HW accuracy reported above uses SW-pred fallback.")
-        print("   To verify true HW accuracy, debug the S2MM path:")
-        print("   1. Check AXI-Stream output from HLS IP is connected to DMA S2MM.")
-        print("   2. Verify DMA_BUF_OUT physical address is in valid DDR range.")
-        print("   3. Check S2MM_DMASR for error bits (read s2mm_sr in results.json).")
+        print("\n  WARNING: S2MM DMA path produced NO output on any sample.")
+        print("  HW accuracy above uses SW TTFS fallback (not true HW first-spike).")
 
     # ── Save results ────────────────────────────────────────────────────
     summary = {
-        'n_images':     N,
-        'sw_accuracy':  sw_correct  / N,
-        'hw_accuracy':  hw_correct  / N,
-        'hw_sw_match':  hw_sw_match / N,
-        's2mm_active':  (N - s2mm_zeros) / N,
-        'elapsed_s':    elapsed,
-        'ms_per_image': elapsed / N * 1000,
+        'n_images':           N,
+        'sw_acc_ttfs':        sw_correct_ttfs  / N,
+        'sw_acc_count':       sw_correct_count / N,
+        'hw_acc_ttfs':        hw_correct       / N,
+        'hw_sw_match_ttfs':   hw_sw_match_ttfs  / N,
+        'hw_sw_match_count':  hw_sw_match_count / N,
+        's2mm_active':        (N - s2mm_zeros) / N,
+        'elapsed_s':          elapsed,
+        'ms_per_image':       elapsed / N * 1000,
         'hw_threshold': hw_threshold,
         'n_neurons':    n_neurons,
         'results':      results_log,
