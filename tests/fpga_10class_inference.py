@@ -86,7 +86,9 @@ DMA_BUF_OUT         = 0x1F100000   # output spike words (S2MM)
 
 MAX_NEURONS         = 2048         # hardware neuron capacity
 MAX_FANOUT          = 32
-ROUTER_NEURON_ID_W  = 11           # ceil(log2(2048))
+ROUTER_NEURON_ID_W  = 10           # matches RTL NEURON_ID_WIDTH=10 (critical for exc_inh bit)
+SOURCE_OFFSET       = 512          # external-input IDs: SOURCE_OFFSET+j → LIF neuron j
+                                   # LIF output IDs (0..n_neurons-1) get conn_count=0 → no recurrence
 
 
 # =====================================================================
@@ -197,15 +199,34 @@ def reset_system(hls: MMIO, cfg: MMIO) -> None:
     time.sleep(0.010)
 
 
-def program_router_identity(cfg: MMIO, n_neurons: int) -> None:
-    """Identity routing: neuron j → neuron j, weight=127, exc, conn_count=1."""
-    cfg.write(CFG_CONFIG_CTRL, 0)
+def program_router_for_inference(cfg: MMIO, n_neurons: int,
+                                 source_offset: int = SOURCE_OFFSET) -> None:
+    """
+    Program router for external-input TTFS inference:
+      - Source (source_offset + j) → destination j, weight=127, exc, count=1
+      - LIF output neurons j=0..n_neurons-1: conn_count=0  (blocks recurrent loop)
+
+    Using source IDs in the SOURCE_OFFSET range keeps LIF output neuron IDs
+    (0..n_neurons-1) from triggering connections, breaking the feedback path.
+    """
+    cfg.write(CFG_CONFIG_CTRL, 0)   # target = router
+
+    # Step 1: zero conn_count for actual LIF neuron IDs 0..n_neurons-1
+    # (prevents any residual identity connections from previous runs)
     for j in range(n_neurons):
-        ca, cd = encode_conn(j, 0, j, 127, exc=True)
+        cca, ccd = encode_conn_count(j, 0)
+        cfg.write(CFG_CONFIG_ADDR, cca)
+        cfg.write(CFG_CONFIG_WDATA, ccd)
+        time.sleep(0.000_05)
+
+    # Step 2: program connections source_offset+j → j
+    for j in range(n_neurons):
+        src = source_offset + j
+        ca, cd = encode_conn(src, 0, j, 127, exc=True)
         cfg.write(CFG_CONFIG_ADDR, ca)
         cfg.write(CFG_CONFIG_WDATA, cd)
         time.sleep(0.000_05)
-        cca, ccd = encode_conn_count(j, 1)
+        cca, ccd = encode_conn_count(src, 1)
         cfg.write(CFG_CONFIG_ADDR, cca)
         cfg.write(CFG_CONFIG_WDATA, ccd)
         time.sleep(0.000_05)
@@ -223,32 +244,77 @@ def configure_neurons(cfg: MMIO, threshold: int,
 
 def build_spike_words(image: np.ndarray,
                       q_weights: np.ndarray,
-                      pixel_th: float = 0.3) -> np.ndarray:
+                      pixel_th: float = 0.3,
+                      source_offset: int = SOURCE_OFFSET) -> np.ndarray:
     """
-    Convert one MNIST image + int8 weight matrix to AER spike words.
+    Convert one MNIST image + int8 weight matrix to AER spike words (TTFS encoding).
 
-    For each active pixel i and each output neuron j with weight W[j,i] > 0:
-        word = (j & 0x3FF) | ((W[j,i] & 0xFF) << 10)
+    Hardware routing:
+      source (source_offset + j) → LIF neuron j  (router weight=127, exc=1)
+      LIF neuron j (0..n-1) has conn_count=0       (no recurrent feedback)
 
-    Returns an array of uint32 spike words (may be large: up to 784*150 words).
+    TTFS ordering: compute potential[j] = sum(W[j,i] for active i with W[j,i]>0),
+    then sort neurons by potential DESCENDING.  The first spike word sent fires the
+    neuron with the highest potential → first output spike = best predicted class.
+
+    One spike word per unique neuron j (the single spike fires it immediately since
+    router_weight=127 > threshold=120).  Neurons with zero potential are omitted.
+
+    word = ((source_offset + j) & 0x3FF) | (0x7F << 10)   (weight field unused by router)
     """
     flat   = image.flatten()
     active = np.where(flat > pixel_th)[0]
-    words: list = []
+    n_out  = q_weights.shape[0]
+
+    # Accumulate per-neuron potential from all active pixels
+    potential = np.zeros(n_out, dtype=np.int32)
     for i in active:
-        col = q_weights[:, i]          # shape (n_out,)
-        for j, w in enumerate(col):
-            wi = int(w)
-            if wi > 0:
-                words.append((j & 0x3FF) | ((wi & 0xFF) << 10))
+        col = q_weights[:, i]
+        mask = col > 0
+        potential[mask] += col[mask].astype(np.int32)
+
+    # Sort neurons by potential DESCENDING (highest fires first → TTFS classification)
+    order = np.argsort(-potential)
+    words: list = []
+    for j in order:
+        if potential[j] > 0:
+            src = (source_offset + j) & 0x3FF
+            words.append(src | (0x7F << 10))   # weight field ignored by router
+
     if not words:
         return np.zeros(1, dtype=np.uint32)
     return np.array(words, dtype=np.uint32)
 
 
 # =====================================================================
+# HLS Warmup (resolves first-invocation weight-memory init delay ~42 ms)
+# =====================================================================
+
+def warmup_hls(hls: MMIO, timeout_s: float = 0.25) -> None:
+    """
+    Run HLS once (no DMA) to force the one-time weight-memory initialisation.
+    The HLS static `initialized` flag fires on first ever invocation, running
+    MAX_NEURONS^2 = 4.2 M zero-fill iterations (~42 ms at 100 MHz).  Without
+    warmup the first image's inference window overlaps this init and many
+    input spikes are dropped while snn_enable=0.
+    """
+    hls.write(HLS_CTRL_REG, CTRL_ENABLE)
+    hls.write(HLS_AP_CTRL, 0x01)   # ap_start (no auto_restart)
+    deadline = time.monotonic() + timeout_s
+    while time.monotonic() < deadline:
+        ap = hls.read(HLS_AP_CTRL)
+        if ap & 0x06:              # ap_done (bit1) or ap_idle (bit2)
+            break
+        time.sleep(0.005)
+    hls.write(HLS_AP_CTRL, 0x00)
+    hls.write(HLS_CTRL_REG, 0x00)
+    time.sleep(0.010)
+
+
+# =====================================================================
 # DMA Inference with S2MM DMA Fix
 # =====================================================================
+
 
 def run_inference(hls: MMIO, cfg: MMIO, dma: MMIO,
                   spike_words: np.ndarray,
@@ -585,9 +651,13 @@ def main():
           f"({'OK' if ver == 0x534E4E01 else 'UNEXPECTED'})")
 
     # ── Full reset + router setup ───────────────────────────────────────
-    print(f"\nProgramming router ({n_neurons} identity connections) ...")
+    print(f"\nWarm-up HLS (first-invocation init) ...")
+    warmup_hls(hls)
+    print(f"  Done.")
+
+    print(f"\nProgramming router ({n_neurons} source-offset connections) ...")
     reset_system(hls, cfg)
-    program_router_identity(cfg, n_neurons)
+    program_router_for_inference(cfg, n_neurons)
     configure_neurons(cfg, threshold=hw_threshold, leak=0, refrac=0)
     print("  Done.")
 
