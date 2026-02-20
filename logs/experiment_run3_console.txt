@@ -1,0 +1,47 @@
+[00:30:20] ================================================================================
+[00:30:20] EXPERIMENT: Full-Scale SW vs FaithfulOnChip vs PureInt8 Comparison
+[00:30:20] ================================================================================
+[00:30:20] Timestamp: 2026-02-21T00:30:20.361783
+[00:30:20] Device: cuda
+[00:30:20] Config: {
+  "seed": 42,
+  "n_classes": 10,
+  "features_per_class": 15,
+  "n_input": 784,
+  "epochs": 200,
+  "batch_size": 128,
+  "patience": 30,
+  "timesteps": 25,
+  "leak": 0.5,
+  "lr_plus": 0.005,
+  "lr_minus": 0.003,
+  "val_size": 10000,
+  "test_size": 10000,
+  "log_every": 1,
+  "print_every": 5
+}
+[00:30:20] 
+[00:30:20] [1/5] Loading MNIST ...
+[00:30:36]   Train: 60000, Test: 10000
+[00:30:36] [2/5] Creating trainers with synchronized RNG ...
+  Prototype init: W=[0.023,0.672]
+  Calibrated threshold: 119.3 (pot/step~19.88)
+  Prototype init: W=[0.023,0.672] (int8: [3,85])
+  Calibrated threshold: 119.2 (int8 equiv: 15143)
+  Prototype init: W=[3, 86]
+  Calibrated threshold: 15149 (float equiv: 119.3)
+[00:30:38]   SW init weights: [0.0228, 0.6722], mean=0.0948
+[00:30:38]   FC init weights: [0.0228, 0.6722], mean=0.0948
+[00:30:38]   PI init weights: [0.0236, 0.6772], mean=0.0942
+[00:30:38]   Init corr SW↔FC: 1.000000, max_diff: 0.000000e+00
+[00:30:38]   Init corr SW↔PI: 0.999698
+[00:30:38] 
+[00:30:38] [3/5] Training ...
+[00:30:38]   Epochs: 200, Batch: 128, Patience: 30
+[00:30:38] 
+[00:30:38]    Ep |  SW_tr  SW_vl |  FC_tr  FC_vl |  PI_tr  PI_vl |  Corr_SF  Corr_SI | Match_SF    MaxD_SF
+[00:30:38]   --------------------------------------------------------------------------------------------
+[00:32:42]     0 |  82.4%  82.5% |  82.4%  81.4% |  82.4%  85.9% | 0.999993   0.9297 |    96.4%   1.53e-02  [124s]
+[00:34:33]     1 |  83.7%  84.4% |  83.7%  84.4% |  84.0%  85.2% | 0.999988   0.9182 |    94.2%   2.11e-02  [112s]
+[00:36:24]     2 |  83.4%  87.1% |  83.4%  87.1% |  83.3%  86.5% | 0.999987   0.9148 |    96.5%   2.13e-02  [110s]
+[00:43:41]     5 |  83.1%  84.9% |  83.2%  84.1% |  83.0%  84.2% | 0.999962   0.9186 |    89.6%   3.04e-02  [183s]

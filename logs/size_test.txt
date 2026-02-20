@@ -1,0 +1,39 @@
+[0.0s] Start
+[19.3s] Loaded 60k samples
+[19.3s] --- Testing N=10000 ---
+  Prototype init: W=[0.022,0.650]
+  Calibrated threshold: 119.4 (pot/step~19.90)
+  Prototype init: W=[0.022,0.650] (int8: [3,83])
+  Calibrated threshold: 119.4 (int8 equiv: 15158)
+[20.8s] Trainers init for N=10000
+[29.6s] SW batch 50
+[37.2s] FC batch 100
+[45.1s] FC batch 150
+[46.2s] N=10000 COMPLETED OK!
+[46.2s] --- Testing N=60000 ---
+  Prototype init: W=[0.023,0.664]
+  Calibrated threshold: 119.3 (pot/step~19.88)
+  Prototype init: W=[0.023,0.664] (int8: [3,84])
+  Calibrated threshold: 119.2 (int8 equiv: 15142)
+[46.8s] Trainers init for N=60000
+[54.0s] SW batch 50
+[61.2s] SW batch 100
+[69.0s] SW batch 150
+[77.2s] SW batch 200
+[85.0s] SW batch 250
+[92.8s] SW batch 300
+[100.9s] SW batch 350
+[108.9s] SW batch 400
+[117.2s] SW batch 450
+[125.2s] FC batch 500
+[132.6s] FC batch 550
+[141.1s] FC batch 600
+[148.0s] FC batch 650
+[155.2s] FC batch 700
+[162.9s] FC batch 750
+[171.0s] FC batch 800
+[178.4s] FC batch 850
+[186.0s] FC batch 900
+[191.8s] N=60000 COMPLETED OK!
+ALL TESTS PASSED
+EXIT_OK

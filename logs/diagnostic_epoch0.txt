@@ -1,0 +1,49 @@
+Python: /home/jwlee/miniconda3/envs/fpga/bin/python
+PyTorch: 2.9.1+cu130
+CUDA: True
+[1] Loading MNIST...
+  train=1000, test=500
+[2] Creating trainers...
+  Trainers created OK
+[3] Init prototypes...
+  Prototype init: W=[0.023,0.656]
+  Calibrated threshold: 118.8 (pot/step~19.80)
+  Prototype init: W=[0.023,0.656] (int8: [3,83])
+  Calibrated threshold: 118.7 (int8 equiv: 15081)
+  Prototype init: W=[3, 84]
+  Calibrated threshold: 15094 (float equiv: 118.8)
+  Init OK
+  SW init w range: [0.0226, 0.6565]
+  FC init w range: [0.0226, 0.6565]
+[4] Running 2 batches of epoch 0...
+  Training SW...
+    batch 0: spikes shape=torch.Size([128, 25, 784])
+    batch 0: preds=tensor([1, 1, 2, 5, 6], device='cuda:0')
+    batch 0: STDP done
+    batch 1: spikes shape=torch.Size([128, 25, 784])
+    batch 1: preds=tensor([3, 1, 7, 0, 6], device='cuda:0')
+    batch 1: STDP done
+  SW OK — w range: [0.0203 to 0.6565]
+  Training FC...
+    batch 0: spikes shape=torch.Size([128, 25, 784])
+    batch 0: preds=tensor([1, 1, 2, 5, 6], device='cuda:0')
+    batch 0: STDP done
+    batch 1: spikes shape=torch.Size([128, 25, 784])
+    batch 1: preds=tensor([3, 1, 7, 0, 6], device='cuda:0')
+    batch 1: STDP done
+  FC OK — w range: [0.0203 to 0.6565]
+  Training PI...
+    batch 0: spikes shape=torch.Size([128, 25, 784])
+    batch 0: preds=tensor([1, 1, 2, 5, 6], device='cuda:0')
+    batch 0: STDP done
+    batch 1: spikes shape=torch.Size([128, 25, 784])
+    batch 1: preds=tensor([3, 1, 7, 0, 6], device='cuda:0')
+    batch 1: STDP done
+  PI OK — w range: [2.0000 to 84.0000]
+[5] Validation pass...
+  SW val acc: 72.6%
+  FC val acc: 72.2%
+  PI val acc: 74.0%
+[6] SW↔FC corr: 1.000000, max_diff: 0.00e+00
+DIAGNOSTIC COMPLETE - no crashes!
+EXIT_OK
