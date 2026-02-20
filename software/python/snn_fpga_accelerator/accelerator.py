@@ -158,8 +158,14 @@ class _HardwareBackend:
 
 class SNNAccelerator:
     """
-    Event-driven Spiking Neural Network accelerator interface for PYNQ-Z2.
-    
+    Spike-triggered Spiking Neural Network accelerator interface for PYNQ-Z2.
+
+    Implements *spike-triggered gating*: neuron state updates are performed only
+    when an incoming AER spike event is routed to the target neuron by the
+    spike_router.  The FPGA is clock-synchronous (100 MHz); the term
+    "spike-triggered" (rather than "event-driven") better reflects this hardware
+    reality while preserving the sparse-activation efficiency argument.
+
     This class provides the main interface between PyTorch/Python and the
     FPGA-based SNN accelerator hardware while also supporting a pure software
     simulation environment. Developers can therefore target Icarus Verilog or

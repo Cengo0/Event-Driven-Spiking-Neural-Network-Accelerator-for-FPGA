@@ -1,8 +1,15 @@
 """
-SNN FPGA Accelerator - Event-Driven Spiking Neural Network Library
+SNN FPGA Accelerator — Spike-Triggered Spiking Neural Network Library
 
 A PyTorch-like library for building, training, and deploying SNNs on FPGAs.
 Supports surrogate gradient training and hardware-constrained learning.
+
+Terminology note: The FPGA hardware implements *spike-triggered gating* — neuron
+state updates are gated by incoming AER spike events via the spike_router.  The
+FPGA fabric is clock-synchronous (100 MHz), but computation is sparse: only
+neurons targeted by an arriving spike perform state updates in a given cycle.
+This is equivalent to the "event-driven" paradigm used in Loihi/TrueNorth
+literature but more precisely described as spike-triggered for FPGA implementations.
 
 Quick Start:
     import snn_fpga_accelerator as snn
@@ -207,7 +214,10 @@ from . import spyketorch_compat as sf
 # =============================================================================
 from .accelerator import SNNAccelerator
 from .xrt_backend import XRTBackend, RegisterMap  # Optional pyxrt path
-from .pytorch_interface import pytorch_to_snn, SNNLayer, SNNModel
+from .pytorch_interface import (
+    pytorch_to_snn, SNNLayer, SNNModel,
+    SpikingJellyConverter, convert_from_spikingjelly,
+)
 from .spike_encoding import SpikeEvent
 from .learning import STDPLearning, RSTDPLearning, LearningConfig
 from .utils import load_weights, save_weights, visualize_spikes
@@ -328,6 +338,7 @@ __all__ = [
     
     # Legacy (compatibility)
     'SNNAccelerator', 'pytorch_to_snn', 'SNNLayer', 'SNNModel',
+    'SpikingJellyConverter', 'convert_from_spikingjelly',
     'SpikeEvent', 'STDPLearning', 'RSTDPLearning', 'LearningConfig',
     'load_weights', 'save_weights', 'visualize_spikes',
 ]

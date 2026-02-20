@@ -31,7 +31,9 @@ System architecture of the Event-Driven SNN FPGA Accelerator.
 
 **Design Principles**:
 - Hierarchical Core Group architecture (IEEE-inspired)
-- Event-driven processing (asynchronous spike-based)
+- **Spike-triggered processing** — neuron state updates are gated by incoming
+  AER spike events; only neuron targets of an arriving spike are active per cycle
+  (⚠️ not "asynchronous event-driven" — FPGA is clock-synchronous at 100 MHz)
 - AC-based operations (accumulate-only, no multiply)
 - Dense intra-group + sparse inter-group connectivity
 - Fixed-point arithmetic (8-bit weights)
@@ -435,12 +437,12 @@ global_id[6:0]  = local_neuron_id (0-127)
 - Verilog RTL (16 groups): ~35 mW (21%)
 - PS interface: ~15 mW (9%)
 - Clocking: ~8 mW (5%)
-- Total: ~166 mW (event-driven, varies with activity)
+- Total: ~166 mW (spike-triggered, power scales with spike activity)
 
 ### Energy Optimizations
 
 - Shift-based leak (no multiplier)
-- Event-driven processing (only active on spikes)
+- Spike-triggered processing (state updates gated by AER spike events)
 - Per-neuron traces (reduce memory access)
 - Lazy trace update (compute on-demand)
 - 8-bit weights (reduced memory bandwidth)
