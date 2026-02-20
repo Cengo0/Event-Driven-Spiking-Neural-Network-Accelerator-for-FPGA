@@ -370,10 +370,18 @@ def run_inference(hls: MMIO, cfg: MMIO, dma: MMIO,
     max_output_spikes = n_neurons + 16
 
     def arm_s2mm(dest):
-        """Arm S2MM for exactly one 4-byte spike word."""
-        dma.write(DMA_S2MM_DMACR, 0x01)
+        """
+        Arm S2MM for exactly one 4-byte spike word.
+
+        bit12 (IOC_Irq) in DMASR is STICKY (write-1-to-clear).  If we do not
+        clear it before each arm, the next poll immediately sees bit12=1 and
+        falsely concludes a new spike arrived, reading stale DDR zeros.
+        Fix: W1C-clear bit12 FIRST, THEN set up the new transfer.
+        """
+        dma.write(DMA_S2MM_DMASR, 0x1000)   # W1C clear IOC_Irq BEFORE re-arm
+        dma.write(DMA_S2MM_DMACR, 0x01)     # run
         dma.write(DMA_S2MM_DA,    dest)
-        dma.write(DMA_S2MM_LENGTH, 4)
+        dma.write(DMA_S2MM_LENGTH, 4)        # write LENGTH last → triggers transfer
 
     arm_s2mm(dest_ptr)
 
