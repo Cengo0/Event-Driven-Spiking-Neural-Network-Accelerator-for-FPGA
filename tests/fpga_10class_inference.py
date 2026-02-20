@@ -125,8 +125,9 @@ class MMIO:
         return self._mm.read(length)
 
     def flush(self) -> None:
-        """Flush mmap writes to underlying physical memory."""
-        self._mm.flush()
+        """No-op on /dev/mem (O_SYNC already gives strongly-ordered access;
+        msync/mmap.flush() raises EINVAL on device-backed mappings)."""
+        pass
 
     def close(self) -> None:
         self._mm.close()
@@ -369,9 +370,7 @@ def run_inference(hls: MMIO, cfg: MMIO, dma: MMIO,
     # before MM2S DMA reads them, and that DMA writes to DMA_BUF_OUT are
     # visible to the CPU when we read back via buf_out.read_bytes().
     buf_in.write_bytes(0, spike_words.tobytes())
-    buf_in.flush()
     buf_out.write_bytes(0, b'\x00' * (n_neurons * 4 + 64))
-    buf_out.flush()
 
     # --- Hard-reset both DMA channels ---
     dma.write(DMA_MM2S_DMACR, 0x04)   # MM2S reset
