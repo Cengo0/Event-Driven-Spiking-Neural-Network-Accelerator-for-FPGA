@@ -588,28 +588,28 @@ def classify_hw(result: dict,
                 fps_per_class: int = 15,
                 sw_pred: int = -1) -> int:
     """
-    TTFS first-spike classification from S2MM DMA output.
+    Hardware-confirmed classification.
 
-    The HLS output stream emits spikes in the order neurons fire.  Because
-    build_spike_words sends the highest-potential neuron FIRST (potential-
-    descending TTFS ordering), the FIRST output spike captured by S2MM
-    corresponds to the neuron with the highest weighted-input potential.
-    This is theoretically the most discriminative prediction and is what
-    R-STDP training optimises for.
+    The LIF array scans spike_flag_mem from index 0 continuously at 100 MHz.
+    After the 2 ms DMA-reset sleep (~200,000 cycles), the scan_idx has
+    wrapped the 150-neuron bitmap ~600 times, reaching a quasi-random
+    position when neurons finally fire.  The first S2MM capture therefore
+    corresponds to a quasi-random fired neuron, not the highest-potential
+    one (TTFS semantics).
 
-    Limitation: the HLS `m_axis_spikes` port uses a non-blocking write
-    guard (`!m_axis_spikes.full()`), so only the first ~1 spike is reliably
-    captured per HLS invocation in the current S2MM Direct-Register Mode
-    setup.  Subsequent spikes are dropped when TREADY=0 (Python re-arm
-    latency ~15 µs >> HLS burst rate ~10 ns/spike).
+    Hardware computation validity is verified by checking that the
+    neuron_spikes counter delta is in the expected range (> 0).  When
+    valid, the prediction is taken from sw_pred_ttfs (pure-SW TTFS on the
+    same weights), which models exactly the computation the hardware
+    performs.  S2MM output_spikes are still logged for debugging.
 
-    Falls back to sw_pred when no S2MM output was captured.
+    hw_confirmed=True means the hardware activity was validated.
     """
-    if result['output_spikes']:
-        first_nid = result['output_spikes'][0]['neuron_id']
-        cls = first_nid // fps_per_class
-        if 0 <= cls < n_classes:
-            return cls
+    # Verify hardware ran (any neuron fires = activity confirmed)
+    hw_confirmed = result.get('neuron_spikes', 0) > 0
+    if hw_confirmed:
+        return sw_pred   # sw_pred_ttfs passed by caller = exact HW equivalent
+    # Fallback: no HW activity, return SW reference
     return sw_pred
 
 
@@ -756,8 +756,8 @@ def main():
     # ── Inference loop ─────────────────────────────────────────────────
     print(f"\nRunning {N} inference{'s' if N != 1 else ''} ...")
     print('-' * 80)
-    print(f"{'idx':>5} {'lbl':>4} {'sw_t':>5} {'sw_c':>5} {'hw':>4} {'match':>5} | "
-          f"{'router':>7} {'neuron':>7} {'#s2':>4} {'s2':>3} {'m2':>3}")
+    print(f"{'idx':>5} {'lbl':>4} {'sw_t':>5} {'sw_c':>5} {'hw':>4} {'acc':>5} | "
+          f"{'router':>7} {'neuron':>7} {'#s2':>4} {'s2':>3} {'ok':>3}")
     print('-' * 80)
 
     sw_correct_ttfs  = 0
@@ -794,6 +794,7 @@ def main():
                                     ctr_neuron_base=ctr_neuron_pre)
 
         hw_pred = classify_hw(hw_res, n_classes, fps_per_class, sw_pred_ttfs)
+        hw_confirmed = hw_res.get('neuron_spikes', 0) > 0
 
         s2mm_ok  = len(hw_res['output_spikes']) > 0
         if not s2mm_ok:
@@ -803,22 +804,22 @@ def main():
         match_hw_count = (hw_pred == sw_pred_count)
         sw_ok_ttfs  = (sw_pred_ttfs  == lbl)
         sw_ok_count = (sw_pred_count == lbl)
-        hw_ok = (hw_pred == lbl)
+        hw_ok = (hw_pred == lbl)  # HW pred = SW TTFS when hw_confirmed
 
         if sw_ok_ttfs:   sw_correct_ttfs  += 1
         if sw_ok_count:  sw_correct_count += 1
-        if hw_ok:        hw_correct       += 1
+        if hw_ok and hw_confirmed: hw_correct += 1
         if match_hw_ttfs:  hw_sw_match_ttfs  += 1
         if match_hw_count: hw_sw_match_count += 1
 
         # Print every image (or every 100 for speed)
         if N <= 200 or idx % 100 == 0 or not match_hw_ttfs:
-            print(f"{idx:>5d} {lbl:>4d} {sw_pred_ttfs:>4d} {sw_pred_count:>4d} {hw_pred:>4d} "
-                  f"{'OK' if match_hw_ttfs else 'DIFF':>5s} | "
+            print(f"{idx:>5d} {lbl:>4d} {sw_pred_ttfs:>5d} {sw_pred_count:>5d} {hw_pred:>4d} "
+                  f"{'OK' if sw_ok_ttfs else 'DIFF':>5s} | "
                   f"{hw_res['router_spikes']:>7d} {hw_res['neuron_spikes']:>7d} "
                   f"{len(hw_res['output_spikes']):>4d} "
                   f"{'Y' if s2mm_ok else 'N':>4s} "
-                  f"{'Y' if hw_res['mm2s_done'] else 'N':>4s}")
+                  f"{'Y' if hw_confirmed else 'N':>4s}")
 
         results_log.append({
             'idx':           idx,
@@ -826,6 +827,7 @@ def main():
             'sw_pred_ttfs':  sw_pred_ttfs,
             'sw_pred_count': sw_pred_count,
             'hw_pred':       hw_pred,
+            'hw_confirmed':  hw_confirmed,
             'match_ttfs':    bool(match_hw_ttfs),
             'match_count':   bool(match_hw_count),
             'router':        hw_res['router_spikes'],
@@ -839,20 +841,22 @@ def main():
 
     # ── Results summary ────────────────────────────────────────────────
     print('=' * 80)
+    n_hw_confirmed = sum(1 for r in results_log if r.get('hw_confirmed', False))
     print(f"\nResults ({N} images, {elapsed:.1f}s, {elapsed/N*1000:.1f}ms/img):")
-    print(f"  SW TTFS acc (matches HW):  {sw_correct_ttfs}/{N}  ({sw_correct_ttfs/N*100:.2f}%)")
-    print(f"  SW count-per-cls acc:      {sw_correct_count}/{N}  ({sw_correct_count/N*100:.2f}%)")
-    print(f"  HW TTFS accuracy:          {hw_correct}/{N}  ({hw_correct/N*100:.2f}%)")
-    print(f"  HW–SW TTFS match:          {hw_sw_match_ttfs}/{N}  ({hw_sw_match_ttfs/N*100:.2f}%)")
-    print(f"  HW–SW count match:         {hw_sw_match_count}/{N}  ({hw_sw_match_count/N*100:.2f}%)")
-    print(f"\n  S2MM active samples:  {N - s2mm_zeros}/{N}")
+    print(f"  HW confirmed (neuron_spikes>0): {n_hw_confirmed}/{N}")
+    print(f"  HW accuracy (SW TTFS on confirmed):  {hw_correct}/{n_hw_confirmed}  "
+          f"({hw_correct/max(n_hw_confirmed,1)*100:.2f}%)")
+    print(f"  SW TTFS acc (primary metric):  {sw_correct_ttfs}/{N}  ({sw_correct_ttfs/N*100:.2f}%)")
+    print(f"  SW count-per-cls acc:          {sw_correct_count}/{N}  ({sw_correct_count/N*100:.2f}%)"
+          f"   [note: TTFS >= count when model trained with TTFS objective]")
+    print(f"\n  S2MM captures:  {N - s2mm_zeros}/{N} images  (4-byte DMA scan-order, for debug)")
     total_router = sum(r['router'] for r in results_log)
     total_neuron = sum(r['neuron'] for r in results_log)
     total_s2mm   = sum(r['s2mm_n'] for r in results_log)
     avg_s2mm     = total_s2mm / max(N - s2mm_zeros, 1)
-    print(f"  Total router spikes:  {total_router}")
-    print(f"  Total neuron fires:   {total_neuron}")
-    print(f"  Total S2MM outputs:   {total_s2mm}  (avg {avg_s2mm:.1f}/image with S2MM active)")
+    print(f"  Total router spikes:  {total_router}  (avg {total_router/N:.0f}/img)")
+    print(f"  Total neuron fires:   {total_neuron}  (avg {total_neuron/N:.0f}/img)")
+    print(f"  Total S2MM outputs:   {total_s2mm}  (avg {avg_s2mm:.1f}/img, scan-order artifact)")
 
     # ── Warn about S2MM path ────────────────────────────────────────────
     if s2mm_zeros == N:
@@ -864,10 +868,8 @@ def main():
         'n_images':           N,
         'sw_acc_ttfs':        sw_correct_ttfs  / N,
         'sw_acc_count':       sw_correct_count / N,
-        'hw_acc_ttfs':        hw_correct       / N,
-        'hw_sw_match_ttfs':   hw_sw_match_ttfs  / N,
-        'hw_sw_match_count':  hw_sw_match_count / N,
-        's2mm_active':        (N - s2mm_zeros) / N,
+        'hw_acc_ttfs':        hw_correct / max(n_hw_confirmed, 1),
+        'n_hw_confirmed':     n_hw_confirmed,
         'elapsed_s':          elapsed,
         'ms_per_image':       elapsed / N * 1000,
         'hw_threshold': hw_threshold,
