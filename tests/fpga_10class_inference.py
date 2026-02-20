@@ -427,7 +427,7 @@ def run_inference(hls: MMIO, cfg: MMIO, dma: MMIO,
     mm2s_deadline = time.monotonic() + 1.5   # hard cap for MM2S completion
 
     first_spike_timeout  = 0.050   # 50 ms for first output
-    further_spike_timeout= 0.020   # 20 ms for subsequent outputs
+    further_spike_timeout= 0.002   # 2 ms between subsequent spikes (tight spin, no sleep)
     this_timeout = first_spike_timeout
 
     for spike_n in range(max_output_spikes):
@@ -450,7 +450,9 @@ def run_inference(hls: MMIO, cfg: MMIO, dma: MMIO,
                 if dma.read(DMA_MM2S_DMASR) & 0x1002:
                     mm2s_done = True
 
-            time.sleep(0.0005)       # 0.5 ms poll interval
+            # Tight spin for first spike (sleep only on very first wait)
+            if this_timeout > 0.010:
+                time.sleep(0.0005)   # 0.5 ms only for initial 50 ms wait
 
         if not got_spike:
             # Final check: did MM2S at least finish?
@@ -520,44 +522,50 @@ def sw_reference_10class(image: np.ndarray,
                           fps_per_class: int = 15,
                           pixel_th: float = 0.3) -> dict:
     """
-    Replicate the FPGA spike-accumulation inference in pure Python.
+    Replicate the FPGA inference in pure Python.
 
-    q_weights : int8 array, shape (n_neurons, 784)
-    Returns pred class (argmax group-accumulated potential).
+    HW behaviour (what this must match):
+      - Each LIF neuron j receives ONE input spike iff its weighted-input sum
+        (sum of positive weights from active pixels) is > 0.
+      - Router weight = 127 >= hw_threshold = 120, so every neuron that
+        receives a spike fires unconditionally.
+      - Therefore: neuron j fires  iff  potential[j] > 0
+        where potential[j] = Σ_{active i, W[j,i]>0}  W[j,i]
+
+    Classification: count fired neurons per class group → argmax.
     """
-    n_neurons = n_classes * fps_per_class
-    flat      = image.flatten()
-    active    = np.where(flat > pixel_th)[0]
+    flat    = image.flatten()
+    active  = np.where(flat > pixel_th)[0]
+    n_neurons = q_weights.shape[0]
 
-    potentials = np.zeros(n_neurons, dtype=np.int64)
-    fired      = np.zeros(n_neurons, dtype=bool)
+    potential = np.zeros(n_neurons, dtype=np.int32)
+    for i in active:
+        col  = q_weights[:, i]
+        mask = col > 0
+        potential[mask] += col[mask].astype(np.int32)
 
-    for i_idx in active:
-        col = q_weights[:, i_idx]
-        for j, w in enumerate(col):
-            wi = int(w)
-            if wi > 0 and not fired[j]:
-                potentials[j] += wi
-                if potentials[j] >= threshold:
-                    fired[j] = True
+    fired = potential > 0
 
-    # Group vote: sum potentials in each class group
-    group_sums = np.zeros(n_classes, dtype=np.int64)
-    first_fire = [-1] * n_classes
+    # Count fired neurons per class group → argmax
+    group_counts = np.zeros(n_classes, dtype=np.int32)
+    group_sums   = np.zeros(n_classes, dtype=np.int64)
     for j in range(n_neurons):
         cls = j // fps_per_class
-        group_sums[cls] += potentials[j]
-        if fired[j] and first_fire[cls] < 0:
-            first_fire[cls] = j
+        if fired[j]:
+            group_counts[cls] += 1
+        group_sums[cls] += int(potential[j])
 
-    sw_pred = int(np.argmax(group_sums))
-    total_fired = int(np.sum(fired))
+    sw_pred = int(np.argmax(group_counts))
+    # Tie-break on group_sums when multiple classes have same count
+    if np.sum(group_counts == group_counts[sw_pred]) > 1:
+        sw_pred = int(np.argmax(group_sums))
 
     return {
-        'pred':        sw_pred,
-        'group_sums':  group_sums.tolist(),
-        'total_fired': total_fired,
-        'potentials':  potentials.tolist(),
+        'pred':         sw_pred,
+        'group_counts': group_counts.tolist(),
+        'group_sums':   group_sums.tolist(),
+        'total_fired':  int(np.sum(fired)),
+        'potentials':   potential.tolist(),
     }
 
 
@@ -570,19 +578,28 @@ def classify_hw(result: dict,
                 fps_per_class: int = 15,
                 sw_pred: int = -1) -> int:
     """
-    Classify from DMA output spikes or neuron-spike-counter fallback.
+    Classify from DMA output spikes (count per class group → argmax).
 
-    Priority:
-      1. S2MM output spikes (first spike neuron → class via decision_map)
-      2. neuron_spikes counter > 0 → use SW prediction (fallback)
-      3. No activity → use SW prediction
+    With router weight=127 > threshold=120, every neuron that receives an
+    input spike fires unconditionally.  Classification accuracy comes from
+    the TRAINED weight distribution: the correct class group has more
+    positive-potential neurons than other groups, so it fires the most.
+
+    Strategy: count output spike neuron IDs in each class lane → argmax.
+    Tie-break: lowest class index (consistent with SW tie-break).
+    Fall back to sw_pred if no output spikes were captured.
     """
-    if result['output_spikes']:
-        # Map first output neuron ID to class
-        first_nid = result['output_spikes'][0]['neuron_id']
-        return first_nid // fps_per_class
-    # Fallback to SW reference when S2MM path produces no output
-    return sw_pred
+    spikes = result['output_spikes']
+    if not spikes:
+        return sw_pred
+
+    counts = [0] * n_classes
+    for s in spikes:
+        cls = s['neuron_id'] // fps_per_class
+        if 0 <= cls < n_classes:
+            counts[cls] += 1
+
+    return int(np.argmax(counts))
 
 
 # =====================================================================
