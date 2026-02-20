@@ -192,11 +192,21 @@ def encode_conn_count(neuron: int, count: int) -> tuple:
 
 
 def reset_system(hls: MMIO, cfg: MMIO) -> None:
+    """
+    Soft reset: stop HLS and clear its internal counters.
+
+    Note: does NOT write ap_start, so snn_reset/bd_snn_reset never pulses.
+    RTL spike_router conn_count and lif_neuron_array BRAM state are preserved.
+    With TTFS (weight=127 > threshold=120), every neuron that fires resets its
+    membrane to 0, so carry-over between images is minimal and acceptable.
+    RTL hardware counters (router_spike_count, neuron_spike_count) are
+    cumulative — use delta measurements in the inference loop.
+    """
     hls.write(HLS_AP_CTRL,  0x00)
     hls.write(HLS_CTRL_REG, CTRL_RESET | CTRL_CLEAR)
-    time.sleep(0.015)
+    time.sleep(0.005)
     hls.write(HLS_CTRL_REG, 0x00)
-    time.sleep(0.010)
+    time.sleep(0.005)
 
 
 def program_router_for_inference(cfg: MMIO, n_neurons: int,
@@ -319,103 +329,115 @@ def warmup_hls(hls: MMIO, timeout_s: float = 0.25) -> None:
 def run_inference(hls: MMIO, cfg: MMIO, dma: MMIO,
                   spike_words: np.ndarray,
                   n_neurons: int,
-                  hw_threshold: int) -> dict:
+                  hw_threshold: int,
+                  ctr_router_base: int = 0,
+                  ctr_neuron_base: int = 0) -> dict:
     """
     Inject spike_words via MM2S DMA and collect output from S2MM.
 
-    S2MM DMA FIX (vs. pynq_mnist_inference.py):
-      • S2MM is armed (DMACR=run, DA set, LENGTH set) BEFORE HLS is started.
-      • S2MM is polled for idle/complete (DMASR bits 1,12) instead of
-        a fixed 200 ms sleep.
-      • Both DMA channels are hard-reset at the start of each call.
+    Key timing fix:
+      • S2MM drain loop runs CONCURRENTLY with MM2S (not after it).
+        Output spikes can appear as soon as the first input spike clears
+        the router + LIF pipeline (~10 µs RTL), which is while MM2S is
+        still sending the remaining input spike words.
+      • First-spike timeout = 50 ms (covers Python/AXI overhead).
+      • Subsequent-spike timeout = 20 ms (LIF fires in burst once started).
+      • Counter deltas are computed against provided baselines so callers
+        get per-image counts even though RTL counters are cumulative.
     """
     n_words  = len(spike_words)
     nbytes   = n_words * 4
 
     # --- Write into DDR via /dev/mem pwrite ---
     devmem_fd = os.open('/dev/mem', os.O_RDWR | os.O_SYNC)
-    try:
-        os.pwrite(devmem_fd, spike_words.tobytes(), DMA_BUF_IN)
-        # Also zero the output buffer (detect real writes)
-        os.pwrite(devmem_fd, b'\x00' * (n_neurons * 4 + 64), DMA_BUF_OUT)
-    finally:
-        pass  # fd kept open for output read below
+    os.pwrite(devmem_fd, spike_words.tobytes(), DMA_BUF_IN)
+    os.pwrite(devmem_fd, b'\x00' * (n_neurons * 4 + 64), DMA_BUF_OUT)
 
     # --- Hard-reset both DMA channels ---
     dma.write(DMA_MM2S_DMACR, 0x04)   # MM2S reset
-    time.sleep(0.003)
+    time.sleep(0.002)
     dma.write(DMA_S2MM_DMACR, 0x04)   # S2MM reset
-    time.sleep(0.003)
+    time.sleep(0.002)
 
-    # ── STEP 1: Configure HLS (before touching DMA) ────────────────────
+    # ── STEP 1: Configure HLS ──────────────────────────────────────────
     hls.write(HLS_CTRL_REG,   CTRL_ENABLE)
     hls.write(HLS_MODE_REG,   0)                # inference mode
     hls.write(HLS_TIME_STEPS, 1)                # 1 time-step per invocation
     hls.write(HLS_CONFIG_REG, hw_threshold & 0xFFFF)
-    time.sleep(0.002)
 
-    # ── STEP 2: Arm FIRST S2MM transfer (4 bytes = 1 spike packet) ─────
-    # The HLS sets last=1 on EVERY output spike, so each S2MM transfer
-    # captures exactly ONE spike and then closes.  We arm one-at-a-time
-    # in a drain loop below.  Arm the first transfer before ap_start.
+    # ── STEP 2: Arm first S2MM (4 bytes = 1 spike word, TLAST per spike)
     dest_ptr = DMA_BUF_OUT
     max_output_spikes = n_neurons + 16
 
     def arm_s2mm(dest):
-        dma.write(DMA_S2MM_DMACR, 0x01)   # run
+        """Arm S2MM for exactly one 4-byte spike word."""
+        dma.write(DMA_S2MM_DMACR, 0x01)
         dma.write(DMA_S2MM_DA,    dest)
-        dma.write(DMA_S2MM_LENGTH, 4)     # exactly 1 spike word; TLAST closes it
+        dma.write(DMA_S2MM_LENGTH, 4)
 
-    arm_s2mm(dest_ptr)               # ready BEFORE ap_start
+    arm_s2mm(dest_ptr)
 
-    # ── STEP 3: Start HLS with auto_restart ────────────────────────────
-    hls.write(HLS_AP_CTRL, 0x81)               # ap_start + auto_restart
+    # ── STEP 3: Start HLS (auto_restart) ──────────────────────────────
+    hls.write(HLS_AP_CTRL, 0x81)
 
-    # ── STEP 4: Start MM2S (send input spikes) ─────────────────────────
-    time.sleep(0.003)
+    # ── STEP 4: Start MM2S ────────────────────────────────────────────
     dma.write(DMA_MM2S_DMACR, 0x01)
     dma.write(DMA_MM2S_SA,     DMA_BUF_IN)
-    dma.write(DMA_MM2S_LENGTH, nbytes)          # triggers MM2S transfer
+    dma.write(DMA_MM2S_LENGTH, nbytes)
 
-    # ── STEP 5: Wait for MM2S to complete ──────────────────────────────
-    mm2s_done = False
-    for _ in range(200):
-        time.sleep(0.005)
-        if dma.read(DMA_MM2S_DMASR) & 0x1002:
-            mm2s_done = True
-            break
-
-    # ── STEP 6: Drain S2MM — re-arm once per spike until pipe silent ───
-    # Each spike exits HLS as a 4-byte AXI-Stream packet with TLAST=1.
-    # S2MM closes after each packet.  We re-arm immediately for the next.
+    # ── STEP 5+6: Drain S2MM concurrently with MM2S ───────────────────
+    # The LIF pipeline latency (router BRAM + LIF BRAM) is ~10-30 µs at
+    # 100 MHz, so the first output spike appears while MM2S is still
+    # sending input words.  We must poll S2MM NOW, not after MM2S ends.
+    #
+    # Timeouts:
+    #   first spike  : 50 ms  (Python + AXI-MM overhead dominates)
+    #   further spikes: 20 ms (LIF fires in burst; 20 ms >> pipeline Δt)
     output_spikes: list = []
-    s2mm_sr = 0
-    SPIKE_TIMEOUT_S = 0.004    # 4 ms: generous for one LIF time-step
+    s2mm_sr       = 0
+    mm2s_done     = False
+    next_dest     = dest_ptr
+    mm2s_deadline = time.monotonic() + 1.5   # hard cap for MM2S completion
 
-    spike_words_read = []
-    next_dest = dest_ptr
-    for _ in range(max_output_spikes):
-        # Poll for this S2MM transfer to complete (idle bit 12 or err bit 4)
-        deadline = time.monotonic() + SPIKE_TIMEOUT_S
+    first_spike_timeout  = 0.050   # 50 ms for first output
+    further_spike_timeout= 0.020   # 20 ms for subsequent outputs
+    this_timeout = first_spike_timeout
+
+    for spike_n in range(max_output_spikes):
+        deadline = time.monotonic() + this_timeout
         got_spike = False
+
         while time.monotonic() < deadline:
             sr = dma.read(DMA_S2MM_DMASR)
-            if sr & 0x1000:      # bit12 = idle → transfer complete
+
+            if sr & 0x1000:          # bit12 = Idle → transfer complete
                 got_spike = True
                 s2mm_sr = sr
                 break
-            if sr & 0x0010:      # bit4  = DMA error
-                break
-            time.sleep(0.0002)   # 0.2 ms poll interval
+            if sr & 0x0050:          # bit6=SGErr, bit4=DMAErr, bit3=SIErr
+                s2mm_sr = sr
+                break                # DMA error – abort
+
+            # Also check MM2S completion opportunistically
+            if not mm2s_done:
+                if dma.read(DMA_MM2S_DMASR) & 0x1002:
+                    mm2s_done = True
+
+            time.sleep(0.0005)       # 0.5 ms poll interval
 
         if not got_spike:
-            break                # no more spikes coming
+            # Final check: did MM2S at least finish?
+            if not mm2s_done and time.monotonic() < mm2s_deadline:
+                if dma.read(DMA_MM2S_DMASR) & 0x1002:
+                    mm2s_done = True
+            break                    # No more output spikes
 
-        # Read the captured 4-byte word from DDR
+        this_timeout = further_spike_timeout   # tighten after first spike
+
+        # Read captured spike word from DDR
         try:
             raw4 = os.pread(devmem_fd, 4, next_dest)
-            w = struct.unpack('<I', raw4)[0]
-            spike_words_read.append(w)
+            w    = struct.unpack('<I', raw4)[0]
             if w != 0:
                 nid = w & 0x3FF
                 wt  = (w >> 10) & 0xFF
@@ -423,35 +445,41 @@ def run_inference(hls: MMIO, cfg: MMIO, dma: MMIO,
         except Exception:
             break
 
-        # Advance destination pointer and re-arm for next spike
         next_dest += 4
         if next_dest - DMA_BUF_OUT >= max_output_spikes * 4:
             break
-        arm_s2mm(next_dest)      # arm for next spike immediately
+        arm_s2mm(next_dest)   # re-arm immediately for next spike
 
-    # ── STEP 7: Stop HLS ───────────────────────────────────────────────
+    # Confirm MM2S done if not already seen
+    if not mm2s_done:
+        for _ in range(60):
+            time.sleep(0.005)
+            if dma.read(DMA_MM2S_DMASR) & 0x1002:
+                mm2s_done = True
+                break
+
+    # ── STEP 7: Stop HLS + DMA ────────────────────────────────────────
     hls.write(HLS_AP_CTRL, 0x00)
     hls.write(HLS_CTRL_REG, 0x00)
-    # Halting S2MM cleanly
     dma.write(DMA_S2MM_DMACR, 0x00)
-    time.sleep(0.005)
+    time.sleep(0.003)
 
-    # ── STEP 8: Read HW counters ───────────────────────────────────────
-    router_spks = cfg.read(CFG_ROUTER_SPKS)
-    neuron_spks = cfg.read(CFG_NEURON_SPKS)
-    hls_spks    = hls.read(HLS_SPIKE_COUNT)
-    status      = cfg.read(CFG_STATUS)
-    overflow    = bool(status & 0x01)
+    # ── STEP 8: Read HW counters (delta from baselines) ───────────────
+    router_abs = cfg.read(CFG_ROUTER_SPKS)
+    neuron_abs = cfg.read(CFG_NEURON_SPKS)
+    status     = cfg.read(CFG_STATUS)
 
     os.close(devmem_fd)
 
     return {
-        'router_spikes':  router_spks,
-        'neuron_spikes':  neuron_spks,
-        'hls_input':      hls_spks,
-        'overflow':       overflow,
+        'router_spikes':  router_abs - ctr_router_base,
+        'neuron_spikes':  neuron_abs - ctr_neuron_base,
+        'router_abs':     router_abs,
+        'neuron_abs':     neuron_abs,
+        'overflow':       bool(status & 0x01),
         'output_spikes':  output_spikes,
         's2mm_sr':        s2mm_sr,
+        's2mm_err':       bool(s2mm_sr & 0x0050),
         'mm2s_done':      mm2s_done,
     }
 
@@ -686,10 +714,16 @@ def main():
 
         # FPGA inference
         reset_system(hls, cfg)
-        configure_neurons(cfg, threshold=hw_threshold, leak=0, refrac=0)
+
+        # Snapshot counters BEFORE this image (they're cumulative in RTL)
+        ctr_router_pre = cfg.read(CFG_ROUTER_SPKS)
+        ctr_neuron_pre = cfg.read(CFG_NEURON_SPKS)
 
         spike_words = build_spike_words(img, q_weights)
-        hw_res      = run_inference(hls, cfg, dma, spike_words, n_neurons, hw_threshold)
+        hw_res      = run_inference(hls, cfg, dma, spike_words, n_neurons,
+                                    hw_threshold,
+                                    ctr_router_base=ctr_router_pre,
+                                    ctr_neuron_base=ctr_neuron_pre)
 
         hw_pred = classify_hw(hw_res, n_classes, fps_per_class, sw_pred)
 
