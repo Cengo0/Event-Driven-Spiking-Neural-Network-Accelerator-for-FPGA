@@ -16,18 +16,21 @@
 #include <ap_axi_sdata.h>
 #include <hls_stream.h>
 
-//=============================================================================
-// Configuration
-//=============================================================================
-const int MAX_NEURONS = 720;
-const int MAX_SYNAPSES = 518400;  // 720x720
+// Centralized parameters (source of truth: config/snn_params.yaml)
+#include "snn_params.h"
 
-const int WEIGHT_WIDTH = 4;
-const int NEURON_ID_WIDTH = 10;  // Supports up to 1024 encoded channels
+//=============================================================================
+// Configuration (derived from snn_params.h)
+//=============================================================================
+const int MAX_NEURONS    = SNN_MAX_NEURONS;                  // 16×128 = 2048
+const int MAX_SYNAPSES   = SNN_MAX_NEURONS * SNN_MAX_NEURONS;
+
+const int WEIGHT_WIDTH   = SNN_WEIGHT_WIDTH;                 // 8
+const int NEURON_ID_WIDTH = SNN_NEURON_ID_WIDTH;             // 11 (Core Group global ID)
 const int TIMESTAMP_WIDTH = 32;
 
-const int WEIGHT_SCALE = 128;
-const int VERSION_ID = 0x20260210;
+const int WEIGHT_SCALE   = 128;
+const int VERSION_ID     = 0x20260210;
 
 //=============================================================================
 // Operation Modes (use #define for switch-case compatibility)
@@ -40,12 +43,14 @@ const int VERSION_ID = 0x20260210;
 // Basic Data Types
 //=============================================================================
 typedef ap_uint<NEURON_ID_WIDTH> neuron_id_t;
-typedef ap_int<WEIGHT_WIDTH> weight_t;
+typedef ap_int<WEIGHT_WIDTH> weight_t;       // HLS: signed 8-bit
 typedef ap_int<16> weight_delta_t;
 typedef ap_uint<TIMESTAMP_WIDTH> spike_time_t;
 
-const weight_t MAX_WEIGHT = 7;
-const weight_t MIN_WEIGHT = -8;
+// NOTE: HLS STDP engine uses signed 8-bit weights [-128, 127].
+// RTL core_group.v uses unsigned 8-bit magnitude [0, 255] + 1-bit exc/inh flag.
+const weight_t MAX_WEIGHT = 127;
+const weight_t MIN_WEIGHT = -128;
 
 //=============================================================================
 // AXI4-Stream Types

@@ -18,29 +18,29 @@
 <PipelineType>loop pipeline stp</PipelineType>
 <SummaryOfTimingAnalysis>
 <unit>ns</unit>
-<EstimatedClockPeriod>5.737</EstimatedClockPeriod>
+<EstimatedClockPeriod>7.150</EstimatedClockPeriod>
 </SummaryOfTimingAnalysis>
 <SummaryOfOverallLatency>
 <unit>clock cycles</unit>
-<Best-caseLatency>518405</Best-caseLatency>
-<Average-caseLatency>518405</Average-caseLatency>
-<Worst-caseLatency>518405</Worst-caseLatency>
-<Best-caseRealTimeLatency>5.184 ms</Best-caseRealTimeLatency>
-<Average-caseRealTimeLatency>5.184 ms</Average-caseRealTimeLatency>
-<Worst-caseRealTimeLatency>5.184 ms</Worst-caseRealTimeLatency>
-<Interval-min>518401</Interval-min>
-<Interval-max>518401</Interval-max>
+<Best-caseLatency>1048578</Best-caseLatency>
+<Average-caseLatency>1048578</Average-caseLatency>
+<Worst-caseLatency>1048578</Worst-caseLatency>
+<Best-caseRealTimeLatency>10.486 ms</Best-caseRealTimeLatency>
+<Average-caseRealTimeLatency>10.486 ms</Average-caseRealTimeLatency>
+<Worst-caseRealTimeLatency>10.486 ms</Worst-caseRealTimeLatency>
+<Interval-min>1048577</Interval-min>
+<Interval-max>1048577</Interval-max>
 <PerformancePragma>-</PerformancePragma>
 </SummaryOfOverallLatency>
 <SummaryOfLoopLatency>
 <INIT_WEIGHT_OUTER_INIT_WEIGHT_INNER>
 <Slack>7.30</Slack>
-<TripCount>518400</TripCount>
+<TripCount>1048576</TripCount>
 <isPerfectNested>0</isPerfectNested>
-<Latency>518403</Latency>
-<AbsoluteTimeLatency>5184030</AbsoluteTimeLatency>
+<Latency>1048576</Latency>
+<AbsoluteTimeLatency>10485760</AbsoluteTimeLatency>
 <PipelineII>1</PipelineII>
-<PipelineDepth>5</PipelineDepth>
+<PipelineDepth>2</PipelineDepth>
 <PerformancePragma>-</PerformancePragma>
 <InstanceList>
 </InstanceList>
@@ -63,10 +63,10 @@
 
 <AreaEstimates>
 <Resources>
-<DSP>1</DSP>
-<FF>195</FF>
-<LUT>231</LUT>
+<FF>46</FF>
+<LUT>171</LUT>
 <BRAM_18K>0</BRAM_18K>
+<DSP>0</DSP>
 <URAM>0</URAM>
 </Resources>
 <AvailableResources>
@@ -153,7 +153,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>16</Bits>
+<Bits>17</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -197,7 +197,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>16</Bits>
+<Bits>17</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -241,7 +241,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>16</Bits>
+<Bits>17</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -285,7 +285,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>16</Bits>
+<Bits>17</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -329,7 +329,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>16</Bits>
+<Bits>17</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -373,7 +373,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>16</Bits>
+<Bits>17</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -417,7 +417,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>16</Bits>
+<Bits>17</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -461,7 +461,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>16</Bits>
+<Bits>17</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>

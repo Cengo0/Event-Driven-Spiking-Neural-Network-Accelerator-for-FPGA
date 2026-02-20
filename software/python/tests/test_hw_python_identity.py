@@ -325,7 +325,9 @@ def test_pytorch_hw_mode():
     
     # Test configuration
     tau = 0.875  # shift=3
-    threshold = 1000
+    # Threshold must exceed max test membrane (65535) so PyTorch never fires.
+    # This test isolates the leak calculation — spike/reset is tested elsewhere.
+    threshold = 70000
     
     # Create PyTorch neuron in hw_mode
     lif_torch = LIF(thresh=float(threshold), tau=tau, hw_mode=True, reset='zero')

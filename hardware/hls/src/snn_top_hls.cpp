@@ -15,7 +15,7 @@
 //                 - Direct interface to Verilog SNN core
 //-----------------------------------------------------------------------------
 
-#include "snn_top_hls.h"
+#include "../include/snn_top_hls.h"
 
 //=============================================================================
 // Delta-Sigma Spike Encoder (only HW encoder retained for area savings)

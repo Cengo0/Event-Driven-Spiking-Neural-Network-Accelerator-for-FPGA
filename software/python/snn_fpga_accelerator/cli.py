@@ -26,7 +26,7 @@ def flash_bitstream():
     parser = argparse.ArgumentParser(description='Flash bitstream to FPGA')
     parser.add_argument('--bitstream', '-b', type=str, required=True,
                         help='Path to bitstream file (.bit)')
-    parser.add_argument('--ip', type=str, default='192.168.2.99',
+    parser.add_argument('--ip', type=str, default='192.168.0.40',
                         help='PYNQ board IP address')
     parser.add_argument('--verbose', '-v', action='store_true',
                         help='Verbose output')

@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'decay_eligibility_traces'
 ================================================================
-* Date:           Tue Feb 10 21:00:49 2026
+* Date:           Wed Feb 11 07:07:58 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -29,7 +29,7 @@
     |  Latency (cycles) |  Latency (absolute) |  Interval | Pipeline|
     |   min   |   max   |    min   |    max   | min | max |   Type  |
     +---------+---------+----------+----------+-----+-----+---------+
-    |      184|      184|  1.840 us|  1.840 us|  184|  184|       no|
+    |      260|      260|  2.600 us|  2.600 us|  260|  260|       no|
     +---------+---------+----------+----------+-----+-----+---------+
 
     + Detail: 
@@ -38,8 +38,8 @@
         |                                                        |                                              |  Latency (cycles) |  Latency (absolute) |  Interval |      Pipeline     |
         |                        Instance                        |                    Module                    |   min   |   max   |    min   |    max   | min | max |        Type       |
         +--------------------------------------------------------+----------------------------------------------+---------+---------+----------+----------+-----+-----+-------------------+
-        |grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30   |decay_eligibility_traces_Pipeline_DECAY_PRE   |      183|      183|  1.830 us|  1.830 us|    0|    0|  loop pipeline stp|
-        |grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42  |decay_eligibility_traces_Pipeline_DECAY_POST  |      183|      183|  1.830 us|  1.830 us|    0|    0|  loop pipeline stp|
+        |grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30   |decay_eligibility_traces_Pipeline_DECAY_PRE   |      259|      259|  2.590 us|  2.590 us|    0|    0|  loop pipeline stp|
+        |grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42  |decay_eligibility_traces_Pipeline_DECAY_POST  |      259|      259|  2.590 us|  2.590 us|    0|    0|  loop pipeline stp|
         +--------------------------------------------------------+----------------------------------------------+---------+---------+----------+----------+-----+-----+-------------------+
 
         * Loop: 
@@ -57,12 +57,12 @@
 |DSP              |        -|    -|       -|      -|    -|
 |Expression       |        -|    -|       0|      2|    -|
 |FIFO             |        -|    -|       -|      -|    -|
-|Instance         |        -|    -|     222|    248|    -|
+|Instance         |        -|    -|     224|    220|    -|
 |Memory           |        -|    -|       -|      -|    -|
 |Multiplexer      |        -|    -|       0|     14|    -|
 |Register         |        -|    -|       4|      -|    -|
 +-----------------+---------+-----+--------+-------+-----+
-|Total            |        0|    0|     226|    264|    0|
+|Total            |        0|    0|     228|    236|    0|
 +-----------------+---------+-----+--------+-------+-----+
 |Available        |      280|  220|  106400|  53200|    0|
 +-----------------+---------+-----+--------+-------+-----+
@@ -74,10 +74,10 @@
     +--------------------------------------------------------+----------------------------------------------+---------+----+-----+-----+-----+
     |                        Instance                        |                    Module                    | BRAM_18K| DSP|  FF | LUT | URAM|
     +--------------------------------------------------------+----------------------------------------------+---------+----+-----+-----+-----+
-    |grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42  |decay_eligibility_traces_Pipeline_DECAY_POST  |        0|   0|  111|  124|    0|
-    |grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30   |decay_eligibility_traces_Pipeline_DECAY_PRE   |        0|   0|  111|  124|    0|
+    |grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_42  |decay_eligibility_traces_Pipeline_DECAY_POST  |        0|   0|  112|  110|    0|
+    |grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_30   |decay_eligibility_traces_Pipeline_DECAY_PRE   |        0|   0|  112|  110|    0|
     +--------------------------------------------------------+----------------------------------------------+---------+----+-----+-----+-----+
-    |Total                                                   |                                              |        0|   0|  222|  248|    0|
+    |Total                                                   |                                              |        0|   0|  224|  220|    0|
     +--------------------------------------------------------+----------------------------------------------+---------+----+-----+-----+-----+
 
     * DSP: 

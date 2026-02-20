@@ -13,7 +13,7 @@ module tb_integration;
     //-------------------------------------------------------------------------
     parameter NUM_GROUPS        = 4;   // Use 4 groups for faster simulation
     parameter NEURONS_PER_GROUP = 16;  // Use 16 neurons for faster simulation
-    parameter WEIGHT_WIDTH      = 4;
+    parameter WEIGHT_WIDTH      = 8;
     parameter MAX_FANOUT_INTER  = 16;
     parameter DATA_WIDTH        = 16;
     parameter THRESHOLD_WIDTH   = 16;
@@ -478,7 +478,7 @@ module tb_integration;
         //---------------------------------------------------------------------
         $display("\n--- Test 4: External Spike → Neuron Fire ---");
         // Inject w=15 to group 0, neuron 5 → should fire (15 >= 10)
-        inject_ext_spike({2'd0, 4'd5}, 4'd15, 1'b1);
+        inject_ext_spike({2'd0, 4'd5}, 8'd15, 1'b1);
 
         wait_all_idle;
         repeat (1000) @(posedge clk);
@@ -491,8 +491,8 @@ module tb_integration;
         //---------------------------------------------------------------------
         $display("\n--- Test 5: Inter-Group Spike Propagation ---");
         // Setup: Group 0 neuron 5 → Group 1 neuron 8, w=15 (will fire)
-        program_ct(2'd0, 4'd5, 4'd0, 1'b1, 2'd1, 4'd8, 4'd15, 1'b1);
-        program_ct(2'd0, 4'd5, 4'd1, 1'b0, 2'd0, 4'd0, 4'd0,  1'b0);
+        program_ct(2'd0, 4'd5, 4'd0, 1'b1, 2'd1, 4'd8, 8'd15, 1'b1);
+        program_ct(2'd0, 4'd5, 4'd1, 1'b0, 2'd0, 4'd0, 8'd0,  1'b0);
         repeat (5) @(posedge clk);
 
         begin : test5_block
@@ -501,7 +501,7 @@ module tb_integration;
 
             // Fire group 0 neuron 5 again (wait for refractory to expire)
             repeat (500) @(posedge clk);
-            inject_ext_spike({2'd0, 4'd5}, 4'd15, 1'b1);
+            inject_ext_spike({2'd0, 4'd5}, 8'd15, 1'b1);
 
             wait_all_idle;
             repeat (3000) @(posedge clk);
@@ -517,8 +517,8 @@ module tb_integration;
         //---------------------------------------------------------------------
         $display("\n--- Test 6: Chain Propagation G0→G1→G2 ---");
         // G1 neuron 8 → G2 neuron 3, w=15
-        program_ct(2'd1, 4'd8, 4'd0, 1'b1, 2'd2, 4'd3, 4'd15, 1'b1);
-        program_ct(2'd1, 4'd8, 4'd1, 1'b0, 2'd0, 4'd0, 4'd0,  1'b0);
+        program_ct(2'd1, 4'd8, 4'd0, 1'b1, 2'd2, 4'd3, 8'd15, 1'b1);
+        program_ct(2'd1, 4'd8, 4'd1, 1'b0, 2'd0, 4'd0, 8'd0,  1'b0);
         repeat (5) @(posedge clk);
 
         begin : test6_block
@@ -529,7 +529,7 @@ module tb_integration;
             repeat (200) @(posedge clk);
 
             // Fire G0 neuron 5 → propagates to G1 neuron 8 → G2 neuron 3
-            inject_ext_spike({2'd0, 4'd5}, 4'd15, 1'b1);
+            inject_ext_spike({2'd0, 4'd5}, 8'd15, 1'b1);
 
             wait_all_idle;
             repeat (2000) @(posedge clk);
@@ -545,10 +545,10 @@ module tb_integration;
         //---------------------------------------------------------------------
         $display("\n--- Test 7: Intra + Inter Group Combined ---");
         // Setup intra-group: G3 neuron 0 → G3 neuron 1, w=15
-        load_intra_weight(3, 4'd0, 4'd1, 4'd15, 1'b1);
+        load_intra_weight(3, 4'd0, 4'd1, 8'd15, 1'b1);
         // Setup inter-group: G3 neuron 0 → G2 neuron 10, w=15
-        program_ct(2'd3, 4'd0, 4'd0, 1'b1, 2'd2, 4'd10, 4'd15, 1'b1);
-        program_ct(2'd3, 4'd0, 4'd1, 1'b0, 2'd0, 4'd0,  4'd0,  1'b0);
+        program_ct(2'd3, 4'd0, 4'd0, 1'b1, 2'd2, 4'd10, 8'd15, 1'b1);
+        program_ct(2'd3, 4'd0, 4'd1, 1'b0, 2'd0, 4'd0,  8'd0,  1'b0);
         repeat (10) @(posedge clk);
 
         begin : test7_block
@@ -557,7 +557,7 @@ module tb_integration;
             g2_before7  = get_grp_spike_count(2);
 
             // Fire G3 neuron 0
-            inject_ext_spike({2'd3, 4'd0}, 4'd15, 1'b1);
+            inject_ext_spike({2'd3, 4'd0}, 8'd15, 1'b1);
 
             wait_all_idle;
             repeat (2000) @(posedge clk);
@@ -575,10 +575,10 @@ module tb_integration;
         //---------------------------------------------------------------------
         $display("\n--- Test 9: Multi-Group Fanout ---");
         // G0 neuron 10 → G1 n0 (w=15), G2 n0 (w=15), G3 n5(w=15)
-        program_ct(2'd0, 4'd10, 4'd0, 1'b1, 2'd1, 4'd0, 4'd15, 1'b1);
-        program_ct(2'd0, 4'd10, 4'd1, 1'b1, 2'd2, 4'd0, 4'd15, 1'b1);
-        program_ct(2'd0, 4'd10, 4'd2, 1'b1, 2'd3, 4'd5, 4'd15, 1'b1);
-        program_ct(2'd0, 4'd10, 4'd3, 1'b0, 2'd0, 4'd0, 4'd0,  1'b0);
+        program_ct(2'd0, 4'd10, 4'd0, 1'b1, 2'd1, 4'd0, 8'd15, 1'b1);
+        program_ct(2'd0, 4'd10, 4'd1, 1'b1, 2'd2, 4'd0, 8'd15, 1'b1);
+        program_ct(2'd0, 4'd10, 4'd2, 1'b1, 2'd3, 4'd5, 8'd15, 1'b1);
+        program_ct(2'd0, 4'd10, 4'd3, 1'b0, 2'd0, 4'd0, 8'd0,  1'b0);
         repeat (10) @(posedge clk);
 
         begin : test9_block
@@ -587,7 +587,7 @@ module tb_integration;
             g2b = get_grp_spike_count(2);
             g3b = get_grp_spike_count(3);
 
-            inject_ext_spike({2'd0, 4'd10}, 4'd15, 1'b1);
+            inject_ext_spike({2'd0, 4'd10}, 8'd15, 1'b1);
 
             wait_all_idle;
             repeat (5000) @(posedge clk);
@@ -606,15 +606,15 @@ module tb_integration;
         //---------------------------------------------------------------------
         $display("\n--- Test 12: Sub-Threshold Inter-Group ---");
         // G0 neuron 11 → G1 neuron 2, w=5 (sub-threshold, 5 < 10)
-        program_ct(2'd0, 4'd11, 4'd0, 1'b1, 2'd1, 4'd2, 4'd5,  1'b1);
-        program_ct(2'd0, 4'd11, 4'd1, 1'b0, 2'd0, 4'd0, 4'd0,  1'b0);
+        program_ct(2'd0, 4'd11, 4'd0, 1'b1, 2'd1, 4'd2, 8'd5,  1'b1);
+        program_ct(2'd0, 4'd11, 4'd1, 1'b0, 2'd0, 4'd0, 8'd0,  1'b0);
         repeat (5) @(posedge clk);
 
         begin : test12_block
             reg [15:0] g1_before12;
             g1_before12 = get_grp_spike_count(1);
 
-            inject_ext_spike({2'd0, 4'd11}, 4'd15, 1'b1);
+            inject_ext_spike({2'd0, 4'd11}, 8'd15, 1'b1);
 
             wait_all_idle;
             repeat (1000) @(posedge clk);
@@ -660,7 +660,7 @@ module tb_integration;
 
             // Inject 10 spikes rapidly to different neurons
             for (si = 0; si < 10; si = si + 1) begin
-                inject_ext_spike({si[1:0], si[3:0]}, 4'd15, 1'b1);
+                inject_ext_spike({si[1:0], si[3:0]}, 8'd15, 1'b1);
             end
 
             wait_all_idle;

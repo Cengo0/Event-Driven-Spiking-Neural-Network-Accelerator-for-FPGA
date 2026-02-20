@@ -65,7 +65,7 @@ class SNNMonitor:
         plt.show()
 
 # Usage
-network = SNNNetwork(fpga_ip="192.168.1.100")
+network = SNNNetwork(fpga_ip="192.168.0.40")
 network.connect()
 monitor = SNNMonitor(network)
 monitor.start_monitoring()

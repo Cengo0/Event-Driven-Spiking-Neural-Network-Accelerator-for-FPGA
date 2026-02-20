@@ -360,7 +360,7 @@ group = HWCoreGroup(
 )
 
 # Load intra-group weights
-group.set_weight(src=5, dst=10, weight=7, exc=True)  # 4-bit weight + exc flag
+group.set_weight(src=5, dst=10, weight=7, exc=True)  # 8-bit weight + exc flag
 
 # Inject spike and process
 group.inject_spike(neuron_id=5, weight=7, exc=True)

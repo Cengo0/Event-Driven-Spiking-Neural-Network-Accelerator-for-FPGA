@@ -118,6 +118,15 @@ python examples/pytorch/mozafari_rstdp_faithful.py
 - **Model**: Dense SNN 784→20 neurons, STDP training, binary MNIST (digits 0/1)
   - Float accuracy: 89.2%, Int8 quantized: 89.6%
 
+### On-Chip STDP — 10-class MNIST (v3)
+- **Architecture**: 784 → 150 LIF neurons (15/class × 10), WTA inhibition
+- **On-Chip STDP v3**: **92.2%** test accuracy (up from 84.7% in v2)
+  - Key improvements: lr_shift=11 (slow learning), per-epoch L2 normalization (target=600)
+  - All HLS-compatible integer arithmetic (Mozafari weight-dependent STDP)
+  - Multi-seed robust: Mean=91.8%, Std=0.3%
+- **SW Reference**: Float32 WTA 87.7%, Int8 SW-LIF 84.0%
+- **Training speed**: ~3.5s/epoch (GPU, 60k images) — 214× faster than v1
+
 ### RTL Fixes (v2)
 - **Edge detector** on `spike_in_valid` — prevents FIFO duplication on held-high valid
 - **Hold register** on `rtl_spike_out_valid` — captures transient output spikes

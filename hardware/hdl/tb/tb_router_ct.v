@@ -6,20 +6,21 @@
 //=============================================================================
 
 `timescale 1ns / 1ps
+`include "snn_params.vh"
 
 module tb_router_ct;
 
     //-------------------------------------------------------------------------
-    // Parameters (16 groups)
+    // Parameters (from centralized config)
     //-------------------------------------------------------------------------
-    parameter NUM_GROUPS        = 16;
-    parameter NEURONS_PER_GROUP = 128;
-    parameter WEIGHT_WIDTH      = 4;
-    parameter MAX_FANOUT_INTER  = 16;
-    parameter GROUP_ID_WIDTH    = 4;
-    parameter LOCAL_ID_WIDTH    = 7;
-    parameter GLOBAL_ID_WIDTH   = 11;
-    parameter FANOUT_IDX_WIDTH  = 4;
+    parameter NUM_GROUPS        = `SNN_NUM_GROUPS;
+    parameter NEURONS_PER_GROUP = `SNN_NEURONS_PER_GROUP;
+    parameter WEIGHT_WIDTH      = `SNN_WEIGHT_WIDTH;
+    parameter MAX_FANOUT_INTER  = `SNN_MAX_FANOUT_INTER;
+    parameter GROUP_ID_WIDTH    = `SNN_GROUP_ID_WIDTH;
+    parameter LOCAL_ID_WIDTH    = `SNN_LOCAL_ID_WIDTH;
+    parameter GLOBAL_ID_WIDTH   = `SNN_GLOBAL_ID_WIDTH;
+    parameter FANOUT_IDX_WIDTH  = `SNN_FANOUT_IDX_WIDTH;
 
     //-------------------------------------------------------------------------
     // Clock / Reset
@@ -401,7 +402,7 @@ module tb_router_ct;
             @(posedge clk);
             ext_spike_valid    <= 1;
             ext_spike_neuron_id <= {4'd5, 7'd42};
-            ext_spike_weight   <= 4'd9;
+            ext_spike_weight   <= 8'd9;
             ext_spike_exc      <= 1;
             @(posedge clk);
             ext_spike_valid <= 0;
@@ -414,7 +415,7 @@ module tb_router_ct;
             check(4, "External spike neuron_id == 42",
                   (delivered_neurons[0] == 7'd42));
             check(5, "External spike weight == 9",
-                  (delivered_weights[0] == 4'd9));
+                  (delivered_weights[0] == 8'd9));
             check(6, "Spike counter incremented",
                   (routed_spike_count >= 1));
         end
@@ -428,7 +429,7 @@ module tb_router_ct;
             @(posedge clk);
             ext_spike_valid    <= 1;
             ext_spike_neuron_id <= {4'd15, 7'd127};  // Max group, max neuron
-            ext_spike_weight   <= 4'd15;
+            ext_spike_weight   <= 8'd15;
             ext_spike_exc      <= 1;
             @(posedge clk);
             ext_spike_valid <= 0;
@@ -448,9 +449,9 @@ module tb_router_ct;
         $display("\n--- Test 9-12: Connectivity Table Programming ---");
         // Source: group 0, neuron 10, fanout 0
         // Dest: group 3, neuron 50, weight 7, excitatory
-        program_ct_entry(4'd0, 7'd10, 4'd0, 1'b1, 4'd3, 7'd50, 4'd7, 1'b1);
+        program_ct_entry(4'd0, 7'd10, 4'd0, 1'b1, 4'd3, 7'd50, 8'd7, 1'b1);
         // Terminate: fanout 1 = invalid
-        program_ct_entry(4'd0, 7'd10, 4'd1, 1'b0, 4'd0, 7'd0, 4'd0, 1'b0);
+        program_ct_entry(4'd0, 7'd10, 4'd1, 1'b0, 4'd0, 7'd0, 8'd0, 1'b0);
         repeat (5) @(posedge clk);
 
         check(9, "CT programmed without hang", 1);
@@ -477,7 +478,7 @@ module tb_router_ct;
             check(11, "CT lookup destination neuron 50",
                   (delivered_count >= 1 && delivered_neurons[0] == 7'd50));
             check(12, "CT lookup weight 7",
-                  (delivered_count >= 1 && delivered_weights[0] == 4'd7));
+                  (delivered_count >= 1 && delivered_weights[0] == 8'd7));
         end
 
         //---------------------------------------------------------------------
@@ -498,10 +499,10 @@ module tb_router_ct;
         // Fanout 1: → group 7, neuron 60, w=3
         // Fanout 2: → group 12, neuron 100, w=8
         // Fanout 3: invalid (terminator)
-        program_ct_entry(4'd2, 7'd20, 4'd0, 1'b1, 4'd4,  7'd30,  4'd5, 1'b1);
-        program_ct_entry(4'd2, 7'd20, 4'd1, 1'b1, 4'd7,  7'd60,  4'd3, 1'b1);
-        program_ct_entry(4'd2, 7'd20, 4'd2, 1'b1, 4'd12, 7'd100, 4'd8, 1'b1);
-        program_ct_entry(4'd2, 7'd20, 4'd3, 1'b0, 4'd0,  7'd0,   4'd0, 1'b0);
+        program_ct_entry(4'd2, 7'd20, 4'd0, 1'b1, 4'd4,  7'd30,  8'd5, 1'b1);
+        program_ct_entry(4'd2, 7'd20, 4'd1, 1'b1, 4'd7,  7'd60,  8'd3, 1'b1);
+        program_ct_entry(4'd2, 7'd20, 4'd2, 1'b1, 4'd12, 7'd100, 8'd8, 1'b1);
+        program_ct_entry(4'd2, 7'd20, 4'd3, 1'b0, 4'd0,  7'd0,   8'd0, 1'b0);
         repeat (5) @(posedge clk);
 
         delivered_count = 0;
@@ -527,8 +528,8 @@ module tb_router_ct;
         //---------------------------------------------------------------------
         $display("\n--- Test 17-18: Round-Robin Arbitration ---");
         // Program CT entries for both sources
-        program_ct_entry(4'd1, 7'd5, 4'd0, 1'b1, 4'd8, 7'd10, 4'd6, 1'b1);
-        program_ct_entry(4'd1, 7'd5, 4'd1, 1'b0, 4'd0, 7'd0,  4'd0, 1'b0);
+        program_ct_entry(4'd1, 7'd5, 4'd0, 1'b1, 4'd8, 7'd10, 8'd6, 1'b1);
+        program_ct_entry(4'd1, 7'd5, 4'd1, 1'b0, 4'd0, 7'd0,  8'd0, 1'b0);
         // Group 0 neuron 10 already has entries from test 10
 
         repeat (5) @(posedge clk);
@@ -585,7 +586,7 @@ module tb_router_ct;
             learn_weight_group  <= 4'd5;
             learn_weight_src    <= 7'd10;
             learn_weight_dst    <= 7'd20;
-            learn_weight_data   <= 4'd12;
+            learn_weight_data   <= 8'd12;
             learn_weight_exc    <= 1;
             learn_weight_is_inter <= 0;
             @(posedge clk);
@@ -610,7 +611,7 @@ module tb_router_ct;
             learn_weight_group      <= 4'd6;
             learn_weight_src        <= 7'd15;
             learn_weight_dst        <= 7'd25;
-            learn_weight_data       <= 4'd8;
+            learn_weight_data       <= 8'd8;
             learn_weight_exc        <= 1;
             learn_weight_is_inter   <= 1;
             learn_weight_dst_group  <= 4'd9;
@@ -669,7 +670,7 @@ module tb_router_ct;
                     1'b1,
                     fi[GROUP_ID_WIDTH-1:0],    // Route to each group
                     7'd1,                       // Neuron 1 in each group
-                    4'd4,                       // Weight 4
+                    8'd4,                       // Weight 4
                     1'b1                        // Excitatory
                 );
             end

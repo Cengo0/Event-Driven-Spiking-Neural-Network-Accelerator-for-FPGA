@@ -28,12 +28,13 @@
 //-----------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
+`include "snn_params.vh"
 
 module event_router_ng #(
-    parameter NUM_GROUPS        = 8,
-    parameter NEURONS_PER_GROUP = 128,
-    parameter WEIGHT_WIDTH      = 4,
-    parameter MAX_FANOUT_INTER  = 16,
+    parameter NUM_GROUPS        = `SNN_NUM_GROUPS,
+    parameter NEURONS_PER_GROUP = `SNN_NEURONS_PER_GROUP,
+    parameter WEIGHT_WIDTH      = `SNN_WEIGHT_WIDTH,
+    parameter MAX_FANOUT_INTER  = `SNN_MAX_FANOUT_INTER,
     parameter GROUP_ID_WIDTH    = $clog2(NUM_GROUPS),
     parameter LOCAL_ID_WIDTH    = $clog2(NEURONS_PER_GROUP),
     parameter GLOBAL_ID_WIDTH   = GROUP_ID_WIDTH + LOCAL_ID_WIDTH,
@@ -138,12 +139,12 @@ module event_router_ng #(
     reg [GROUP_ID_WIDTH-1:0] rr_priority;       // Current priority pointer
     reg [GROUP_ID_WIDTH-1:0] selected_group;    // Which group won arbitration
     reg [LOCAL_ID_WIDTH-1:0] selected_neuron;   // Neuron ID from winning group
-    reg                      ext_selected;       // External source selected
+    reg                      ext_selected;      // External source selected
     reg [31:0]               spike_counter;
 
     assign routed_spike_count = spike_counter;
     assign router_busy = (state != ST_IDLE);
-    assign ext_spike_ready = (state == ST_IDLE) && !router_busy;
+    assign ext_spike_ready = (state == ST_IDLE);
     assign learn_weight_ready = (state == ST_IDLE);
 
     //=========================================================================
@@ -235,7 +236,9 @@ module event_router_ng #(
                         begin : arb_scan
                             reg found;
                             reg [GROUP_ID_WIDTH-1:0] idx;
+                            reg [GROUP_ID_WIDTH-1:0] found_idx;
                             found = 0;
+                            found_idx = 0;
                             for (gi = 0; gi < NUM_GROUPS; gi = gi + 1) begin
                                 idx = (rr_priority + gi[GROUP_ID_WIDTH-1:0]) % NUM_GROUPS;
                                 if (!found && grp_spike_valid[idx]) begin
@@ -243,10 +246,11 @@ module event_router_ng #(
                                     selected_neuron <= grp_spike_neuron_id[idx*LOCAL_ID_WIDTH +: LOCAL_ID_WIDTH];
                                     grp_spike_ready[idx] <= 1;
                                     found = 1;
+                                    found_idx = idx;
                                 end
                             end
                             if (found) begin
-                                rr_priority <= (selected_group + 1) % NUM_GROUPS;
+                                rr_priority <= (found_idx + 1) % NUM_GROUPS;
                                 fanout_idx  <= 0;
                                 state       <= ST_CT_LOOKUP;
                             end else begin
@@ -264,13 +268,15 @@ module event_router_ng #(
                             tgt_grp    = ext_spike_neuron_id[GLOBAL_ID_WIDTH-1:LOCAL_ID_WIDTH];
                             tgt_neuron = ext_spike_neuron_id[LOCAL_ID_WIDTH-1:0];
 
-                            if (grp_in_ready[tgt_grp]) begin
+                            if (tgt_grp < NUM_GROUPS && grp_in_ready[tgt_grp]) begin
                                 grp_in_valid[tgt_grp] <= 1;
                                 grp_in_dest_id[tgt_grp*LOCAL_ID_WIDTH +: LOCAL_ID_WIDTH] <= tgt_neuron;
                                 grp_in_weight[tgt_grp*WEIGHT_WIDTH +: WEIGHT_WIDTH]      <= ext_spike_weight;
                                 grp_in_exc[tgt_grp]   <= ext_spike_exc;
                                 spike_counter <= spike_counter + 1;
                                 state         <= ST_IDLE;
+                            end else if (tgt_grp >= NUM_GROUPS) begin
+                                state <= ST_IDLE;  // Drop invalid group index
                             end
                             // else: wait for ready (backpressure)
                         end
@@ -299,7 +305,10 @@ module event_router_ng #(
                     ST_CT_DELIVER: begin
                         if (ct_result_valid && ct_result_entry_valid) begin
                             // Deliver spike to destination core group
-                            if (grp_in_ready[ct_result_dst_group]) begin
+                            if (ct_result_dst_group >= NUM_GROUPS) begin
+                                // Invalid destination group — skip to next fanout
+                                state <= ST_CT_NEXT;
+                            end else if (grp_in_ready[ct_result_dst_group]) begin
                                 grp_in_valid[ct_result_dst_group] <= 1;
                                 grp_in_dest_id[ct_result_dst_group*LOCAL_ID_WIDTH +: LOCAL_ID_WIDTH]
                                     <= ct_result_dst_neuron;

@@ -169,7 +169,7 @@ class SNNAccelerator:
     def __init__(
         self,
         bitstream_path: Optional[str] = None,
-        fpga_ip: str = "192.168.2.99",
+        fpga_ip: str = "192.168.0.40",
         simulation_mode: bool = False,
         simulation_backend: str = "software",
         icarus_binary: str = "iverilog",

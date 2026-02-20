@@ -30,12 +30,13 @@
 //-----------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
+`include "snn_params.vh"
 
 module synaptic_connectivity_table #(
-    parameter NUM_GROUPS        = 8,
-    parameter NEURONS_PER_GROUP = 128,
-    parameter WEIGHT_WIDTH      = 4,
-    parameter MAX_FANOUT_INTER  = 16,           // Max inter-group connections per neuron
+    parameter NUM_GROUPS        = `SNN_NUM_GROUPS,
+    parameter NEURONS_PER_GROUP = `SNN_NEURONS_PER_GROUP,
+    parameter WEIGHT_WIDTH      = `SNN_WEIGHT_WIDTH,
+    parameter MAX_FANOUT_INTER  = `SNN_MAX_FANOUT_INTER,
     parameter GROUP_ID_WIDTH    = $clog2(NUM_GROUPS),
     parameter LOCAL_ID_WIDTH    = $clog2(NEURONS_PER_GROUP),
     parameter GLOBAL_ID_WIDTH   = GROUP_ID_WIDTH + LOCAL_ID_WIDTH,

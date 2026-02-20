@@ -1,13 +1,15 @@
 `timescale 1ns / 1ps
+`include "snn_params.vh"
+
 module tb_core_group;
-    parameter NEURONS_PER_GROUP  = 128;
-    parameter DATA_WIDTH         = 16;
-    parameter WEIGHT_WIDTH       = 4;
-    parameter THRESHOLD_WIDTH    = 16;
-    parameter LEAK_WIDTH         = 8;
-    parameter REFRAC_WIDTH       = 8;
-    parameter SPIKE_BUFFER_DEPTH = 64;
-    parameter LOCAL_ID_WIDTH     = 7;
+    parameter NEURONS_PER_GROUP  = `SNN_NEURONS_PER_GROUP;
+    parameter DATA_WIDTH         = `SNN_DATA_WIDTH;
+    parameter WEIGHT_WIDTH       = `SNN_WEIGHT_WIDTH;
+    parameter THRESHOLD_WIDTH    = `SNN_THRESHOLD_WIDTH;
+    parameter LEAK_WIDTH         = `SNN_LEAK_WIDTH;
+    parameter REFRAC_WIDTH       = `SNN_REFRAC_WIDTH;
+    parameter SPIKE_BUFFER_DEPTH = `SNN_SPIKE_BUFFER_DEPTH;
+    parameter LOCAL_ID_WIDTH     = `SNN_LOCAL_ID_WIDTH;
 
     reg clk = 0;
     always #5 clk = ~clk;
@@ -152,19 +154,19 @@ module tb_core_group;
 
         // TEST 2: Weight load
         $display("\n--- Test 2: Weight Load ---");
-        load_weight(7'd0, 7'd1, 4'd15, 1'b1);
+        load_weight(7'd0, 7'd1, 8'd15, 1'b1);
         repeat(5) @(posedge clk);
         check(2, "Weight loaded without error", 1);
 
         // TEST 3: Sub-threshold (w=5 < threshold=10)
         $display("\n--- Test 3: Sub-threshold ---");
-        inject_spike(7'd5, 4'd5, 1'b1);
+        inject_spike(7'd5, 8'd5, 1'b1);
         wait_done;
         check(3, "Sub-threshold: spike_count stays 0", spike_count == 0);
 
         // TEST 4: Supra-threshold (w=15 >= threshold=10)
         $display("\n--- Test 4: Supra-threshold ---");
-        inject_spike(7'd10, 4'd15, 1'b1);
+        inject_spike(7'd10, 8'd15, 1'b1);
         wait_spikes(1);
         check(4, "Supra-threshold: spike_count=1", spike_count == 1);
 
@@ -174,7 +176,7 @@ module tb_core_group;
             reg seen;
             integer i;
             seen = 0;
-            inject_spike(7'd20, 4'd15, 1'b1);
+            inject_spike(7'd20, 8'd15, 1'b1);
             for (i = 0; i < 5000; i = i + 1) begin
                 @(posedge clk);
                 if (out_spike_valid && out_spike_neuron_id == 7'd20) seen = 1;
@@ -189,10 +191,10 @@ module tb_core_group;
             global_refrac_period <= 8'd200;
             repeat(5) @(posedge clk);
             sc = spike_count;
-            inject_spike(7'd15, 4'd15, 1'b1);
+            inject_spike(7'd15, 8'd15, 1'b1);
             wait_spikes(sc + 1);
             sc = spike_count;
-            inject_spike(7'd15, 4'd15, 1'b1);
+            inject_spike(7'd15, 8'd15, 1'b1);
             wait_done;
             check(6, "Refractory blocks second fire", spike_count == sc);
             global_refrac_period <= 8'd5;
@@ -203,11 +205,11 @@ module tb_core_group;
         begin : t7
             reg [15:0] sc;
             sc = spike_count;
-            inject_spike(7'd30, 4'd4, 1'b1);
+            inject_spike(7'd30, 8'd4, 1'b1);
             wait_done;
-            inject_spike(7'd30, 4'd4, 1'b1);
+            inject_spike(7'd30, 8'd4, 1'b1);
             wait_done;
-            inject_spike(7'd30, 4'd4, 1'b1);
+            inject_spike(7'd30, 8'd4, 1'b1);
             wait_spikes(sc + 1);
             check(7, "3x4=12>10 fires", spike_count > sc);
         end
@@ -217,7 +219,7 @@ module tb_core_group;
         begin : t8
             reg [15:0] sc;
             sc = spike_count;
-            inject_spike(7'd40, 4'd10, 1'b0);
+            inject_spike(7'd40, 8'd10, 1'b0);
             wait_done;
             check(8, "Inhibitory: no fire", spike_count == sc);
         end
@@ -226,10 +228,10 @@ module tb_core_group;
         $display("\n--- Test 9: Intra-Group Recurrence ---");
         begin : t9
             reg [15:0] sc;
-            load_weight(7'd50, 7'd51, 4'd15, 1'b1);
+            load_weight(7'd50, 7'd51, 8'd15, 1'b1);
             repeat(5) @(posedge clk);
             sc = spike_count;
-            inject_spike(7'd50, 4'd15, 1'b1);
+            inject_spike(7'd50, 8'd15, 1'b1);
             wait_spikes(sc + 2);
             check(9, "Recurrence: both 50 and 51 fire", spike_count >= sc + 2);
         end
@@ -240,7 +242,7 @@ module tb_core_group;
             reg [15:0] sc;
             out_spike_ready <= 0;
             sc = spike_count;
-            inject_spike(7'd60, 4'd15, 1'b1);
+            inject_spike(7'd60, 8'd15, 1'b1);
             wait_spikes(sc + 1);
             check(10, "Fires even with backpressure", spike_count > sc);
             out_spike_ready <= 1;
@@ -252,7 +254,7 @@ module tb_core_group;
         begin : t11
             reg [15:0] sc;
             sc = spike_count;
-            inject_spike(7'd70, 4'd0, 1'b1);
+            inject_spike(7'd70, 8'd0, 1'b1);
             wait_done;
             check(11, "Zero weight: no fire", spike_count == sc);
         end
@@ -264,7 +266,7 @@ module tb_core_group;
             reg [15:0] sc;
             sc = spike_count;
             for (bi = 0; bi < 10; bi = bi + 1) begin
-                inject_spike(80 + bi[6:0], 4'd15, 1'b1);
+                inject_spike(80 + bi[6:0], 8'd15, 1'b1);
             end
             wait_spikes(sc + 10);
             check(12, "Burst: 10 spikes all fire", spike_count >= sc + 10);
@@ -275,7 +277,7 @@ module tb_core_group;
         begin : t13
             reg [15:0] sc;
             sc = spike_count;
-            inject_spike(7'd100, 4'd10, 1'b1);
+            inject_spike(7'd100, 8'd10, 1'b1);
             wait_spikes(sc + 1);
             check(13, "Exact threshold fires", spike_count > sc);
         end
@@ -285,11 +287,11 @@ module tb_core_group;
         begin : t14
             reg [15:0] sc;
             sc = spike_count;
-            inject_spike(7'd110, 4'd3, 1'b1);
+            inject_spike(7'd110, 8'd3, 1'b1);
             wait_done;
-            inject_spike(7'd111, 4'd12, 1'b1);
+            inject_spike(7'd111, 8'd12, 1'b1);
             wait_spikes(sc + 1);
-            inject_spike(7'd112, 4'd1, 1'b1);
+            inject_spike(7'd112, 8'd1, 1'b1);
             wait_done;
             check(14, "Only w=12 neuron fires", spike_count == sc + 1);
         end
@@ -301,10 +303,10 @@ module tb_core_group;
             global_leak_rate <= 8'd1;
             repeat(5) @(posedge clk);
             sc = spike_count;
-            inject_spike(7'd120, 4'd8, 1'b1);
+            inject_spike(7'd120, 8'd8, 1'b1);
             wait_done;
             repeat(5000) @(posedge clk);
-            inject_spike(7'd120, 4'd3, 1'b1);
+            inject_spike(7'd120, 8'd3, 1'b1);
             wait_done;
             check(15, "After leak decay sub-threshold stays sub-thresh", spike_count == sc);
             global_leak_rate <= 8'd0;

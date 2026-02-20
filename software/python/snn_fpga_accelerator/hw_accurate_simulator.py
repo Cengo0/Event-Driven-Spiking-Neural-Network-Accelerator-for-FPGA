@@ -23,44 +23,61 @@ from .utils import logger
 
 
 # =============================================================================
-# Hardware Constants (must match Verilog/HLS)
+# Hardware Constants (single source of truth: config/snn_params.yaml)
 # =============================================================================
+# Import from the generated constants module.  If the generated file does not
+# exist (e.g. fresh clone before running generate_params.py), fall back to
+# hardcoded defaults that match the canonical YAML values.
 
-# From snn_core_group_top.v / core_group.v RTL defaults
-MAX_NEURONS = 2048         # 16 groups × 128 neurons per group
-NUM_GROUPS = 16            # Number of core groups
-NEURONS_PER_GROUP = 128    # Neurons per core group
-MAX_FANOUT_INTER = 16      # Max inter-group connections per neuron
-SPIKE_BUFFER_DEPTH = 64    # Input FIFO depth per core group
+import importlib.util as _ilu
+from pathlib import Path as _Path
 
-# Weight format: 4-bit unsigned magnitude + 1-bit exc/inh flag (matches core_group.v)
-WEIGHT_SCALE = 16
-MAX_WEIGHT = 15            # 4-bit unsigned max
-MIN_WEIGHT = 0             # 4-bit unsigned min (polarity via exc/inh flag)
-MAX_WEIGHT_DELTA = 15
+_GEN_PARAMS = _Path(__file__).resolve().parents[3] / "config" / "generated" / "snn_params.py"
 
-# Legacy 8-bit weight constants (for backward compatibility with HLS STDP engine)
-LEGACY_MAX_WEIGHT = 127
-LEGACY_MIN_WEIGHT = -128
-LEGACY_WEIGHT_SCALE = 128
+if _GEN_PARAMS.exists():
+    _spec = _ilu.spec_from_file_location("_snn_params", str(_GEN_PARAMS))
+    _mod = _ilu.module_from_spec(_spec)
+    _spec.loader.exec_module(_mod)
 
-# ID widths (HLS wrapper uses 11-bit global IDs; local is 7-bit)
-HLS_NEURON_ID_WIDTH = 11   # Matches snn_core_group_top.v HLS_NEURON_ID_WIDTH
-GROUP_ID_WIDTH = 4         # $clog2(NUM_GROUPS)
-LOCAL_ID_WIDTH = 7         # $clog2(NEURONS_PER_GROUP)
-GLOBAL_ID_WIDTH = GROUP_ID_WIDTH + LOCAL_ID_WIDTH  # 11 bits
-NEURON_ID_WIDTH = GLOBAL_ID_WIDTH
-
-# Bit widths from core_group.v
-DATA_WIDTH = 16          # Membrane potential width
-WEIGHT_WIDTH = 4         # Synaptic weight bits (4-bit unsigned)
-THRESHOLD_WIDTH = 16     # Threshold width
-LEAK_WIDTH = 8           # Leak rate width
-REFRAC_WIDTH = 8         # Refractory period width
-
-# Fixed-point format for HLS: ap_fixed<16,8> means 8 integer bits, 8 fraction bits
-FIXED_POINT_FRAC_BITS = 8
-FIXED_POINT_SCALE = 1 << FIXED_POINT_FRAC_BITS  # 256
+    # Pull every public constant into this module's namespace
+    for _k in dir(_mod):
+        if not _k.startswith("_"):
+            globals()[_k] = getattr(_mod, _k)
+else:
+    # ---- fallback (keep in sync with config/snn_params.yaml) ---------------
+    NUM_GROUPS          = 16
+    NEURONS_PER_GROUP   = 128
+    MAX_NEURONS_PER_GROUP = 128
+    GROUP_SIZES         = [128] * 16
+    TOTAL_NEURONS       = 2048
+    MAX_FANOUT_INTER    = 16
+    SPIKE_BUFFER_DEPTH  = 64
+    DATA_WIDTH          = 16
+    WEIGHT_WIDTH        = 8
+    THRESHOLD_WIDTH     = 16
+    LEAK_WIDTH          = 8
+    REFRAC_WIDTH        = 8
+    GROUP_ID_WIDTH      = 4
+    LOCAL_ID_WIDTH      = 7
+    GLOBAL_ID_WIDTH     = 11
+    FANOUT_IDX_WIDTH    = 4
+    MAX_NEURONS         = 2048
+    CT_DATA_WIDTH       = 21
+    NEURON_STATE_WIDTH  = 24
+    MAX_WEIGHT          = 255
+    MIN_WEIGHT          = 0
+    WEIGHT_FLAG_WIDTH   = 9
+    MAX_WEIGHT_DELTA    = 255
+    HLS_NEURON_ID_WIDTH = 11
+    HLS_MAX_NEURONS     = 2048
+    HLS_WEIGHT_WIDTH    = 8
+    NEURON_ID_WIDTH     = GLOBAL_ID_WIDTH
+    FIXED_POINT_FRAC_BITS = 8
+    FIXED_POINT_SCALE   = 1 << FIXED_POINT_FRAC_BITS
+    LEGACY_MAX_WEIGHT   = 127
+    LEGACY_MIN_WEIGHT   = -128
+    LEGACY_WEIGHT_SCALE = 128
+    WEIGHT_SCALE        = 256
 
 
 # =============================================================================
@@ -431,7 +448,7 @@ class HWAccurateLIFNeuron:
         syn_valid : bool
             Synaptic input valid signal
         syn_weight : int
-            Synaptic weight (4-bit unsigned, 0-15)
+            Synaptic weight (8-bit unsigned, 0-15)
         syn_excitatory : bool
             True for excitatory, False for inhibitory
         enable : bool
@@ -564,9 +581,9 @@ class HWAccurateSTDPEngine:
         # Weight matrix for Mozafari weight-dependent updates
         self.weights: Optional[np.ndarray] = None
         
-        # Weight bounds (4-bit unsigned, polarity via exc/inh flag)
-        self.w_max = MAX_WEIGHT   # 15 for 4-bit
-        self.w_min = MIN_WEIGHT   # 0 for 4-bit unsigned
+        # Weight bounds (8-bit unsigned, polarity via exc/inh flag)
+        self.w_max = MAX_WEIGHT   # 255 for 8-bit
+        self.w_min = MIN_WEIGHT   # 0 for 8-bit unsigned
         
         # Mu parameter (Q4.4, default 0x10 = 1.0 linear)
         self.mu = 0x10  # 1.0 in Q4.4
@@ -808,7 +825,7 @@ class HWCoreGroup:
     Bit-accurate simulator for core_group.v.
 
     Implements 128 time-multiplexed LIF neurons with:
-    - Dense local weight BRAM [128×128] with 4-bit weights + exc flag
+    - Dense local weight BRAM [128×128] with 8-bit weights + exc flag
     - Input spike FIFO (64 entries)
     - FSM: IDLE → SPIKE_RD/CMP/WR → INTRA_READ/ROUTE, LEAK_RD/CMP/WR
     - Spike bitmap scan for output
@@ -840,7 +857,7 @@ class HWCoreGroup:
         self.v_mem = np.zeros(self.n, dtype=np.uint16)
         self.refrac = np.zeros(self.n, dtype=np.uint8)
 
-        # Weight memory: 4-bit weight + 1-bit exc per connection
+        # Weight memory: 8-bit weight + 1-bit exc per connection
         self.weights = np.zeros((self.n, self.n), dtype=np.uint8)   # weight[3:0]
         self.weight_exc = np.zeros((self.n, self.n), dtype=np.bool_)  # exc flag
 
@@ -1154,40 +1171,48 @@ class HWAccurateSNNSimulator:
     """
     Complete hardware-accurate SNN simulator matching the Core Group RTL.
 
-    Architecture: 16 core groups × 128 neurons = 2,048 total neurons
-    - Each group: dense intra-group weights (128×128×5b)
+    Architecture: configurable core groups with per-group neuron counts.
+    - Each group: dense intra-group weights (Ni×Ni×9b)
     - Inter-group: sparse connectivity table (32K entries)
     - Event router: round-robin arbitration, CT-based routing
     - STDP learning: HLS engine observing all routed spikes
 
-    Global neuron ID format:
-        global_id[10:7] = group_id (0-15)
-        global_id[6:0]  = local_neuron_id (0-127)
+    Global neuron ID format (uniform bus width = clog2(max(group_sizes))):
+        global_id[GROUP_ID_WIDTH+LOCAL_ID_WIDTH-1 : LOCAL_ID_WIDTH] = group_id
+        global_id[LOCAL_ID_WIDTH-1 : 0] = local_neuron_id
     """
 
     def __init__(
         self,
         num_groups: int = NUM_GROUPS,
         neurons_per_group: int = NEURONS_PER_GROUP,
+        group_sizes: Optional[List[int]] = None,
         neuron_params: Optional[LIFNeuronParams] = None,
         stdp_config: Optional[STDPConfig] = None,
         clock_period_ns: int = 10  # 100MHz default
     ):
-        self.num_groups = num_groups
-        self.neurons_per_group = neurons_per_group
-        self.num_neurons = num_groups * neurons_per_group
+        # Per-group variable sizing: use group_sizes if provided, else uniform
+        if group_sizes is not None:
+            self.group_sizes = list(group_sizes)
+            self.num_groups = len(self.group_sizes)
+        else:
+            self.num_groups = num_groups
+            self.group_sizes = [neurons_per_group] * num_groups
+
+        self.neurons_per_group = max(self.group_sizes)  # max for bus width compat
+        self.num_neurons = sum(self.group_sizes)
         self.clock_period_ns = clock_period_ns
 
-        # Initialize core groups
+        # Initialize core groups with per-group neuron counts
         params = neuron_params or LIFNeuronParams()
         self.groups = [
-            HWCoreGroup(group_id=g, neurons_per_group=neurons_per_group, params=params)
-            for g in range(num_groups)
+            HWCoreGroup(group_id=g, neurons_per_group=self.group_sizes[g], params=params)
+            for g in range(self.num_groups)
         ]
 
         # Initialize connectivity table and event router
-        self.ct = HWConnectivityTable(num_groups, neurons_per_group)
-        self.router = HWEventRouter(num_groups, self.ct)
+        self.ct = HWConnectivityTable(self.num_groups, self.neurons_per_group)
+        self.router = HWEventRouter(self.num_groups, self.ct)
 
         # Initialize STDP engine
         self.stdp = HWAccurateSTDPEngine(
@@ -1200,10 +1225,12 @@ class HWAccurateSNNSimulator:
         self.spike_history: List[Tuple[int, int]] = []  # (cycle, global_neuron_id)
 
         logger.info(
-            f"HW-Accurate Core Group simulator: {num_groups} groups × "
-            f"{neurons_per_group} neurons = {self.num_neurons} total, "
+            f"HW-Accurate Core Group simulator: {self.num_groups} groups, "
+            f"{self.num_neurons} total neurons, "
             f"{clock_period_ns}ns clock"
         )
+        if len(set(self.group_sizes)) > 1:
+            logger.info(f"  Variable group sizes: {self.group_sizes}")
 
     def reset(self):
         """Reset entire system."""
@@ -1248,6 +1275,41 @@ class HWAccurateSNNSimulator:
         if 0 <= gid < self.num_groups:
             self.groups[gid].push_spike(dest_id=lid, weight=weight, exc=exc)
 
+    def inject_routed_event(self, source_global_id: int) -> int:
+        """
+        Inject an event meaning "source neuron has fired" and route via CT.
+
+        This matches the FPGA DMA path:
+          DMA spike(neuron_id=X) → HLS → spike_router → CT_lookup(X)
+          → deliver to destinations with CT-specified weights.
+
+        The DMA spike's weight field is NOT used (RTL router ignores it).
+        Only the neuron_id matters for CT lookup.
+
+        Parameters
+        ----------
+        source_global_id : int
+            Global neuron ID of the "source" that fired.
+
+        Returns
+        -------
+        int
+            Number of CT deliveries made.
+        """
+        src_group, src_neuron = self.global_to_local(source_global_id)
+        connections = self.ct.get_all_connections(src_group, src_neuron)
+        deliveries = 0
+        for conn in connections:
+            if conn.valid and 0 <= conn.dst_group < self.num_groups:
+                self.groups[conn.dst_group].push_spike(
+                    dest_id=conn.dst_neuron,
+                    weight=conn.weight,
+                    exc=conn.exc_inh
+                )
+                self.router.routed_spike_count += 1
+                deliveries += 1
+        return deliveries
+
     def tick(self, external_spikes: Optional[List[Tuple[int, int, bool]]] = None) -> List[int]:
         """
         Advance simulation by one timestep.
@@ -1273,30 +1335,33 @@ class HWAccurateSNNSimulator:
             for global_id, weight, exc in external_spikes:
                 self.inject_spike(global_id, weight, exc)
 
-        # Step 2: Process all groups
+        # Step 2-4: Process -> Route -> Process loop until convergence
+        # Matches RTL behavior where event_router keeps running until all
+        # groups are idle (no pending spikes in any FIFO or output queue).
         all_fired_global = []
-        for gid, group in enumerate(self.groups):
-            fired_local = group.process_step()
-            for lid in fired_local:
-                global_id = self.local_to_global(gid, lid)
-                all_fired_global.append(global_id)
-                self.spike_history.append((self.current_cycle, global_id))
+        learn_events = []
+        max_cascade = 100  # Safety limit to prevent infinite loops
 
-        # Step 3: Route output spikes through connectivity table
-        learn_events = self.router.route_spikes(self.groups)
-
-        # Step 4: Process inter-group spikes that were just delivered
-        # (These were pushed into group FIFOs by the router)
-        for gid, group in enumerate(self.groups):
-            if group.fifo:
+        for cascade in range(max_cascade):
+            # Process all groups
+            any_fired = False
+            for gid, group in enumerate(self.groups):
                 fired_local = group.process_step()
                 for lid in fired_local:
                     global_id = self.local_to_global(gid, lid)
                     all_fired_global.append(global_id)
                     self.spike_history.append((self.current_cycle, global_id))
+                    any_fired = True
 
-        # Route any new inter-group spikes from cascading fires
-        self.router.route_spikes(self.groups)
+            # Route output spikes through connectivity table
+            new_learn = self.router.route_spikes(self.groups)
+            learn_events.extend(new_learn)
+
+            # Check if any group has pending spikes (from routing)
+            has_pending = any(group.fifo for group in self.groups)
+
+            if not any_fired and not has_pending:
+                break  # Converged -- no more activity
 
         # Step 5: Forward learn spikes to STDP engine
         for src_global in learn_events:
@@ -1345,7 +1410,7 @@ class HWAccurateSNNSimulator:
     def get_neuron_state(self, global_neuron_id: int) -> Dict:
         """Get detailed state of a neuron by global ID."""
         gid, lid = self.global_to_local(global_neuron_id)
-        if 0 <= gid < self.num_groups and 0 <= lid < self.neurons_per_group:
+        if 0 <= gid < self.num_groups and 0 <= lid < self.group_sizes[gid]:
             group = self.groups[gid]
             return {
                 'group_id': gid,
@@ -1383,8 +1448,8 @@ def verify_lif_neuron():
     
     neuron = HWAccurateLIFNeuron(0, params)
     
-    # Test 1: Integration and spike generation with 4-bit weights
-    print("\n  Test 1: Integration and Spike Generation (4-bit weights)")
+    # Test 1: Integration and spike generation with 8-bit weights
+    print("\n  Test 1: Integration and Spike Generation (8-bit weights)")
     neuron.reset()
     
     spike_count = 0
@@ -1402,7 +1467,7 @@ def verify_lif_neuron():
     print("\n  Test 2: Leak Behavior")
     neuron.reset()
     
-    # Inject some potential (4-bit weight max=15)
+    # Inject some potential (8-bit weight max=255)
     for _ in range(5):
         neuron.tick(syn_valid=True, syn_weight=15, syn_excitatory=True)
     
@@ -1432,7 +1497,7 @@ def verify_lif_neuron():
     print("\n  Test 3: Refractory Period")
     neuron.reset()
     
-    # Force spike with 4-bit weights
+    # Force spike with 8-bit weights
     for _ in range(12):
         neuron.tick(syn_valid=True, syn_weight=15, syn_excitatory=True)
     
@@ -1476,7 +1541,7 @@ def verify_stdp_engine():
     print("\nVerifying HW-Accurate STDP Engine (Mozafari Weight-Dependent)...")
     
     config = STDPConfig(
-        a_plus=0.5,          # Larger learning rate for 4-bit weight range
+        a_plus=0.5,          # Larger learning rate for 8-bit weight range
         a_minus=0.5,
         tau_plus=20.0,
         tau_minus=20.0,
@@ -1485,9 +1550,9 @@ def verify_stdp_engine():
     
     stdp = HWAccurateSTDPEngine(config)
     
-    # Set up weight matrix with 4-bit weights
+    # Set up weight matrix with 8-bit weights
     weights = np.zeros((MAX_NEURONS, MAX_NEURONS), dtype=np.int16)
-    weights[0, 1] = 8    # Pre=0, Post=1 has weight 8 (mid-range for 4-bit)
+    weights[0, 1] = 8    # Pre=0, Post=1 has weight 8 (mid-range for 8-bit)
     stdp.set_weights(weights)
     stdp.set_mu(1.0)  # mu=1.0 (linear, matches stdp_engine.v default)
     
@@ -1554,7 +1619,7 @@ def verify_stdp_engine():
     print("\n  Test 4: Weight-dependent saturation (w=w_max)")
     stdp.reset()
     max_weights = np.zeros((MAX_NEURONS, MAX_NEURONS), dtype=np.int16)
-    max_weights[0, 1] = MAX_WEIGHT  # Already at max (15 for 4-bit)
+    max_weights[0, 1] = MAX_WEIGHT  # Already at max (255 for 8-bit)
     stdp.set_weights(max_weights)
     
     stdp.process_pre_spike(0, 100, connected_post_ids=[1])
@@ -1603,7 +1668,7 @@ def compare_with_rtl_values():
     print("\nComparing with Core Group RTL Values...")
     print("-" * 60)
 
-    # Test 1: LIF neuron in core_group context (4-bit weights)
+    # Test 1: LIF neuron in core_group context (8-bit weights)
     print("\n  LIF Neuron (matching core_group.v):")
     print("  Parameters: threshold=100, leak_rate=3 (tau=0.875), weight=10")
 

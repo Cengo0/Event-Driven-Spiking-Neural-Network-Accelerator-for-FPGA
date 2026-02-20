@@ -34,8 +34,8 @@ def test_constants():
     assert MAX_NEURONS == 2048, f"MAX_NEURONS={MAX_NEURONS}"
     assert NUM_GROUPS == 16
     assert NEURONS_PER_GROUP == 128
-    assert WEIGHT_WIDTH == 4
-    assert MAX_WEIGHT == 15
+    assert WEIGHT_WIDTH == 8
+    assert MAX_WEIGHT == 255
     assert MIN_WEIGHT == 0
     assert HLS_NEURON_ID_WIDTH == 11
     assert GLOBAL_ID_WIDTH == 11
@@ -197,10 +197,10 @@ def test_core_group_fifo_full():
 
 
 def test_core_group_weight_clipping():
-    """Weights clip to MAX_WEIGHT (15)."""
+    """Weights clip to MAX_WEIGHT (255)."""
     group = HWCoreGroup(group_id=0)
-    group.set_weight(0, 1, 20, True)  # Exceeds 15
-    assert group.weights[0, 1] == 15
+    group.set_weight(0, 1, 300, True)  # Exceeds 255
+    assert group.weights[0, 1] == 255
     print("PASS: test_core_group_weight_clipping")
 
 
@@ -369,11 +369,11 @@ def test_system_neuron_state():
 
 
 # ============================================================================
-# Test STDP with 4-bit weights
+# Test STDP with 8-bit weights
 # ============================================================================
 
 def test_stdp_4bit_ltp():
-    """STDP LTP with 4-bit weight range."""
+    """STDP LTP with 8-bit weight range."""
     config = STDPConfig(a_plus=0.5, a_minus=0.5, stdp_window=100)
     stdp = HWAccurateSTDPEngine(config, max_neurons=256)
     weights = np.zeros((256, 256), dtype=np.int16)
@@ -389,7 +389,7 @@ def test_stdp_4bit_ltp():
 
 
 def test_stdp_4bit_ltd():
-    """STDP LTD with 4-bit weight range."""
+    """STDP LTD with 8-bit weight range."""
     config = STDPConfig(a_plus=0.5, a_minus=0.5, stdp_window=100)
     stdp = HWAccurateSTDPEngine(config, max_neurons=256)
     weights = np.zeros((256, 256), dtype=np.int16)
@@ -409,7 +409,7 @@ def test_stdp_4bit_saturation():
     config = STDPConfig(a_plus=0.5, a_minus=0.5, stdp_window=100)
     stdp = HWAccurateSTDPEngine(config, max_neurons=256)
     weights = np.zeros((256, 256), dtype=np.int16)
-    weights[0, 1] = MAX_WEIGHT  # Already at 15
+    weights[0, 1] = MAX_WEIGHT  # Already at 255
     stdp.set_weights(weights)
     stdp.add_synapse(0, 1)
 
@@ -425,9 +425,9 @@ def test_stdp_4bit_saturation():
 # ============================================================================
 
 def test_neuron_hw_mode():
-    """LIF neuron hw_mode uses 4-bit weights."""
+    """LIF neuron hw_mode uses 8-bit weights."""
     lif = LIF(hw_mode=True)
-    assert lif.weight_bits == 4
+    assert lif.weight_bits == 8
     print("PASS: test_neuron_hw_mode")
 
 

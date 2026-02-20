@@ -1,0 +1,97 @@
+# =============================================================================
+# SNN Accelerator — Single Source of Truth for Hardware Parameters
+# =============================================================================
+#
+# This file is the ONLY place where hardware parameters are defined.
+# Run `python config/generate_params.py` to regenerate:
+#   - config/generated/snn_params.vh   (Verilog `include header)
+#   - config/generated/snn_params.py   (Python constants module)
+#   - config/generated/snn_params.h    (HLS/C++ header)
+#
+# All RTL modules, Python simulators, and HLS code must import from the
+# generated files. NEVER hardcode parameter values elsewhere.
+#
+# Author: Jiwoon Lee (@metr0jw)
+# =============================================================================
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Core Architecture
+# ─────────────────────────────────────────────────────────────────────────────
+# Flexible Core Group sizing — per-group neuron counts via `group_sizes`.
+#
+#   group_sizes: list of neuron counts, one per active group.
+#     - len(group_sizes) determines num_groups
+#     - max(group_sizes) determines bus widths (LOCAL_ID_WIDTH)
+#     - All groups share the same LOCAL_ID_WIDTH for interconnect uniformity
+#     - BRAM per group ≈ N² × 9b (dense intra-group weight matrix)
+#
+#   Example configurations for xc7z020 (280 BRAM18K):
+#     16 × 128  = 2048 neurons, ~128 BRAM18K  (default)
+#     8  × 256  = 2048 neurons, ~256 BRAM18K  (larger groups, more intra-group)
+#     [256,256,128,128,64,64,64,64] = 1024 neurons, ~88 BRAM18K  (mixed)
+#
+#   Fallback: if group_sizes is absent, all groups get `neurons_per_group`.
+architecture:
+  neurons_per_group: 128    # Default / fallback per-group size
+  group_sizes:              # Per-group neuron counts (len = num_groups)
+    - 128
+    - 128
+    - 128
+    - 128
+    - 128
+    - 128
+    - 128
+    - 128
+    - 128
+    - 128
+    - 128
+    - 128
+    - 128
+    - 128
+    - 128
+    - 128
+  max_fanout_inter: 16      # Max inter-group fanout entries per neuron
+  spike_buffer_depth: 64    # Input FIFO depth per core group (entries)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Data Widths (bit widths for fixed-point / integer representations)
+# ─────────────────────────────────────────────────────────────────────────────
+widths:
+  data_width: 16            # Membrane potential (unsigned)
+  weight_width: 8           # Synaptic weight magnitude (unsigned Q4.4 fixed-point, 0–255)
+  threshold_width: 16       # Threshold register
+  leak_width: 8             # Leak rate register (shift1[2:0] + shift2_cfg[7:3])
+  refrac_width: 8           # Refractory period counter
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Weight Representation
+# ─────────────────────────────────────────────────────────────────────────────
+# Mixed-Precision Strategy (optimised for Zynq-7020 DSP48E1):
+#   - Inference: 8-bit unsigned magnitude + 1-bit exc/inh flag (Q4.4 fixed-point)
+#   - STDP learning: 16-bit internal accumulator, truncated to 8-bit on write-back
+#   - DSP48E1 natively supports 25×18 multiply — 8-bit fits in one DSP slice
+#   - LUT-based exponential decay table for STDP (256 entries in BRAM)
+#
+# Core Group weight memory: 128×128×9b ≈ 8 BRAM18K/group × 16 groups = 128 BRAM18K
+# (xc7z020: 280 BRAM18K total — ~46% for weight storage)
+weights:
+  # RTL: 8-bit unsigned magnitude + 1-bit exc/inh flag = 9-bit per synapse
+  # Polarity is encoded by the exc_inh flag, NOT by sign bit.
+  max_weight: 255           # (1 << weight_width) - 1
+  min_weight: 0             # Unsigned representation
+  weight_with_flag_width: 9 # weight_width + 1 (exc/inh flag)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# HLS Interface Compatibility
+# ─────────────────────────────────────────────────────────────────────────────
+hls:
+  hls_weight_width: 8       # AXI interface width for weight data (= weight_width)
+  fixed_point_frac_bits: 8  # ap_fixed<16,8> fractional bits
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FPGA Target
+# ─────────────────────────────────────────────────────────────────────────────
+target:
+  fpga_part: "xc7z020clg400-1"
+  clock_period_ns: 10       # 100 MHz
+  board: "tul.com.tw:pynq-z2:part0:1.0"

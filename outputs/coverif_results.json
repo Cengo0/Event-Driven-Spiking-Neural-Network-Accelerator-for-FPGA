@@ -1,0 +1,285 @@
+{
+  "timestamp": "2026-02-11 10:25:32",
+  "host": "192.168.0.40",
+  "sw_results": {
+    "T06_sw_simulation": {
+      "total_spikes": 3,
+      "spike_history": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          128
+        ]
+      ],
+      "routed_spike_count": 3,
+      "per_group_spikes": [
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "threshold": 100,
+      "leak_rate": 3,
+      "leak_shift1": 3,
+      "refractory_period": 5
+    },
+    "T06_neuron_states": {
+      "group0_neuron0": {
+        "group_id": 0,
+        "local_id": 0,
+        "membrane_potential": 0,
+        "refractory_counter": 2,
+        "is_refractory": true
+      },
+      "group0_neuron1": {
+        "group_id": 0,
+        "local_id": 1,
+        "membrane_potential": 0,
+        "refractory_counter": 2,
+        "is_refractory": true
+      },
+      "group1_neuron0": {
+        "group_id": 1,
+        "local_id": 0,
+        "membrane_potential": 0,
+        "refractory_counter": 3,
+        "is_refractory": true
+      }
+    },
+    "T10_sw_weight_matrix": [
+      [
+        {
+          "weight": 0,
+          "exc": true
+        },
+        {
+          "weight": 21,
+          "exc": false
+        },
+        {
+          "weight": 22,
+          "exc": true
+        },
+        {
+          "weight": 23,
+          "exc": false
+        }
+      ],
+      [
+        {
+          "weight": 30,
+          "exc": false
+        },
+        {
+          "weight": 0,
+          "exc": true
+        },
+        {
+          "weight": 32,
+          "exc": false
+        },
+        {
+          "weight": 33,
+          "exc": true
+        }
+      ],
+      [
+        {
+          "weight": 40,
+          "exc": true
+        },
+        {
+          "weight": 41,
+          "exc": false
+        },
+        {
+          "weight": 0,
+          "exc": true
+        },
+        {
+          "weight": 43,
+          "exc": false
+        }
+      ],
+      [
+        {
+          "weight": 50,
+          "exc": false
+        },
+        {
+          "weight": 51,
+          "exc": true
+        },
+        {
+          "weight": 52,
+          "exc": false
+        },
+        {
+          "weight": 0,
+          "exc": true
+        }
+      ]
+    ],
+    "T10_sw_multi_step": {
+      "total_spikes": 1,
+      "spike_history": [
+        [
+          0,
+          0
+        ]
+      ],
+      "per_group_spikes": [
+        1,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "hw_results": {
+    "timestamp": "2026-02-11 01:25:37",
+    "bitstream": "snn_integrated.bit",
+    "tests": {
+      "T01_version": {
+        "cfg_version": "0x534E4E01",
+        "cfg_version_valid": true,
+        "hls_version": "0x00000000",
+        "hls_version_valid": false,
+        "ap_ctrl": "0x04",
+        "hls_idle": true,
+        "pass": false
+      },
+      "T02_params": {
+        "threshold_written": 500,
+        "threshold_readback": 500,
+        "threshold_match": true,
+        "neuron_params_written": "0x00000A03",
+        "neuron_params_readback": "0x00000A03",
+        "params_match": true,
+        "hls_config_written": "0x000301F4",
+        "hls_config_readback": "0x000301F4",
+        "hls_config_match": true,
+        "pass": true
+      },
+      "T03_reset_status": {
+        "router_spikes": 0,
+        "neuron_spikes": 0,
+        "status": "0x00000000",
+        "overflow": false,
+        "hls_spikes": 0,
+        "spikes_cleared": true,
+        "pass": true
+      },
+      "T04_ct_program": {
+        "addr": "0x00000000",
+        "wdata": "0x88A64805",
+        "expected": "0x88A64805",
+        "encoding_valid": true,
+        "pass": true
+      },
+      "T05_intra_weight": {
+        "addr": "0x10000000",
+        "wdata": "0x00054200",
+        "expected": "0x00054200",
+        "encoding_valid": true,
+        "pass": true
+      },
+      "T06_stress": {
+        "iterations": 100,
+        "errors": 0,
+        "pass": true
+      },
+      "T07_multi_ct": {
+        "entries_written": 16,
+        "pass": true
+      },
+      "T08_spike_test": {
+        "threshold": 100,
+        "weight_intra": 120,
+        "weight_inter": 110,
+        "router_spikes": 0,
+        "neuron_spikes": 0,
+        "hls_spikes": 0,
+        "status": "0x00000000",
+        "throughput": 102970888,
+        "any_activity": false,
+        "pass": true
+      },
+      "T09_reg_dump": {
+        "hls_registers": {
+          "AP_CTRL": "0x00000081",
+          "CTRL": "0x00000000",
+          "CONFIG": "0x00030064",
+          "STATUS": "0x00000000",
+          "SPIKE_CNT": "0x00000000",
+          "WEIGHT_SUM": "0x00000000",
+          "VERSION": "0x00000000",
+          "REWARD": "0x00000000"
+        },
+        "cfg_registers": {
+          "CTRL": "0x00000000",
+          "ADDR": "0x00000000",
+          "WDATA": "0x8806E801",
+          "RDATA": "0x0806E801",
+          "THRESH": "0x00000064",
+          "PARAMS": "0x00000503",
+          "RTR_SPK": "0x00000000",
+          "NEU_SPK": "0x00000000",
+          "STATUS": "0x00000000",
+          "THRU": "0x062431FF",
+          "VER": "0x534E4E01"
+        },
+        "pass": true
+      },
+      "T10_dma_spike": {
+        "spike_injected": "0x0001E000",
+        "buffer_readback_match": true,
+        "ap_ctrl_before": "0x81",
+        "ap_ctrl_started": "0x81",
+        "ap_ctrl_after": "0x81",
+        "hls_status": "0x00000000",
+        "mm2s_status": "0x00001002",
+        "s2mm_status": "0x00000000",
+        "mm2s_complete": true,
+        "mm2s_error": false,
+        "pre_spikes": {
+          "router": 0,
+          "neuron": 0,
+          "hls": 0
+        },
+        "router_spikes": 0,
+        "neuron_spikes": 0,
+        "hls_spikes": 0,
+        "status": "0x00000000",
+        "output_words": [],
+        "any_activity": false,
+        "pass": true
+      }
+    },
+    "fpga_programmed": true,
+    "summary": {
+      "passed": 9,
+      "total": 10,
+      "failed": 1
+    }
+  }
+}

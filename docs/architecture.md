@@ -34,7 +34,7 @@ System architecture of the Event-Driven SNN FPGA Accelerator.
 - Event-driven processing (asynchronous spike-based)
 - AC-based operations (accumulate-only, no multiply)
 - Dense intra-group + sparse inter-group connectivity
-- Fixed-point arithmetic (4-bit weights)
+- Fixed-point arithmetic (8-bit weights)
 
 **Hardware**: Xilinx Zynq-7020 (xc7z020clg400-1) on PYNQ-Z2
 
@@ -71,9 +71,9 @@ neuromorphic architectures described in recent IEEE literature.
   HLS ◄──────────────│───│  learn_spike (observation port)     │    │
   Learning           │   │                                     │    │
                      │   └──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬────┘    │
-                     │      │  │  │  │  │  │  │  │  │  │  │ ...     │
-                     │     ┌┴┐┌┴┐┌┴┐┌┴┐┌┴┐┌┴┐...                    │
-                     │     │0││1││2││3││4││5│    (16 groups)        │
+                     │      │  │  │  │  │  │  │  │  │  │  │         │
+                     │     ┌┴┐┌┴┐┌┴┐┌┴┐┌┴┐┌┴┐                       │
+                     │     │0││1││2││3││4││5│ ... (16 groups)       │
                      │     │C││C││C││C││C││C│                       │
                      │     │G││G││G││G││G││G│                       │
                      │     └┬┘└┬┘└┬┘└┬┘└┬┘└┬┘                       │
@@ -141,7 +141,7 @@ addr = {src_group[3:0], src_neuron[6:0], fanout_idx[3:0]}
 [16]     valid       — entry is active
 [15:12]  dst_group   — destination core group ID (4-bit)
 [11:5]   dst_neuron  — destination neuron within group (7-bit)
-[4:1]    weight      — 4-bit synaptic weight
+[8:1]    weight      — 8-bit synaptic weight
 [0]      exc_inh     — 1=excitatory, 0=inhibitory
 ```
 
@@ -331,7 +331,7 @@ or connectivity table (inter-group).
 
 **Parameters**:
 - a_plus, a_minus: Learning rates (8-bit fixed-point)
-- w_min, w_max: Weight bounds (4-bit)
+- w_min, w_max: Weight bounds (8-bit)
 - tau_pre, tau_post: Trace decay time constants
 - mu: Weight-dependence exponent (Q4.4 fixed-point)
 
@@ -443,7 +443,7 @@ global_id[6:0]  = local_neuron_id (0-127)
 - Event-driven processing (only active on spikes)
 - Per-neuron traces (reduce memory access)
 - Lazy trace update (compute on-demand)
-- 4-bit weights (reduced memory bandwidth)
+- 8-bit weights (reduced memory bandwidth)
 - Sparse inter-group connectivity (reduced BRAM)
 
 ## Build Details

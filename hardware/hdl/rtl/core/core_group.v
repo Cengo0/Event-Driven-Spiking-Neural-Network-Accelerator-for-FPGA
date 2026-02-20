@@ -20,26 +20,27 @@
 //                                                  [back to FIFO]
 //                                  + spike_out → event router
 //
-// Resource Budget (per group, 128 neurons, 4-bit weights):
+// Resource Budget (per group, 128 neurons, 8-bit weights):
 //   - Neuron state BRAM: 128 x 24b = 1 BRAM18K
-//   - Weight memory: 128 x 128 x 4b = 4 BRAM18K (SDP)
+//   - Weight memory: 128 x 128 x 9b ≈ 8 BRAM18K (SDP, incl. exc/inh flag)
 //   - Spike FIFO: LUTRAM (~32 entries)
 //   - Logic: ~600 LUT, ~200 FF
-//   Total per group: ~5 BRAM18K, ~600 LUT
-//   8 groups: ~40 BRAM18K, ~4,800 LUT
+//   Total per group: ~9 BRAM18K, ~600 LUT
+//   16 groups: ~144 BRAM18K, ~9,600 LUT
 //-----------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
+`include "snn_params.vh"
 
 module core_group #(
     parameter GROUP_ID              = 0,
-    parameter NEURONS_PER_GROUP     = 128,
-    parameter DATA_WIDTH            = 16,       // Membrane potential width
-    parameter WEIGHT_WIDTH          = 4,        // Synaptic weight bits
-    parameter THRESHOLD_WIDTH       = 16,
-    parameter LEAK_WIDTH            = 8,
-    parameter REFRAC_WIDTH          = 8,
-    parameter SPIKE_BUFFER_DEPTH    = 64,       // Input FIFO depth
+    parameter NEURONS_PER_GROUP     = `SNN_NEURONS_PER_GROUP,
+    parameter DATA_WIDTH            = `SNN_DATA_WIDTH,
+    parameter WEIGHT_WIDTH          = `SNN_WEIGHT_WIDTH,
+    parameter THRESHOLD_WIDTH       = `SNN_THRESHOLD_WIDTH,
+    parameter LEAK_WIDTH            = `SNN_LEAK_WIDTH,
+    parameter REFRAC_WIDTH          = `SNN_REFRAC_WIDTH,
+    parameter SPIKE_BUFFER_DEPTH    = `SNN_SPIKE_BUFFER_DEPTH,
     parameter LOCAL_ID_WIDTH        = $clog2(NEURONS_PER_GROUP)
 )(
     input  wire                         clk,

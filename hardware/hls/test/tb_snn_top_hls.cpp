@@ -11,7 +11,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
-#include "snn_top_hls.h"
+#include "../include/snn_top_hls.h"
 
 // Test configuration
 #define NUM_TEST_SPIKES 20

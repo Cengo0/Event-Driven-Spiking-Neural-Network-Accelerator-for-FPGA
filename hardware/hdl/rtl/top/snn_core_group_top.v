@@ -10,27 +10,29 @@
 //                 ┌─────────────────────────────────────────────────────┐
 //                 │              snn_core_group_top                     │
 //                 │                                                     │
-//                 │  ┌─────────────────┐    ┌──────────────────┐       │
-//                 │  │  design_1_wrapper│    │  Synaptic Conn.  │       │
-//                 │  │  (PS + HLS IP)  │    │  Table (BRAM)    │       │
-//                 │  └──────┬──────────┘    └────────┬─────────┘       │
+//                 │  ┌─────────────────┐    ┌──────────────────┐        │
+//                 │  │ design_1_wrapper│    │  Synaptic Conn.  │        │
+//                 │  │  (PS + HLS IP)  │    │  Table (BRAM)    │        │
+//                 │  └──────┬──────────┘    └────────┬─────────┘        │
 //                 │         │                        │                  │
 //                 │         ▼                        ▼                  │
-//                 │  ┌──────────────────────────────────────────┐      │
-//                 │  │         Event Router (NG)                │      │
-//                 │  │  - Round-robin arbitration               │      │
-//                 │  │  - Sparse inter-group routing            │      │
-//                 │  │  - Learning engine interface             │      │
-//                 │  │  - External sensor/host input            │      │
-//                 │  └──┬───┬───┬───┬───┬───┬───┬───┬──────────┘      │
-//                 │     │   │   │   │   │   │   │   │                  │
-//                 │     ▼   ▼   ▼   ▼   ▼   ▼   ...   ▼   ▼           │
-//                 │  ┌───┐┌───┐┌───┐┌───┐┌───┐     ┌────┐┌────┐      │
-//                 │  │CG0││CG1││CG2││CG3││CG4│ ... │CG14││CG15│      │
-//                 │  │128││128││128││128││128│     │128 ││128 │      │
-//                 │  └───┘└───┘└───┘└───┘└───┘     └────┘└────┘      │
+//                 │  ┌──────────────────────────────────────────┐       │
+//                 │  │         Event Router (NG)                │       │
+//                 │  │  - Round-robin arbitration               │       │
+//                 │  │  - Sparse inter-group routing            │       │
+//                 │  │  - Learning engine interface             │       │
+//                 │  │  - External sensor/host input            │       │
+//                 │  └──┬───┬───┬───┬───┬───┬────────┬───┬──────┘       │
+//                 │     │   │   │   │   │   │        │   │              │
+//                 │     ▼   ▼   ▼   ▼   ▼   ▼  ...   ▼   ▼              │
+//                 │  ┌───┐┌───┐┌───┐┌───┐┌───┐     ┌────┐┌────┐         │
+//                 │  │CG0││CG1││CG2││CG3││CG4│ ... │CG14││CG15│         │
+//                 │  │ N0││ N1││ N2││ N3││ N4│     │ N14││ N15│         │
+//                 │  └───┘└───┘└───┘└───┘└───┘     └────┘└────┘         │
 //                 │                                                     │
-//                 │  Total: 2048 neurons (16 groups × 128)             │
+//                 │  Variable group sizes: Ni = SNN_GROUP_SIZE_i        │
+//                 │  Default: all 128 (16 × 128 = 2048 neurons)         │
+//                 │  Bus width: LOCAL_ID_WIDTH = clog2(max(Ni))         │
 //                 └─────────────────────────────────────────────────────┘
 //
 // Config Register Mapping (from AXI-Lite):
@@ -39,23 +41,23 @@
 //     0x1: Intra-group weight write (selects group via addr[27:25])
 //     0x2: Status readback
 //
-//   cfg_router_config_wdata format for connectivity table:
+//   cfg_router_config_wdata format for connectivity table (8-bit weight):
 //     [31]    = valid
 //     [30:27] = dst_group  (4-bit, supports up to 16 groups)
-//     [26:20] = dst_neuron (7-bit, 128 neurons/group)
-//     [19:16] = weight     (4-bit)
-//     [15]    = exc_inh
-//     [14:11] = fanout_idx (4-bit, max 16 fanout)
-//     [10:4]  = src_neuron (7-bit)
-//     [3:0]   = src_group  (4-bit)
+//     [26:20] = dst_neuron (7-bit, max neurons/group)
+//     [19:12] = weight     (8-bit unsigned magnitude)
+//     [11]    = exc_inh
+//     [10:7]  = fanout_idx (4-bit, max 16 fanout)
+//     [6:0]   = src_neuron (7-bit)
+//     addr[3:0] = src_group (4-bit)
 //
-//   cfg_router_config_wdata format for intra-group weight:
+//   cfg_router_config_wdata format for intra-group weight (8-bit weight):
 //     [31:25] = src_neuron
 //     [24:18] = dst_neuron
-//     [17:14] = weight
-//     [13]    = exc
-//     [12:9]  = group_id   (4-bit, supports up to 16 groups)
-//     [8:0]   = reserved
+//     [17:10] = weight     (8-bit unsigned magnitude)
+//     [9]     = exc
+//     [8:5]   = group_id   (4-bit, supports up to 16 groups)
+//     [4:0]   = reserved
 //
 // Resource Budget (xc7z020clg400-1):
 //   - 16 Core Groups:      ~48 BRAM36, ~9,120 LUT
@@ -67,28 +69,29 @@
 //-----------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
+`include "snn_params.vh"
 
 module snn_core_group_top #(
-    // Core Group Parameters
-    parameter NUM_GROUPS            = 16,
-    parameter NEURONS_PER_GROUP     = 128,
-    parameter WEIGHT_WIDTH          = 4,        // 4-bit synaptic weights
-    parameter MAX_FANOUT_INTER      = 16,       // Max inter-group fanout
-    parameter GROUP_ID_WIDTH        = 4,        // $clog2(NUM_GROUPS)
-    parameter LOCAL_ID_WIDTH        = 7,        // $clog2(NEURONS_PER_GROUP)
-    parameter GLOBAL_ID_WIDTH       = 11,       // GROUP_ID + LOCAL_ID
+    // Core Group Parameters (defaults from snn_params.yaml via snn_params.vh)
+    parameter NUM_GROUPS            = `SNN_NUM_GROUPS,
+    parameter NEURONS_PER_GROUP     = `SNN_NEURONS_PER_GROUP,
+    parameter WEIGHT_WIDTH          = `SNN_WEIGHT_WIDTH,
+    parameter MAX_FANOUT_INTER      = `SNN_MAX_FANOUT_INTER,
+    parameter GROUP_ID_WIDTH        = `SNN_GROUP_ID_WIDTH,
+    parameter LOCAL_ID_WIDTH        = `SNN_LOCAL_ID_WIDTH,
+    parameter GLOBAL_ID_WIDTH       = `SNN_GLOBAL_ID_WIDTH,
 
     // Neuron Parameters
-    parameter DATA_WIDTH            = 16,
-    parameter THRESHOLD_WIDTH       = 16,
-    parameter LEAK_WIDTH            = 8,
-    parameter REFRAC_WIDTH          = 8,
-    parameter SPIKE_BUFFER_DEPTH    = 64,
+    parameter DATA_WIDTH            = `SNN_DATA_WIDTH,
+    parameter THRESHOLD_WIDTH       = `SNN_THRESHOLD_WIDTH,
+    parameter LEAK_WIDTH            = `SNN_LEAK_WIDTH,
+    parameter REFRAC_WIDTH          = `SNN_REFRAC_WIDTH,
+    parameter SPIKE_BUFFER_DEPTH    = `SNN_SPIKE_BUFFER_DEPTH,
 
     // HLS Compatibility
-    parameter HLS_NEURON_ID_WIDTH   = 11,       // Match GLOBAL_ID_WIDTH
-    parameter HLS_MAX_NEURONS       = 2048,     // 16 groups × 128 neurons
-    parameter HLS_WEIGHT_WIDTH      = 8         // HLS interface width (HLS internal: 4-bit)
+    parameter HLS_NEURON_ID_WIDTH   = `SNN_HLS_NEURON_ID_WIDTH,
+    parameter HLS_MAX_NEURONS       = `SNN_TOTAL_NEURONS,
+    parameter HLS_WEIGHT_WIDTH      = `SNN_HLS_WEIGHT_WIDTH
 )(
     //-------------------------------------------------------------------------
     // DDR Interface (directly from PS)
@@ -124,7 +127,7 @@ module snn_core_group_top #(
     // Derived Parameters
     //=========================================================================
     localparam FANOUT_IDX_WIDTH = $clog2(MAX_FANOUT_INTER);
-    localparam TOTAL_NEURONS    = NUM_GROUPS * NEURONS_PER_GROUP;
+    localparam TOTAL_NEURONS    = `SNN_TOTAL_NEURONS;
 
     //=========================================================================
     // Clock / Reset from PS Block Design
@@ -136,65 +139,65 @@ module snn_core_group_top #(
     //=========================================================================
     // HLS <-> RTL Interface Signals (from Block Design)
     //=========================================================================
-    wire                             hls_spike_out_valid;
+    wire                            hls_spike_out_valid;
     wire [HLS_NEURON_ID_WIDTH-1:0]  hls_spike_out_neuron_id;
     wire [HLS_WEIGHT_WIDTH-1:0]     hls_spike_out_weight;
-    wire                             rtl_spike_in_ready;
+    wire                            rtl_spike_in_ready;
 
-    wire                             rtl_spike_out_valid;
+    wire                            rtl_spike_out_valid;
     wire [HLS_NEURON_ID_WIDTH-1:0]  rtl_spike_out_neuron_id;
     wire [HLS_WEIGHT_WIDTH-1:0]     rtl_spike_out_weight;
-    wire                             hls_spike_in_ready;
+    wire                            hls_spike_in_ready;
 
-    wire                             hls_snn_enable;
-    wire                             hls_snn_reset;
-    wire                             rtl_snn_ready;
-    wire                             rtl_snn_busy;
-    wire [15:0]                      hls_threshold_out;
-    wire [15:0]                      hls_leak_rate_out;
+    wire                            hls_snn_enable;
+    wire                            hls_snn_reset;
+    wire                            rtl_snn_ready;
+    wire                            rtl_snn_busy;
+    wire [15:0]                     hls_threshold_out;
+    wire [15:0]                     hls_leak_rate_out;
 
     //=========================================================================
     // Config Register Interface (from AXI-Lite in Block Design)
     //=========================================================================
-    wire                         cfg_router_config_we;
-    wire [31:0]                  cfg_router_config_addr;
-    wire [31:0]                  cfg_router_config_wdata;
-    wire [31:0]                  cfg_router_config_rdata;
+    wire                            cfg_router_config_we;
+    wire [31:0]                     cfg_router_config_addr;
+    wire [31:0]                     cfg_router_config_wdata;
+    wire [31:0]                     cfg_router_config_rdata;
 
-    wire                         cfg_neuron_config_we;
-    wire [9:0]                   cfg_neuron_config_addr;
-    wire [31:0]                  cfg_neuron_config_wdata;
+    wire                            cfg_neuron_config_we;
+    wire [9:0]                      cfg_neuron_config_addr;
+    wire [31:0]                     cfg_neuron_config_wdata;
 
-    wire [15:0]                  cfg_global_threshold;
-    wire [7:0]                   cfg_global_leak_rate;
-    wire [7:0]                   cfg_global_refrac_period;
+    wire [15:0]                     cfg_global_threshold;
+    wire [7:0]                      cfg_global_leak_rate;
+    wire [7:0]                      cfg_global_refrac_period;
 
     //=========================================================================
     // Internal Wiring: Event Router <-> Core Groups
     //=========================================================================
 
     // Core group output spikes → event router
-    wire [NUM_GROUPS-1:0]                         grp_spike_valid;
-    wire [NUM_GROUPS*LOCAL_ID_WIDTH-1:0]           grp_spike_neuron_id;
-    wire [NUM_GROUPS-1:0]                         grp_spike_ready;
+    wire [NUM_GROUPS-1:0]                       grp_spike_valid;
+    wire [NUM_GROUPS*LOCAL_ID_WIDTH-1:0]        grp_spike_neuron_id;
+    wire [NUM_GROUPS-1:0]                       grp_spike_ready;
 
     // Event router → core group input spikes
-    wire [NUM_GROUPS-1:0]                         grp_in_valid;
-    wire [NUM_GROUPS*LOCAL_ID_WIDTH-1:0]           grp_in_dest_id;
-    wire [NUM_GROUPS*WEIGHT_WIDTH-1:0]             grp_in_weight;
-    wire [NUM_GROUPS-1:0]                         grp_in_exc;
-    wire [NUM_GROUPS-1:0]                         grp_in_ready;
+    wire [NUM_GROUPS-1:0]                       grp_in_valid;
+    wire [NUM_GROUPS*LOCAL_ID_WIDTH-1:0]        grp_in_dest_id;
+    wire [NUM_GROUPS*WEIGHT_WIDTH-1:0]          grp_in_weight;
+    wire [NUM_GROUPS-1:0]                       grp_in_exc;
+    wire [NUM_GROUPS-1:0]                       grp_in_ready;
 
     // Weight config from event router → core groups
-    wire [NUM_GROUPS-1:0]                         grp_weight_we;
-    wire [LOCAL_ID_WIDTH-1:0]                     grp_weight_src;
-    wire [LOCAL_ID_WIDTH-1:0]                     grp_weight_dst;
-    wire [WEIGHT_WIDTH-1:0]                       grp_weight_data;
-    wire                                          grp_weight_exc;
+    wire [NUM_GROUPS-1:0]                       grp_weight_we;
+    wire [LOCAL_ID_WIDTH-1:0]                   grp_weight_src;
+    wire [LOCAL_ID_WIDTH-1:0]                   grp_weight_dst;
+    wire [WEIGHT_WIDTH-1:0]                     grp_weight_data;
+    wire                                        grp_weight_exc;
 
     // Core group status
-    wire [NUM_GROUPS*16-1:0]                      grp_spike_count;
-    wire [NUM_GROUPS-1:0]                         grp_busy;
+    wire [NUM_GROUPS*16-1:0]                    grp_spike_count;
+    wire [NUM_GROUPS-1:0]                       grp_busy;
 
     //=========================================================================
     // Internal Wiring: Event Router <-> Connectivity Table
@@ -267,24 +270,25 @@ module snn_core_group_top #(
             if (cfg_router_config_we) begin
                 case (cfg_cmd)
                     4'h0: begin
-                        // Connectivity table write (16-group format)
+                        // Connectivity table write (8-bit weight format)
+                        // src_group is in address register [3:0]
                         ct_cfg_we_reg         <= 1;
                         ct_cfg_valid_reg      <= cfg_router_config_wdata[31];
                         ct_cfg_dst_group_reg  <= cfg_router_config_wdata[30:27];
                         ct_cfg_dst_neuron_reg <= cfg_router_config_wdata[26:20];
-                        ct_cfg_weight_reg     <= cfg_router_config_wdata[19:16];
-                        ct_cfg_exc_inh_reg    <= cfg_router_config_wdata[15];
-                        ct_cfg_fanout_idx_reg <= cfg_router_config_wdata[14:11];
-                        ct_cfg_src_neuron_reg <= cfg_router_config_wdata[10:4];
-                        ct_cfg_src_group_reg  <= cfg_router_config_wdata[3:0];
+                        ct_cfg_weight_reg     <= cfg_router_config_wdata[19:12];
+                        ct_cfg_exc_inh_reg    <= cfg_router_config_wdata[11];
+                        ct_cfg_fanout_idx_reg <= cfg_router_config_wdata[10:7];
+                        ct_cfg_src_neuron_reg <= cfg_router_config_wdata[6:0];
+                        ct_cfg_src_group_reg  <= cfg_router_config_addr[3:0];
                     end
                     4'h1: begin
-                        // Intra-group weight write (16-group format)
+                        // Intra-group weight write (8-bit weight format)
                         intra_weight_src_reg  <= cfg_router_config_wdata[31:25];
                         intra_weight_dst_reg  <= cfg_router_config_wdata[24:18];
-                        intra_weight_data_reg <= cfg_router_config_wdata[17:14];
-                        intra_weight_exc_reg  <= cfg_router_config_wdata[13];
-                        intra_weight_we_reg[cfg_router_config_wdata[12:9]] <= 1'b1;
+                        intra_weight_data_reg <= cfg_router_config_wdata[17:10];
+                        intra_weight_exc_reg  <= cfg_router_config_wdata[9];
+                        intra_weight_we_reg[cfg_router_config_wdata[8:5]] <= 1'b1;
                     end
                     default: ;
                 endcase
@@ -295,11 +299,21 @@ module snn_core_group_top #(
     //=========================================================================
     // Status Readback
     //=========================================================================
-    reg [31:0] total_spike_count;
     reg [31:0] total_neuron_spikes;
 
-    // Sum spike counts from all 16 groups (pipelined for timing)
-    reg [31:0] spike_sum_stage1 [0:3];  // 4 partial sums of 4 groups each
+    // Parametric spike summation: returns 0 for out-of-range group indices
+    function [15:0] safe_spike_count;
+        input integer idx;
+        begin
+            if (idx < NUM_GROUPS)
+                safe_spike_count = grp_spike_count[16*idx +: 16];
+            else
+                safe_spike_count = 16'd0;
+        end
+    endfunction
+
+    // Sum spike counts from all groups (pipelined for timing)
+    reg [31:0] spike_sum_stage1 [0:3];  // 4 partial sums of up to 4 groups each
     integer si;
     always @(posedge clk_100mhz) begin
         if (!rst_n_sync || hls_snn_reset) begin
@@ -307,15 +321,15 @@ module snn_core_group_top #(
                 spike_sum_stage1[si] <= 0;
             total_neuron_spikes <= 0;
         end else begin
-            // Stage 1: Sum 4 groups each
-            spike_sum_stage1[0] <= grp_spike_count[16*0 +: 16] + grp_spike_count[16*1 +: 16] +
-                                   grp_spike_count[16*2 +: 16] + grp_spike_count[16*3 +: 16];
-            spike_sum_stage1[1] <= grp_spike_count[16*4 +: 16] + grp_spike_count[16*5 +: 16] +
-                                   grp_spike_count[16*6 +: 16] + grp_spike_count[16*7 +: 16];
-            spike_sum_stage1[2] <= grp_spike_count[16*8 +: 16] + grp_spike_count[16*9 +: 16] +
-                                   grp_spike_count[16*10 +: 16] + grp_spike_count[16*11 +: 16];
-            spike_sum_stage1[3] <= grp_spike_count[16*12 +: 16] + grp_spike_count[16*13 +: 16] +
-                                   grp_spike_count[16*14 +: 16] + grp_spike_count[16*15 +: 16];
+            // Stage 1: Sum up to 4 groups each (safe for NUM_GROUPS < 16)
+            spike_sum_stage1[0] <= safe_spike_count(0)  + safe_spike_count(1)  +
+                                   safe_spike_count(2)  + safe_spike_count(3);
+            spike_sum_stage1[1] <= safe_spike_count(4)  + safe_spike_count(5)  +
+                                   safe_spike_count(6)  + safe_spike_count(7);
+            spike_sum_stage1[2] <= safe_spike_count(8)  + safe_spike_count(9)  +
+                                   safe_spike_count(10) + safe_spike_count(11);
+            spike_sum_stage1[3] <= safe_spike_count(12) + safe_spike_count(13) +
+                                   safe_spike_count(14) + safe_spike_count(15);
             // Stage 2: Final sum
             total_neuron_spikes <= spike_sum_stage1[0] + spike_sum_stage1[1] +
                                    spike_sum_stage1[2] + spike_sum_stage1[3];
@@ -421,8 +435,16 @@ module snn_core_group_top #(
     // All 2048 neurons are addressable
     assign rtl_spike_out_valid     = learn_spike_valid;
     assign rtl_spike_out_neuron_id = learn_spike_src_id;
-    assign rtl_spike_out_weight    = {{(HLS_WEIGHT_WIDTH-WEIGHT_WIDTH){1'b0}},
-                                       ct_result_weight};  // Zero-extend 4-bit to HLS_WEIGHT_WIDTH
+
+    // Weight bridge: zero-extend if WEIGHT_WIDTH < HLS_WEIGHT_WIDTH, else direct
+    generate
+        if (HLS_WEIGHT_WIDTH > WEIGHT_WIDTH)
+            assign rtl_spike_out_weight = {{(HLS_WEIGHT_WIDTH-WEIGHT_WIDTH){1'b0}},
+                                            ct_result_weight};
+        else
+            assign rtl_spike_out_weight = ct_result_weight[HLS_WEIGHT_WIDTH-1:0];
+    endgenerate
+
     assign learn_spike_ready       = hls_spike_in_ready;
 
     // HLS ready/busy
@@ -431,7 +453,14 @@ module snn_core_group_top #(
     assign rtl_snn_busy       = router_busy | (grp_busy != {NUM_GROUPS{1'b0}});
 
     //=========================================================================
-    // Core Group Instantiations (16 groups × 128 neurons = 2048 total)
+    // Core Group Instantiations
+    //=========================================================================
+    // Each group has its own NEURONS_PER_GROUP from SNN_GROUP_SIZE_x defines.
+    // All groups share the same LOCAL_ID_WIDTH (= clog2(max(group_sizes)))
+    // for uniform interconnect bus widths.
+    //
+    // Default: 16 × 128 = 2048 neurons (all groups identical).
+    // Variable: configure group_sizes in snn_params.yaml for mixed sizes.
     //=========================================================================
 
     // Mux write enable: AXI config writes OR event router weight updates
@@ -459,9 +488,31 @@ module snn_core_group_top #(
 
     generate
         for (g = 0; g < NUM_GROUPS; g = g + 1) begin : gen_core_groups
+
+            // Per-group neuron count: maps genvar g → SNN_GROUP_SIZE_x define.
+            // All groups use uniform LOCAL_ID_WIDTH for bus compatibility.
+            localparam THIS_NPG =
+                (g ==  0) ? `SNN_GROUP_SIZE_0  :
+                (g ==  1) ? `SNN_GROUP_SIZE_1  :
+                (g ==  2) ? `SNN_GROUP_SIZE_2  :
+                (g ==  3) ? `SNN_GROUP_SIZE_3  :
+                (g ==  4) ? `SNN_GROUP_SIZE_4  :
+                (g ==  5) ? `SNN_GROUP_SIZE_5  :
+                (g ==  6) ? `SNN_GROUP_SIZE_6  :
+                (g ==  7) ? `SNN_GROUP_SIZE_7  :
+                (g ==  8) ? `SNN_GROUP_SIZE_8  :
+                (g ==  9) ? `SNN_GROUP_SIZE_9  :
+                (g == 10) ? `SNN_GROUP_SIZE_10 :
+                (g == 11) ? `SNN_GROUP_SIZE_11 :
+                (g == 12) ? `SNN_GROUP_SIZE_12 :
+                (g == 13) ? `SNN_GROUP_SIZE_13 :
+                (g == 14) ? `SNN_GROUP_SIZE_14 :
+                            `SNN_GROUP_SIZE_15 ;
+
             core_group #(
                 .GROUP_ID           (g),
-                .NEURONS_PER_GROUP  (NEURONS_PER_GROUP),
+                .NEURONS_PER_GROUP  (THIS_NPG),
+                .LOCAL_ID_WIDTH     (LOCAL_ID_WIDTH),
                 .DATA_WIDTH         (DATA_WIDTH),
                 .WEIGHT_WIDTH       (WEIGHT_WIDTH),
                 .THRESHOLD_WIDTH    (THRESHOLD_WIDTH),
