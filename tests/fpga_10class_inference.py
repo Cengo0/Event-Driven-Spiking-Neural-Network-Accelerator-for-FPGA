@@ -114,6 +114,20 @@ class MMIO:
         self._mm.seek(self._off + offset)
         self._mm.write(struct.pack('<I', value & 0xFFFF_FFFF))
 
+    def write_bytes(self, offset: int, data: bytes) -> None:
+        """Bulk write raw bytes at offset (for DMA buffer population)."""
+        self._mm.seek(self._off + offset)
+        self._mm.write(data)
+
+    def read_bytes(self, offset: int, length: int) -> bytes:
+        """Bulk read raw bytes at offset (cache-coherent via O_SYNC mmap)."""
+        self._mm.seek(self._off + offset)
+        return self._mm.read(length)
+
+    def flush(self) -> None:
+        """Flush mmap writes to underlying physical memory."""
+        self._mm.flush()
+
     def close(self) -> None:
         self._mm.close()
         os.close(self._fd)
@@ -330,6 +344,8 @@ def run_inference(hls: MMIO, cfg: MMIO, dma: MMIO,
                   spike_words: np.ndarray,
                   n_neurons: int,
                   hw_threshold: int,
+                  buf_in:  MMIO = None,
+                  buf_out: MMIO = None,
                   ctr_router_base: int = 0,
                   ctr_neuron_base: int = 0) -> dict:
     """
@@ -348,10 +364,14 @@ def run_inference(hls: MMIO, cfg: MMIO, dma: MMIO,
     n_words  = len(spike_words)
     nbytes   = n_words * 4
 
-    # --- Write into DDR via /dev/mem pwrite ---
-    devmem_fd = os.open('/dev/mem', os.O_RDWR | os.O_SYNC)
-    os.pwrite(devmem_fd, spike_words.tobytes(), DMA_BUF_IN)
-    os.pwrite(devmem_fd, b'\x00' * (n_neurons * 4 + 64), DMA_BUF_OUT)
+    # --- Write input spikes + zero output buffer via mmap (cache-coherent) ---
+    # Using MMIO (mmap + O_SYNC) guarantees the ARM CPU's writes reach DDR
+    # before MM2S DMA reads them, and that DMA writes to DMA_BUF_OUT are
+    # visible to the CPU when we read back via buf_out.read_bytes().
+    buf_in.write_bytes(0, spike_words.tobytes())
+    buf_in.flush()
+    buf_out.write_bytes(0, b'\x00' * (n_neurons * 4 + 64))
+    buf_out.flush()
 
     # --- Hard-reset both DMA channels ---
     dma.write(DMA_MM2S_DMACR, 0x04)   # MM2S reset
@@ -442,16 +462,15 @@ def run_inference(hls: MMIO, cfg: MMIO, dma: MMIO,
 
         this_timeout = further_spike_timeout   # tighten after first spike
 
-        # Read captured spike word from DDR
-        try:
-            raw4 = os.pread(devmem_fd, 4, next_dest)
-            w    = struct.unpack('<I', raw4)[0]
-            if w != 0:
-                nid = w & 0x3FF
-                wt  = (w >> 10) & 0xFF
-                output_spikes.append({'neuron_id': int(nid), 'weight': int(wt)})
-        except Exception:
-            break
+        # Read captured spike word from DDR via mmap (cache-coherent)
+        # os.pread reads cached data; MMIO.read_bytes uses the O_SYNC mmap
+        # which creates an uncached mapping on Zynq → sees DMA-written data.
+        raw4 = buf_out.read_bytes(next_dest - DMA_BUF_OUT, 4)
+        w    = struct.unpack('<I', raw4)[0]
+        if w != 0:
+            nid = w & 0x3FF
+            wt  = (w >> 10) & 0xFF
+            output_spikes.append({'neuron_id': int(nid), 'weight': int(wt)})
 
         next_dest += 4
         if next_dest - DMA_BUF_OUT >= max_output_spikes * 4:
@@ -477,7 +496,6 @@ def run_inference(hls: MMIO, cfg: MMIO, dma: MMIO,
     neuron_abs = cfg.read(CFG_NEURON_SPKS)
     status     = cfg.read(CFG_STATUS)
 
-    os.close(devmem_fd)
 
     return {
         'router_spikes':  router_abs - ctr_router_base,
@@ -697,6 +715,17 @@ def main():
     configure_neurons(cfg, threshold=hw_threshold, leak=0, refrac=0)
     print("  Done.")
 
+    # ── DDR buffer MMIO objects (opened once, O_SYNC → cache-coherent) ─
+    # On Zynq-7020 (ARM Cortex-A9), opening /dev/mem with O_SYNC and
+    # mmapping a DDR region creates a strongly-ordered (nGnRE) mapping.
+    # All reads/writes bypass the L1/L2 cache, so we always see what
+    # AXI-DMA actually wrote instead of stale cache-line data.
+    # Input buffer: up to n_neurons spike words (784 pixels max); output:
+    # n_neurons LIF output spikes (one 32-bit word each).  Add 64-byte pad.
+    n_buf_words = n_neurons + 16
+    buf_in  = MMIO(DMA_BUF_IN,  n_buf_words * 4 + 64)
+    buf_out = MMIO(DMA_BUF_OUT, n_buf_words * 4 + 64)
+
     # ── Inference loop ─────────────────────────────────────────────────
     print(f"\nRunning {N} inference{'s' if N != 1 else ''} ...")
     print('-' * 72)
@@ -730,6 +759,7 @@ def main():
         spike_words = build_spike_words(img, q_weights)
         hw_res      = run_inference(hls, cfg, dma, spike_words, n_neurons,
                                     hw_threshold,
+                                    buf_in=buf_in, buf_out=buf_out,
                                     ctr_router_base=ctr_router_pre,
                                     ctr_neuron_base=ctr_neuron_pre)
 
@@ -814,6 +844,8 @@ def main():
     hls.close()
     cfg.close()
     dma.close()
+    buf_in.close()
+    buf_out.close()
 
 
 if __name__ == '__main__':
