@@ -16,15 +16,39 @@
 #   6. Optionally runs synthesis/implementation
 #===============================================================================
 
-# Project paths - adjust as needed
-set proj_dir "../vivado"
-set proj_name "Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA"
+# Project paths
 set hls_ip_repo "../hls/hls_output/hls/impl/ip"
-set bd_name "design_1"  ;# Adjust to your block design name
+set bd_name "design_1"
+
+# Prefer legacy path, then current build outputs.
+set project_candidates [list \
+    "../vivado/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA.xpr" \
+    "../build/snn_accelerator/snn_accelerator.xpr" \
+    "../build/snn_integrated_v2/snn_integrated_v2.xpr" \
+]
+
+set proj_xpr ""
+foreach cand $project_candidates {
+    if {[file exists $cand]} {
+        set proj_xpr $cand
+        break
+    }
+}
+
+if {$proj_xpr eq ""} {
+    puts "ERROR: No Vivado project (.xpr) found in expected locations:"
+    foreach cand $project_candidates {
+        puts "  - $cand"
+    }
+    exit 1
+}
+
+set proj_dir [file dirname $proj_xpr]
+set proj_name [file rootname [file tail $proj_xpr]]
 
 # Open existing project
-puts "Opening project: ${proj_dir}/${proj_name}.xpr"
-open_project ${proj_dir}/${proj_name}.xpr
+puts "Opening project: ${proj_xpr}"
+open_project ${proj_xpr}
 
 # Add HLS IP repository
 puts "Adding HLS IP repository: ${hls_ip_repo}"
@@ -33,11 +57,23 @@ update_ip_catalog -rebuild
 
 # Open block design
 puts "Opening block design: ${bd_name}"
-open_bd_design ${proj_dir}/${proj_name}.srcs/sources_1/bd/${bd_name}/${bd_name}.bd
+set bd_path "${proj_dir}/${proj_name}.srcs/sources_1/bd/${bd_name}/${bd_name}.bd"
+if {![file exists $bd_path]} {
+    puts "ERROR: Block design not found: ${bd_path}"
+    exit 1
+}
+open_bd_design ${bd_path}
 
 # Report current IP versions
 puts "\n=== Current IP versions in design ==="
-report_property [get_bd_cells] -return_string
+set bd_cells [get_bd_cells]
+if {[llength $bd_cells] > 0} {
+    foreach cell $bd_cells {
+        puts "  - $cell ([get_property VLNV $cell])"
+    }
+} else {
+    puts "No BD cells found in ${bd_name}."
+}
 
 # Upgrade IP cores (interactive prompt disabled in batch mode)
 puts "\n=== Upgrading IP cores ==="

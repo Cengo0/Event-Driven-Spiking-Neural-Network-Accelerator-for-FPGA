@@ -11,7 +11,7 @@ from __future__ import annotations
 import struct
 import time
 from dataclasses import dataclass
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 
@@ -56,24 +56,111 @@ class RegisterMap:
     mode_reg: int = 0x20       # mode_reg[31:0] (bits[1:0]=mode, bit[8]=encoder_en)
     time_steps_reg: int = 0x28 # time_steps_reg[31:0]
     
-    # Learning params struct (5 x 32-bit words)
-    learning_base: int = 0x30  # learning_params[0..4] at 0x30,0x34,0x38,0x3C,0x40
+    # Learning params struct (5 x 32-bit words, 144-bit packed total)
+    learning_base: int = 0x30  # learning_params[31:0] ... learning_params[143:128]
     
-    # Encoder config struct (4 x 32-bit words)
-    encoder_base: int = 0x48   # encoder_config[0..3] at 0x48,0x4C,0x50,0x54
+    # Encoder config struct (3 x 32-bit words, 80-bit packed total)
+    encoder_base: int = 0x48   # encoder_config[31:0], [63:32], [79:64]
     
     # Status/debug read-only registers
-    status_reg: int = 0x5C     # status_reg[31:0]
-    spike_count_reg: int = 0x6C    # spike_count_reg[31:0]
-    weight_sum_reg: int = 0x7C     # weight_sum_reg[31:0]
-    version_reg: int = 0x8C        # version_reg[31:0]
+    status_reg: int = 0x58         # status_reg[31:0]
+    spike_count_reg: int = 0x68    # spike_count_reg[31:0]
+    weight_sum_reg: int = 0x78     # weight_sum_reg[31:0]
+    version_reg: int = 0x88        # version_reg[31:0]
     
     # Reward signal (R-STDP)
-    reward_signal: int = 0x9C  # reward_signal[7:0]
+    reward_signal: int = 0x98       # reward_signal[7:0]
+
+
+def _q8_8(value: float) -> int:
+    """Convert python float to signed Q8.8 (16-bit two's complement)."""
+    raw = int(round(float(value) * 256.0))
+    if raw > 32767:
+        raw = 32767
+    elif raw < -32768:
+        raw = -32768
+    return raw & 0xFFFF
+
+
+def pack_learning_params_words(
+    a_plus: float = 0.1,
+    a_minus: float = 0.12,
+    tau_plus: int = 20,
+    tau_minus: int = 20,
+    stdp_window: int = 50,
+    learning_rate: float = 0.01,
+    rstdp_enable: bool = False,
+    trace_decay: float = 0.125,
+    reward_scale: float = 1.0,
+) -> Tuple[int, int, int, int, int]:
+    """Pack learning_params_t into five 32-bit AXI-Lite words.
+
+    Matches HLS struct layout:
+      [15:0]    a_plus (Q8.8)
+      [31:16]   a_minus (Q8.8)
+      [47:32]   tau_plus
+      [63:48]   tau_minus
+      [79:64]   stdp_window
+      [95:80]   learning_rate (Q8.8)
+      [103:96]  rstdp_enable (bool stored in 8-bit slot)
+      [111:104] padding
+      [127:112] trace_decay (Q8.8)
+      [143:128] reward_scale (Q8.8)
+    """
+    tau_plus_u16 = int(tau_plus) & 0xFFFF
+    tau_minus_u16 = int(tau_minus) & 0xFFFF
+    stdp_window_u16 = int(stdp_window) & 0xFFFF
+    rstdp_u8 = 1 if rstdp_enable else 0
+
+    a_plus_u16 = _q8_8(a_plus)
+    a_minus_u16 = _q8_8(a_minus)
+    learning_rate_u16 = _q8_8(learning_rate)
+    trace_decay_u16 = _q8_8(trace_decay)
+    reward_scale_u16 = _q8_8(reward_scale)
+
+    w0 = a_plus_u16 | (a_minus_u16 << 16)
+    w1 = tau_plus_u16 | (tau_minus_u16 << 16)
+    w2 = stdp_window_u16 | (learning_rate_u16 << 16)
+    w3 = (rstdp_u8 & 0xFF) | (trace_decay_u16 << 16)
+    w4 = reward_scale_u16
+    return w0, w1, w2, w3, w4
+
+
+def pack_encoder_config_words(
+    encoding_type: int = 0,
+    delta_threshold: int = 1000,
+    delta_decay: int = 10,
+    num_channels: int = 784,
+    default_weight: int = 127,
+) -> Tuple[int, int, int]:
+    """Pack encoder_config_t into three 32-bit AXI-Lite words.
+
+    Matches synthesized bit extraction in snn_top_hls.v:
+      encoding_type   = encoder_config[3:0]
+      delta_threshold = encoder_config[31:16]
+      delta_decay     = encoder_config[47:32]
+      num_channels    = encoder_config[63:48]
+      default_weight  = encoder_config[71:64]
+    """
+    enc_type_u4 = int(encoding_type) & 0xF
+    dth_u16 = int(delta_threshold) & 0xFFFF
+    ddec_u16 = int(delta_decay) & 0xFFFF
+    nch_u16 = int(num_channels) & 0xFFFF
+    dw_u8 = int(default_weight) & 0xFF
+
+    w0 = enc_type_u4 | (dth_u16 << 16)
+    w1 = ddec_u16 | (nch_u16 << 16)
+    w2 = dw_u8
+    return w0, w1, w2
 
 
 class XRTBackend:
     """Wrapper over pyxrt for register and DMA operations."""
+
+    AP_START = 0x01
+    AP_DONE = 0x02
+    AP_IDLE = 0x04
+    AP_READY = 0x08
 
     def __init__(self, xclbin_path: str, device_index: int = 0, reg_map: Optional[RegisterMap] = None) -> None:
         if xrt is None:
@@ -175,6 +262,34 @@ class XRTBackend:
 
     def set_reward(self, reward: int) -> None:
         self.write_reg(self.regs.reward_signal, reward & 0xFF)
+
+    def set_learning_params(
+        self,
+        a_plus: float = 0.1,
+        a_minus: float = 0.12,
+        tau_plus: int = 20,
+        tau_minus: int = 20,
+        stdp_window: int = 50,
+        learning_rate: float = 0.01,
+        rstdp_enable: bool = False,
+        trace_decay: float = 0.125,
+        reward_scale: float = 1.0,
+    ) -> None:
+        """Write packed learning_params_t words to AXI-Lite registers."""
+        words = pack_learning_params_words(
+            a_plus=a_plus,
+            a_minus=a_minus,
+            tau_plus=tau_plus,
+            tau_minus=tau_minus,
+            stdp_window=stdp_window,
+            learning_rate=learning_rate,
+            rstdp_enable=rstdp_enable,
+            trace_decay=trace_decay,
+            reward_scale=reward_scale,
+        )
+        base = self.regs.learning_base
+        for i, w in enumerate(words):
+            self.write_reg(base + (i * 4), int(w) & 0xFFFFFFFF)
     
     def load_weights(self, weights: np.ndarray) -> None:
         """Load weights to FPGA weight memory via s_axis_weights stream.
@@ -253,12 +368,7 @@ class XRTBackend:
     
     def set_encoder_config(
         self,
-        encoding_type: int = 0,  # 0=NONE, 1=RATE_POISSON, 2=LATENCY, 3=DELTA_SIGMA
-        two_neuron_enable: bool = False,
-        baseline: int = 128,
-        num_steps: int = 100,
-        rate_scale: int = 256,
-        latency_window: int = 100,
+        encoding_type: int = 0,  # 0=NONE, 1=DELTA_SIGMA (current HLS)
         delta_threshold: int = 1000,
         delta_decay: int = 10,
         num_channels: int = 784,
@@ -267,15 +377,10 @@ class XRTBackend:
         """Configure on-chip spike encoder parameters.
         
         Args:
-            encoding_type: 4-bit encoding type (0-3 defined, 4-15 reserved)
-            two_neuron_enable: Enable ON/OFF neuron split (doubles channels)
-            baseline: Baseline for two-neuron split (default 128 for uint8)
-            num_steps: Total simulation timesteps (for rate/latency normalization)
-            rate_scale: Rate coding threshold scale
-            latency_window: Latency coding time window (timesteps)
+            encoding_type: 4-bit encoding type (ENC_NONE=0, ENC_DELTA_SIGMA=1)
             delta_threshold: Delta-sigma integration threshold
             delta_decay: Delta-sigma decay rate
-            num_channels: Number of input channels (output = 2x if two_neuron_enable)
+            num_channels: Number of input channels
             default_weight: Default spike weight (0-255)
         
         Raises:
@@ -284,61 +389,61 @@ class XRTBackend:
         # Validate encoding_type
         validate_parameter(
             encoding_type,
-            valid_options=[0, 1, 2, 3],
+            valid_options=[0, 1],
             parameter_name="encoding_type"
         )
-        
-        # Validate ranges
-        if not (0 <= baseline <= 255):
+
+        if not (0 <= delta_threshold <= 65535):
             raise ConfigurationError(
-                "baseline must be in range [0, 255]",
-                parameter="baseline",
-                value=baseline,
-                valid_range=(0, 255),
+                "delta_threshold must be in range [0, 65535]",
+                parameter="delta_threshold",
+                value=delta_threshold,
+                valid_range=(0, 65535),
                 error_code=4001
             )
-        
-        if not (1 <= num_steps <= 65535):
+        if not (0 <= delta_decay <= 65535):
             raise ConfigurationError(
-                "num_steps must be in range [1, 65535]",
-                parameter="num_steps",
-                value=num_steps,
-                valid_range=(1, 65535),
+                "delta_decay must be in range [0, 65535]",
+                parameter="delta_decay",
+                value=delta_decay,
+                valid_range=(0, 65535),
                 error_code=4002
             )
-        
+        if not (0 <= num_channels <= 65535):
+            raise ConfigurationError(
+                "num_channels must be in range [0, 65535]",
+                parameter="num_channels",
+                value=num_channels,
+                valid_range=(0, 65535),
+                error_code=4003
+            )
         if not (0 <= default_weight <= 255):
             raise ConfigurationError(
                 "default_weight must be in range [0, 255]",
                 parameter="default_weight",
                 value=default_weight,
                 valid_range=(0, 255),
-                error_code=4003
+                error_code=4004
             )
         
         try:
-            # Assuming encoder config registers start after basic control regs
-            # This would need to match the actual HLS register map
-            enc_base = 0x40  # Example offset for encoder config block
-            
-            # Pack encoding_type (4-bit) and two_neuron_enable (1-bit) into single register
-            enc_ctrl = (encoding_type & 0xF) | ((1 if two_neuron_enable else 0) << 4)
-            self.write_reg(enc_base + 0x00, enc_ctrl)
-            
-            self.write_reg(enc_base + 0x04, baseline & 0xFF)
-            self.write_reg(enc_base + 0x08, num_steps & 0xFFFF)
-            self.write_reg(enc_base + 0x0C, rate_scale & 0xFFFF)
-            self.write_reg(enc_base + 0x10, latency_window & 0xFFFF)
-            self.write_reg(enc_base + 0x14, delta_threshold & 0xFFFF)
-            self.write_reg(enc_base + 0x18, delta_decay & 0xFFFF)
-            self.write_reg(enc_base + 0x1C, num_channels & 0xFFFF)
-            self.write_reg(enc_base + 0x20, default_weight & 0xFF)
+            w0, w1, w2 = pack_encoder_config_words(
+                encoding_type=encoding_type,
+                delta_threshold=delta_threshold,
+                delta_decay=delta_decay,
+                num_channels=num_channels,
+                default_weight=default_weight,
+            )
+            enc_base = self.regs.encoder_base
+            self.write_reg(enc_base + 0x00, w0)
+            self.write_reg(enc_base + 0x04, w1)
+            self.write_reg(enc_base + 0x08, w2)
         except (ConfigurationError, CommunicationError):
             raise
         except Exception as e:
             raise ConfigurationError(
                 f"Failed to configure encoder: {e}",
-                error_code=4004
+                error_code=4005
             ) from e
 
     # ------------------------------------------------------------------
@@ -411,7 +516,7 @@ class XRTBackend:
         
         try:
             # Start kernel (set AP_START bit)
-            self.write_reg(self.regs.ap_ctrl, 0x01)
+            self.write_reg(self.regs.ap_ctrl, self.AP_START)
             logger.debug("Kernel started")
         except CommunicationError:
             raise
@@ -428,18 +533,11 @@ class XRTBackend:
         while time.time() - start_time < timeout_sec:
             try:
                 status = self.kernel.read_register(self.regs.ap_ctrl)
-                
-                # Check for error bit (bit[3] typically indicates error in Vitis HLS)
-                if status & 0x08:
-                    raise KernelExecutionError(
-                        "Kernel reported error during execution",
-                        kernel_name="snn_top_hls",
-                        exit_code=status,
-                        error_code=5002
-                    )
-                
-                # Check for completion (bit[1] = AP_DONE)
-                if status & 0x02:
+
+                # HLS ap_ctrl semantics:
+                #   bit0=ap_start, bit1=ap_done, bit2=ap_idle, bit3=ap_ready.
+                # AP_READY is NOT an error bit; completion is AP_DONE.
+                if status & self.AP_DONE:
                     logger.debug("Kernel completed successfully")
                     return
                     

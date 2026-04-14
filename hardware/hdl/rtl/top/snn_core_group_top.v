@@ -149,6 +149,18 @@ module snn_core_group_top #(
     wire [HLS_WEIGHT_WIDTH-1:0]     rtl_spike_out_weight;
     wire                            hls_spike_in_ready;
 
+    // HLS learned-weight update channel (HLS -> Event Router)
+    wire                            hls_learn_weight_valid;
+    wire [GROUP_ID_WIDTH-1:0]       hls_learn_weight_group;
+    wire [LOCAL_ID_WIDTH-1:0]       hls_learn_weight_src;
+    wire [LOCAL_ID_WIDTH-1:0]       hls_learn_weight_dst;
+    wire [WEIGHT_WIDTH-1:0]         hls_learn_weight_data;
+    wire                            hls_learn_weight_exc;
+    wire                            hls_learn_weight_is_inter;
+    wire [GROUP_ID_WIDTH-1:0]       hls_learn_weight_dst_group;
+    wire [FANOUT_IDX_WIDTH-1:0]     hls_learn_weight_fanout_idx;
+    wire                            rtl_learn_weight_ready;
+
     wire                            hls_snn_enable;
     wire                            hls_snn_reset;
     wire                            rtl_snn_ready;
@@ -229,6 +241,30 @@ module snn_core_group_top #(
     wire                          learn_spike_valid;
     wire [GLOBAL_ID_WIDTH-1:0]    learn_spike_src_id;
     wire                          learn_spike_ready;
+
+    // Enable learned-weight bridge from HLS to Event Router.
+    // If block design does not expose learn_weight_* yet, set this to 0.
+    localparam                    LEARN_WEIGHT_BRIDGE_ENABLE = 1'b1;
+    wire                          learn_weight_valid_br;
+    wire [GROUP_ID_WIDTH-1:0]     learn_weight_group_br;
+    wire [LOCAL_ID_WIDTH-1:0]     learn_weight_src_br;
+    wire [LOCAL_ID_WIDTH-1:0]     learn_weight_dst_br;
+    wire [WEIGHT_WIDTH-1:0]       learn_weight_data_br;
+    wire                          learn_weight_exc_br;
+    wire                          learn_weight_is_inter_br;
+    wire [GROUP_ID_WIDTH-1:0]     learn_weight_dst_group_br;
+    wire [FANOUT_IDX_WIDTH-1:0]   learn_weight_fanout_idx_br;
+    wire                          learn_weight_ready_br;
+
+    assign learn_weight_valid_br      = LEARN_WEIGHT_BRIDGE_ENABLE ? hls_learn_weight_valid : 1'b0;
+    assign learn_weight_group_br      = LEARN_WEIGHT_BRIDGE_ENABLE ? hls_learn_weight_group : {GROUP_ID_WIDTH{1'b0}};
+    assign learn_weight_src_br        = LEARN_WEIGHT_BRIDGE_ENABLE ? hls_learn_weight_src : {LOCAL_ID_WIDTH{1'b0}};
+    assign learn_weight_dst_br        = LEARN_WEIGHT_BRIDGE_ENABLE ? hls_learn_weight_dst : {LOCAL_ID_WIDTH{1'b0}};
+    assign learn_weight_data_br       = LEARN_WEIGHT_BRIDGE_ENABLE ? hls_learn_weight_data : {WEIGHT_WIDTH{1'b0}};
+    assign learn_weight_exc_br        = LEARN_WEIGHT_BRIDGE_ENABLE ? hls_learn_weight_exc : 1'b0;
+    assign learn_weight_is_inter_br   = LEARN_WEIGHT_BRIDGE_ENABLE ? hls_learn_weight_is_inter : 1'b0;
+    assign learn_weight_dst_group_br  = LEARN_WEIGHT_BRIDGE_ENABLE ? hls_learn_weight_dst_group : {GROUP_ID_WIDTH{1'b0}};
+    assign learn_weight_fanout_idx_br = LEARN_WEIGHT_BRIDGE_ENABLE ? hls_learn_weight_fanout_idx : {FANOUT_IDX_WIDTH{1'b0}};
 
     // Router status
     wire [31:0]                   routed_spike_count;
@@ -389,6 +425,18 @@ module snn_core_group_top #(
         .rtl_spike_out_weight    (rtl_spike_out_weight),
         .hls_spike_in_ready      (hls_spike_in_ready),
 
+        // HLS -> RTL learned-weight update interface
+        .hls_learn_weight_valid     (hls_learn_weight_valid),
+        .hls_learn_weight_group     (hls_learn_weight_group),
+        .hls_learn_weight_src       (hls_learn_weight_src),
+        .hls_learn_weight_dst       (hls_learn_weight_dst),
+        .hls_learn_weight_data      (hls_learn_weight_data),
+        .hls_learn_weight_exc       (hls_learn_weight_exc),
+        .hls_learn_weight_is_inter  (hls_learn_weight_is_inter),
+        .hls_learn_weight_dst_group (hls_learn_weight_dst_group),
+        .hls_learn_weight_fanout_idx(hls_learn_weight_fanout_idx),
+        .rtl_learn_weight_ready     (rtl_learn_weight_ready),
+
         // SNN Control
         .hls_snn_enable          (hls_snn_enable),
         .hls_snn_reset           (hls_snn_reset),
@@ -435,6 +483,7 @@ module snn_core_group_top #(
     // All 2048 neurons are addressable
     assign rtl_spike_out_valid     = learn_spike_valid;
     assign rtl_spike_out_neuron_id = learn_spike_src_id;
+    assign rtl_learn_weight_ready  = LEARN_WEIGHT_BRIDGE_ENABLE ? learn_weight_ready_br : 1'b0;
 
     // Weight bridge: zero-extend if WEIGHT_WIDTH < HLS_WEIGHT_WIDTH, else direct
     generate
@@ -654,17 +703,17 @@ module snn_core_group_top #(
         .learn_spike_src_id (learn_spike_src_id),
         .learn_spike_ready  (learn_spike_ready),
 
-        // Learning weight update (tie off for now — HLS manages)
-        .learn_weight_valid     (1'b0),
-        .learn_weight_group     ({GROUP_ID_WIDTH{1'b0}}),
-        .learn_weight_src       ({LOCAL_ID_WIDTH{1'b0}}),
-        .learn_weight_dst       ({LOCAL_ID_WIDTH{1'b0}}),
-        .learn_weight_data      ({WEIGHT_WIDTH{1'b0}}),
-        .learn_weight_exc       (1'b0),
-        .learn_weight_is_inter  (1'b0),
-        .learn_weight_dst_group ({GROUP_ID_WIDTH{1'b0}}),
-        .learn_weight_fanout_idx({FANOUT_IDX_WIDTH{1'b0}}),
-        .learn_weight_ready     (/* unused */),
+        // Learning weight update (HLS -> Event Router bridge)
+        .learn_weight_valid     (learn_weight_valid_br),
+        .learn_weight_group     (learn_weight_group_br),
+        .learn_weight_src       (learn_weight_src_br),
+        .learn_weight_dst       (learn_weight_dst_br),
+        .learn_weight_data      (learn_weight_data_br),
+        .learn_weight_exc       (learn_weight_exc_br),
+        .learn_weight_is_inter  (learn_weight_is_inter_br),
+        .learn_weight_dst_group (learn_weight_dst_group_br),
+        .learn_weight_fanout_idx(learn_weight_fanout_idx_br),
+        .learn_weight_ready     (learn_weight_ready_br),
 
         // Connectivity table interface
         .ct_lookup_en       (ct_lookup_en),

@@ -4,19 +4,59 @@ Learning Algorithms for SNN
 Implements STDP (Spike-Timing Dependent Plasticity) and R-STDP (Reward-modulated STDP)
 learning algorithms for the FPGA SNN accelerator.
 
+Supports both legacy 2-D synapse maps and Phase 6.5 NeuronGroup-aware flat
+weight buffers via :func:`synapse_map_from_network`.
+
 Author: Jiwoon Lee (@metr0jw)
 Organization: Kwangwoon University, Seoul, South Korea
 Contact: jwlee@linux.com
 """
 
 import numpy as np
-from typing import List, Dict, Optional, Tuple, Callable
+from typing import List, Dict, Optional, Tuple, Callable, TYPE_CHECKING
 import time
 from dataclasses import dataclass
 from collections import defaultdict, deque
 
 from .spike_encoding import SpikeEvent
 from .utils import logger
+
+if TYPE_CHECKING:
+    from .network import CompiledNetwork
+
+
+def synapse_map_from_network(
+    compiled: "CompiledNetwork",
+    flat_weights: np.ndarray,
+) -> Dict[Tuple[int, int], float]:
+    """Build a synapse map ``{(pre, post): weight}`` from a compiled network.
+
+    This bridges the NeuronGroup-aware flat buffer world with the
+    learning engine's abstract synapse_map interface.
+
+    Parameters
+    ----------
+    compiled : CompiledNetwork
+        Compiled topology with connection offsets.
+    flat_weights : np.ndarray
+        1-D int8 flat weight buffer.
+
+    Returns
+    -------
+    dict
+        ``{(pre_global_id, post_global_id): float_weight}``
+    """
+    synapse_map: Dict[Tuple[int, int], float] = {}
+    for conn in compiled.connections:
+        for s in range(conn.src_size):
+            for d in range(conn.dst_size):
+                idx = conn.weight_offset + s * conn.dst_size + d
+                w = float(flat_weights[idx]) / 128.0  # int8 → [-1, 1)
+                if abs(w) > 1e-7:
+                    pre_id = conn.src_id_start + s
+                    post_id = conn.dst_id_start + d
+                    synapse_map[(pre_id, post_id)] = w
+    return synapse_map
 
 
 @dataclass

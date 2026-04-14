@@ -1,178 +1,47 @@
 """
-SNN FPGA Accelerator — Spike-Triggered Spiking Neural Network Library
+SNN FPGA Accelerator package entrypoint.
 
-A PyTorch-like library for building, training, and deploying SNNs on FPGAs.
-Supports surrogate gradient training and hardware-constrained learning.
-
-Terminology note: The FPGA hardware implements *spike-triggered gating* — neuron
-state updates are gated by incoming AER spike events via the spike_router.  The
-FPGA fabric is clock-synchronous (100 MHz), but computation is sparse: only
-neurons targeted by an arriving spike perform state updates in a given cycle.
-This is equivalent to the "event-driven" paradigm used in Loihi/TrueNorth
-literature but more precisely described as spike-triggered for FPGA implementations.
-
-Quick Start:
-    import snn_fpga_accelerator as snn
-    
-    # Build model (like PyTorch)
-    model = nn.Sequential(
-        snn.Linear(784, 256),
-        snn.LIF(),
-        snn.Linear(256, 10),
-        snn.LIF(),
-    )
-    
-    # Train with surrogate gradient
-    loss_fn = snn.loss.CrossEntropy()
-    optimizer = torch.optim.Adam(model.parameters())
-    trainer = snn.Trainer(model, optimizer, loss_fn)
-    trainer.fit(train_loader, epochs=10)
-    
-    # Deploy to FPGA
-    snn.deploy.export(model, 'weights.npz')
-    fpga = snn.PYNQ('snn.bit')
-    fpga.load_weights(model)
-    output = fpga.run(test_data)
-
-Author: Jiwoon Lee (@metr0jw)
-Organization: Kwangwoon University
-License: MIT
+This module intentionally keeps imports lightweight so that hardware-accurate
+simulation utilities can be used even when optional ML dependencies (PyTorch)
+are not installed.
 """
+
+from __future__ import annotations
+
+import importlib.util
+import warnings
 
 __version__ = "0.2.0"
 __author__ = "Jiwoon Lee"
 
-# =============================================================================
-# Core Imports - Neurons (like activation functions)
-# =============================================================================
-from .neuron import (
-    # Spiking neurons
-    LIF,              # Leaky Integrate-and-Fire (most common)
-    IF,               # Integrate-and-Fire (simpler)
-    ALIF,             # Adaptive LIF
-    PLIF,             # Parametric LIF (learnable tau/thresh)
-    Izhikevich,       # Biologically realistic
-    
-    # Surrogate gradients
-    FastSigmoid,      # Default, fast
-    ATan,             # Arctangent
-    SuperSpike,       # SuperSpike
-    SigmoidGrad,      # Sigmoid
-    PiecewiseLinear,  # PWL
-    get_surrogate,    # Get by name
-    
-    # Utilities
-    reset_neurons,    # Reset all neuron states
-    detach_states,    # Detach for TBPTT
-    set_hw_mode,      # Enable HW constraints
-    
-    # Base class
-    SpikingNeuron,
+
+def _raise_torch_missing(*_args, **_kwargs):
+    raise ImportError(
+        "PyTorch is required for this API. Install `torch` to use training/"
+        "neuron/layer/deploy interfaces."
+    )
+
+
+class _TorchUnavailable:
+    def __init__(self, *_args, **_kwargs):
+        _raise_torch_missing()
+
+
+_TORCH_AVAILABLE = importlib.util.find_spec("torch") is not None
+
+# ============================================================================
+# Always-available imports (no hard torch dependency)
+# ============================================================================
+from .network import (
+    NeuronGroup,
+    Synapses,
+    SNNNetwork,
+    CompiledNetwork,
+    ConnectionInfo,
+    create_mnist_network,
+    create_mnist_block_sparse_network,
 )
 
-# =============================================================================
-# Layers (like nn.Linear, nn.Conv2d)
-# =============================================================================
-from .layer import (
-    # Linear
-    Linear,           # FC layer with HW quantization
-    SLinear,          # Linear + LIF combined
-    
-    # Convolutional
-    Conv2d,           # Conv2d with HW quantization  
-    SConv2d,          # Conv2d + LIF combined
-    
-    # Pooling
-    AvgPool2d,
-    MaxPool2d,
-    
-    # Normalization
-    BatchNorm,
-    LayerNorm,
-    
-    # Recurrent
-    SRNN,             # Spiking RNN
-    SLSTM,            # Spiking LSTM-like
-    
-    # Containers
-    Sequential,       # nn.Sequential with reset()
-    SNN,              # Base class for SNN models
-    
-    # Regularization
-    Dropout,
-)
-
-# =============================================================================
-# Encoding/Decoding
-# =============================================================================
-from .encoder import (
-    # Encoders
-    Rate,             # Rate coding (spike prob = intensity)
-    Poisson,          # Poisson spike train
-    Latency,          # Time-to-first-spike
-    Temporal,         # Learnable temporal
-    Delta,            # Event-based (DVS-like)
-    Phase,            # Phase encoding
-    
-    # Decoders
-    RateDecoder,      # Sum spike counts
-    LatencyDecoder,   # First spike time
-    MaxDecoder,       # Argmax for classification
-    
-    # Aliases
-    RateEncoder,
-    PoissonEncoder,
-    LatencyEncoder,
-)
-
-# =============================================================================
-# Training
-# =============================================================================
-from .training import (
-    # Loss functions
-    CrossEntropy,     # CE on spike counts
-    MSE,              # MSE on spike rates
-    SpikeCount,       # Spike count regularizer
-    SpikeRate,        # Target spike rate loss
-    MemPotential,     # Membrane potential loss
-    
-    # STDP learning
-    STDP,             # Classic STDP
-    RSTDP,            # Reward-modulated STDP
-    STDPConfig,       # STDP parameters
-    
-    # Training utilities
-    Trainer,          # High-level trainer
-    accuracy,         # Accuracy metric
-)
-
-# =============================================================================
-# Deployment (submodule)
-# =============================================================================
-from . import deploy
-from .deploy import (
-    # Quantization
-    quantize,
-    dequantize,
-    calibrate,
-    
-    # Export
-    export,
-    export_onnx,
-    
-    # FPGA
-    PYNQ,
-    AXIInterface,
-    
-    # Config
-    gen_config,
-    NetworkConfig,
-    LayerConfig,
-)
-
-# =============================================================================
-# Hardware Simulation (submodule)
-# =============================================================================
 from . import hw_accurate_simulator as hw_sim
 from .hw_accurate_simulator import (
     HWAccurateLIFNeuron,
@@ -183,162 +52,328 @@ from .hw_accurate_simulator import (
     verify_lif_neuron,
     verify_stdp_engine,
     FixedPoint,
-    # Tau/leak_rate conversion utilities
     tau_to_leak_rate,
     leak_rate_to_tau,
     get_available_tau_values,
+    weight_index_flat,
 )
 
-# =============================================================================
-# SpykeTorch Compatibility (for Mozafari et al. style networks)
-# =============================================================================
-from .spyketorch_compat import (
-    # Filters
-    DoGKernel, GaborKernel, Filter,
-    # Transforms
-    Intensity2Latency, LateralIntensityInhibition,
-    # Functional
-    local_normalization, pointwise_inhibition, fire,
-    get_k_winners, pooling, pad,
-    # STDP Layer
-    STDPConvolution, STDP,
-    # Complete transforms
-    S1C1Transform, CacheDataset,
-)
-
-# SpykeTorch-like functional module
-from . import spyketorch_compat as sf
-
-# =============================================================================
-# Legacy/Compatibility (will be deprecated)
-# =============================================================================
-from .accelerator import SNNAccelerator
-from .xrt_backend import XRTBackend, RegisterMap  # Optional pyxrt path
 from .pytorch_interface import (
-    pytorch_to_snn, SNNLayer, SNNModel,
-    SpikingJellyConverter, convert_from_spikingjelly,
+    pytorch_to_snn,
+    SNNLayer,
+    SNNModel,
 )
-from .spike_encoding import SpikeEvent
-from .learning import STDPLearning, RSTDPLearning, LearningConfig
+from .spike_encoding import SpikeEvent, RateEncoder, PoissonEncoder, LatencyEncoder
+from .learning import STDPLearning, RSTDPLearning, LearningConfig, synapse_map_from_network
 from .utils import load_weights, save_weights, visualize_spikes
-
-# =============================================================================
-# Submodules
-# =============================================================================
-from . import neuron
-from . import layer
-from . import encoder
-from . import training
-
-# For loss functions as submodule
-class loss:
-    """Loss functions for SNN training."""
-    CrossEntropy = CrossEntropy
-    MSE = MSE
-    SpikeCount = SpikeCount
-    SpikeRate = SpikeRate
-    MemPotential = MemPotential
-
-# For surrogate gradients as submodule
-class surrogate:
-    """Surrogate gradient functions."""
-    fast_sigmoid = FastSigmoid
-    atan = ATan
-    super_spike = SuperSpike
-    sigmoid = SigmoidGrad
-    pwl = PiecewiseLinear
-    get = get_surrogate
-
-# =============================================================================
-# Functional API (like torch.nn.functional)
-# =============================================================================
-class functional:
-    """Functional API for spiking operations."""
-    
-    @staticmethod
-    def spike(mem, thresh: float = 1.0, surrogate: str = 'fast_sigmoid'):
-        """Generate spikes from membrane potential."""
-        spike_fn = get_surrogate(surrogate)
-        return spike_fn(mem, thresh)
-    
-    @staticmethod
-    def rate_encode(x, T: int = 100):
-        """Rate encode input to spikes."""
-        return Rate(T)(x)
-    
-    @staticmethod  
-    def rate_decode(spikes, dim: int = 1):
-        """Decode spike counts."""
-        return spikes.sum(dim=dim)
-
-F = functional  # Alias
+from .xrt_backend import XRTBackend, RegisterMap
+from .accelerator import SNNAccelerator
 
 
-# =============================================================================
-# All exports
-# =============================================================================
+# ============================================================================
+# Optional torch-backed APIs
+# ============================================================================
+if _TORCH_AVAILABLE:
+    from .neuron import (
+        LIF,
+        IF,
+        ALIF,
+        PLIF,
+        Izhikevich,
+        FastSigmoid,
+        ATan,
+        SuperSpike,
+        SigmoidGrad,
+        PiecewiseLinear,
+        get_surrogate,
+        reset_neurons,
+        detach_states,
+        set_hw_mode,
+        SpikingNeuron,
+    )
+    from .layer import (
+        Linear,
+        SLinear,
+        Conv2d,
+        SConv2d,
+        AvgPool2d,
+        MaxPool2d,
+        BatchNorm,
+        LayerNorm,
+        SRNN,
+        SLSTM,
+        Sequential,
+        SNN,
+        Dropout,
+    )
+    from .encoder import (
+        Rate,
+        Poisson,
+        Latency,
+        Temporal,
+        Delta,
+        Phase,
+        RateDecoder,
+        LatencyDecoder,
+        MaxDecoder,
+    )
+    from .training import (
+        CrossEntropy,
+        MSE,
+        SpikeCount,
+        SpikeRate,
+        MemPotential,
+        STDP,
+        RSTDP,
+        STDPConfig,
+        Trainer,
+        accuracy,
+    )
+    from . import deploy
+    from .deploy import (
+        quantize,
+        dequantize,
+        calibrate,
+        export,
+        export_onnx,
+        PYNQ,
+        AXIInterface,
+        gen_config,
+        NetworkConfig,
+        LayerConfig,
+    )
+    from .spyketorch_compat import (
+        DoGKernel,
+        GaborKernel,
+        Filter,
+        Intensity2Latency,
+        LateralIntensityInhibition,
+        local_normalization,
+        pointwise_inhibition,
+        fire,
+        get_k_winners,
+        pooling,
+        pad,
+        STDPConvolution,
+        S1C1Transform,
+        CacheDataset,
+    )
+    from . import spyketorch_compat as sf
+
+    class loss:
+        CrossEntropy = CrossEntropy
+        MSE = MSE
+        SpikeCount = SpikeCount
+        SpikeRate = SpikeRate
+        MemPotential = MemPotential
+
+    class surrogate:
+        fast_sigmoid = FastSigmoid
+        atan = ATan
+        super_spike = SuperSpike
+        sigmoid = SigmoidGrad
+        pwl = PiecewiseLinear
+        get = get_surrogate
+
+    class functional:
+        @staticmethod
+        def spike(mem, thresh: float = 1.0, surrogate: str = "fast_sigmoid"):
+            spike_fn = get_surrogate(surrogate)
+            return spike_fn(mem, thresh)
+
+        @staticmethod
+        def rate_encode(x, T: int = 100):
+            return Rate(T)(x)
+
+        @staticmethod
+        def rate_decode(spikes, dim: int = 1):
+            return spikes.sum(dim=dim)
+
+    F = functional
+else:
+    warnings.warn(
+        "PyTorch not found. Importing `snn_fpga_accelerator` in minimal mode; "
+        "torch-backed APIs are unavailable.",
+        RuntimeWarning,
+        stacklevel=1,
+    )
+
+    LIF = IF = ALIF = PLIF = Izhikevich = _TorchUnavailable
+    FastSigmoid = ATan = SuperSpike = SigmoidGrad = PiecewiseLinear = _TorchUnavailable
+    SpikingNeuron = _TorchUnavailable
+    reset_neurons = detach_states = set_hw_mode = _raise_torch_missing
+    get_surrogate = _raise_torch_missing
+
+    Linear = SLinear = Conv2d = SConv2d = AvgPool2d = MaxPool2d = _TorchUnavailable
+    BatchNorm = LayerNorm = SRNN = SLSTM = Sequential = SNN = Dropout = _TorchUnavailable
+
+    Rate = Poisson = Latency = Temporal = Delta = Phase = _TorchUnavailable
+    RateDecoder = LatencyDecoder = MaxDecoder = _TorchUnavailable
+
+    CrossEntropy = MSE = SpikeCount = SpikeRate = MemPotential = _TorchUnavailable
+    STDP = RSTDP = STDPConfig = Trainer = _TorchUnavailable
+
+    deploy = None
+    quantize = dequantize = calibrate = export = export_onnx = _raise_torch_missing
+    PYNQ = AXIInterface = gen_config = NetworkConfig = LayerConfig = _TorchUnavailable
+
+    DoGKernel = GaborKernel = Filter = Intensity2Latency = LateralIntensityInhibition = _TorchUnavailable
+    local_normalization = pointwise_inhibition = fire = get_k_winners = _raise_torch_missing
+    pooling = pad = _raise_torch_missing
+    STDPConvolution = S1C1Transform = CacheDataset = _TorchUnavailable
+    sf = None
+
+    def accuracy(*_args, **_kwargs):
+        _raise_torch_missing()
+
+    class loss:
+        CrossEntropy = _TorchUnavailable
+        MSE = _TorchUnavailable
+        SpikeCount = _TorchUnavailable
+        SpikeRate = _TorchUnavailable
+        MemPotential = _TorchUnavailable
+
+    class surrogate:
+        fast_sigmoid = staticmethod(_raise_torch_missing)
+        atan = staticmethod(_raise_torch_missing)
+        super_spike = staticmethod(_raise_torch_missing)
+        sigmoid = staticmethod(_raise_torch_missing)
+        pwl = staticmethod(_raise_torch_missing)
+        get = staticmethod(_raise_torch_missing)
+
+    class functional:
+        @staticmethod
+        def spike(*_args, **_kwargs):
+            _raise_torch_missing()
+
+        @staticmethod
+        def rate_encode(*_args, **_kwargs):
+            _raise_torch_missing()
+
+        @staticmethod
+        def rate_decode(*_args, **_kwargs):
+            _raise_torch_missing()
+
+    F = functional
+
+
 __all__ = [
-    # Version
-    '__version__',
-    '__author__',
-    
-    # Neurons
-    'LIF', 'IF', 'ALIF', 'PLIF', 'Izhikevich', 'SpikingNeuron',
-    
-    # Surrogate gradients
-    'FastSigmoid', 'ATan', 'SuperSpike', 'SigmoidGrad', 'PiecewiseLinear',
-    'get_surrogate', 'surrogate',
-    
-    # Neuron utilities
-    'reset_neurons', 'detach_states', 'set_hw_mode',
-    
-    # Layers
-    'Linear', 'SLinear', 'Conv2d', 'SConv2d',
-    'AvgPool2d', 'MaxPool2d', 'BatchNorm', 'LayerNorm',
-    'SRNN', 'SLSTM', 'Sequential', 'SNN', 'Dropout',
-    
-    # Encoding
-    'Rate', 'Poisson', 'Latency', 'Temporal', 'Delta', 'Phase',
-    'RateDecoder', 'LatencyDecoder', 'MaxDecoder',
-    'RateEncoder', 'PoissonEncoder', 'LatencyEncoder',
-    
-    # Training
-    'CrossEntropy', 'MSE', 'SpikeCount', 'SpikeRate', 'MemPotential',
-    'STDP', 'RSTDP', 'STDPConfig',
-    'Trainer', 'accuracy',
-    'loss',
-    
-    # Deployment
-    'deploy', 'quantize', 'dequantize', 'calibrate',
-    'export', 'export_onnx',
-    'PYNQ', 'AXIInterface',
-    'gen_config', 'NetworkConfig', 'LayerConfig',
-    
-    # Hardware simulation
-    'hw_sim',
-    'HWAccurateLIFNeuron', 'HWAccurateSTDPEngine', 'HWAccurateSNNSimulator',
-    'LIFNeuronParams', 'LIFNeuronState',
-    'verify_lif_neuron', 'verify_stdp_engine', 'FixedPoint',
-    'tau_to_leak_rate', 'leak_rate_to_tau', 'get_available_tau_values',
-    
-    # Submodules
-    'neuron', 'layer', 'encoder', 'training',
-    
-    # Functional
-    'functional', 'F',
-    
-    # SpykeTorch compatibility
-    'DoGKernel', 'GaborKernel', 'Filter',
-    'Intensity2Latency', 'LateralIntensityInhibition',
-    'local_normalization', 'pointwise_inhibition', 'fire',
-    'get_k_winners', 'pooling', 'pad',
-    'STDPConvolution', 'STDP',
-    'S1C1Transform', 'CacheDataset',
-    'sf',  # SpykeTorch-like functional module
-    
-    # Legacy (compatibility)
-    'SNNAccelerator', 'pytorch_to_snn', 'SNNLayer', 'SNNModel',
-    'SpikingJellyConverter', 'convert_from_spikingjelly',
-    'SpikeEvent', 'STDPLearning', 'RSTDPLearning', 'LearningConfig',
-    'load_weights', 'save_weights', 'visualize_spikes',
+    "__version__",
+    "__author__",
+    # Always available
+    "NeuronGroup",
+    "Synapses",
+    "SNNNetwork",
+    "CompiledNetwork",
+    "ConnectionInfo",
+    "create_mnist_network",
+    "create_mnist_block_sparse_network",
+    "hw_sim",
+    "HWAccurateLIFNeuron",
+    "HWAccurateSTDPEngine",
+    "HWAccurateSNNSimulator",
+    "LIFNeuronParams",
+    "LIFNeuronState",
+    "verify_lif_neuron",
+    "verify_stdp_engine",
+    "FixedPoint",
+    "tau_to_leak_rate",
+    "leak_rate_to_tau",
+    "get_available_tau_values",
+    "weight_index_flat",
+    "SpikeEvent",
+    "RateEncoder",
+    "PoissonEncoder",
+    "LatencyEncoder",
+    "STDPLearning",
+    "RSTDPLearning",
+    "LearningConfig",
+    "synapse_map_from_network",
+    "SNNAccelerator",
+    "XRTBackend",
+    "RegisterMap",
+    "pytorch_to_snn",
+    "SNNLayer",
+    "SNNModel",
+    "load_weights",
+    "save_weights",
+    "visualize_spikes",
+    # Torch-backed names (exposed as real APIs or placeholders)
+    "LIF",
+    "IF",
+    "ALIF",
+    "PLIF",
+    "Izhikevich",
+    "SpikingNeuron",
+    "FastSigmoid",
+    "ATan",
+    "SuperSpike",
+    "SigmoidGrad",
+    "PiecewiseLinear",
+    "get_surrogate",
+    "reset_neurons",
+    "detach_states",
+    "set_hw_mode",
+    "Linear",
+    "SLinear",
+    "Conv2d",
+    "SConv2d",
+    "AvgPool2d",
+    "MaxPool2d",
+    "BatchNorm",
+    "LayerNorm",
+    "SRNN",
+    "SLSTM",
+    "Sequential",
+    "SNN",
+    "Dropout",
+    "Rate",
+    "Poisson",
+    "Latency",
+    "Temporal",
+    "Delta",
+    "Phase",
+    "RateDecoder",
+    "LatencyDecoder",
+    "MaxDecoder",
+    "CrossEntropy",
+    "MSE",
+    "SpikeCount",
+    "SpikeRate",
+    "MemPotential",
+    "STDP",
+    "RSTDP",
+    "STDPConfig",
+    "Trainer",
+    "accuracy",
+    "loss",
+    "surrogate",
+    "functional",
+    "F",
+    "deploy",
+    "quantize",
+    "dequantize",
+    "calibrate",
+    "export",
+    "export_onnx",
+    "PYNQ",
+    "AXIInterface",
+    "gen_config",
+    "NetworkConfig",
+    "LayerConfig",
+    "DoGKernel",
+    "GaborKernel",
+    "Filter",
+    "Intensity2Latency",
+    "LateralIntensityInhibition",
+    "local_normalization",
+    "pointwise_inhibition",
+    "fire",
+    "get_k_winners",
+    "pooling",
+    "pad",
+    "STDPConvolution",
+    "S1C1Transform",
+    "CacheDataset",
+    "sf",
 ]

@@ -51,6 +51,13 @@ from .exceptions import (
     validate_parameter,
 )
 from .learning import RSTDPLearning, STDPLearning
+from .network import (
+    NeuronGroup,
+    Synapses,
+    SNNNetwork,
+    CompiledNetwork,
+    create_mnist_network,
+)
 from .pytorch_interface import SNNModel, simulate_snn_inference
 from .spike_encoding import SpikeEvent
 from .utils import logger, PerformanceMonitor
@@ -226,6 +233,10 @@ class SNNAccelerator:
         self.learning_engine: Optional[Union[STDPLearning, RSTDPLearning]] = None
         self.learning_enabled: bool = False
 
+        # NeuronGroup-aware flat weight buffer (Phase 6.5)
+        self._snn_network: Optional[SNNNetwork] = None
+        self._compiled_network: Optional[CompiledNetwork] = None
+
         # Performance monitoring
         self.spike_count = 0
         self.last_spike_time = 0.0
@@ -276,7 +287,10 @@ class SNNAccelerator:
         Maps Python encoder configuration to HLS register writes via XRT backend.
         
         Args:
-            encoding_type: Encoding method - "none", "rate_poisson", "latency", "delta_sigma"
+            encoding_type: Encoding method:
+                - "none": no on-chip encoding
+                - "delta_sigma": use on-chip HLS encoder
+                - "rate_poisson"/"latency": host-side encoding (for compatibility)
             num_steps: Total simulation timesteps (for rate/latency normalization)
             two_neuron_enable: Enable ON/OFF neuron polarity split (doubles channels)
             baseline: Baseline value for two-neuron encoding (default 128 for uint8)
@@ -302,19 +316,15 @@ class SNNAccelerator:
             ...     num_channels=784
             ... )
         """
-        # Encoding type mapping
-        enc_type_map = {
-            "none": 0,
-            "rate_poisson": 1,
-            "latency": 2,
-            "delta_sigma": 3
-        }
+        # Public API supports host-side aliases for backward compatibility.
+        # Hardware encoder itself currently supports only NONE(0)/DELTA_SIGMA(1).
+        valid_encodings = ["none", "rate_poisson", "latency", "delta_sigma"]
         
         # Validate encoding type
         try:
             validate_parameter(
                 encoding_type,
-                valid_options=list(enc_type_map.keys()),
+                valid_options=valid_encodings,
                 parameter_name="encoding_type"
             )
         except ValueError as e:
@@ -325,11 +335,9 @@ class SNNAccelerator:
                 error_code=4010
             ) from e
         
-        enc_type_code = enc_type_map[encoding_type]
+        hw_encoding_type = 1 if encoding_type == "delta_sigma" else 0
         
         # Extract encoder parameters with defaults
-        rate_scale = encoder_params.get('rate_scale', 256)
-        latency_window = encoder_params.get('latency_window', num_steps)
         delta_threshold = encoder_params.get('delta_threshold', 1000)
         delta_decay = encoder_params.get('delta_decay', 10)
         num_channels = encoder_params.get('num_channels', 784)
@@ -337,13 +345,14 @@ class SNNAccelerator:
         
         # Configure via XRT if available
         if self.use_xrt and self._xrt_backend is not None:
+            if encoding_type in ("rate_poisson", "latency"):
+                logger.warning(
+                    "XRT on-chip encoder supports only none/delta_sigma. "
+                    "%s is treated as host-side encoding (HW encoder disabled).",
+                    encoding_type,
+                )
             self._xrt_backend.set_encoder_config(
-                encoding_type=enc_type_code,
-                two_neuron_enable=two_neuron_enable,
-                baseline=baseline,
-                num_steps=num_steps,
-                rate_scale=rate_scale,
-                latency_window=latency_window,
+                encoding_type=hw_encoding_type,
                 delta_threshold=delta_threshold,
                 delta_decay=delta_decay,
                 num_channels=num_channels,
@@ -351,7 +360,7 @@ class SNNAccelerator:
             )
             logger.info(
                 f"Configured on-chip encoder: type={encoding_type}, "
-                f"num_steps={num_steps}, two_neuron={two_neuron_enable}, "
+                f"num_steps={num_steps}, two_neuron={two_neuron_enable} (host), "
                 f"channels={num_channels}"
             )
         elif self._hardware_backend is not None:
@@ -377,10 +386,14 @@ class SNNAccelerator:
         Args:
             duration: Simulation duration in seconds
             input_spikes: List of input spike events
-            encoding_type: 0=NONE, 1=RATE_POISSON, 2=LATENCY, 3=DELTA_SIGMA
+            encoding_type: hardware encoder selector.
+                - 0: NONE
+                - 1: DELTA_SIGMA
+                - 2/3: legacy values (mapped for compatibility)
             two_neuron_enable: Enable ON/OFF neuron polarity split
             baseline: Baseline value for two-neuron encoding (default 128)
-            encoder_params: Optional dict with rate_scale, latency_window, delta_threshold, etc.
+            encoder_params: Optional dict with delta_threshold, delta_decay,
+                num_channels, default_weight.
         """
         if self._xrt_backend is None:
             raise RuntimeError("XRT backend not configured")
@@ -390,8 +403,21 @@ class SNNAccelerator:
         logger.info("Running XRT simulation: duration=%.3fs, time_steps=%d, encoding=%d, two_neuron=%s",
                    duration, time_steps, encoding_type, two_neuron_enable)
         
+        # Backward-compatible mapping: old callers used
+        # 0=NONE, 1=RATE_POISSON, 2=LATENCY, 3=DELTA_SIGMA.
+        hw_encoding_type = int(encoding_type)
+        if hw_encoding_type == 3:
+            hw_encoding_type = 1
+        elif hw_encoding_type in (1, 2):
+            logger.warning(
+                "Legacy encoding_type=%d maps to host-side encoding. "
+                "Hardware encoder is disabled (NONE).",
+                int(encoding_type),
+            )
+            hw_encoding_type = 0
+
         # Set control registers
-        encoder_enable = (encoding_type != 0)  # Enable encoder for non-NONE types
+        encoder_enable = (hw_encoding_type == 1)
         self._xrt_backend.set_mode(mode=0, encoder_enable=encoder_enable)  # MODE_INFERENCE
         self._xrt_backend.set_time_steps(time_steps)
         
@@ -399,12 +425,7 @@ class SNNAccelerator:
         if encoder_enable:
             params = encoder_params or {}
             self._xrt_backend.set_encoder_config(
-                encoding_type=encoding_type,
-                two_neuron_enable=two_neuron_enable,
-                baseline=baseline,
-                num_steps=time_steps,  # Pass total timesteps to encoder
-                rate_scale=params.get('rate_scale', 256),
-                latency_window=params.get('latency_window', 100),
+                encoding_type=1,
                 delta_threshold=params.get('delta_threshold', 1000),
                 delta_decay=params.get('delta_decay', 10),
                 num_channels=params.get('num_channels', 784),
@@ -607,6 +628,130 @@ class SNNAccelerator:
         dma.sendchannel.transfer(weight_buffer)  # type: ignore[attr-defined]
         dma.sendchannel.wait()  # type: ignore[attr-defined]
         logger.info("Uploaded %d weights to FPGA DMA", weights.size)
+
+    # ------------------------------------------------------------------
+    # NeuronGroup-aware weight API  (Phase 6.5 flat buffer)
+    # ------------------------------------------------------------------
+
+    def configure_from_network(
+        self,
+        network: SNNNetwork,
+        weight_dict: Optional[Dict[str, np.ndarray]] = None,
+    ) -> CompiledNetwork:
+        """Configure accelerator from a NeuronGroup-based network topology.
+
+        Parameters
+        ----------
+        network:
+            An :class:`SNNNetwork` with groups and synapses defined.
+        weight_dict:
+            Optional per-connection weight matrices keyed by connection name.
+            If ``None``, weights must be loaded separately via
+            :meth:`load_flat_weights`.
+
+        Returns
+        -------
+        CompiledNetwork
+            The compiled topology (flat buffer layout, offsets, etc.).
+        """
+        self._snn_network = network
+        compiled = network.compile()
+        self._compiled_network = compiled
+
+        self.num_neurons = compiled.total_logical_neurons
+        self.network_topology = {
+            "type": "neuron_group",
+            "groups": len(compiled.groups),
+            "connections": len(compiled.connections),
+            "buffer_size": compiled.max_weight_buffer_size,
+        }
+
+        # Validate against HW constants if available
+        errors = compiled.validate_against_hardware()
+        if errors:
+            logger.warning("Network/HW mismatch: %s", "; ".join(errors))
+
+        if weight_dict is not None:
+            flat = compiled.pack_weights(weight_dict)
+            self.load_flat_weights(flat)
+
+        logger.info(
+            "Configured NeuronGroup network: %d groups, %d connections, "
+            "%d neurons, %d weight buffer",
+            len(compiled.groups),
+            len(compiled.connections),
+            compiled.total_logical_neurons,
+            compiled.max_weight_buffer_size,
+        )
+        return compiled
+
+    def load_flat_weights(self, flat_weights: np.ndarray) -> None:
+        """Upload a pre-packed flat weight buffer to FPGA.
+
+        The buffer must be int8 with length == compiled_network.max_weight_buffer_size.
+        This maps directly to the HLS ``weight_memory[MAX_WEIGHT_BUFFER_SIZE]``.
+
+        Parameters
+        ----------
+        flat_weights:
+            1-D int8 array of packed weights.
+        """
+        flat = np.asarray(flat_weights, dtype=np.int8).ravel()
+        if self._compiled_network is not None:
+            expected = self._compiled_network.max_weight_buffer_size
+            if flat.size != expected:
+                raise WeightLoadError(
+                    f"Flat weight buffer size {flat.size} != expected {expected}",
+                    weight_shape=flat.shape,
+                    error_code=3020,
+                )
+        self._load_weights_raw_flat(flat)
+
+    def read_flat_weights(self) -> Optional[Dict[str, np.ndarray]]:
+        """Read weights from FPGA and unpack per connection.
+
+        Returns
+        -------
+        dict or None
+            ``{connection_name: np.ndarray}`` or ``None`` if no compiled network.
+        """
+        if self._compiled_network is None:
+            logger.warning("No compiled network – cannot unpack flat weights")
+            return None
+        # Placeholder: actual HW readback via checkpoint or AXI
+        logger.warning("Hardware weight readback not yet implemented")
+        return None
+
+    def _load_weights_raw_flat(self, flat: np.ndarray) -> None:
+        """Low-level upload of a flat int8 buffer via DMA or XRT."""
+        if self.simulation_mode:
+            logger.debug("Simulation mode: skipping flat weight upload (%d entries)", flat.size)
+            return
+
+        if self.use_xrt and self._xrt_backend is not None:
+            try:
+                # XRT expects uint8 range [0,255]
+                flat_u8 = (flat.astype(np.int16) + 128).clip(0, 255).astype(np.uint8)
+                self._xrt_backend.load_weights(flat_u8)
+                logger.info("Uploaded %d flat weights via XRT", flat.size)
+                return
+            except Exception as e:
+                raise WeightLoadError(
+                    f"XRT flat weight upload failed: {e}",
+                    weight_shape=flat.shape,
+                    error_code=3021,
+                ) from e
+
+        if self._hardware_backend is None or self._hardware_backend.dma is None:
+            raise RuntimeError("Hardware DMA engine not initialised")
+
+        dma = self._hardware_backend.dma
+        weight_buffer = allocate(shape=(flat.size,), dtype=np.int8)  # type: ignore[arg-type]
+        weight_buffer[:] = flat
+        dma.sendchannel.transfer(weight_buffer)  # type: ignore[attr-defined]
+        dma.sendchannel.wait()  # type: ignore[attr-defined]
+        logger.info("Uploaded %d flat weights to FPGA DMA", flat.size)
+
     
     def send_spike_event(self, neuron_id: int, timestamp: float, weight: float = 1.0) -> None:
         """
@@ -814,6 +959,28 @@ class SNNAccelerator:
         rates = self._spike_events_to_rates(output_events, duration)
         return rates
 
+    def forward(
+        self,
+        x: Union[List[SpikeEvent], Sequence[SpikeEvent], np.ndarray],
+        duration: Optional[float] = None,
+        return_events: bool = False,
+    ) -> Union[List[SpikeEvent], np.ndarray]:
+        """PyTorch-like forward alias for ``infer``.
+
+        This keeps user experience aligned with ``model.forward(x)`` /
+        ``model(x)`` patterns used in PyTorch-based SNN libraries.
+        """
+        return self.infer(x, duration=duration, return_events=return_events)
+
+    def __call__(
+        self,
+        x: Union[List[SpikeEvent], Sequence[SpikeEvent], np.ndarray],
+        duration: Optional[float] = None,
+        return_events: bool = False,
+    ) -> Union[List[SpikeEvent], np.ndarray]:
+        """Callable alias for ``forward``."""
+        return self.forward(x, duration=duration, return_events=return_events)
+
     def reset_state(self) -> None:
         """Set the step mode for inference.
         
@@ -917,23 +1084,60 @@ class SNNAccelerator:
         logger.info("Hardware weight verification not yet implemented, assuming success")
         return True
     
-    def set_learning_parameters(self, learning_rate: float, stdp_window: float) -> None:
-        """Configure STDP learning parameters."""
+    def set_learning_parameters(
+        self,
+        learning_rate: float,
+        stdp_window: float,
+        a_plus: float = 0.1,
+        a_minus: float = 0.12,
+        tau_plus: int = 20,
+        tau_minus: int = 20,
+        rstdp_enable: bool = False,
+        trace_decay: float = 0.125,
+        reward_scale: float = 1.0,
+    ) -> None:
+        """Configure STDP/R-STDP parameters for hardware execution.
+
+        In XRT mode this writes the packed `learning_params_t` AXI-Lite words
+        at 0x30..0x40 (matching HLS control interface).
+        """
         if self.simulation_mode:
             logger.debug(
                 "Simulation mode: skipping hardware learning parameter configuration"
             )
             return
 
+        if self.use_xrt and self._xrt_backend is not None:
+            self._xrt_backend.set_learning_params(
+                a_plus=a_plus,
+                a_minus=a_minus,
+                tau_plus=int(tau_plus),
+                tau_minus=int(tau_minus),
+                stdp_window=int(round(stdp_window)),
+                learning_rate=learning_rate,
+                rstdp_enable=rstdp_enable,
+                trace_decay=trace_decay,
+                reward_scale=reward_scale,
+            )
+            logger.info(
+                "Learning params set (XRT): lr=%s, window=%s, a+=%s, a-=%s, rstdp=%s",
+                learning_rate, stdp_window, a_plus, a_minus, rstdp_enable
+            )
+            return
+
         if self._hardware_backend is None or self._hardware_backend.ip is None:
             raise RuntimeError("Hardware backend not initialised")
 
-        lr_fixed = int(learning_rate * 1024)
-        window_fixed = int(stdp_window * 1e6)
+        # Legacy fallback path for non-XRT overlays using old custom register map.
+        lr_fixed = int(round(learning_rate * 1024))
+        window_fixed = int(round(stdp_window))
         ip = self._hardware_backend.ip
         ip.write(0x200, lr_fixed)
         ip.write(0x204, window_fixed)
-        logger.info("Learning parameters set: lr=%s, window=%ss", learning_rate, stdp_window)
+        logger.warning(
+            "Learning params written via legacy map (0x200/0x204). "
+            "Use XRT backend for full learning_params_t support."
+        )
     
     def get_performance_stats(self) -> Dict:
         """Get performance statistics from the accelerator."""

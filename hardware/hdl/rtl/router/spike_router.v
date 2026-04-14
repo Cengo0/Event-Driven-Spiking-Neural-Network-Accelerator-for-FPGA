@@ -43,9 +43,15 @@ module spike_router #(
     input  wire                         m_spike_ready,
     
     // Configuration interface (from AXI)
+    // Read path: config_addr -> config_readdata
+    // Write path: either legacy config_we/config_addr/config_data OR
+    //             queued config_cmd_valid/config_cmd_addr/config_cmd_data.
     input  wire                         config_we,
     input  wire [31:0]                  config_addr,
     input  wire [31:0]                  config_data,
+    input  wire                         config_cmd_valid,
+    input  wire [31:0]                  config_cmd_addr,
+    input  wire [31:0]                  config_cmd_data,
     output reg  [31:0]                  config_readdata,
     
     // Status
@@ -58,6 +64,11 @@ module spike_router #(
     // Upper bits reserved for future expansion
     wire unused_addr_bits_valid = |config_addr[23:12];  // Will be optimized away
     wire unused_data_bits_valid = |config_data[31:24];  // Will be optimized away
+
+    // Queued command path has priority over legacy direct write path.
+    wire        cfg_wr_en   = config_cmd_valid | config_we;
+    wire [31:0] cfg_wr_addr = config_cmd_valid ? config_cmd_addr : config_addr;
+    wire [31:0] cfg_wr_data = config_cmd_valid ? config_cmd_data : config_data;
 
     // State machine states
     localparam IDLE         = 3'd0;
@@ -73,6 +84,21 @@ module spike_router #(
     // Format: [valid(1), exc/inh(1), weight(8), delay(8), dest_id(NEURON_ID_WIDTH)]
     // Total width = 18 + NEURON_ID_WIDTH bits
     localparam CONN_WIDTH = 18 + NEURON_ID_WIDTH;
+    localparam CONN_DEPTH = NUM_NEURONS * MAX_FANOUT;
+    localparam CONN_ADDR_WIDTH = (CONN_DEPTH <= 2) ? 1 :
+                                 (CONN_DEPTH <= 4) ? 2 :
+                                 (CONN_DEPTH <= 8) ? 3 :
+                                 (CONN_DEPTH <= 16) ? 4 :
+                                 (CONN_DEPTH <= 32) ? 5 :
+                                 (CONN_DEPTH <= 64) ? 6 :
+                                 (CONN_DEPTH <= 128) ? 7 :
+                                 (CONN_DEPTH <= 256) ? 8 :
+                                 (CONN_DEPTH <= 512) ? 9 :
+                                 (CONN_DEPTH <= 1024) ? 10 :
+                                 (CONN_DEPTH <= 2048) ? 11 :
+                                 (CONN_DEPTH <= 4096) ? 12 :
+                                 (CONN_DEPTH <= 8192) ? 13 :
+                                 (CONN_DEPTH <= 16384) ? 14 : 15;
 
     //-------------------------------------------------------------------------
     // Connection memory: True Dual-Port BRAM inference pattern
@@ -80,23 +106,27 @@ module spike_router #(
     //   Port B: data-path read (operational fetches)
     // 1024 neurons * 32 fanout * 28 bits = 917 Kbit = ~32 BRAM18K
     //-------------------------------------------------------------------------
-    (* ram_style = "block" *) reg [CONN_WIDTH-1:0] conn_memory [0:(NUM_NEURONS * MAX_FANOUT)-1];
+    (* ram_style = "block" *) reg [CONN_WIDTH-1:0] conn_memory [0:CONN_DEPTH-1];
 
-    // Port A registered output (config readback)
-    reg [CONN_WIDTH-1:0] conn_mem_dout_a;
-    // Port B registered output (data-path fetch)
+    // Port B registered output (data-path fetch / config readback when idle)
     reg [CONN_WIDTH-1:0] conn_mem_dout_b;
+
+    // Connection count per neuron.
+    // This array has concurrent config read + datapath read + write, so
+    // synthesis maps it to distributed RAM on xc7z020.
+    (* ram_style = "distributed" *) reg [7:0] conn_count [0:NUM_NEURONS-1];
 
     // Initialize connection memory to 0 (for simulation)
     integer init_idx;
+    integer init_cc_idx;
     initial begin
-        for (init_idx = 0; init_idx < NUM_NEURONS * MAX_FANOUT; init_idx = init_idx + 1) begin
+        for (init_idx = 0; init_idx < CONN_DEPTH; init_idx = init_idx + 1) begin
             conn_memory[init_idx] = {CONN_WIDTH{1'b0}};
         end
+        for (init_cc_idx = 0; init_cc_idx < NUM_NEURONS; init_cc_idx = init_cc_idx + 1) begin
+            conn_count[init_cc_idx] = 8'd0;
+        end
     end
-
-    // Connection count per neuron (small enough for LUTRAM: 1024 * 8 = 8 Kbit)
-    reg [7:0] conn_count [0:NUM_NEURONS-1];
     
     // Spike event FIFO
     wire fifo_wr_en, fifo_rd_en;
@@ -166,24 +196,32 @@ module spike_router #(
     //   Port B: data-path read only   (always block B)
     //-------------------------------------------------------------------------
 
-    // Port A — config write + config readback
+    wire [CONN_ADDR_WIDTH-1:0] cfg_wr_conn_addr = cfg_wr_addr[CONN_ADDR_WIDTH-1:0];
+    wire [CONN_ADDR_WIDTH-1:0] cfg_rd_conn_addr = config_addr[CONN_ADDR_WIDTH-1:0];
+
+    // Port A — config write only.
+    // Port-A readback is intentionally removed to avoid extra BRAM read-port pressure.
     always @(posedge clk) begin
-        if (config_we && config_addr[31:24] == 8'h00) begin
-            conn_memory[config_addr[15:0]] <= config_data[CONN_WIDTH-1:0];
+        if (cfg_wr_en && cfg_wr_addr[31:24] == 8'h00) begin
+            conn_memory[cfg_wr_conn_addr] <= cfg_wr_data[CONN_WIDTH-1:0];
         end
-        conn_mem_dout_a <= conn_memory[config_addr[15:0]];
     end
 
     // Port B — data-path read (FETCH_CONN)
     // Combinational address mux — address set in state BEFORE read is needed
-    reg [15:0] conn_rd_addr_b;
+    reg [CONN_ADDR_WIDTH-1:0] conn_rd_addr_b;
     always @(*) begin
-        case (state)
-            IDLE:      conn_rd_addr_b = fifo_spike_id * MAX_FANOUT;        // prep for FETCH after WAIT_FIFO
-            WAIT_FIFO: conn_rd_addr_b = fifo_spike_id * MAX_FANOUT;        // read first connection
-            NEXT_CONN: conn_rd_addr_b = current_neuron * MAX_FANOUT + conn_index + 1'b1; // read next connection
-            default:   conn_rd_addr_b = current_neuron * MAX_FANOUT + conn_index;
-        endcase
+        // Reuse Port-B for config readback only when router is fully idle.
+        if ((state == IDLE) && fifo_empty && (config_addr[31:24] == 8'h00)) begin
+            conn_rd_addr_b = cfg_rd_conn_addr;
+        end else begin
+            case (state)
+                IDLE:      conn_rd_addr_b = fifo_spike_id * MAX_FANOUT;        // prep for FETCH after WAIT_FIFO
+                WAIT_FIFO: conn_rd_addr_b = fifo_spike_id * MAX_FANOUT;        // read first connection
+                NEXT_CONN: conn_rd_addr_b = current_neuron * MAX_FANOUT + conn_index + 1'b1; // read next connection
+                default:   conn_rd_addr_b = current_neuron * MAX_FANOUT + conn_index;
+            endcase
+        end
     end
     always @(posedge clk) begin
         conn_mem_dout_b <= conn_memory[conn_rd_addr_b];
@@ -191,20 +229,37 @@ module spike_router #(
 
     // conn_count: direct access (small LUTRAM, 8 Kbit)
     //   Write: config interface
-    //   Read: state machine (WAIT_FIFO) + config readback
+    //   Read-A: config readback
+    //   Read-B: state-machine datapath (registered to break long FIFO->mux paths)
     reg [7:0] conn_count_dout_a;
+    (* keep = "true" *) reg [7:0] conn_count_dout_b;
+    (* keep = "true" *) reg [NEURON_ID_WIDTH-1:0] conn_count_rd_addr_b;
 
     // Config write + readback for conn_count
-    integer i;
     always @(posedge clk) begin
         if (!rst_n) begin
-            for (i = 0; i < NUM_NEURONS; i = i + 1) begin
-                conn_count[i] <= 8'd0;
-            end
-        end else if (config_we && config_addr[31:24] == 8'h01) begin
-            conn_count[config_addr[NEURON_ID_WIDTH-1:0]] <= config_data[7:0];
+            conn_count_dout_a <= 8'd0;
+        end else if (cfg_wr_en && cfg_wr_addr[31:24] == 8'h01) begin
+            conn_count[cfg_wr_addr[NEURON_ID_WIDTH-1:0]] <= cfg_wr_data[7:0];
+            conn_count_dout_a <= conn_count[cfg_wr_addr[NEURON_ID_WIDTH-1:0]];
+        end else begin
+            conn_count_dout_a <= conn_count[config_addr[NEURON_ID_WIDTH-1:0]];
         end
-        conn_count_dout_a <= conn_count[config_addr[NEURON_ID_WIDTH-1:0]];
+    end
+
+    // Datapath read port (registered address + registered output).
+    // This adds an explicit pipeline boundary so FIFO rd_data does not
+    // directly feed the wide conn_count mux cone in the same cycle.
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            conn_count_rd_addr_b <= {NEURON_ID_WIDTH{1'b0}};
+            conn_count_dout_b <= 8'd0;
+        end else begin
+            if (state == WAIT_FIFO) begin
+                conn_count_rd_addr_b <= fifo_spike_id;
+            end
+            conn_count_dout_b <= conn_count[conn_count_rd_addr_b];
+        end
     end
 
     //-------------------------------------------------------------------------
@@ -282,15 +337,19 @@ module spike_router #(
                 end
                 
                 WAIT_FIFO: begin
-                    // FIFO data valid, capture it; direct sync read of conn_count
+                    // FIFO data valid, capture it
                     current_neuron <= fifo_spike_id;
                     spike_timestamp <= fifo_timestamp;
-                    current_conn_count <= conn_count[fifo_spike_id];
                 end
                 
                 FETCH_CONN: begin
-                    // Port B BRAM read result available in conn_mem_dout_b
+                    // Port-B reads are registered and become available here.
                     current_conn <= conn_mem_dout_b;
+                end
+
+                CHECK_DELAY: begin
+                    // conn_count_dout_b corresponds to registered current_neuron.
+                    current_conn_count <= conn_count_dout_b;
                 end
                 
                 ROUTE_SPIKE: begin
@@ -324,7 +383,7 @@ module spike_router #(
         if (!rst_n) begin
             spike_counter <= 32'd0;
         end else begin
-            if (config_we && config_addr[31:24] == 8'h02 && config_data[0]) begin
+            if (cfg_wr_en && cfg_wr_addr[31:24] == 8'h02 && cfg_wr_data[0]) begin
                 spike_counter <= 32'd0;
             end else if (spike_counter_inc) begin
                 spike_counter <= spike_counter + 1'b1;
@@ -338,7 +397,7 @@ module spike_router #(
             config_readdata <= 32'd0;
         end else begin
             case (config_addr[31:24])
-                8'h00: config_readdata <= {{(32-CONN_WIDTH){1'b0}}, conn_mem_dout_a};
+                8'h00: config_readdata <= {{(32-CONN_WIDTH){1'b0}}, conn_mem_dout_b};
                 8'h01: config_readdata <= {24'd0, conn_count_dout_a};
                 8'h10: config_readdata <= spike_counter;
                 8'h11: config_readdata <= {31'd0, fifo_overflow};

@@ -874,42 +874,10 @@ class CPUvsSNNComparator:
 
 class SpikingJellyConverter:
     """
-    Convert SpikingJelly SNN models to SNNModel for FPGA deployment.
+    Deprecated placeholder.
 
-    Supports both the new ``activation_based`` API (≥0.0.0.0.14) and the
-    legacy ``clock_driven`` API.  The converter extracts Linear layers and LIF
-    neuron parameters and produces an :class:`SNNModel` whose layers can be
-    directly loaded to the FPGA via the existing deployment pipeline.
-
-    Example (activation_based API)::
-
-        import spikingjelly.activation_based.layer as sjl
-        import spikingjelly.activation_based.neuron as sjn
-
-        class MNISTNet(nn.Module):
-            def __init__(self):
-                super().__init__()
-                self.flat  = sjl.Flatten()
-                self.fc1   = sjl.Linear(784, 150)
-                self.lif1  = sjn.LIFNode(tau=2.0, v_threshold=1.0)
-            def forward(self, x):
-                x = self.flat(x)
-                x = self.fc1(x)
-                x = self.lif1(x)
-                return x
-
-        converter = SpikingJellyConverter(
-            weight_scale=127,
-            default_threshold_hw=6350,
-        )
-        snn_model = converter.convert(net, input_shape=(784,))
-
-    Hardware mapping
-    ----------------
-    - ``Linear.weight`` → int8 weights (scaled by *weight_scale*, clipped to [-127, 127])
-    - ``LIFNode.tau``   → HW leak_rate = round(256 / tau)  (8-bit fraction of decay)
-    - ``LIFNode.v_threshold`` → HW threshold (scaled by *hw_threshold_scale*)
-    - If no LIF found after a Linear layer, default params are used.
+    SpikingJelly auto-conversion is removed from the supported workflow.
+    Use native training + ``pytorch_to_snn`` export path instead.
     """
 
     def __init__(
@@ -935,11 +903,10 @@ class SpikingJellyConverter:
             Scale factor to convert LIF v_threshold (float) to HW threshold (int).
             ``hw_threshold = round(v_threshold * hw_threshold_scale)``
         """
-        self.weight_scale = weight_scale
-        self.default_threshold_hw = default_threshold_hw
-        self.default_leak_rate = default_leak_rate
-        self.default_refrac = default_refrac
-        self.hw_threshold_scale = hw_threshold_scale
+        raise RuntimeError(
+            "SpikingJelly auto-conversion has been removed. "
+            "Use native training modules and export with pytorch_to_snn()."
+        )
 
     # ------------------------------------------------------------------
     # Public API
@@ -951,104 +918,10 @@ class SpikingJellyConverter:
         input_shape: Tuple[int, ...],
         model_name: str = "spikingjelly_model",
     ) -> "SNNModel":
-        """
-        Convert a SpikingJelly model to :class:`SNNModel`.
-
-        Parameters
-        ----------
-        sj_model : nn.Module
-            Trained SpikingJelly model.
-        input_shape : tuple
-            Input feature shape (no batch dimension), e.g. ``(784,)`` for MNIST.
-        model_name : str
-            Name for the resulting :class:`SNNModel`.
-
-        Returns
-        -------
-        SNNModel
-            Hardware-ready model with int8 weights and mapped neuron parameters.
-        """
-        if torch is None or nn is None:
-            raise RuntimeError(
-                "PyTorch is required for SpikingJelly conversion. "
-                "Install with: pip install torch"
-            )
-        try:
-            import spikingjelly  # type: ignore[import]
-        except ImportError as exc:
-            raise ImportError(
-                "SpikingJelly is required.  Install with:\n"
-                "  pip install spikingjelly"
-            ) from exc
-
-        sj_model.eval()
-        snn_model = SNNModel(name=model_name)
-
-        # --- Collect (linear_module, lif_module_or_None) pairs ---
-        pairs = self._extract_layer_pairs(sj_model)
-
-        if not pairs:
-            raise ValueError(
-                "No Linear layers found in the SpikingJelly model. "
-                "Ensure the model contains nn.Linear or "
-                "spikingjelly.activation_based.layer.Linear layers."
-            )
-
-        current_size = input_shape[0] if len(input_shape) == 1 else int(np.prod(input_shape))
-
-        for linear_mod, lif_mod in pairs:
-            out_size = linear_mod.out_features
-
-            # --- Build SNNLayer ---
-            snn_layer = SNNLayer(
-                input_size=current_size,
-                output_size=out_size,
-                layer_type="fully_connected",
-            )
-
-            # --- Convert weights ---
-            W = linear_mod.weight.detach().cpu().float().numpy()
-            b = (
-                linear_mod.bias.detach().cpu().float().numpy()
-                if linear_mod.bias is not None
-                else None
-            )
-            W_int8 = np.clip(np.round(W * self.weight_scale), -127, 127).astype(np.int8)
-            b_int8 = (
-                np.clip(np.round(b * self.weight_scale), -127, 127).astype(np.int8)
-                if b is not None
-                else None
-            )
-            snn_layer.set_weights(W_int8.astype(np.float32), b_int8.astype(np.float32) if b_int8 is not None else None)
-
-            # --- Map neuron parameters ---
-            if lif_mod is not None:
-                tau, v_thresh, refrac = self._extract_lif_params(lif_mod)
-                hw_thresh = int(round(v_thresh * self.hw_threshold_scale))
-                # Hardware leak_rate ≈ 256/tau  (fraction of potential lost per step)
-                hw_leak = max(1, int(round(256.0 / tau)))
-            else:
-                hw_thresh = self.default_threshold_hw
-                hw_leak = self.default_leak_rate
-                refrac = self.default_refrac
-
-            snn_layer.set_neuron_parameters(
-                threshold=hw_thresh,
-                leak_rate=hw_leak,
-                refractory_period=refrac,
-            )
-            snn_layer.layer_config["hw_threshold"] = hw_thresh
-            snn_layer.layer_config["hw_leak_rate"] = hw_leak
-
-            snn_model.add_layer(snn_layer)
-            current_size = out_size
-
-        logger.info(
-            "SpikingJelly conversion complete: %d layer(s), %d total neurons",
-            len(snn_model.layers),
-            snn_model.total_neurons,
+        raise RuntimeError(
+            "SpikingJelly auto-conversion has been removed. "
+            "Use native training modules and export with pytorch_to_snn()."
         )
-        return snn_model
 
     @staticmethod
     def from_numpy_stdp(
@@ -1215,75 +1088,10 @@ def convert_from_spikingjelly(
     hw_threshold_scale: float = 6350.0,
     model_name: str = "spikingjelly_model",
 ) -> SNNModel:
-    """
-    One-shot conversion of a SpikingJelly model to :class:`SNNModel`.
-
-    This is the recommended entry-point for paper demonstrations.  It wraps
-    :class:`SpikingJellyConverter` with sensible defaults for our PYNQ-Z2
-    hardware (int8 weights, HW threshold ~6350, leak_rate=3).
-
-    Parameters
-    ----------
-    sj_model : nn.Module
-        Trained SpikingJelly (activation_based or clock_driven) model.
-    input_shape : tuple
-        Input shape excluding batch, e.g. ``(784,)`` for flattened MNIST.
-    weight_scale : float
-        Float → int8 weight scaling factor (default 127 maps [0,1] → [0,127]).
-    default_threshold_hw : int
-        HW threshold when no LIF v_threshold is available (default 6350).
-    default_leak_rate : int
-        HW leak rate when no LIF tau is available (default 3).
-    hw_threshold_scale : float
-        Maps ``v_threshold`` (float) → HW int threshold.
-    model_name : str
-        Name tag for the resulting :class:`SNNModel`.
-
-    Returns
-    -------
-    SNNModel
-        Ready-to-deploy model.  Use with the FPGA controller::
-
-            snn = convert_from_spikingjelly(net, (784,))
-            layer = snn.layers[0]
-            print(f"Weights: {layer.weights.shape}, HW thresh: "
-                  f"{layer.layer_config['hw_threshold']}")
-
-    Example
-    -------
-    ::
-
-        # Train with SpikingJelly
-        import spikingjelly.activation_based.layer as sjl
-        import spikingjelly.activation_based.neuron as sjn
-
-        class Net(nn.Module):
-            def __init__(self):
-                super().__init__()
-                self.fc  = sjl.Linear(784, 150)
-                self.lif = sjn.LIFNode(tau=2.0, v_threshold=1.0)
-            def forward(self, x):
-                return self.lif(self.fc(x))
-
-        net = Net()
-        # ... training ...
-        snn = convert_from_spikingjelly(net, (784,))
-
-    Notes
-    -----
-    *Spike-triggered gating*: Our FPGA implements spike-triggered neuron
-    updates – the LIF state is updated only when an incoming AER spike event
-    is received (via the spike_router).  This is equivalent to the temporal
-    processing in SpikingJelly's timestep loop, mapped to event-sparse
-    hardware execution.
-    """
-    converter = SpikingJellyConverter(
-        weight_scale=weight_scale,
-        default_threshold_hw=default_threshold_hw,
-        default_leak_rate=default_leak_rate,
-        hw_threshold_scale=hw_threshold_scale,
+    raise RuntimeError(
+        "convert_from_spikingjelly() has been removed. "
+        "Use native training modules and export with pytorch_to_snn()."
     )
-    return converter.convert(sj_model, input_shape, model_name=model_name)
 
 
 # =============================================================================

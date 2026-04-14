@@ -73,7 +73,7 @@ print(f"  HW threshold (mean): {hw_threshold}")
 
 # Quantise weights to int8
 q_weights = np.clip(np.round(weights * WEIGHT_SCALE), -127, 127).astype(np.int8)
-print(f"  Quantised weights: {q_weights.shape}  [{q_weights.min()}, {q_weights.max()}]")
+print(f"  Quantized weights: {q_weights.shape}  [{q_weights.min()}, {q_weights.max()}]")
 
 # Quick sanity: zero-weight fraction
 zero_frac = (q_weights == 0).mean()

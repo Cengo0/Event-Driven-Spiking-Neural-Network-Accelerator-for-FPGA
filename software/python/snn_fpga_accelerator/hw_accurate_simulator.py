@@ -68,7 +68,7 @@ else:
     MIN_WEIGHT          = 0
     WEIGHT_FLAG_WIDTH   = 9
     MAX_WEIGHT_DELTA    = 255
-    HLS_NEURON_ID_WIDTH = 11
+    HLS_NEURON_ID_WIDTH = 13
     HLS_MAX_NEURONS     = 2048
     HLS_WEIGHT_WIDTH    = 8
     NEURON_ID_WIDTH     = GLOBAL_ID_WIDTH
@@ -78,6 +78,122 @@ else:
     LEGACY_MIN_WEIGHT   = -128
     LEGACY_WEIGHT_SCALE = 128
     WEIGHT_SCALE        = 256
+
+    # Phase 6.5 NeuronGroup-aware defaults (Block-sparse K=1024, 4 blocks)
+    NUM_NEURON_GROUPS   = 9
+    NUM_CONNECTIONS     = 8
+    NEURON_GROUP_NAMES  = ['input_0', 'input_1', 'input_2', 'input_3',
+                           'hidden_0', 'hidden_1', 'hidden_2', 'hidden_3',
+                           'output']
+    NEURON_GROUP_SIZES  = [196, 196, 196, 196, 1024, 1024, 1024, 1024, 10]
+    NEURON_GROUP_ID_START = [0, 196, 392, 588, 784, 1808, 2832, 3856, 4880, 4890]
+    TOTAL_LOGICAL_NEURONS = 4890
+    MAX_WEIGHT_BUFFER_SIZE = 843776  # 4×(196×1024) + 4×(1024×10)
+    CONNECTIONS = [
+        {'name': 'in0_to_hid0', 'src_group': 0, 'dst_group': 4,
+         'src_size': 196, 'dst_size': 1024, 'weight_offset': 0,
+         'num_weights': 200704},
+        {'name': 'in1_to_hid1', 'src_group': 1, 'dst_group': 5,
+         'src_size': 196, 'dst_size': 1024, 'weight_offset': 200704,
+         'num_weights': 200704},
+        {'name': 'in2_to_hid2', 'src_group': 2, 'dst_group': 6,
+         'src_size': 196, 'dst_size': 1024, 'weight_offset': 401408,
+         'num_weights': 200704},
+        {'name': 'in3_to_hid3', 'src_group': 3, 'dst_group': 7,
+         'src_size': 196, 'dst_size': 1024, 'weight_offset': 602112,
+         'num_weights': 200704},
+        {'name': 'hid0_to_output', 'src_group': 4, 'dst_group': 8,
+         'src_size': 1024, 'dst_size': 10, 'weight_offset': 802816,
+         'num_weights': 10240},
+        {'name': 'hid1_to_output', 'src_group': 5, 'dst_group': 8,
+         'src_size': 1024, 'dst_size': 10, 'weight_offset': 813056,
+         'num_weights': 10240},
+        {'name': 'hid2_to_output', 'src_group': 6, 'dst_group': 8,
+         'src_size': 1024, 'dst_size': 10, 'weight_offset': 823296,
+         'num_weights': 10240},
+        {'name': 'hid3_to_output', 'src_group': 7, 'dst_group': 8,
+         'src_size': 1024, 'dst_size': 10, 'weight_offset': 833536,
+         'num_weights': 10240},
+    ]
+
+    # Phase 7 BRAM optimization: Loihi/TrueNorth/KIST on-chip constants
+    WEIGHT_BITS         = 4
+    PACKED_MAX_WEIGHT   = 7   # 2^(WEIGHT_BITS-1) - 1
+    PACKED_MIN_WEIGHT   = -8  # -2^(WEIGHT_BITS-1)
+    TIME_EMBEDDING      = 1
+    AUXILIARY_LUTRAM    = 1
+
+
+# =============================================================================
+# NeuronGroup-aware flat weight index (matches HLS weight_index())
+# =============================================================================
+
+def _ng_id_start():
+    """Get NEURON_GROUP_ID_START from globals (may be overridden by generated params)."""
+    return globals().get('NEURON_GROUP_ID_START', [0, 196, 392, 588, 784, 1808, 2832, 3856, 4880, 4890])
+
+
+def _ng_connections():
+    """Get CONNECTIONS from globals."""
+    return globals().get('CONNECTIONS', [])
+
+
+def _conn_src_start(conn: Dict) -> int:
+    """Resolve connection source start ID with robust fallback."""
+    if 'src_id_start' in conn:
+        return int(conn.get('src_id_start', 0))
+    id_start = _ng_id_start()
+    src_g = int(conn.get('src_group', -1))
+    if 0 <= src_g < len(id_start) - 1:
+        return int(id_start[src_g])
+    return 0
+
+
+def _conn_dst_start(conn: Dict) -> int:
+    """Resolve connection destination start ID with robust fallback."""
+    if 'dst_id_start' in conn:
+        return int(conn.get('dst_id_start', 0))
+    id_start = _ng_id_start()
+    dst_g = int(conn.get('dst_group', -1))
+    if 0 <= dst_g < len(id_start) - 1:
+        return int(id_start[dst_g])
+    return 0
+
+
+def weight_index_flat(pre_id: int, post_id: int) -> int:
+    """Compute flat buffer offset for (pre_id, post_id).
+
+    Matches HLS ``weight_index()`` exactly.  Returns -1 if no connection.
+    """
+    id_start = _ng_id_start()
+    conns = _ng_connections()
+
+    # Find pre group
+    src_g = -1
+    for g in range(len(id_start) - 1):
+        if id_start[g] <= pre_id < id_start[g + 1]:
+            src_g = g
+            break
+    if src_g < 0:
+        return -1
+
+    # Find post group
+    dst_g = -1
+    for g in range(len(id_start) - 1):
+        if id_start[g] <= post_id < id_start[g + 1]:
+            dst_g = g
+            break
+    if dst_g < 0:
+        return -1
+
+    # Find connection
+    for conn in conns:
+        if conn['src_group'] == src_g and conn['dst_group'] == dst_g:
+            local_src = pre_id - id_start[src_g]
+            local_dst = post_id - id_start[dst_g]
+            return conn['weight_offset'] + local_src * conn['dst_size'] + local_dst
+
+    return -1
 
 
 # =============================================================================
@@ -522,24 +638,41 @@ class HWAccurateLIFNeuron:
 @dataclass
 class STDPConfig:
     """
-    STDP configuration matching HLS learning_config_t.
-    
-    All values stored as fixed-point Q8.8 internally.
+    STDP configuration matching HLS learning_params_t.
+
+    HLS uses trace-based Mozafari updates with global per-timestep decay:
+      LTP: +a_plus * (w_max - w) * pre_trace
+      LTD: -a_minus * (w - w_min) * post_trace
+    and then scales by learning_rate.
     """
-    a_plus: float = 0.01        # LTP amplitude
-    a_minus: float = 0.01       # LTD amplitude
-    tau_plus: float = 20.0      # LTP time constant (in timestamp units)
-    tau_minus: float = 20.0     # LTD time constant
-    stdp_window: int = 100      # STDP time window
+    a_plus: float = 0.1
+    a_minus: float = 0.12
+    tau_plus: float = 20.0      # Reserved for host-side trace tuning
+    tau_minus: float = 20.0     # Reserved for host-side trace tuning
+    stdp_window: int = 50       # Reserved (HLS does not gate by dt window)
+    learning_rate: float = 0.01
+    rstdp_enable: bool = False
+    trace_decay: float = 0.125
+    reward_scale: float = 1.0
     enable_homeostasis: bool = False
     target_rate: float = 10.0
-    
+
     def __post_init__(self):
-        # Convert to fixed-point
-        self._a_plus_fp = FixedPoint(self.a_plus)
-        self._a_minus_fp = FixedPoint(self.a_minus)
-        self._tau_plus_fp = FixedPoint(self.tau_plus)
-        self._tau_minus_fp = FixedPoint(self.tau_minus)
+        # Keep Q8.8 helpers for bit-accurate integer arithmetic.
+        self._a_plus_raw = self._q8_8(self.a_plus)
+        self._a_minus_raw = self._q8_8(self.a_minus)
+        self._learning_rate_raw = self._q8_8(self.learning_rate)
+        self._trace_decay_raw = self._q8_8(self.trace_decay)
+        self._reward_scale_raw = self._q8_8(self.reward_scale)
+
+    @staticmethod
+    def _q8_8(value: float) -> int:
+        raw = int(round(float(value) * 256.0))
+        if raw > 32767:
+            return 32767
+        if raw < -32768:
+            return -32768
+        return raw
 
 
 @dataclass
@@ -553,14 +686,7 @@ class WeightUpdate:
 
 class HWAccurateSTDPEngine:
     """
-    Bit-accurate STDP learning engine matching stdp_engine.v and snn_top_hls.cpp
-    
-    Implements Mozafari weight-dependent STDP with trace-based timing:
-    - LTP: Δw = +a_plus * (w_max - w)^μ  (pre before post)
-    - LTD: Δw = -a_minus * (w - w_min)^μ  (post before pre)
-    - Anti-STDP: reverses LTP/LTD for R-STDP punishment
-    
-    Weight-dependent rule matches stdp_engine.v exactly.
+    Bit-accurate STDP engine matching hardware/hls/src/snn_top_hls.cpp.
     """
     
     def __init__(self, config: Optional[STDPConfig] = None, max_neurons: int = MAX_NEURONS,
@@ -571,44 +697,94 @@ class HWAccurateSTDPEngine:
         default_mask_bits = max(1, int(math.ceil(math.log2(max_neurons)))) if max_neurons > 0 else 1
         self.id_mask = id_mask if id_mask is not None else ((1 << default_mask_bits) - 1)
         
-        # Spike time arrays (matching HLS static arrays)
-        self.pre_spike_times: Dict[int, int] = {}
-        self.post_spike_times: Dict[int, int] = {}
-        
+        # KIST-style global traces (uint8) and eligibility traces (int8 domain).
+        self.pre_traces = np.zeros(self.max_neurons, dtype=np.uint8)
+        self.post_traces = np.zeros(self.max_neurons, dtype=np.uint8)
+        self.pre_eligibility = np.zeros(self.max_neurons, dtype=np.int16)
+        self.post_eligibility = np.zeros(self.max_neurons, dtype=np.int16)
+
         # Synapse map (pre_id -> list of post_ids)
         self.synapses: Dict[int, List[int]] = {}
         
         # Weight matrix for Mozafari weight-dependent updates
         self.weights: Optional[np.ndarray] = None
+
+        # Phase 6.5: optional flat weight buffer (matches HLS weight_memory[])
+        self._flat_weights: Optional[np.ndarray] = None
+        self._use_flat: bool = False
         
-        # Weight bounds (8-bit unsigned, polarity via exc/inh flag)
-        self.w_max = MAX_WEIGHT   # 255 for 8-bit
-        self.w_min = MIN_WEIGHT   # 0 for 8-bit unsigned
+        # Weight bounds — now uses packed range (Loihi-style configurable precision)
+        # HLS STDP engine clips to packed_weight_t [PACKED_MIN_WEIGHT, PACKED_MAX_WEIGHT]
+        # e.g. 4-bit signed: [-8, 7], 2-bit: [-2, 1], 8-bit: [-128, 127]
+        self.w_max = PACKED_MAX_WEIGHT   # 7 for 4-bit (default)
+        self.w_min = PACKED_MIN_WEIGHT   # -8 for 4-bit (default)
         
-        # Mu parameter (Q4.4, default 0x10 = 1.0 linear)
-        self.mu = 0x10  # 1.0 in Q4.4
-        
+        # Legacy field retained for API compatibility.
+        self.mu = 0x10
+
         # Update counter
         self.update_counter: int = 0
         
         # Output queue
         self.weight_updates: deque = deque()
-        
+
+        # Track timestamp to apply per-step global trace decay.
+        self._last_decay_time: Optional[int] = None
+
         self.enabled = True
-        
+
     def reset(self):
         """Reset engine state."""
-        self.pre_spike_times = {}
-        self.post_spike_times = {}
+        self.pre_traces.fill(0)
+        self.post_traces.fill(0)
+        self.pre_eligibility.fill(0)
+        self.post_eligibility.fill(0)
         self.update_counter = 0
         self.weight_updates.clear()
+        self._last_decay_time = None
     
     def set_weights(self, weights: np.ndarray):
-        """Set weight matrix for weight-dependent STDP updates."""
+        """Set weight matrix for weight-dependent STDP updates (legacy 2D path)."""
         self.weights = np.clip(weights, self.w_min, self.w_max).astype(np.int16)
+        self._use_flat = False
+
+    def set_flat_weights(self, flat: np.ndarray):
+        """Set flat weight buffer for NeuronGroup-aware STDP (Phase 6.5).
+
+        Parameters
+        ----------
+        flat : np.ndarray
+            1-D int8/int16 array matching HLS weight_memory[MAX_WEIGHT_BUFFER_SIZE].
+        """
+        self._flat_weights = np.clip(flat.ravel(), self.w_min, self.w_max).astype(np.int16)
+        self._use_flat = True
+
+    def get_weight(self, pre_id: int, post_id: int) -> int:
+        """Read a single weight, supporting both 2D and flat storage."""
+        if self._use_flat and self._flat_weights is not None:
+            idx = weight_index_flat(pre_id, post_id)
+            if idx < 0 or idx >= self._flat_weights.size:
+                return 0
+            return int(self._flat_weights[idx])
+        if self.weights is not None:
+            if pre_id < self.weights.shape[0] and post_id < self.weights.shape[1]:
+                return int(self.weights[pre_id, post_id])
+        return 0
+
+    def put_weight(self, pre_id: int, post_id: int, value: int):
+        """Write a single weight, supporting both 2D and flat storage."""
+        value = max(self.w_min, min(self.w_max, value))
+        if self._use_flat and self._flat_weights is not None:
+            idx = weight_index_flat(pre_id, post_id)
+            if 0 <= idx < self._flat_weights.size:
+                self._flat_weights[idx] = value
+            return
+        if self.weights is not None:
+            if pre_id < self.weights.shape[0] and post_id < self.weights.shape[1]:
+                self.weights[pre_id, post_id] = value
     
     def set_mu(self, mu_float: float):
-        """Set mu parameter. mu_float in [0, 1], stored as Q4.4."""
+        """Legacy compatibility hook. HLS path currently uses linear distance."""
         self.mu = int(round(mu_float * 16))
     
     def add_synapse(self, pre_id: int, post_id: int):
@@ -622,185 +798,285 @@ class HWAccurateSTDPEngine:
         if post_id not in self.synapses[pre_id]:
             self.synapses[pre_id].append(post_id)
     
-    def _apply_mu(self, distance: int) -> int:
+    @staticmethod
+    def _clip_int8_signed(v: int) -> int:
+        return 127 if v > 127 else (-128 if v < -128 else v)
+
+    @staticmethod
+    def _saturating_add_u8(v: int, inc: int) -> int:
+        out = int(v) + int(inc)
+        return 255 if out > 255 else (0 if out < 0 else out)
+
+    def _sync_time(self, timestamp: int):
         """
-        Apply mu power approximation matching stdp_engine.v apply_mu function.
-        result = distance * mu / 16  (Q4.4 scaling)
+        Apply global trace decay for each elapsed timestep, matching HLS.
         """
-        return (distance * self.mu) >> 4
-        
-    def _calculate_ltp(self, dt: int, pre_id: int = 0, post_id: int = 0) -> int:
+        if self._last_decay_time is None:
+            self._last_decay_time = int(timestamp)
+            return
+
+        target = int(timestamp)
+        while self._last_decay_time < target:
+            self.decay_all_traces()
+            self._last_decay_time += 1
+
+    def decay_all_traces(self):
         """
-        Calculate LTP weight change matching stdp_engine.v Mozafari rule.
-        LTP: Δw = a_plus * (w_max - w)^μ / 256
-        
-        Returns fixed-point delta scaled by WEIGHT_SCALE.
+        Global trace decay:
+            trace = trace - ((trace * trace_decay_frac) >> 8)
+        where trace_decay_frac is low 8 bits of Q8.8 trace_decay.
         """
-        if dt < 0 or dt >= self.config.stdp_window:
-            return 0
-        
-        # Get current weight
-        if self.weights is not None and pre_id < self.weights.shape[0] and post_id < self.weights.shape[1]:
-            w = int(self.weights[pre_id, post_id])
-        else:
-            w = 0
-        
-        # Mozafari weight-dependent rule: (w_max - w)
-        distance = self.w_max - w
-        if distance <= 0:
-            return 0
-        
-        # Apply mu and a_plus scaling
-        mu_distance = self._apply_mu(distance)
-        a_plus_int = int(self.config.a_plus * 256)  # Q8.8 to integer
-        delta = (a_plus_int * mu_distance) >> 8
-        
-        # Clamp
-        if delta > MAX_WEIGHT_DELTA:
-            delta = MAX_WEIGHT_DELTA
-        
-        return delta
-    
-    def _calculate_ltd(self, dt: int, pre_id: int = 0, post_id: int = 0) -> int:
+        decay_frac = self.config._trace_decay_raw & 0xFF
+        if decay_frac == 0:
+            return
+
+        pre = self.pre_traces.astype(np.uint16)
+        post = self.post_traces.astype(np.uint16)
+        pre = pre - ((pre * decay_frac) >> 8)
+        post = post - ((post * decay_frac) >> 8)
+        self.pre_traces[:] = pre.astype(np.uint8)
+        self.post_traces[:] = post.astype(np.uint8)
+
+    def decay_eligibility_traces(self):
         """
-        Calculate LTD weight change matching stdp_engine.v Mozafari rule.
-        LTD: Δw = -a_minus * (w - w_min)^μ / 256
-        
-        Returns fixed-point delta scaled by WEIGHT_SCALE (negative).
+        Shift-based eligibility decay matching HLS:
+            elig = elig - (elig >> 3)
         """
-        if dt < 0 or dt >= self.config.stdp_window:
-            return 0
-        
-        # Get current weight
-        if self.weights is not None and pre_id < self.weights.shape[0] and post_id < self.weights.shape[1]:
-            w = int(self.weights[pre_id, post_id])
-        else:
-            w = 0
-        
-        # Mozafari weight-dependent rule: (w - w_min)
-        distance = w - self.w_min
-        if distance <= 0:
-            return 0
-        
-        # Apply mu and a_minus scaling
-        mu_distance = self._apply_mu(distance)
-        a_minus_int = int(self.config.a_minus * 256)  # Q8.8 to integer
-        delta = -((a_minus_int * mu_distance) >> 8)
-        
-        # Clamp
-        if delta < -MAX_WEIGHT_DELTA:
-            delta = -MAX_WEIGHT_DELTA
-        
-        return delta
-    
+        pre = self.pre_eligibility.astype(np.int16)
+        post = self.post_eligibility.astype(np.int16)
+        pre = pre - (pre >> 3)
+        post = post - (post >> 3)
+        self.pre_eligibility[:] = np.clip(pre, -128, 127)
+        self.post_eligibility[:] = np.clip(post, -128, 127)
+
+    def _update_eligibility_on_pre_spike(self, pre_id: int):
+        self.pre_eligibility[pre_id] = self._clip_int8_signed(int(self.pre_eligibility[pre_id]) + 32)
+
+    def _update_eligibility_on_post_spike(self, post_id: int):
+        self.post_eligibility[post_id] = self._clip_int8_signed(int(self.post_eligibility[post_id]) + 32)
+
+    def _connected_posts_from_topology(self, pre_id: int) -> List[int]:
+        ids: List[int] = []
+        for conn in _ng_connections():
+            src0 = _conn_src_start(conn)
+            src_size = int(conn.get('src_size', 0))
+            dst0 = _conn_dst_start(conn)
+            dst_size = int(conn.get('dst_size', 0))
+            if src0 <= pre_id < src0 + src_size:
+                ids.extend(range(dst0, dst0 + dst_size))
+        # Deduplicate while preserving order.
+        return list(dict.fromkeys(ids))
+
+    def _connected_pres_from_topology(self, post_id: int) -> List[int]:
+        ids: List[int] = []
+        for conn in _ng_connections():
+            src0 = _conn_src_start(conn)
+            src_size = int(conn.get('src_size', 0))
+            dst0 = _conn_dst_start(conn)
+            dst_size = int(conn.get('dst_size', 0))
+            if dst0 <= post_id < dst0 + dst_size:
+                ids.extend(range(src0, src0 + src_size))
+        # Deduplicate while preserving order.
+        return list(dict.fromkeys(ids))
+
     def process_pre_spike(self, neuron_id: int, timestamp: int, 
                           connected_post_ids: Optional[List[int]] = None) -> List[WeightUpdate]:
         """
-        Process pre-synaptic spike (matching HLS pre_spikes stream processing).
-        
-        Checks for post-pre pairs (LTD).
-        
-        Parameters
-        ----------
-        neuron_id : int
-            Pre-synaptic neuron ID
-        timestamp : int
-            Spike timestamp
-        connected_post_ids : list, optional
-            List of connected post-synaptic neuron IDs
+        Process pre-synaptic spike (LTD path) matching HLS trace-based engine.
         """
         neuron_id &= self.id_mask
-        if connected_post_ids is not None:
-            connected_post_ids = [nid & self.id_mask for nid in connected_post_ids]
         if not self.enabled or neuron_id >= self.max_neurons:
             return []
-        
-        updates = []
-        pre_time = timestamp
-        self.pre_spike_times[neuron_id] = pre_time
-        
-        # Get connected post-synaptic neurons
+
+        self._sync_time(timestamp)
+
+        # Add pre trace and eligibility (saturating), same as HLS.
+        self.pre_traces[neuron_id] = self._saturating_add_u8(self.pre_traces[neuron_id], 128)
+        self._update_eligibility_on_pre_spike(neuron_id)
+
         if connected_post_ids is None:
             connected_post_ids = self.synapses.get(neuron_id, [])
-        
-        # Check for post-pre pairs (LTD) - post spiked before pre
+            if not connected_post_ids:
+                connected_post_ids = self._connected_posts_from_topology(neuron_id)
+        connected_post_ids = [nid & self.id_mask for nid in connected_post_ids]
+
+        updates: List[WeightUpdate] = []
+        a_raw = int(self.config._a_minus_raw)
+        lr_raw = int(self.config._learning_rate_raw)
+
         for post_id in connected_post_ids:
-            if post_id in self.post_spike_times:
-                post_time = self.post_spike_times[post_id]
-                dt = pre_time - post_time  # dt > 0 means pre after post -> LTD
-                
-                if 0 < dt < self.config.stdp_window:
-                    delta = self._calculate_ltd(dt, pre_id=neuron_id, post_id=post_id)
-                    
-                    if delta != 0:
-                        update = WeightUpdate(
-                            pre_id=neuron_id,
-                            post_id=post_id,
-                            delta=delta,
-                            timestamp=pre_time
-                        )
-                        updates.append(update)
-                        self.weight_updates.append(update)
-                        self.update_counter += 1
-        
+            if post_id >= self.max_neurons:
+                continue
+            post_trace = int(self.post_traces[post_id])
+            if post_trace == 0:
+                continue
+
+            current_w = int(self.get_weight(neuron_id, post_id))
+            distance = current_w - self.w_min
+            if distance <= 0:
+                continue
+
+            mul_dt = distance * post_trace
+            scaled = (mul_dt * a_raw) >> 16
+            delta = -((scaled * lr_raw) >> 8)
+
+            if delta == 0:
+                continue
+
+            new_w = current_w + int(delta)
+            self.put_weight(neuron_id, post_id, new_w)
+            update = WeightUpdate(
+                pre_id=neuron_id,
+                post_id=post_id,
+                delta=int(delta),
+                timestamp=int(timestamp),
+            )
+            updates.append(update)
+            self.weight_updates.append(update)
+
+        self.update_counter += 1
         return updates
-    
+
     def process_post_spike(self, neuron_id: int, timestamp: int,
                            connected_pre_ids: Optional[List[int]] = None) -> List[WeightUpdate]:
         """
-        Process post-synaptic spike (matching HLS post_spikes stream processing).
-        
-        Checks for pre-post pairs (LTP).
-        
-        Parameters
-        ----------
-        neuron_id : int
-            Post-synaptic neuron ID
-        timestamp : int
-            Spike timestamp
-        connected_pre_ids : list, optional
-            List of connected pre-synaptic neuron IDs
+        Process post-synaptic spike (LTP path) matching HLS trace-based engine.
         """
         neuron_id &= self.id_mask
-        if connected_pre_ids is not None:
-            connected_pre_ids = [nid & self.id_mask for nid in connected_pre_ids]
         if not self.enabled or neuron_id >= self.max_neurons:
             return []
-        
-        updates = []
-        post_time = timestamp
-        self.post_spike_times[neuron_id] = post_time
-        
-        # Get connected pre-synaptic neurons
+
+        self._sync_time(timestamp)
+
+        # Add post trace and eligibility (saturating), same as HLS.
+        self.post_traces[neuron_id] = self._saturating_add_u8(self.post_traces[neuron_id], 128)
+        self._update_eligibility_on_post_spike(neuron_id)
+
         if connected_pre_ids is None:
-            # Find all pre-synaptic neurons that connect to this post-synaptic neuron
             connected_pre_ids = [
                 pre_id for pre_id, post_ids in self.synapses.items() 
                 if neuron_id in post_ids
             ]
-        
-        # Check for pre-post pairs (LTP) - pre spiked before post
+            if not connected_pre_ids:
+                connected_pre_ids = self._connected_pres_from_topology(neuron_id)
+        connected_pre_ids = [nid & self.id_mask for nid in connected_pre_ids]
+
+        updates: List[WeightUpdate] = []
+        a_raw = int(self.config._a_plus_raw)
+        lr_raw = int(self.config._learning_rate_raw)
+
         for pre_id in connected_pre_ids:
-            if pre_id in self.pre_spike_times:
-                pre_time = self.pre_spike_times[pre_id]
-                dt = post_time - pre_time  # dt > 0 means post after pre -> LTP
-                
-                if 0 < dt < self.config.stdp_window:
-                    delta = self._calculate_ltp(dt, pre_id=pre_id, post_id=neuron_id)
-                    
-                    if delta != 0:
-                        update = WeightUpdate(
-                            pre_id=pre_id,
-                            post_id=neuron_id,
-                            delta=delta,
-                            timestamp=post_time
-                        )
-                        updates.append(update)
-                        self.weight_updates.append(update)
-                        self.update_counter += 1
-        
+            if pre_id >= self.max_neurons:
+                continue
+            pre_trace = int(self.pre_traces[pre_id])
+            if pre_trace == 0:
+                continue
+
+            current_w = int(self.get_weight(pre_id, neuron_id))
+            distance = self.w_max - current_w
+            if distance <= 0:
+                continue
+
+            mul_dt = distance * pre_trace
+            scaled = (mul_dt * a_raw) >> 16
+            delta = (scaled * lr_raw) >> 8
+
+            if delta == 0:
+                continue
+
+            new_w = current_w + int(delta)
+            self.put_weight(pre_id, neuron_id, new_w)
+            update = WeightUpdate(
+                pre_id=pre_id,
+                post_id=neuron_id,
+                delta=int(delta),
+                timestamp=int(timestamp),
+            )
+            updates.append(update)
+            self.weight_updates.append(update)
+
+        self.update_counter += 1
         return updates
-    
+
+    def apply_rstdp_reward(self, reward_signal: int, timestamp: int = 0) -> List[WeightUpdate]:
+        """
+        Apply reward-modulated STDP using per-neuron eligibility traces.
+        Mirrors HLS apply_rstdp_reward() + decay_eligibility_traces().
+        """
+        if not self.enabled:
+            return []
+        if reward_signal == 0 or not self.config.rstdp_enable:
+            return []
+
+        self._sync_time(timestamp)
+
+        reward_positive = reward_signal >= 0
+        reward_mag = abs(int(reward_signal)) & 0xFF
+        if reward_mag >= 64:
+            shift_sel = 0
+        elif reward_mag >= 32:
+            shift_sel = 1
+        elif reward_mag >= 16:
+            shift_sel = 2
+        else:
+            shift_sel = 3
+
+        rs_raw = int(self.config._reward_scale_raw)
+        updates: List[WeightUpdate] = []
+
+        # Iterate explicit synapse map if provided; otherwise infer from topology.
+        syn_map = self.synapses
+        if not syn_map:
+            syn_map = {}
+            for pre_id in range(self.max_neurons):
+                posts = self._connected_posts_from_topology(pre_id)
+                if posts:
+                    syn_map[pre_id] = posts
+
+        for pre_id, posts in syn_map.items():
+            if pre_id >= self.max_neurons:
+                continue
+            pre_elig = int(self.pre_eligibility[pre_id])
+            if pre_elig == 0:
+                continue
+
+            for post_id in posts:
+                post_id &= self.id_mask
+                if post_id >= self.max_neurons:
+                    continue
+                post_elig = int(self.post_eligibility[post_id])
+                if post_elig == 0:
+                    continue
+
+                combined = (pre_elig * post_elig) >> 8
+                if shift_sel == 0:
+                    base_scaled = combined >> 1
+                elif shift_sel == 1:
+                    base_scaled = combined >> 2
+                elif shift_sel == 2:
+                    base_scaled = combined >> 3
+                else:
+                    base_scaled = combined >> 4
+
+                scaled = (base_scaled * rs_raw) >> 8
+                delta = scaled if reward_positive else -scaled
+                if delta == 0:
+                    continue
+
+                current_w = int(self.get_weight(pre_id, post_id))
+                self.put_weight(pre_id, post_id, current_w + int(delta))
+                update = WeightUpdate(
+                    pre_id=int(pre_id),
+                    post_id=int(post_id),
+                    delta=int(delta),
+                    timestamp=int(timestamp),
+                )
+                updates.append(update)
+                self.weight_updates.append(update)
+
+        self.decay_eligibility_traces()
+        return updates
+
     def get_pending_updates(self) -> List[WeightUpdate]:
         """Get all pending weight updates."""
         updates = list(self.weight_updates)

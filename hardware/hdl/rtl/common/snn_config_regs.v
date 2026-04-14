@@ -22,8 +22,9 @@
 //   0x18  ROUTER_SPIKE_CNT[R]  [31:0] routed spike count
 //   0x1C  NEURON_SPIKE_CNT[R]  [31:0] neuron spike count
 //   0x20  STATUS          [R]  [0] fifo_overflow, [8:1] active_neurons
-//   0x24  THROUGHPUT      [R]  [31:0] throughput counter
+//   0x24  THROUGHPUT      [R]  [31:0] first-spike latency counter
 //   0x28  VERSION         [R]  [31:0] = 0x534E4E01 ("SNN" + v1)
+//   0x2C  SERVICE_CYCLES  [R]  [31:0] service-time counter
 //-----------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
@@ -36,7 +37,7 @@ module snn_config_regs #(
     // AXI4-Lite Slave Interface
     //=========================================================================
     (* X_INTERFACE_INFO = "xilinx.com:signal:clock:1.0 s_axi_aclk CLK" *)
-    (* X_INTERFACE_PARAMETER = "ASSOCIATED_BUSIF s_axi, ASSOCIATED_RESET s_axi_aresetn, FREQ_HZ 100000000" *)
+    (* X_INTERFACE_PARAMETER = "ASSOCIATED_BUSIF s_axi, ASSOCIATED_RESET s_axi_aresetn" *)
     input  wire                              s_axi_aclk,
 
     (* X_INTERFACE_INFO = "xilinx.com:signal:reset:1.0 s_axi_aresetn RST" *)
@@ -114,11 +115,12 @@ module snn_config_regs #(
     input  wire [31:0]                       neuron_spike_count,
     input  wire                              fifo_overflow,
     input  wire [7:0]                        active_neurons,
-    input  wire [31:0]                       throughput_counter
+    input  wire [31:0]                       throughput_counter,
+    input  wire [31:0]                       service_cycles_counter
 );
 
     // AXI4-Lite interface parameters
-    (* X_INTERFACE_PARAMETER = "PROTOCOL AXI4LITE, DATA_WIDTH 32, ADDR_WIDTH 6, FREQ_HZ 100000000" *)
+    (* X_INTERFACE_PARAMETER = "PROTOCOL AXI4LITE, DATA_WIDTH 32, ADDR_WIDTH 6" *)
 
     //=========================================================================
     // Register Address Decode (word-aligned, [5:2] selects register)
@@ -134,6 +136,7 @@ module snn_config_regs #(
     localparam ADDR_STATUS           = 4'h8;   // 0x20
     localparam ADDR_THROUGHPUT       = 4'h9;   // 0x24
     localparam ADDR_VERSION          = 4'hA;   // 0x28
+    localparam ADDR_SERVICE_CYCLES   = 4'hB;   // 0x2C
 
     //=========================================================================
     // AXI4-Lite State Machine
@@ -347,6 +350,7 @@ module snn_config_regs #(
                     ADDR_STATUS:            r_data <= {23'd0, active_neurons, fifo_overflow};
                     ADDR_THROUGHPUT:        r_data <= throughput_counter;
                     ADDR_VERSION:           r_data <= 32'h534E4E01;  // "SNN" + v1
+                    ADDR_SERVICE_CYCLES:    r_data <= service_cycles_counter;
                     default:                r_data <= 32'hDEADBEEF;
                 endcase
             end else if (r_valid && s_axi_rready) begin

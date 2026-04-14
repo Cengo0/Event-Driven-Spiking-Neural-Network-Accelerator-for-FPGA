@@ -10,10 +10,18 @@
 //                 DDR/FIXED_IO are internal to the BD.
 //
 //                 Key fixes:
-//                 1. Rising-edge detector on spike_in_valid (ap_none output)
-//                    to prevent FIFO duplication.
-//                 2. Hold register on RTL->HLS neuron output so HLS can
-//                    sample the 1-cycle pulse.
+//                 1. HLS ap_none "new spike" detector on spike_in_valid +
+//                    payload change (prevents duplication and dropped events
+//                    when valid stays high across packets).
+//                 2. FIFO bridge on RTL->HLS neuron output so HLS ready
+//                    stalls do not drop post-spike bursts.
+//
+//                 NeuronGroup Note (Phase 6.5):
+//                 The NeuronGroup connection topology (Brian2-style) is handled
+//                 entirely in HLS weight_memory (flat buffer) and Python host.
+//                 The RTL spike_router uses a generic config-based conn_memory
+//                 that is NeuronGroup-agnostic. The Python host generates the
+//                 routing table entries based on NeuronGroup connections.
 //-----------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
@@ -23,8 +31,8 @@ module snn_integrated_top #(
     parameter NUM_AXONS             = 1024,
     parameter NUM_PARALLEL_UNITS    = 4,
     parameter SPIKE_BUFFER_DEPTH    = 64,
-    parameter HLS_NEURON_ID_WIDTH   = 10,
-    parameter HLS_MAX_NEURONS       = 512,
+    parameter HLS_NEURON_ID_WIDTH   = 11,
+    parameter HLS_MAX_NEURONS       = NUM_NEURONS,
     parameter NEURON_ID_WIDTH       = 10,
     parameter AXON_ID_WIDTH         = 10,
     parameter DATA_WIDTH            = 16,
@@ -73,13 +81,13 @@ module snn_integrated_top #(
 
     // HLS -> RTL spike (ap_none outputs from BD)
     wire [0:0]  bd_spike_in_valid;
-    wire [9:0]  bd_spike_in_neuron_id;
+    wire [HLS_NEURON_ID_WIDTH-1:0]  bd_spike_in_neuron_id;
     wire [7:0]  bd_spike_in_weight;
     wire        bd_spike_in_ready;
 
     // RTL -> HLS spike (ap_none inputs to BD)
     wire        bd_spike_out_valid;
-    wire [9:0]  bd_spike_out_neuron_id;
+    wire [HLS_NEURON_ID_WIDTH-1:0]  bd_spike_out_neuron_id;
     wire [7:0]  bd_spike_out_weight;
     wire [0:0]  bd_spike_out_ready;
 
@@ -88,6 +96,16 @@ module snn_integrated_top #(
     wire [0:0]  bd_snn_reset;
     wire        bd_snn_ready;
     wire        bd_snn_busy;
+    wire        bd_learn_weight_valid;
+    wire [3:0]  bd_learn_weight_group;
+    wire [6:0]  bd_learn_weight_src;
+    wire [6:0]  bd_learn_weight_dst;
+    wire [7:0]  bd_learn_weight_data;
+    wire        bd_learn_weight_exc;
+    wire        bd_learn_weight_is_inter;
+    wire [3:0]  bd_learn_weight_dst_group;
+    wire [3:0]  bd_learn_weight_fanout_idx;
+    wire        bd_learn_weight_ready;
 
     // Config
     wire        cfg_router_config_we;
@@ -106,10 +124,28 @@ module snn_integrated_top #(
     wire [31:0] neuron_spike_count;
     wire        fifo_overflow;
     wire [7:0]  active_neurons;
-    wire [31:0] throughput_counter;
+    wire [31:0] cfg_throughput_counter;
+    wire [31:0] cfg_service_cycles_counter;
+    wire [31:0] neuron_throughput_counter;
     wire [15:0] threshold_out;
     wire [15:0] leak_rate_out;
     wire [0:0]  debug_learning_active;
+
+    // Router config command queue
+    localparam ROUTER_CFG_CMD_FIFO_DEPTH = 16;
+    wire        router_cfg_cmd_fifo_full;
+    wire        router_cfg_cmd_fifo_empty;
+    wire        router_cfg_cmd_fifo_almost_full;
+    wire        router_cfg_cmd_fifo_almost_empty;
+    wire [64-1:0] router_cfg_cmd_fifo_rd_data;
+    wire [$clog2(ROUTER_CFG_CMD_FIFO_DEPTH):0] router_cfg_cmd_fifo_count;
+    wire        router_cfg_cmd_fifo_overflow;
+    wire        router_cfg_cmd_fifo_underflow;
+    wire        router_cfg_cmd_fifo_rd_en;
+    reg         router_cfg_cmd_pop_pending;
+    reg         router_cfg_cmd_valid;
+    reg  [31:0] router_cfg_cmd_addr;
+    reg  [31:0] router_cfg_cmd_data;
 
     // Router internal
     wire                       router_spike_valid;
@@ -120,6 +156,7 @@ module snn_integrated_top #(
     wire                       router_input_valid;
     wire [NEURON_ID_WIDTH-1:0] router_input_neuron_id;
     wire                       router_input_ready;
+    wire                       spike_in_in_router_range;
 
     // Neuron output
     wire                       neuron_spike_valid;
@@ -129,6 +166,7 @@ module snn_integrated_top #(
     wire                       neuron_array_busy;
 
     assign rst_n = rst_n_vec[0];
+    assign bd_learn_weight_ready = 1'b1;
 
     //=========================================================================
     // Block Design Instantiation
@@ -173,6 +211,17 @@ module snn_integrated_top #(
         .spike_out_neuron_id     (bd_spike_out_neuron_id),
         .spike_out_weight        (bd_spike_out_weight),
         .spike_out_ready         (bd_spike_out_ready),
+        // HLS learned-weight bridge (kept connected for synthesis consistency)
+        .learn_weight_valid      (bd_learn_weight_valid),
+        .learn_weight_group      (bd_learn_weight_group),
+        .learn_weight_src        (bd_learn_weight_src),
+        .learn_weight_dst        (bd_learn_weight_dst),
+        .learn_weight_data       (bd_learn_weight_data),
+        .learn_weight_exc        (bd_learn_weight_exc),
+        .learn_weight_is_inter   (bd_learn_weight_is_inter),
+        .learn_weight_dst_group  (bd_learn_weight_dst_group),
+        .learn_weight_fanout_idx (bd_learn_weight_fanout_idx),
+        .learn_weight_ready      (bd_learn_weight_ready),
 
         // SNN Control
         .snn_enable              (bd_snn_enable),
@@ -201,69 +250,267 @@ module snn_integrated_top #(
         .cfg_neuron_spike_count  (neuron_spike_count),
         .cfg_fifo_overflow       (fifo_overflow),
         .cfg_active_neurons      (active_neurons),
-        .cfg_throughput_counter  (throughput_counter)
+        .cfg_throughput_counter  (cfg_throughput_counter),
+        .cfg_service_cycles_counter(cfg_service_cycles_counter)
     );
 
     //=========================================================================
-    // FIX 1: Rising-Edge Detector on spike_in_valid
-    // ap_none output stays HIGH for many clocks -> FIFO duplication
+    // FIX 1: HLS ap_none "new spike" detector
+    // HLS can keep spike_in_valid HIGH across multiple packets.
+    // Generate one pulse when:
+    //   (a) valid rises, or
+    //   (b) valid is HIGH and payload (neuron_id/weight) changes.
+    // This avoids both FIFO duplication (same payload held) and
+    // packet loss (multiple packets while valid stays HIGH).
     //=========================================================================
-    reg  spike_in_valid_d;
-    wire spike_in_valid_pulse;
+    reg                              hls_spike_valid_d;
+    reg  [HLS_NEURON_ID_WIDTH-1:0]   hls_spike_nid_d;
+    reg  [WEIGHT_WIDTH-1:0]          hls_spike_wt_d;
+    wire                             hls_spike_payload_changed;
+    wire                             hls_spike_event;
 
     always @(posedge clk) begin
-        if (!rst_n || bd_snn_reset[0])
-            spike_in_valid_d <= 1'b0;
-        else
-            spike_in_valid_d <= bd_spike_in_valid[0];
+        if (!rst_n || bd_snn_reset[0] || !bd_snn_enable[0]) begin
+            hls_spike_valid_d <= 1'b0;
+            hls_spike_nid_d   <= {HLS_NEURON_ID_WIDTH{1'b0}};
+            hls_spike_wt_d    <= {WEIGHT_WIDTH{1'b0}};
+        end else begin
+            hls_spike_valid_d <= bd_spike_in_valid[0];
+            if (bd_spike_in_valid[0]) begin
+                hls_spike_nid_d <= bd_spike_in_neuron_id;
+                hls_spike_wt_d  <= bd_spike_in_weight;
+            end
+        end
     end
 
-    assign spike_in_valid_pulse = bd_spike_in_valid[0] & ~spike_in_valid_d;
+    assign hls_spike_payload_changed =
+        (bd_spike_in_neuron_id != hls_spike_nid_d) ||
+        (bd_spike_in_weight    != hls_spike_wt_d);
+
+    assign hls_spike_event = bd_spike_in_valid[0] &
+                             (~hls_spike_valid_d | hls_spike_payload_changed);
 
     //=========================================================================
     // Spike Input Mux  (HLS priority > recurrent)
     //=========================================================================
-    assign router_input_valid     = spike_in_valid_pulse | neuron_spike_valid;
-    assign router_input_neuron_id = spike_in_valid_pulse
-                                    ? bd_spike_in_neuron_id
+    assign spike_in_in_router_range = (bd_spike_in_neuron_id < NUM_NEURONS);
+    assign router_input_valid     = (hls_spike_event & spike_in_in_router_range) | neuron_spike_valid;
+    assign router_input_neuron_id = (hls_spike_event & spike_in_in_router_range)
+                                    ? bd_spike_in_neuron_id[NEURON_ID_WIDTH-1:0]
                                     : neuron_spike_id;
     assign bd_spike_in_ready      = router_input_ready;
-    assign neuron_spike_ready_wire = router_input_ready & ~spike_in_valid_pulse;
+    assign neuron_spike_ready_wire = router_input_ready & ~hls_spike_event;
 
     //=========================================================================
-    // FIX 2: Hold Register  RTL -> HLS
-    // Neuron pulse is 1-cycle; HLS samples once per ~25 clocks -> miss.
-    // Hold valid+data until HLS acks via spike_out_ready.
+    // FIX 2: FIFO Bridge  RTL -> HLS
+    // Neuron pulse can arrive while HLS ready is deasserted. A single hold
+    // register drops bursts in that case, so buffer post-spikes in a small
+    // local FIFO and stream them to HLS with ready/valid handshaking.
     //=========================================================================
-    wire neuron_in_hls_range = (neuron_spike_id < HLS_MAX_NEURONS);
+    localparam [HLS_NEURON_ID_WIDTH-1:0] HLS_MAX_NEURON_ID = HLS_MAX_NEURONS[HLS_NEURON_ID_WIDTH-1:0];
+    wire [HLS_NEURON_ID_WIDTH-1:0] neuron_spike_id_hls =
+        {{(HLS_NEURON_ID_WIDTH-NEURON_ID_WIDTH){1'b0}}, neuron_spike_id};
+    // lif_neuron_array exports only spike ID on post-spike path.
+    // Keep HLS port width stable by tagging each post-spike with unit weight.
+    wire [WEIGHT_WIDTH-1:0] neuron_spike_weight_hls = {{(WEIGHT_WIDTH-1){1'b0}}, 1'b1};
+    wire neuron_in_hls_range = (neuron_spike_id_hls < HLS_MAX_NEURON_ID);
+    localparam SPIKE_OUT_FIFO_DEPTH = 32;
+    localparam SPIKE_OUT_FIFO_AW    = $clog2(SPIKE_OUT_FIFO_DEPTH);
+    localparam SPIKE_OUT_FIFO_DW    = HLS_NEURON_ID_WIDTH + WEIGHT_WIDTH;
+    localparam [SPIKE_OUT_FIFO_AW-1:0] SPIKE_OUT_FIFO_LAST = {SPIKE_OUT_FIFO_AW{1'b1}};
 
-    reg                            spike_out_valid_hold;
-    reg  [HLS_NEURON_ID_WIDTH-1:0] spike_out_nid_hold;
-    reg  [WEIGHT_WIDTH-1:0]        spike_out_wt_hold;
+    reg [SPIKE_OUT_FIFO_DW-1:0] spike_out_fifo_mem [0:SPIKE_OUT_FIFO_DEPTH-1];
+    reg [SPIKE_OUT_FIFO_AW-1:0] spike_out_fifo_wr_ptr;
+    reg [SPIKE_OUT_FIFO_AW-1:0] spike_out_fifo_rd_ptr;
+    reg [SPIKE_OUT_FIFO_AW:0]   spike_out_fifo_count;
+    reg                         spike_out_ready_d;
+    reg                         neuron_spike_valid_d;
+    reg [NEURON_ID_WIDTH-1:0]   neuron_spike_id_d;
+
+    wire spike_out_fifo_empty = (spike_out_fifo_count == 0);
+    wire spike_out_fifo_full  = (spike_out_fifo_count == SPIKE_OUT_FIFO_DEPTH);
+    // Capture post-spikes with edge/payload-change event detection so they are
+    // not dropped when input-path arbitration temporarily deasserts ready.
+    wire neuron_spike_payload_changed = (neuron_spike_id != neuron_spike_id_d);
+    wire neuron_spike_event = neuron_spike_valid &&
+                              (~neuron_spike_valid_d || neuron_spike_payload_changed);
+    wire spike_out_fifo_push  = neuron_spike_event && neuron_in_hls_range;
+    // HLS drives spike_out_ready as a consume-ack toggle token; pop once per toggle.
+    wire spike_out_ready_toggle = (bd_spike_out_ready[0] ^ spike_out_ready_d);
+    wire spike_out_fifo_pop   = spike_out_ready_toggle && !spike_out_fifo_empty;
+    wire [SPIKE_OUT_FIFO_DW-1:0] spike_out_fifo_head =
+        spike_out_fifo_mem[spike_out_fifo_rd_ptr];
+    wire [SPIKE_OUT_FIFO_AW-1:0] spike_out_fifo_wr_ptr_next =
+        (spike_out_fifo_wr_ptr == SPIKE_OUT_FIFO_LAST) ? {SPIKE_OUT_FIFO_AW{1'b0}} : (spike_out_fifo_wr_ptr + 1'b1);
+    wire [SPIKE_OUT_FIFO_AW-1:0] spike_out_fifo_rd_ptr_next =
+        (spike_out_fifo_rd_ptr == SPIKE_OUT_FIFO_LAST) ? {SPIKE_OUT_FIFO_AW{1'b0}} : (spike_out_fifo_rd_ptr + 1'b1);
 
     always @(posedge clk) begin
-        if (!rst_n || bd_snn_reset[0]) begin
-            spike_out_valid_hold <= 1'b0;
-            spike_out_nid_hold   <= 0;
-            spike_out_wt_hold    <= 0;
-        end else if (bd_spike_out_ready[0] && spike_out_valid_hold) begin
-            spike_out_valid_hold <= 1'b0;        // HLS acked
-        end else if (neuron_spike_valid && neuron_in_hls_range && !spike_out_valid_hold) begin
-            spike_out_valid_hold <= 1'b1;
-            spike_out_nid_hold   <= neuron_spike_id[HLS_NEURON_ID_WIDTH-1:0];
-            spike_out_wt_hold    <= router_spike_weight;
+        if (!rst_n || bd_snn_reset[0] || !bd_snn_enable[0]) begin
+            spike_out_fifo_wr_ptr <= {SPIKE_OUT_FIFO_AW{1'b0}};
+            spike_out_fifo_rd_ptr <= {SPIKE_OUT_FIFO_AW{1'b0}};
+            spike_out_fifo_count  <= {(SPIKE_OUT_FIFO_AW+1){1'b0}};
+            spike_out_ready_d     <= 1'b0;
+            neuron_spike_valid_d  <= 1'b0;
+            neuron_spike_id_d     <= {NEURON_ID_WIDTH{1'b0}};
+        end else begin
+            spike_out_ready_d <= bd_spike_out_ready[0];
+            neuron_spike_valid_d <= neuron_spike_valid;
+            if (neuron_spike_valid) begin
+                neuron_spike_id_d <= neuron_spike_id;
+            end
+
+            if (spike_out_fifo_push && !spike_out_fifo_full) begin
+                spike_out_fifo_mem[spike_out_fifo_wr_ptr] <= {neuron_spike_id_hls, neuron_spike_weight_hls};
+                spike_out_fifo_wr_ptr <= spike_out_fifo_wr_ptr_next;
+            end
+
+            if (spike_out_fifo_pop) begin
+                spike_out_fifo_rd_ptr <= spike_out_fifo_rd_ptr_next;
+            end
+
+            case ({(spike_out_fifo_push && !spike_out_fifo_full), spike_out_fifo_pop})
+                2'b10: spike_out_fifo_count <= spike_out_fifo_count + 1'b1;
+                2'b01: spike_out_fifo_count <= spike_out_fifo_count - 1'b1;
+                default: spike_out_fifo_count <= spike_out_fifo_count;
+            endcase
         end
     end
 
-    assign bd_spike_out_valid     = spike_out_valid_hold;
-    assign bd_spike_out_neuron_id = spike_out_nid_hold;
-    assign bd_spike_out_weight    = spike_out_wt_hold;
+    assign bd_spike_out_valid     = !spike_out_fifo_empty;
+    assign bd_spike_out_neuron_id = spike_out_fifo_head[SPIKE_OUT_FIFO_DW-1:WEIGHT_WIDTH];
+    assign bd_spike_out_weight    = spike_out_fifo_head[WEIGHT_WIDTH-1:0];
+
+    //=========================================================================
+    // PL-only latency counter (cycles)
+    // Measures: first accepted HLS input spike -> first neuron output spike.
+    // Exported through cfg_throughput_counter (0x24) for host-side conversion:
+    //   latency_ms = cycles / f_clk_hz * 1000
+    //=========================================================================
+    reg [31:0] pl_latency_cycles_cur;
+    reg [31:0] pl_latency_cycles_latched;
+    reg        pl_latency_active;
+    reg        pl_latency_done;
+    reg [31:0] pl_service_cycles_cur;
+    reg [31:0] pl_service_cycles_latched;
+    reg        pl_service_active;
+    reg        pl_service_done;
+    reg        pl_service_seen_busy;
+
+    wire hls_input_accept_event = hls_spike_event & router_input_ready;
+
+    always @(posedge clk) begin
+        if (!rst_n || bd_snn_reset[0]) begin
+            pl_latency_cycles_cur    <= 32'd0;
+            pl_latency_cycles_latched<= 32'd0;
+            pl_latency_active        <= 1'b0;
+            pl_latency_done          <= 1'b0;
+            pl_service_cycles_cur    <= 32'd0;
+            pl_service_cycles_latched<= 32'd0;
+            pl_service_active        <= 1'b0;
+            pl_service_done          <= 1'b0;
+            pl_service_seen_busy     <= 1'b0;
+        end else if (!bd_snn_enable[0]) begin
+            // Inter-image idle window: keep last latched value readable.
+            pl_latency_cycles_cur <= 32'd0;
+            pl_latency_active     <= 1'b0;
+            pl_latency_done       <= 1'b0;
+            pl_service_cycles_cur <= 32'd0;
+            pl_service_active     <= 1'b0;
+            pl_service_done       <= 1'b0;
+            pl_service_seen_busy  <= 1'b0;
+        end else begin
+            if (!pl_latency_active && !pl_latency_done) begin
+                if (hls_input_accept_event) begin
+                    pl_latency_cycles_cur     <= 32'd0;
+                    pl_latency_cycles_latched <= 32'd0;
+                    pl_latency_active         <= 1'b1;
+                end
+            end else if (pl_latency_active) begin
+                pl_latency_cycles_cur <= pl_latency_cycles_cur + 1'b1;
+                if (neuron_spike_event) begin
+                    pl_latency_cycles_latched <= pl_latency_cycles_cur + 1'b1;
+                    pl_latency_active         <= 1'b0;
+                    pl_latency_done           <= 1'b1;
+                end
+            end
+
+            // Service-time cycles:
+            // first accepted input spike -> return to idle after busy period.
+            if (!pl_service_active && !pl_service_done) begin
+                if (hls_input_accept_event) begin
+                    pl_service_cycles_cur     <= 32'd0;
+                    pl_service_cycles_latched <= 32'd0;
+                    pl_service_active         <= 1'b1;
+                    pl_service_seen_busy      <= bd_snn_busy;
+                end
+            end else if (pl_service_active) begin
+                pl_service_cycles_cur <= pl_service_cycles_cur + 1'b1;
+                if (bd_snn_busy) begin
+                    pl_service_seen_busy <= 1'b1;
+                end
+                if ((pl_service_seen_busy || bd_snn_busy) && !bd_snn_busy) begin
+                    pl_service_cycles_latched <= pl_service_cycles_cur + 1'b1;
+                    pl_service_active         <= 1'b0;
+                    pl_service_done           <= 1'b1;
+                end
+            end
+        end
+    end
+
+    assign cfg_throughput_counter = pl_latency_cycles_latched;
+    assign cfg_service_cycles_counter = pl_service_cycles_latched;
 
     //=========================================================================
     // SNN Status
     //=========================================================================
     assign bd_snn_ready = ~router_busy & ~neuron_array_busy;
     assign bd_snn_busy  = router_busy | neuron_array_busy;
+
+    //=========================================================================
+    // Router Config Queue (Loihi-style decoupled control path)
+    // Decouple AXI register fanout from router BRAM write path.
+    //=========================================================================
+    fifo #(
+        .DATA_WIDTH(64),
+        .DEPTH(ROUTER_CFG_CMD_FIFO_DEPTH)
+    ) u_router_cfg_cmd_fifo (
+        .clk          (clk),
+        .rst_n        (rst_n & ~bd_snn_reset[0]),
+        .wr_en        (cfg_router_config_we),
+        .wr_data      ({cfg_router_config_addr, cfg_router_config_wdata}),
+        .full         (router_cfg_cmd_fifo_full),
+        .almost_full  (router_cfg_cmd_fifo_almost_full),
+        .rd_en        (router_cfg_cmd_fifo_rd_en),
+        .rd_data      (router_cfg_cmd_fifo_rd_data),
+        .empty        (router_cfg_cmd_fifo_empty),
+        .almost_empty (router_cfg_cmd_fifo_almost_empty),
+        .count        (router_cfg_cmd_fifo_count),
+        .overflow     (router_cfg_cmd_fifo_overflow),
+        .underflow    (router_cfg_cmd_fifo_underflow)
+    );
+
+    assign router_cfg_cmd_fifo_rd_en = !router_cfg_cmd_pop_pending && !router_cfg_cmd_fifo_empty;
+
+    always @(posedge clk) begin
+        if (!rst_n || bd_snn_reset[0]) begin
+            router_cfg_cmd_pop_pending <= 1'b0;
+            router_cfg_cmd_valid       <= 1'b0;
+            router_cfg_cmd_addr        <= 32'd0;
+            router_cfg_cmd_data        <= 32'd0;
+        end else begin
+            router_cfg_cmd_valid <= 1'b0;
+
+            if (router_cfg_cmd_pop_pending) begin
+                router_cfg_cmd_addr        <= router_cfg_cmd_fifo_rd_data[63:32];
+                router_cfg_cmd_data        <= router_cfg_cmd_fifo_rd_data[31:0];
+                router_cfg_cmd_valid       <= 1'b1;
+                router_cfg_cmd_pop_pending <= 1'b0;
+            end else if (!router_cfg_cmd_fifo_empty) begin
+                router_cfg_cmd_pop_pending <= 1'b1;
+            end
+        end
+    end
 
     //=========================================================================
     // Spike Router
@@ -286,9 +533,12 @@ module snn_integrated_top #(
         .m_spike_weight  (router_spike_weight),
         .m_spike_exc_inh (router_spike_exc_inh),
         .m_spike_ready   (router_spike_ready),
-        .config_we       (cfg_router_config_we),
+        .config_we       (1'b0),
         .config_addr     (cfg_router_config_addr),
-        .config_data     (cfg_router_config_wdata),
+        .config_data     (32'd0),
+        .config_cmd_valid(router_cfg_cmd_valid),
+        .config_cmd_addr (router_cfg_cmd_addr),
+        .config_cmd_data (router_cfg_cmd_data),
         .config_readdata (cfg_router_config_rdata),
         .routed_spike_count(router_spike_count),
         .router_busy     (router_busy),
@@ -330,7 +580,7 @@ module snn_integrated_top #(
         .global_refrac_period   (cfg_global_refrac_period),
         .spike_count            (neuron_spike_count),
         .array_busy             (neuron_array_busy),
-        .throughput_counter     (throughput_counter),
+        .throughput_counter     (neuron_throughput_counter),
         .active_neurons         (active_neurons)
     );
 
