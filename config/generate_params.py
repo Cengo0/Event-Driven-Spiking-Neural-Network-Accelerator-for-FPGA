@@ -87,9 +87,73 @@ def compute_derived(cfg: dict) -> dict:
     # Aggregate counts (backward compat aliases)
     d['max_neurons'] = total_neurons
 
-    # HLS compatibility aliases
-    d['hls_neuron_id_width'] = d['global_id_width']
+    # HLS compatibility aliases (hls_neuron_id_width computed after topology)
     d['hls_max_neurons'] = total_neurons
+
+    # --- NeuronGroup Connection Topology (Brian2-style) -------------------------
+    neuron_groups = cfg.get('neuron_groups', [])
+    connections = cfg.get('connections', [])
+
+    if neuron_groups and connections:
+        # Compute connection details
+        conn_list = []
+        weight_offset = 0
+        total_weight_buffer_size = 0
+        max_src_neurons = 0
+        max_dst_neurons = 0
+
+        # Build group_id_start array (cumulative neuron ID offsets)
+        ng_sizes = [g['size'] for g in neuron_groups]
+        ng_id_start = [0]
+        for sz in ng_sizes:
+            ng_id_start.append(ng_id_start[-1] + sz)
+
+        for conn in connections:
+            src_idx = conn['src_group']
+            dst_idx = conn['dst_group']
+            src_size = neuron_groups[src_idx]['size']
+            dst_size = neuron_groups[dst_idx]['size']
+            num_weights = src_size * dst_size
+
+            conn_list.append({
+                'name': conn['name'],
+                'src_group': src_idx,
+                'dst_group': dst_idx,
+                'src_size': src_size,
+                'dst_size': dst_size,
+                'weight_offset': weight_offset,
+                'num_weights': num_weights,
+                'src_id_start': ng_id_start[src_idx],
+                'dst_id_start': ng_id_start[dst_idx],
+            })
+
+            weight_offset += num_weights
+            total_weight_buffer_size += num_weights
+            max_src_neurons = max(max_src_neurons, src_size)
+            max_dst_neurons = max(max_dst_neurons, dst_size)
+
+        d['neuron_groups'] = neuron_groups
+        d['neuron_group_sizes'] = ng_sizes
+        d['neuron_group_id_start'] = ng_id_start
+        d['num_neuron_groups'] = len(neuron_groups)
+        d['connections'] = conn_list
+        d['num_connections'] = len(conn_list)
+        d['max_weight_buffer_size'] = total_weight_buffer_size
+        d['max_src_neurons'] = max_src_neurons
+        d['max_dst_neurons'] = max_dst_neurons
+        d['total_logical_neurons'] = ng_id_start[-1]  # sum of all group sizes
+    else:
+        # Fallback: no topology defined, use legacy N×N
+        d['neuron_groups'] = []
+        d['connections'] = []
+        d['num_connections'] = 0
+        d['num_neuron_groups'] = 0
+        d['max_weight_buffer_size'] = total_neurons * total_neurons
+        d['max_src_neurons'] = total_neurons
+        d['max_dst_neurons'] = total_neurons
+        d['neuron_group_sizes'] = []
+        d['neuron_group_id_start'] = []
+        d['total_logical_neurons'] = total_neurons
 
     # Connectivity table data width:
     #   [valid(1)] [dst_group(GROUP_ID_WIDTH)] [dst_neuron(LOCAL_ID_WIDTH)]
@@ -97,9 +161,27 @@ def compute_derived(cfg: dict) -> dict:
     d['ct_data_width'] = (1 + d['group_id_width'] + d['local_id_width']
                           + widths['weight_width'] + 1)
 
+    # HLS neuron ID width: must accommodate ALL logical neuron IDs.
+    # RTL core groups use global_id_width (GROUP_ID + LOCAL_ID = 11 bits for 2048).
+    # HLS logical neuron space (NeuronGroups) may be larger (e.g., 4890 → 13 bits).
+    logical_bits = clog2(d['total_logical_neurons']) if d['total_logical_neurons'] > 0 else 0
+    d['hls_neuron_id_width'] = max(d['global_id_width'], logical_bits)
+
     # Neuron state width (packed BRAM word):
     #   [v_mem(DATA_WIDTH)] [refrac(REFRAC_WIDTH)]
     d['neuron_state_width'] = widths['data_width'] + widths['refrac_width']
+
+    # --- Weight Memory Optimization (Loihi/TrueNorth/KIST-inspired) -----------
+    wm = cfg.get('weight_memory', {})
+    d['weight_bits'] = wm.get('weight_bits', 8)  # 2, 4, or 8
+    d['time_embedding'] = 1 if wm.get('time_embedding', False) else 0
+    aux_storage = wm.get('auxiliary_storage', 'bram')
+    d['auxiliary_lutram'] = 1 if aux_storage == 'lutram' else 0
+
+    # Packed buffer size: ceil(max_weight_buffer_size * weight_bits / 8)
+    wb = d['weight_bits']
+    total_bits = d['max_weight_buffer_size'] * wb
+    d['packed_buffer_bytes'] = (total_bits + 7) // 8
 
     return d
 
@@ -185,6 +267,17 @@ def generate_verilog(cfg: dict, derived: dict) -> str:
         f'`define SNN_HLS_MAX_NEURONS     {derived["hls_max_neurons"]}',
         f'`define SNN_HLS_WEIGHT_WIDTH    {hls["hls_weight_width"]}',
         f'',
+        f'// ─── NeuronGroup Weight Buffer ─────────────────────────────────────',
+        f'`define SNN_MAX_WEIGHT_BUFFER_SIZE {derived["max_weight_buffer_size"]}',
+        f'`define SNN_NUM_CONNECTIONS       {derived["num_connections"]}',
+        f'`define SNN_NUM_NEURON_GROUPS     {derived["num_neuron_groups"]}',
+        f'',
+        f'// ─── Weight Memory Optimization (Loihi/TrueNorth/KIST) ──────────',
+        f'`define SNN_WEIGHT_BITS           {derived["weight_bits"]}',
+        f'`define SNN_TIME_EMBEDDING        {derived["time_embedding"]}',
+        f'`define SNN_AUXILIARY_LUTRAM      {derived["auxiliary_lutram"]}',
+        f'`define SNN_PACKED_BUFFER_BYTES   {derived["packed_buffer_bytes"]}',
+        f'',
         f'`endif // SNN_PARAMS_VH',
     ]
     return '\n'.join(lines) + '\n'
@@ -256,6 +349,55 @@ def generate_python(cfg: dict, derived: dict) -> str:
         f'HLS_WEIGHT_WIDTH    = {hls["hls_weight_width"]}',
         f'NEURON_ID_WIDTH     = GLOBAL_ID_WIDTH  # Alias',
         f'',
+    ]
+
+    # --- NeuronGroup Connection Topology (Brian2-style) -------------------------
+    if derived['num_neuron_groups'] > 0:
+        ng_sizes = derived['neuron_group_sizes']
+        ng_id_start = derived['neuron_group_id_start']
+        conns = derived['connections']
+
+        lines += [
+            f'# ─── NeuronGroup Connection Topology (Brian2-style) ────────────────',
+            f'NUM_NEURON_GROUPS       = {derived["num_neuron_groups"]}',
+            f'NUM_CONNECTIONS         = {derived["num_connections"]}',
+            f'MAX_WEIGHT_BUFFER_SIZE  = {derived["max_weight_buffer_size"]}',
+            f'MAX_SRC_NEURONS         = {derived["max_src_neurons"]}',
+            f'MAX_DST_NEURONS         = {derived["max_dst_neurons"]}',
+            f'TOTAL_LOGICAL_NEURONS   = {derived["total_logical_neurons"]}',
+            f'',
+            f'NEURON_GROUP_NAMES  = {[g["name"] for g in derived["neuron_groups"]]}',
+            f'NEURON_GROUP_SIZES  = {ng_sizes}',
+            f'NEURON_GROUP_ID_START = {ng_id_start}',
+            f'',
+            f'# Per-Connection metadata: list of dicts',
+            f'CONNECTIONS = [',
+        ]
+        for c in conns:
+            lines.append(f'    {{"name": "{c["name"]}", "src_group": {c["src_group"]}, '
+                         f'"dst_group": {c["dst_group"]}, "src_size": {c["src_size"]}, '
+                         f'"dst_size": {c["dst_size"]}, "weight_offset": {c["weight_offset"]}, '
+                         f'"num_weights": {c["num_weights"]}, '
+                         f'"src_id_start": {c["src_id_start"]}, '
+                         f'"dst_id_start": {c["dst_id_start"]}}},')
+        lines += [
+            f']',
+            f'',
+        ]
+    else:
+        lines += [
+            f'# ─── Legacy N×N weight memory (no connection topology) ─────────────',
+            f'MAX_WEIGHT_BUFFER_SIZE  = {derived["max_weight_buffer_size"]}',
+            f'NUM_CONNECTIONS         = 0',
+            f'NUM_NEURON_GROUPS       = 0',
+            f'CONNECTIONS             = []',
+            f'NEURON_GROUP_NAMES      = []',
+            f'NEURON_GROUP_SIZES      = []',
+            f'NEURON_GROUP_ID_START   = []',
+            f'',
+        ]
+
+    lines += [
         f'# ─── Fixed-Point (HLS ap_fixed<16,8>) ─────────────────────────────',
         f'FIXED_POINT_FRAC_BITS = {hls["fixed_point_frac_bits"]}',
         f'FIXED_POINT_SCALE     = 1 << FIXED_POINT_FRAC_BITS  # {1 << hls["fixed_point_frac_bits"]}',
@@ -265,6 +407,14 @@ def generate_python(cfg: dict, derived: dict) -> str:
         f'LEGACY_MIN_WEIGHT   = -128',
         f'LEGACY_WEIGHT_SCALE = 128',
         f'WEIGHT_SCALE        = {1 << widths["weight_width"]}',
+        f'',
+        f'# ─── Weight Memory Optimization (Loihi/TrueNorth/KIST) ──────────',
+        f'WEIGHT_BITS             = {derived["weight_bits"]}',
+        f'PACKED_MAX_WEIGHT       = {(1 << (derived["weight_bits"] - 1)) - 1}',
+        f'PACKED_MIN_WEIGHT       = {-(1 << (derived["weight_bits"] - 1))}',
+        f'TIME_EMBEDDING          = {derived["time_embedding"]}',
+        f'AUXILIARY_LUTRAM         = {derived["auxiliary_lutram"]}',
+        f'PACKED_BUFFER_BYTES     = {derived["packed_buffer_bytes"]}',
         f'',
         f'# ─── FPGA Target ──────────────────────────────────────────────────',
         f'FPGA_PART           = "{target["fpga_part"]}"',
@@ -340,6 +490,64 @@ def generate_hls(cfg: dict, derived: dict) -> str:
         f'const int SNN_HLS_NEURON_ID_WIDTH = {derived["hls_neuron_id_width"]};',
         f'const int SNN_HLS_MAX_NEURONS     = {derived["hls_max_neurons"]};',
         f'const int SNN_HLS_WEIGHT_WIDTH    = {hls["hls_weight_width"]};',
+        f'',
+    ]
+
+    # --- NeuronGroup Connection Topology (Brian2-style) -------------------------
+    if derived['num_neuron_groups'] > 0:
+        ng_sizes = derived['neuron_group_sizes']
+        ng_id_start = derived['neuron_group_id_start']
+        conns = derived['connections']
+
+        lines += [
+            f'// ─── NeuronGroup Connection Topology (Brian2-style) ─────────────',
+            f'const int SNN_NUM_NEURON_GROUPS      = {derived["num_neuron_groups"]};',
+            f'const int SNN_NUM_CONNECTIONS         = {derived["num_connections"]};',
+            f'#define SNN_NUM_NEURON_GROUPS_PP      {derived["num_neuron_groups"]}',
+            f'#define SNN_NUM_CONNECTIONS_PP         {derived["num_connections"]}',
+            f'const int SNN_MAX_WEIGHT_BUFFER_SIZE  = {derived["max_weight_buffer_size"]};',
+            f'const int SNN_MAX_SRC_NEURONS         = {derived["max_src_neurons"]};',
+            f'const int SNN_MAX_DST_NEURONS         = {derived["max_dst_neurons"]};',
+            f'const int SNN_TOTAL_LOGICAL_NEURONS   = {derived["total_logical_neurons"]};',
+            f'',
+            f'// Per-NeuronGroup sizes',
+        ]
+        for i, ng in enumerate(derived['neuron_groups']):
+            lines.append(f'const int SNN_NG_SIZE_{i} = {ng["size"]};  // {ng["name"]}')
+        lines.append(f'')
+        lines.append(f'// NeuronGroup ID start offsets (cumulative)')
+        for i, start in enumerate(ng_id_start):
+            lines.append(f'const int SNN_NG_ID_START_{i} = {start};')
+        lines.append(f'')
+        lines.append(f'// Per-Connection parameters')
+        for i, c in enumerate(conns):
+            lines.append(f'// Connection {i}: {c["name"]} (group {c["src_group"]} -> group {c["dst_group"]})')
+            lines.append(f'const int SNN_CONN_{i}_SRC_GROUP      = {c["src_group"]};')
+            lines.append(f'const int SNN_CONN_{i}_DST_GROUP      = {c["dst_group"]};')
+            lines.append(f'const int SNN_CONN_{i}_SRC_SIZE       = {c["src_size"]};')
+            lines.append(f'const int SNN_CONN_{i}_DST_SIZE       = {c["dst_size"]};')
+            lines.append(f'const int SNN_CONN_{i}_WEIGHT_OFFSET  = {c["weight_offset"]};')
+            lines.append(f'const int SNN_CONN_{i}_NUM_WEIGHTS    = {c["num_weights"]};')
+            lines.append(f'const int SNN_CONN_{i}_SRC_ID_START   = {c["src_id_start"]};')
+            lines.append(f'const int SNN_CONN_{i}_DST_ID_START   = {c["dst_id_start"]};')
+            lines.append(f'')
+    else:
+        lines += [
+            f'// ─── Legacy N×N weight memory (no connection topology defined) ─',
+            f'const int SNN_MAX_WEIGHT_BUFFER_SIZE  = {derived["max_weight_buffer_size"]};',
+            f'const int SNN_NUM_CONNECTIONS         = 0;',
+            f'const int SNN_NUM_NEURON_GROUPS       = 0;',
+            f'#define SNN_NUM_NEURON_GROUPS_PP      0',
+            f'#define SNN_NUM_CONNECTIONS_PP         0',
+            f'',
+        ]
+
+    lines += [
+        f'// ─── Weight Memory Optimization (Loihi/TrueNorth/KIST) ───────────',
+        f'#define SNN_WEIGHT_BITS           {derived["weight_bits"]}',
+        f'#define SNN_TIME_EMBEDDING        {derived["time_embedding"]}',
+        f'#define SNN_AUXILIARY_LUTRAM      {derived["auxiliary_lutram"]}',
+        f'const int SNN_PACKED_BUFFER_BYTES = {derived["packed_buffer_bytes"]};',
         f'',
         f'// ─── Fixed-Point (ap_fixed<16,8>) ─────────────────────────────────',
         f'const int SNN_FIXED_POINT_FRAC_BITS = {hls["fixed_point_frac_bits"]};',

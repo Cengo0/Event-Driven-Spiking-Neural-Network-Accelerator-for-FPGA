@@ -23,14 +23,167 @@
 // Configuration (derived from snn_params.h)
 //=============================================================================
 const int MAX_NEURONS    = SNN_MAX_NEURONS;                  // 16×128 = 2048
-const int MAX_SYNAPSES   = SNN_MAX_NEURONS * SNN_MAX_NEURONS;
+
+// --- NeuronGroup-aware weight buffer (Brian2-style) ---
+// Replaces the old O(N²) dense weight_memory[MAX_NEURONS][MAX_NEURONS].
+// Weight memory is now a flat buffer: Σ(src_size × dst_size) per connection.
+const int MAX_WEIGHT_BUFFER_SIZE = SNN_MAX_WEIGHT_BUFFER_SIZE;
+const int NUM_CONNECTIONS        = SNN_NUM_CONNECTIONS;
+const int NUM_NEURON_GROUPS      = SNN_NUM_NEURON_GROUPS;
+const int TOTAL_LOGICAL_NEURONS  = SNN_TOTAL_LOGICAL_NEURONS;
+
+// Connection descriptor: defines one src_group→dst_group synaptic projection.
+// Used by HLS to index into the flat weight_memory[] buffer.
+struct SynapticConnection {
+    int src_group;        // source NeuronGroup index
+    int dst_group;        // destination NeuronGroup index
+    int src_size;         // number of neurons in source group
+    int dst_size;         // number of neurons in destination group
+    int weight_offset;    // byte offset into flat weight_memory[]
+    int num_weights;      // src_size * dst_size
+    int src_id_start;     // global neuron ID of first neuron in src group
+    int dst_id_start;     // global neuron ID of first neuron in dst group
+};
+
+// Static connection table (initialized from generated constants)
+// Supports up to 8 connections for block-sparse topology (K=1024, 4 blocks)
+static const SynapticConnection CONNECTION_TABLE[NUM_CONNECTIONS] = {
+#if SNN_NUM_CONNECTIONS_PP >= 1
+    { SNN_CONN_0_SRC_GROUP, SNN_CONN_0_DST_GROUP,
+      SNN_CONN_0_SRC_SIZE,  SNN_CONN_0_DST_SIZE,
+      SNN_CONN_0_WEIGHT_OFFSET, SNN_CONN_0_NUM_WEIGHTS,
+      SNN_CONN_0_SRC_ID_START, SNN_CONN_0_DST_ID_START },
+#endif
+#if SNN_NUM_CONNECTIONS_PP >= 2
+    { SNN_CONN_1_SRC_GROUP, SNN_CONN_1_DST_GROUP,
+      SNN_CONN_1_SRC_SIZE,  SNN_CONN_1_DST_SIZE,
+      SNN_CONN_1_WEIGHT_OFFSET, SNN_CONN_1_NUM_WEIGHTS,
+      SNN_CONN_1_SRC_ID_START, SNN_CONN_1_DST_ID_START },
+#endif
+#if SNN_NUM_CONNECTIONS_PP >= 3
+    { SNN_CONN_2_SRC_GROUP, SNN_CONN_2_DST_GROUP,
+      SNN_CONN_2_SRC_SIZE,  SNN_CONN_2_DST_SIZE,
+      SNN_CONN_2_WEIGHT_OFFSET, SNN_CONN_2_NUM_WEIGHTS,
+      SNN_CONN_2_SRC_ID_START, SNN_CONN_2_DST_ID_START },
+#endif
+#if SNN_NUM_CONNECTIONS_PP >= 4
+    { SNN_CONN_3_SRC_GROUP, SNN_CONN_3_DST_GROUP,
+      SNN_CONN_3_SRC_SIZE,  SNN_CONN_3_DST_SIZE,
+      SNN_CONN_3_WEIGHT_OFFSET, SNN_CONN_3_NUM_WEIGHTS,
+      SNN_CONN_3_SRC_ID_START, SNN_CONN_3_DST_ID_START },
+#endif
+#if SNN_NUM_CONNECTIONS_PP >= 5
+    { SNN_CONN_4_SRC_GROUP, SNN_CONN_4_DST_GROUP,
+      SNN_CONN_4_SRC_SIZE,  SNN_CONN_4_DST_SIZE,
+      SNN_CONN_4_WEIGHT_OFFSET, SNN_CONN_4_NUM_WEIGHTS,
+      SNN_CONN_4_SRC_ID_START, SNN_CONN_4_DST_ID_START },
+#endif
+#if SNN_NUM_CONNECTIONS_PP >= 6
+    { SNN_CONN_5_SRC_GROUP, SNN_CONN_5_DST_GROUP,
+      SNN_CONN_5_SRC_SIZE,  SNN_CONN_5_DST_SIZE,
+      SNN_CONN_5_WEIGHT_OFFSET, SNN_CONN_5_NUM_WEIGHTS,
+      SNN_CONN_5_SRC_ID_START, SNN_CONN_5_DST_ID_START },
+#endif
+#if SNN_NUM_CONNECTIONS_PP >= 7
+    { SNN_CONN_6_SRC_GROUP, SNN_CONN_6_DST_GROUP,
+      SNN_CONN_6_SRC_SIZE,  SNN_CONN_6_DST_SIZE,
+      SNN_CONN_6_WEIGHT_OFFSET, SNN_CONN_6_NUM_WEIGHTS,
+      SNN_CONN_6_SRC_ID_START, SNN_CONN_6_DST_ID_START },
+#endif
+#if SNN_NUM_CONNECTIONS_PP >= 8
+    { SNN_CONN_7_SRC_GROUP, SNN_CONN_7_DST_GROUP,
+      SNN_CONN_7_SRC_SIZE,  SNN_CONN_7_DST_SIZE,
+      SNN_CONN_7_WEIGHT_OFFSET, SNN_CONN_7_NUM_WEIGHTS,
+      SNN_CONN_7_SRC_ID_START, SNN_CONN_7_DST_ID_START },
+#endif
+};
+
+// NeuronGroup ID start offsets (for global_id → local_id conversion)
+// Supports up to 9 groups + 1 sentinel for block-sparse topology
+static const int NG_ID_START[NUM_NEURON_GROUPS + 1] = {
+    SNN_NG_ID_START_0,
+    SNN_NG_ID_START_1,
+    SNN_NG_ID_START_2,
+#if SNN_NUM_NEURON_GROUPS_PP >= 4
+    SNN_NG_ID_START_3,
+#endif
+#if SNN_NUM_NEURON_GROUPS_PP >= 5
+    SNN_NG_ID_START_4,
+#endif
+#if SNN_NUM_NEURON_GROUPS_PP >= 6
+    SNN_NG_ID_START_5,
+#endif
+#if SNN_NUM_NEURON_GROUPS_PP >= 7
+    SNN_NG_ID_START_6,
+#endif
+#if SNN_NUM_NEURON_GROUPS_PP >= 8
+    SNN_NG_ID_START_7,
+#endif
+#if SNN_NUM_NEURON_GROUPS_PP >= 9
+    SNN_NG_ID_START_8,
+#endif
+#if SNN_NUM_NEURON_GROUPS_PP >= 10
+    SNN_NG_ID_START_9,
+#endif
+    // Explicit sentinel avoids zero-initialized tail when group count changes.
+    SNN_TOTAL_LOGICAL_NEURONS,
+};
 
 const int WEIGHT_WIDTH   = SNN_WEIGHT_WIDTH;                 // 8
-const int NEURON_ID_WIDTH = SNN_NEURON_ID_WIDTH;             // 11 (Core Group global ID)
+const int RTL_NEURON_ID_WIDTH = SNN_NEURON_ID_WIDTH;         // 11 (RTL Core Group global ID)
+const int NEURON_ID_WIDTH = SNN_HLS_NEURON_ID_WIDTH;         // 13 (HLS logical neuron space, K=1024)
 const int TIMESTAMP_WIDTH = 32;
 
+// AXI Spike Packet Bit-Field Layout (32-bit total):
+//   [NEURON_ID_WIDTH-1 : 0]          neuron_id  (13 bits, K=1024)
+//   [NEURON_ID_WIDTH+7 : NEURON_ID_WIDTH]  weight     (8 bits)
+//   [31 : NEURON_ID_WIDTH+8]         timestamp  (11 bits)
+const int SPIKE_PKT_ID_LO  = 0;
+const int SPIKE_PKT_ID_HI  = NEURON_ID_WIDTH - 1;
+const int SPIKE_PKT_WGT_LO = NEURON_ID_WIDTH;
+const int SPIKE_PKT_WGT_HI = NEURON_ID_WIDTH + 7;
+const int SPIKE_PKT_TS_LO  = NEURON_ID_WIDTH + 8;
+const int SPIKE_PKT_TS_HI  = 31;
+
+//=============================================================================
+// Loihi/TrueNorth/KIST-Inspired Weight Memory Optimization
+//=============================================================================
+// WEIGHT_BITS: Configurable synapse precision (Loihi supports 1-9 bit).
+//   8-bit: full precision (original), ~794 BRAM18K for N=2048
+//   4-bit: Loihi default,            ~353 BRAM18K (halved)
+//   2-bit: TrueNorth ternary,        ~177 BRAM18K (quartered)
+//
+// PACKED_BUFFER_BYTES: ceil(MAX_WEIGHT_BUFFER_SIZE * WEIGHT_BITS / 8)
+//   The storage array is declared as ap_int<WEIGHT_BITS> flat entries,
+//   letting HLS map to the most efficient BRAM configuration.
+//
+// TIME_EMBEDDING (KIST-style): Remove per-neuron 16-bit timestamps.
+//   Traces decay globally each timestep instead of lazily per-access.
+//   Saves 16 bits × TOTAL_LOGICAL_NEURONS × 2 in BRAM.
+//
+// AUXILIARY_LUTRAM: Move traces & eligibility to distributed LUTRAM
+//   instead of BRAM.  ~1,400 LUTs (2.6% of xc7z020) frees ~30 BRAM18K.
+//=============================================================================
+const int WEIGHT_BITS    = SNN_WEIGHT_BITS;                  // 4 (default)
+const int PACKED_BUFFER_SIZE = SNN_MAX_WEIGHT_BUFFER_SIZE;   // logical entries
+
+// Packed weight type: signed N-bit value stored per synapse
+typedef ap_int<SNN_WEIGHT_BITS> packed_weight_t;
+
+// Weight range depends on bit width
+#if SNN_WEIGHT_BITS == 2
+const packed_weight_t PACKED_MAX_WEIGHT = 1;     // 2-bit: [-2, 1]
+const packed_weight_t PACKED_MIN_WEIGHT = -2;
+#elif SNN_WEIGHT_BITS == 4
+const packed_weight_t PACKED_MAX_WEIGHT = 7;     // 4-bit: [-8, 7]
+const packed_weight_t PACKED_MIN_WEIGHT = -8;
+#else  // SNN_WEIGHT_BITS == 8 (original)
+const packed_weight_t PACKED_MAX_WEIGHT = 127;   // 8-bit: [-128, 127]
+const packed_weight_t PACKED_MIN_WEIGHT = -128;
+#endif
+
 const int WEIGHT_SCALE   = 128;
-const int VERSION_ID     = 0x20260210;
+const int VERSION_ID     = 0x20260221;
 
 //=============================================================================
 // Operation Modes (use #define for switch-case compatibility)
@@ -38,25 +191,35 @@ const int VERSION_ID     = 0x20260210;
 #define MODE_INFERENCE 0       // Forward inference only
 #define MODE_TRAIN_STDP 1      // On-chip STDP learning
 #define MODE_CHECKPOINT 2      // Stream weights to DDR/PS
+// mode_reg[31:16] can optionally hold checkpoint chunk size (words):
+//   0 -> legacy single-frame checkpoint (TLAST at final word only)
+//   N -> emit TLAST every N words while streaming checkpoint packets
 
 //=============================================================================
 // Basic Data Types
 //=============================================================================
-typedef ap_uint<NEURON_ID_WIDTH> neuron_id_t;
-typedef ap_int<WEIGHT_WIDTH> weight_t;       // HLS: signed 8-bit
+typedef ap_uint<NEURON_ID_WIDTH> neuron_id_t;      // HLS logical neuron ID (13b, K=1024)
+typedef ap_uint<RTL_NEURON_ID_WIDTH> rtl_nid_t;    // RTL core group ID (11b)
+typedef ap_uint<SNN_GROUP_ID_WIDTH> group_id_t;
+typedef ap_uint<SNN_LOCAL_ID_WIDTH> local_id_t;
+typedef ap_uint<SNN_FANOUT_IDX_WIDTH> fanout_idx_t;
+typedef ap_int<WEIGHT_WIDTH> weight_t;              // HLS AXI interface: signed 8-bit
 typedef ap_int<16> weight_delta_t;
 typedef ap_uint<TIMESTAMP_WIDTH> spike_time_t;
 
-// NOTE: HLS STDP engine uses signed 8-bit weights [-128, 127].
+// NOTE: HLS STDP engine uses packed_weight_t (configurable SNN_WEIGHT_BITS).
+// AXI-Stream packets still use 8-bit weight_t for interface compatibility.
 // RTL core_group.v uses unsigned 8-bit magnitude [0, 255] + 1-bit exc/inh flag.
-const weight_t MAX_WEIGHT = 127;
-const weight_t MIN_WEIGHT = -128;
+const packed_weight_t MAX_WEIGHT = PACKED_MAX_WEIGHT;
+const packed_weight_t MIN_WEIGHT = PACKED_MIN_WEIGHT;
 
 //=============================================================================
 // AXI4-Stream Types
 //=============================================================================
-// Spike packet (AER over AXIS32):
-// [31:18] timestamp(14b), [17:10] weight(8b,wo's complement), [9:0] neuron_id
+// Spike packet (AER over AXIS32) — parameterized bit-field layout:
+//   [SPIKE_PKT_ID_HI : SPIKE_PKT_ID_LO]   neuron_id  (NEURON_ID_WIDTH bits)
+//   [SPIKE_PKT_WGT_HI : SPIKE_PKT_WGT_LO] weight     (8 bits)
+//   [SPIKE_PKT_TS_HI : SPIKE_PKT_TS_LO]   timestamp  (remaining bits)
 typedef ap_axiu<32, 1, 1, 1> axis_spike_t;
 
 // Weight packet: [31:24] reserved, [23:16] weight, [15:8] post_id, [7:0] pre_id
@@ -69,18 +232,18 @@ typedef ap_axiu<32, 1, 1, 1> axis_data_t;
 // Learning Parameters Structure
 //=============================================================================
 struct learning_params_t {
-    // STDP parameters
-    ap_fixed<16,8> a_plus;          // LTP amplitude (0.0 ~ 1.0)
-    ap_fixed<16,8> a_minus;         // LTD amplitude (0.0 ~ 1.0)
-    ap_uint<16> tau_plus;           // LTP time constant (timesteps)
-    ap_uint<16> tau_minus;          // LTD time constant (timesteps)
-    ap_uint<16> stdp_window;        // STDP window size (timesteps)
-    ap_fixed<16,8> learning_rate;   // Global learning rate
+    // STDP parameters (all used in HLS STDP engine)
+    ap_fixed<16,8> a_plus;          // LTP amplitude — scales Δw in LTP (used)
+    ap_fixed<16,8> a_minus;         // LTD amplitude — scales Δw in LTD (used)
+    ap_uint<16> tau_plus;           // Pre-trace time constant (host-side, for computing trace_decay)
+    ap_uint<16> tau_minus;          // Post-trace time constant (host-side, for computing trace_decay)
+    ap_uint<16> stdp_window;        // Reserved (KIST global decay makes window implicit)
+    ap_fixed<16,8> learning_rate;   // Global learning rate — final scale on all weight updates (used)
     
     // R-STDP parameters
-    bool rstdp_enable;              // Enable reward-modulated STDP
-    ap_fixed<16,8> trace_decay;     // Eligibility trace decay rate
-    ap_fixed<16,8> reward_scale;    // Reward signal scaling
+    bool rstdp_enable;              // Enable reward-modulated STDP (used)
+    ap_fixed<16,8> trace_decay;     // Trace decay rate per timestep (used in decay_all_traces)
+    ap_fixed<16,8> reward_scale;    // Reward signal scaling in R-STDP (used)
 };
 
 //=============================================================================
@@ -152,17 +315,29 @@ void snn_top_hls(
     // Reward signal input (for R-STDP)
     ap_int<8> reward_signal,
     
-    // Verilog Interface - Spike Input (to SNN core)
+    // Verilog Interface - Spike Input (to SNN core) — RTL-width IDs
     ap_uint<1> &spike_in_valid,
-    neuron_id_t &spike_in_neuron_id,
+    rtl_nid_t &spike_in_neuron_id,
     ap_int<8> &spike_in_weight,
     ap_uint<1> spike_in_ready,
     
-    // Verilog Interface - Spike Output (from SNN core)
+    // Verilog Interface - Spike Output (from SNN core) — RTL-width IDs
     ap_uint<1> spike_out_valid,
-    neuron_id_t spike_out_neuron_id,
+    rtl_nid_t spike_out_neuron_id,
     ap_int<8> spike_out_weight,
     ap_uint<1> &spike_out_ready,
+
+    // Verilog Interface - Learned weight update (HLS -> Event Router)
+    ap_uint<1> &learn_weight_valid,
+    group_id_t &learn_weight_group,
+    local_id_t &learn_weight_src,
+    local_id_t &learn_weight_dst,
+    ap_uint<8> &learn_weight_data,
+    ap_uint<1> &learn_weight_exc,
+    ap_uint<1> &learn_weight_is_inter,
+    group_id_t &learn_weight_dst_group,
+    fanout_idx_t &learn_weight_fanout_idx,
+    ap_uint<1> learn_weight_ready,
     
     // Verilog Interface - Control signals
     ap_uint<1> &snn_enable,
@@ -178,8 +353,57 @@ void snn_top_hls(
 //=============================================================================
 // Utility Functions
 //=============================================================================
-void write_weight(neuron_id_t pre_id, neuron_id_t post_id, weight_t weight);
-weight_t read_weight(neuron_id_t pre_id, neuron_id_t post_id);
-void load_weights_from_stream(hls::stream<axis_weight_t> &weight_stream, ap_uint<16> num_weights);
+void write_weight(neuron_id_t pre_id, neuron_id_t post_id, packed_weight_t weight);
+packed_weight_t read_weight(neuron_id_t pre_id, neuron_id_t post_id);
+void load_weights_from_stream(hls::stream<axis_weight_t> &weight_stream, ap_uint<32> num_weights);
+
+//=============================================================================
+// NeuronGroup Weight Access Helpers
+// These convert global neuron IDs to flat buffer offsets via connection table.
+//=============================================================================
+
+// Find which NeuronGroup a global neuron ID belongs to.
+// Returns group index [0, NUM_NEURON_GROUPS), or -1 if not found.
+static inline int find_neuron_group(neuron_id_t nid) {
+    #pragma HLS INLINE
+    for (int g = 0; g < NUM_NEURON_GROUPS; g++) {
+        #pragma HLS UNROLL
+        if ((int)nid >= NG_ID_START[g] && (int)nid < NG_ID_START[g + 1]) {
+            return g;
+        }
+    }
+    return -1;
+}
+
+// Find connection index for a (src_group, dst_group) pair.
+// Returns connection index [0, NUM_CONNECTIONS), or -1 if not connected.
+static inline int find_connection(int src_group, int dst_group) {
+    #pragma HLS INLINE
+    for (int c = 0; c < NUM_CONNECTIONS; c++) {
+        #pragma HLS UNROLL
+        if (CONNECTION_TABLE[c].src_group == src_group &&
+            CONNECTION_TABLE[c].dst_group == dst_group) {
+            return c;
+        }
+    }
+    return -1;
+}
+
+// Compute flat buffer index for a (pre_id, post_id) pair.
+// Returns offset into weight_memory[], or -1 if not connected.
+static inline int weight_index(neuron_id_t pre_id, neuron_id_t post_id) {
+    #pragma HLS INLINE
+    int src_g = find_neuron_group(pre_id);
+    int dst_g = find_neuron_group(post_id);
+    if (src_g < 0 || dst_g < 0) return -1;
+
+    int conn_idx = find_connection(src_g, dst_g);
+    if (conn_idx < 0) return -1;
+
+    const SynapticConnection &conn = CONNECTION_TABLE[conn_idx];
+    int local_src = (int)pre_id - conn.src_id_start;
+    int local_dst = (int)post_id - conn.dst_id_start;
+    return conn.weight_offset + local_src * conn.dst_size + local_dst;
+}
 
 #endif // SNN_TOP_HLS_H

@@ -1,6 +1,6 @@
 // =============================================================================
 // SNN Accelerator Parameters — AUTO-GENERATED from snn_params.yaml
-// Generated: 2026-02-11 09:19:54
+// Generated: 2026-02-22 16:30:32
 // DO NOT EDIT — modify config/snn_params.yaml and run generate_params.py
 // =============================================================================
 
@@ -57,8 +57,19 @@
 `define SNN_WEIGHT_FLAG_WIDTH   9
 
 // ─── HLS Interface ────────────────────────────────────────────────
-`define SNN_HLS_NEURON_ID_WIDTH 11
+`define SNN_HLS_NEURON_ID_WIDTH 13
 `define SNN_HLS_MAX_NEURONS     2048
 `define SNN_HLS_WEIGHT_WIDTH    8
+
+// ─── NeuronGroup Weight Buffer ─────────────────────────────────────
+`define SNN_MAX_WEIGHT_BUFFER_SIZE 843776
+`define SNN_NUM_CONNECTIONS       8
+`define SNN_NUM_NEURON_GROUPS     9
+
+// ─── Weight Memory Optimization (Loihi/TrueNorth/KIST) ──────────
+`define SNN_WEIGHT_BITS           4
+`define SNN_TIME_EMBEDDING        1
+`define SNN_AUXILIARY_LUTRAM      1
+`define SNN_PACKED_BUFFER_BYTES   421888
 
 `endif // SNN_PARAMS_VH

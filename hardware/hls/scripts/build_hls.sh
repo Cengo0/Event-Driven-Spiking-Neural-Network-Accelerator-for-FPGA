@@ -29,6 +29,8 @@ WORK_DIR="./hls_output"
 # Script location
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 HLS_DIR="$(dirname "$SCRIPT_DIR")"
+PROJECT_ROOT="$(dirname "$(dirname "$HLS_DIR")")"
+CONFIG_GENERATED_DIR="$PROJECT_ROOT/config/generated"
 
 # Parse arguments
 CLEAN=0

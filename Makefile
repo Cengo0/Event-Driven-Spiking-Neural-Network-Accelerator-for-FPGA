@@ -60,6 +60,7 @@ help:
 	@echo "  python         - Install Python package"
 	@echo "  examples       - Run example scripts"
 	@echo "  test           - Run all tests"
+	@echo "  verify-parity  - Run SW/HW parity verification suite"
 	@echo ""
 	@echo "$(YELLOW)Quick commands:$(RESET)"
 	@echo "  make setup     - One-command setup"
@@ -100,6 +101,12 @@ hls:
 	@if command -v $(VPP) >/dev/null 2>&1; then \
 		cd $(HARDWARE_DIR)/hls && \
 		./scripts/build_hls.sh --clean; \
+		if [ -d hls_output/hls/impl/ip ]; then \
+			rm -rf ../ip_repo/snn_top_hls_1_0; \
+			mkdir -p ../ip_repo; \
+			cp -a hls_output/hls/impl/ip ../ip_repo/snn_top_hls_1_0; \
+			echo "$(GREEN)✅ Synced HLS IP to hardware/ip_repo/snn_top_hls_1_0$(RESET)"; \
+		fi; \
 		echo "$(GREEN)✅ HLS build completed$(RESET)"; \
 	else \
 		echo "$(RED)❌ v++ compiler not found. Source Vitis settings first.$(RESET)"; \
@@ -157,6 +164,12 @@ test: install
 	@echo "$(BLUE)Integration tests...$(RESET)"
 	@$(PYTHON) $(EXAMPLES_DIR)/complete_integration_example.py --simulation-mode --skip-training || echo "$(YELLOW)Integration test not available$(RESET)"
 	@echo "$(GREEN)✅ All tests completed$(RESET)"
+
+.PHONY: verify-parity
+verify-parity:
+	@echo "$(YELLOW)Running SW/HW parity verification suite...$(RESET)"
+	@./scripts/verify_sw_hw_parity.sh
+	@echo "$(GREEN)✅ SW/HW parity verification completed$(RESET)"
 
 # Legacy compatibility
 .PHONY: software

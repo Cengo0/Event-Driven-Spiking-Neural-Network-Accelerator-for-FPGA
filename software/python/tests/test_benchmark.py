@@ -76,32 +76,44 @@ class TestMemoryFootprint:
     """Memory footprint estimation tests."""
     
     def test_weight_memory_requirements(self):
-        """Calculate weight memory requirements."""
+        """Calculate weight memory requirements (NeuronGroup-aware flat buffer)."""
         # Network configuration
         input_size = 784   # MNIST 28x28
         hidden_size = 128
         output_size = 10
         
-        # Weights (16-bit fixed-point)
-        w1_count = input_size * hidden_size
-        w2_count = hidden_size * output_size
+        # Phase 6.5: NeuronGroup-aware flat buffer
+        # Only defined connections are stored, not N×N dense
+        w1_count = input_size * hidden_size   # input → hidden
+        w2_count = hidden_size * output_size  # hidden → output
+        flat_buffer_size = w1_count + w2_count  # total entries in flat buffer
         
-        w1_bytes = w1_count * 2  # 16-bit = 2 bytes
-        w2_bytes = w2_count * 2
+        # Compare with dense N×N (old approach)
+        total_neurons = input_size + hidden_size + output_size  # 922
+        dense_size = total_neurons * total_neurons  # 850,084
         
-        total_weight_bytes = w1_bytes + w2_bytes
-        total_weight_kb = total_weight_bytes / 1024
+        # Weights (8-bit int8 for HLS)
+        flat_bytes = flat_buffer_size * 1  # int8 = 1 byte
+        dense_bytes = dense_size * 1
+        
+        total_weight_kb = flat_bytes / 1024
+        dense_kb = dense_bytes / 1024
+        reduction_pct = (1 - flat_buffer_size / dense_size) * 100
         
         print("\n" + "="*60)
-        print("Weight Memory Footprint")
+        print("Weight Memory Footprint (NeuronGroup-aware)")
         print("="*60)
-        print(f"  Input -> Hidden:  {w1_count:,} weights ({w1_bytes/1024:.2f} KB)")
-        print(f"  Hidden -> Output: {w2_count:,} weights ({w2_bytes/1024:.2f} KB)")
-        print(f"  Total weights:    {w1_count + w2_count:,} ({total_weight_kb:.2f} KB)")
+        print(f"  Input -> Hidden:  {w1_count:,} weights")
+        print(f"  Hidden -> Output: {w2_count:,} weights")
+        print(f"  Flat buffer:      {flat_buffer_size:,} ({total_weight_kb:.2f} KB)")
+        print(f"  vs Dense N×N:     {dense_size:,} ({dense_kb:.2f} KB)")
+        print(f"  Reduction:        {reduction_pct:.1f}%")
         print("="*60)
         
         # Should fit in PYNQ-Z2 BRAM (512 KB total)
         assert total_weight_kb < 200, f"Weights too large: {total_weight_kb:.2f} KB"
+        # Flat buffer must be smaller than dense
+        assert flat_buffer_size < dense_size
     
     def test_neuron_state_memory(self):
         """Calculate neuron state memory requirements."""

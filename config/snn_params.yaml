@@ -54,6 +54,105 @@ architecture:
   spike_buffer_depth: 64    # Input FIFO depth per core group (entries)
 
 # ─────────────────────────────────────────────────────────────────────────────
+# NeuronGroup Connection Topology (Brian2-style, Block-Sparse K=1024)
+# ─────────────────────────────────────────────────────────────────────────────
+# Block-sparse connectivity inspired by Loihi's core-local synapses.
+# Instead of fully-connected Input(784)→Hidden(2048), the image is split
+# into 4 horizontal stripes (7 rows each = 196 pixels) and each stripe
+# connects to a dedicated block of 1024 hidden neurons.
+#
+# Block-sparse advantages:
+#   - 74% fewer synapses vs fully-connected Input(784)→Hidden(4096)
+#   - HLS BRAM is quantized: weight_memory uses 256 BRAM18K for any
+#     entry count >524,288. K=1024 maximizes neurons within this budget.
+#   - At 4-bit: 263 BRAM18K (93%) — same cost as K=640 or K=768
+#   - 4× faster STDP per spike (loop over 1024 instead of 4096)
+#   - Biologically plausible local receptive fields
+#   - DSP48E1-mapped trace decay for II=1 global decay pipeline
+#
+# Layout:
+#   input_0 (rows 0-6,  196px) → hidden_0 (1024) ─┐
+#   input_1 (rows 7-13, 196px) → hidden_1 (1024) ─┤→ output (10)
+#   input_2 (rows 14-20,196px) → hidden_2 (1024) ─┤
+#   input_3 (rows 21-27,196px) → hidden_3 (1024) ─┘
+#
+# Total weights = 4×(196×1024) + 4×(1024×10) = 802,816 + 40,960 = 843,776
+#
+neuron_groups:
+  - name: "input_0"       # MNIST rows 0-6   (pixels 0-195)
+    size: 196
+  - name: "input_1"       # MNIST rows 7-13  (pixels 196-391)
+    size: 196
+  - name: "input_2"       # MNIST rows 14-20 (pixels 392-587)
+    size: 196
+  - name: "input_3"       # MNIST rows 21-27 (pixels 588-783)
+    size: 196
+  - name: "hidden_0"      # Processes top stripe features
+    size: 1024
+  - name: "hidden_1"      # Processes upper-middle stripe features
+    size: 1024
+  - name: "hidden_2"      # Processes lower-middle stripe features
+    size: 1024
+  - name: "hidden_3"      # Processes bottom stripe features
+    size: 1024
+  - name: "output"        # Classification layer (10 digits)
+    size: 10
+
+connections:
+  # Block-sparse input→hidden (each input stripe → dedicated hidden block)
+  - name: "in0_to_hid0"
+    src_group: 0          # input_0
+    dst_group: 4          # hidden_0
+  - name: "in1_to_hid1"
+    src_group: 1          # input_1
+    dst_group: 5          # hidden_1
+  - name: "in2_to_hid2"
+    src_group: 2          # input_2
+    dst_group: 6          # hidden_2
+  - name: "in3_to_hid3"
+    src_group: 3          # input_3
+    dst_group: 7          # hidden_3
+  # Fully-connected hidden→output (all hidden blocks converge)
+  - name: "hid0_to_output"
+    src_group: 4          # hidden_0
+    dst_group: 8          # output
+  - name: "hid1_to_output"
+    src_group: 5          # hidden_1
+    dst_group: 8          # output
+  - name: "hid2_to_output"
+    src_group: 6          # hidden_2
+    dst_group: 8          # output
+  - name: "hid3_to_output"
+    src_group: 7          # hidden_3
+    dst_group: 8          # output
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Weight Memory Optimization (Loihi / TrueNorth / KIST-inspired, ALL on-chip)
+# ─────────────────────────────────────────────────────────────────────────────
+# Neuromorphic chips (Loihi, TrueNorth) keep ALL weights on-chip SRAM to
+# avoid von Neumann bottleneck.  No DDR is used in the datapath.
+# We apply three techniques to maximize neuron density within BRAM budget:
+#
+# 1. weight_bits: Configurable synapse precision (Loihi supports 1-9 bit).
+#    4-bit halves BRAM vs 8-bit; 2-bit quarters it.
+#    - 8-bit: full precision, ~353 BRAM18K per 1.6M synapses (N=2048)
+#    - 4-bit: Loihi default, ~177 BRAM18K  (fits in xc7z020)
+#    - 2-bit: TrueNorth ternary, ~89 BRAM18K (max density)
+#
+# 2. time_embedding: KIST-style technique to remove per-neuron 16-bit
+#    timestamps from trace storage.  Decay is applied globally each timestep
+#    instead of lazily per access.  Saves 16 bits × N × 2 traces.
+#
+# 3. auxiliary_storage: Move small arrays (traces, eligibility) to
+#    distributed LUTRAM instead of BRAM.  ~1,400 LUTs (2.6%) frees
+#    ~30 BRAM18K on xc7z020.
+#
+weight_memory:
+  weight_bits: 4                # 2, 4, or 8 (bits per synapse weight)
+  time_embedding: true          # KIST-style: remove per-neuron timestamps
+  auxiliary_storage: "lutram"   # "bram" or "lutram" for traces/eligibility
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Data Widths (bit widths for fixed-point / integer representations)
 # ─────────────────────────────────────────────────────────────────────────────
 widths:

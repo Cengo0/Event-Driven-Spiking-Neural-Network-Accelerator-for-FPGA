@@ -3,13 +3,14 @@
 # Run all SNN Core Group testbenches using Vivado xsim
 # Usage: bash run_testbenches.sh
 #=============================================================================
-set -e
+set -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJ_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 RTL_DIR="$PROJ_ROOT/hardware/hdl/rtl"
 TB_DIR="$PROJ_ROOT/hardware/hdl/tb"
 WORK_DIR="$PROJ_ROOT/hardware/sim_work"
+INC_DIR="$PROJ_ROOT/config/generated"
 
 source /tools/Xilinx/2025.2/Vivado/settings64.sh
 
@@ -35,8 +36,7 @@ run_test() {
 
     # Compile
     echo "  [1/3] Compiling..."
-    xvlog -nolog "${SRC_FILES[@]}" "$TB_FILE" > compile_${TESTNAME}.log 2>&1
-    if [ $? -ne 0 ]; then
+    if ! xvlog -nolog -i "$INC_DIR" "${SRC_FILES[@]}" "$TB_FILE" > compile_${TESTNAME}.log 2>&1; then
         echo "  [COMPILE ERROR] $TESTNAME"
         cat compile_${TESTNAME}.log
         FAIL_TOTAL=$((FAIL_TOTAL + 1))
@@ -46,8 +46,7 @@ run_test() {
     # Elaborate
     echo "  [2/3] Elaborating..."
     local TOP=$(basename "$TB_FILE" .v)
-    xelab -nolog -debug off "$TOP" -s "${TESTNAME}_sim" > elab_${TESTNAME}.log 2>&1
-    if [ $? -ne 0 ]; then
+    if ! xelab -nolog -debug off "$TOP" -s "${TESTNAME}_sim" > elab_${TESTNAME}.log 2>&1; then
         echo "  [ELABORATE ERROR] $TESTNAME"
         cat elab_${TESTNAME}.log
         FAIL_TOTAL=$((FAIL_TOTAL + 1))
@@ -56,15 +55,23 @@ run_test() {
 
     # Simulate
     echo "  [3/3] Simulating..."
-    xsim -nolog "${TESTNAME}_sim" -runall > sim_${TESTNAME}.log 2>&1
+    if ! xsim -nolog "${TESTNAME}_sim" -runall > sim_${TESTNAME}.log 2>&1; then
+        echo "  [SIM ERROR] $TESTNAME"
+        cat sim_${TESTNAME}.log
+        FAIL_TOTAL=$((FAIL_TOTAL + 1))
+        return
+    fi
 
     # Print results
     echo ""
-    grep -E "\[PASS\]|\[FAIL\]|Results:|ALL TESTS|SOME TESTS|ERROR" sim_${TESTNAME}.log || true
+    grep -aE "\[PASS\]|\[FAIL\]|Results:|ALL TESTS|SOME TESTS|ERROR" sim_${TESTNAME}.log || true
 
     # Count
-    local P=$(grep -c "\[PASS\]" sim_${TESTNAME}.log 2>/dev/null || echo 0)
-    local F=$(grep -c "\[FAIL\]" sim_${TESTNAME}.log 2>/dev/null || echo 0)
+    local P F
+    P=$(grep -ac "\[PASS\]" sim_${TESTNAME}.log 2>/dev/null || true)
+    F=$(grep -ac "\[FAIL\]" sim_${TESTNAME}.log 2>/dev/null || true)
+    P=${P:-0}
+    F=${F:-0}
     PASS_TOTAL=$((PASS_TOTAL + P))
     FAIL_TOTAL=$((FAIL_TOTAL + F))
 }

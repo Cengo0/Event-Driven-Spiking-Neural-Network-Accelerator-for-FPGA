@@ -386,6 +386,46 @@ class SNNAccelerator:
         
         print(f"Programmed {len(connections)} connections for "
               f"{len(by_src)} source neurons")
+
+    def program_network_from_topology(self, compiled_network):
+        """
+        Program the spike router from a NeuronGroup-aware CompiledNetwork.
+
+        For each connection in the compiled topology, creates MAX_FANOUT router
+        entries mapping source neurons to their destination neurons.
+        Weight values are taken from the connection info (uniform default).
+
+        Args:
+            compiled_network: A CompiledNetwork from network.py compile().
+        """
+        total_conns = 0
+        for conn_info in compiled_network.connections:
+            src_start = conn_info.src_id_start
+            dst_start = conn_info.dst_id_start
+            src_size = conn_info.src_size
+            dst_size = conn_info.dst_size
+
+            # For sparse routers, we program per-source fanout entries.
+            # If dst_size > 32 (MAX_FANOUT), we need multiple passes or
+            # rely on the HLS learning path instead of router weights.
+            max_fanout = min(dst_size, 32)
+
+            for s in range(src_size):
+                src_neuron = (src_start + s) & 0x3FF
+                for d in range(max_fanout):
+                    dest_neuron = (dst_start + d) & 0x3FF
+                    self.program_connection(
+                        src_neuron=src_neuron,
+                        conn_idx=d,
+                        dest_neuron=dest_neuron,
+                        weight=10,
+                        excitatory=True,
+                    )
+                self.set_connection_count(src_neuron, max_fanout)
+                total_conns += max_fanout
+
+        print(f"Programmed {total_conns} router entries from "
+              f"{len(compiled_network.connections)} NeuronGroup connections")
     
     def read_router_config(self, addr):
         """
