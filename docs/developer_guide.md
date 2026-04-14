@@ -1,5 +1,15 @@
 # Developer Guide
 
+This is the main public developer-facing guide for build, deployment, and the
+maintained native execution paths.
+
+## Documentation Map
+
+- `README.md`: project overview and quick start
+- `docs/api_reference.md`: Python/runtime API details
+- `docs/architecture.md`: hardware/software architecture overview
+- `docs/user_guide.md`: end-user setup and examples
+
 ## Setup
 
 ```bash
@@ -66,6 +76,32 @@ vivado -mode batch -source synth_core_group.tcl
 ```
 
 Output: `outputs/snn_integrated.bit`
+
+## Supported Workflow Policy
+
+- Native library-first path is the maintained route.
+- Removed from supported path: `SpikingJelly auto-conversion`.
+- Recommended scenarios:
+  1. GPU train (surrogate/STDP) -> native export -> FPGA inference
+  2. FPGA STDP train + inference with parity tooling
+
+## Maintained Native Workflows
+
+### Scenario 1: GPU Train -> FPGA Inference
+
+```bash
+./scripts/run_scenario1_native_fpga_infer.sh \
+  --deployment /home/xilinx/snn/mnist_10class_deployment.npz \
+  --output /home/xilinx/snn/mnist_10class_results_scenario1.json
+```
+
+### Scenario 2: FPGA STDP Train + FPGA Inference
+
+```bash
+./scripts/run_scenario2_fpga_stdp_train_infer.sh \
+  --stdp-steps 100 \
+  --infer-output /home/xilinx/snn/mnist_10class_results_scenario2.json
+```
 
 ## RTL Development
 

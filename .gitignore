@@ -111,6 +111,14 @@ models/*
 outputs/*.bit
 
 # ============================================================
+# Local research / working docs
+# ============================================================
+RESEARCH_NOTE.md
+TODO.md
+ACCEPTANCE_CRITERIA.md
+docs/experiment_results_dashboard.md
+
+# ============================================================
 # Editor / IDE
 # ============================================================
 .vscode/
