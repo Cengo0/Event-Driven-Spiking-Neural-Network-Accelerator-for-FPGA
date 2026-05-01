@@ -73,11 +73,11 @@ tests/
 ## Citation
 
 ```bibtex
-@misc{lee2025snnaccelerator,
-  title={Event-Driven Spiking Neural Network Accelerator for FPGA},
-  author={Lee, Jiwoon},
-  year={2025},
-  url={https://github.com/metr0jw/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA}
+@article{lee2026hardware,
+  title={Hardware-Software Co-Design for Event-Driven SNN Deployment on Low-Cost Neuromorphic FPGAs},
+  author={Lee, Jiwoon and Chakraborty, Souvik and Alam, Syed Bahauddin and Park, Cheolsoo},
+  journal={arXiv preprint arXiv:2604.22179},
+  year={2026}
 }
 ```
 
