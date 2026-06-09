@@ -7,9 +7,11 @@ hardware/hdl/rtl/core/core_group.v
 hardware/hdl/rtl/core/event_router_ng.v
 hardware/hdl/rtl/core/synaptic_connectivity_table.v
 
-# Optional: Spike Convolution AGU (Loihi-style)
-# Uncomment to enable convolutional connectivity support
+# Optional: Spike Convolution Layer (Loihi-style)
+# Uncomment to enable convolutional connectivity support with shared weights
 # hardware/hdl/rtl/core/spike_conv_agu.v
+# hardware/hdl/rtl/core/spike_conv_connectivity_table.v
+# hardware/hdl/rtl/core/spike_conv_layer.v
 
 # Common utilities
 hardware/hdl/rtl/common/direct_axis_id_decoder.v
