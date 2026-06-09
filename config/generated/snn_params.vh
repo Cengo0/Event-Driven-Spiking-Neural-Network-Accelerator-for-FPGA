@@ -1,6 +1,6 @@
 // =============================================================================
-// SNN Accelerator Parameters — AUTO-GENERATED from snn_params.yaml
-// Generated: 2026-02-22 16:30:32
+// SpikeMold Fabric Parameters - AUTO-GENERATED from snn_params.yaml
+// Generated deterministically from config/snn_params.yaml
 // DO NOT EDIT — modify config/snn_params.yaml and run generate_params.py
 // =============================================================================
 
@@ -12,6 +12,12 @@
 `define SNN_NEURONS_PER_GROUP   128   // max(group_sizes) — bus width driver
 `define SNN_MAX_NEURONS_PER_GROUP 128
 `define SNN_MAX_FANOUT_INTER    16
+`define SNN_ROUTER_MAX_FANOUT   32
+`define SNN_ROUTER_DELAY_WIDTH  8
+`define SNN_ROUTER_USE_DIRECT_OFFSET_MAP 0
+`define SNN_ROUTER_USE_TABLE_FALLBACK 0
+`define SNN_ROUTER_DIRECT_MAP_WINDOWS 4
+`define SNN_ROUTER_CONN_RAM_STYLE_DIST 0
 `define SNN_SPIKE_BUFFER_DEPTH  64
 
 // ─── Per-Group Neuron Counts ─────────────────────────────────────
@@ -60,16 +66,35 @@
 `define SNN_HLS_NEURON_ID_WIDTH 13
 `define SNN_HLS_MAX_NEURONS     2048
 `define SNN_HLS_WEIGHT_WIDTH    8
+`define SNN_HLS_LEARNING_ENABLE 0
+`define SNN_HLS_SMOKE_COMMANDS_ENABLE 0
+`define SNN_HLS_CNN_DESCRIPTOR_PAGE_ENABLE 1
 
 // ─── NeuronGroup Weight Buffer ─────────────────────────────────────
-`define SNN_MAX_WEIGHT_BUFFER_SIZE 843776
-`define SNN_NUM_CONNECTIONS       8
-`define SNN_NUM_NEURON_GROUPS     9
+`define SNN_MAX_WEIGHT_BUFFER_SIZE 262144
+`define SNN_RESIDENT_WEIGHT_BUFFER_SIZE 1
+`define SNN_RESIDENT_WEIGHT_LOGICAL_ENTRIES 0
+`define SNN_TILED_WEIGHT_ENTRIES 262144
+`define SNN_NUM_CONNECTIONS       1
+`define SNN_NUM_NEURON_GROUPS     3
 
 // ─── Weight Memory Optimization (Loihi/TrueNorth/KIST) ──────────
-`define SNN_WEIGHT_BITS           4
+`define SNN_WEIGHT_BITS           8
 `define SNN_TIME_EMBEDDING        1
 `define SNN_AUXILIARY_LUTRAM      1
-`define SNN_PACKED_BUFFER_BYTES   421888
+`define SNN_TRACE_MAINTENANCE_ACTIVE_SET 0
+`define SNN_TRACE_ACTIVE_CLEAR_THRESHOLD 0
+`define SNN_PACKED_BUFFER_BYTES   262144
+
+// ─── Weight Tiling (future large-network path) ───────────────────
+`define SNN_WEIGHT_TILING_ENABLE  1
+`define SNN_WEIGHT_TILING_LARGE_ONLY 1
+`define SNN_WEIGHT_TILING_LARGE_CONN_MIN_WEIGHTS 65536
+`define SNN_WEIGHT_TILING_SRC_CHUNK 196
+`define SNN_WEIGHT_TILING_DST_CHUNK 128
+`define SNN_WEIGHT_TILING_DOUBLE_BUFFER 0
+`define SNN_WEIGHT_TILING_ACTIVE_BUFFERS 1
+`define SNN_WEIGHT_TILING_ACTIVE_TILE_WEIGHTS 25088
+`define SNN_WEIGHT_TILING_ACTIVE_TILE_BYTES 25088
 
 `endif // SNN_PARAMS_VH

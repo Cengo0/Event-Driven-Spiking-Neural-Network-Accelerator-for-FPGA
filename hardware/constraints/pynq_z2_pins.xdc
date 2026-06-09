@@ -1,6 +1,6 @@
 ##-----------------------------------------------------------------------------
-## Title         : Pin Constraints for PYNQ-Z2 SNN Accelerator
-## Project       : PYNQ-Z2 SNN Accelerator
+## Title         : Pin Constraints for PYNQ-Z2 SpikeMold Target
+## Project       : SpikeMold (HW) + SpikePress (SW)
 ## File          : pynq_z2_pins.xdc
 ## Author        : Jiwoon Lee (@metr0jw)
 ## Organization  : Kwangwoon University, Seoul, South Korea

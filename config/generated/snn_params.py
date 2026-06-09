@@ -1,15 +1,22 @@
 """
-SNN Accelerator Parameters — AUTO-GENERATED from snn_params.yaml
+SpikeMold Fabric Parameters - AUTO-GENERATED from snn_params.yaml
 
-Generated: 2026-02-22 16:30:32
+Generated deterministically from config/snn_params.yaml
 DO NOT EDIT — modify config/snn_params.yaml and run generate_params.py
 """
 
 # ─── Core Architecture ─────────────────────────────────────────────
 NUM_GROUPS          = 16
-NEURONS_PER_GROUP   = 128   # max(GROUP_SIZES) — backward compat
+NEURONS_PER_GROUP   = 128   # max(GROUP_SIZES)
 MAX_NEURONS_PER_GROUP = 128
 MAX_FANOUT_INTER    = 16
+ROUTER_MAX_FANOUT   = 32
+ROUTER_DELAY_WIDTH  = 8
+ROUTER_USE_DIRECT_OFFSET_MAP = 0
+ROUTER_USE_TABLE_FALLBACK = 0
+ROUTER_DIRECT_MAP_WINDOWS = 4
+ROUTER_CONN_RAM_STYLE = "block"
+ROUTER_CONN_RAM_STYLE_DIST = 0
 SPIKE_BUFFER_DEPTH  = 64
 
 # ─── Per-Group Neuron Counts ────────────────────────────────────────
@@ -44,51 +51,64 @@ MAX_WEIGHT_DELTA    = 255
 HLS_NEURON_ID_WIDTH = 13
 HLS_MAX_NEURONS     = 2048
 HLS_WEIGHT_WIDTH    = 8
+HLS_LEARNING_ENABLE = 0
+HLS_SMOKE_COMMANDS_ENABLE = 0
+HLS_CNN_DESCRIPTOR_PAGE_ENABLE = 1
 NEURON_ID_WIDTH     = GLOBAL_ID_WIDTH  # Alias
 
 # ─── NeuronGroup Connection Topology (Brian2-style) ────────────────
-NUM_NEURON_GROUPS       = 9
-NUM_CONNECTIONS         = 8
-MAX_WEIGHT_BUFFER_SIZE  = 843776
-MAX_SRC_NEURONS         = 1024
-MAX_DST_NEURONS         = 1024
+NUM_NEURON_GROUPS       = 3
+NUM_CONNECTIONS         = 1
+MAX_WEIGHT_BUFFER_SIZE  = 262144
+RESIDENT_WEIGHT_BUFFER_SIZE = 1
+RESIDENT_WEIGHT_LOGICAL_ENTRIES = 0
+TILED_WEIGHT_ENTRIES    = 262144
+MAX_SRC_NEURONS         = 512
+MAX_DST_NEURONS         = 512
 TOTAL_LOGICAL_NEURONS   = 4890
 
-NEURON_GROUP_NAMES  = ['input_0', 'input_1', 'input_2', 'input_3', 'hidden_0', 'hidden_1', 'hidden_2', 'hidden_3', 'output']
-NEURON_GROUP_SIZES  = [196, 196, 196, 196, 1024, 1024, 1024, 1024, 10]
-NEURON_GROUP_ID_START = [0, 196, 392, 588, 784, 1808, 2832, 3856, 4880, 4890]
+NEURON_GROUP_NAMES  = ['visible_output', 'input', 'dummy_pad']
+NEURON_GROUP_SIZES  = [512, 512, 3866]
+NEURON_GROUP_ID_START = [0, 512, 1024, 4890]
 
 # Per-Connection metadata: list of dicts
 CONNECTIONS = [
-    {"name": "in0_to_hid0", "src_group": 0, "dst_group": 4, "src_size": 196, "dst_size": 1024, "weight_offset": 0, "num_weights": 200704, "src_id_start": 0, "dst_id_start": 784},
-    {"name": "in1_to_hid1", "src_group": 1, "dst_group": 5, "src_size": 196, "dst_size": 1024, "weight_offset": 200704, "num_weights": 200704, "src_id_start": 196, "dst_id_start": 1808},
-    {"name": "in2_to_hid2", "src_group": 2, "dst_group": 6, "src_size": 196, "dst_size": 1024, "weight_offset": 401408, "num_weights": 200704, "src_id_start": 392, "dst_id_start": 2832},
-    {"name": "in3_to_hid3", "src_group": 3, "dst_group": 7, "src_size": 196, "dst_size": 1024, "weight_offset": 602112, "num_weights": 200704, "src_id_start": 588, "dst_id_start": 3856},
-    {"name": "hid0_to_output", "src_group": 4, "dst_group": 8, "src_size": 1024, "dst_size": 10, "weight_offset": 802816, "num_weights": 10240, "src_id_start": 784, "dst_id_start": 4880},
-    {"name": "hid1_to_output", "src_group": 5, "dst_group": 8, "src_size": 1024, "dst_size": 10, "weight_offset": 813056, "num_weights": 10240, "src_id_start": 1808, "dst_id_start": 4880},
-    {"name": "hid2_to_output", "src_group": 6, "dst_group": 8, "src_size": 1024, "dst_size": 10, "weight_offset": 823296, "num_weights": 10240, "src_id_start": 2832, "dst_id_start": 4880},
-    {"name": "hid3_to_output", "src_group": 7, "dst_group": 8, "src_size": 1024, "dst_size": 10, "weight_offset": 833536, "num_weights": 10240, "src_id_start": 3856, "dst_id_start": 4880},
+    {"name": "input_to_visible_output", "src_group": 1, "dst_group": 0, "src_size": 512, "dst_size": 512, "weight_offset": 0, "resident_weight_offset": -1, "tiled": True, "num_weights": 262144, "src_id_start": 512, "dst_id_start": 0},
 ]
 
 # ─── Fixed-Point (HLS ap_fixed<16,8>) ─────────────────────────────
 FIXED_POINT_FRAC_BITS = 8
 FIXED_POINT_SCALE     = 1 << FIXED_POINT_FRAC_BITS  # 256
 
-# ─── Legacy 8-bit weight constants (backward compat) ──────────────
-LEGACY_MAX_WEIGHT   = 127
-LEGACY_MIN_WEIGHT   = -128
-LEGACY_WEIGHT_SCALE = 128
+# ─── Reference signed 8-bit packed weight constants ──────────────
+REFERENCE_MAX_WEIGHT = 127
+REFERENCE_MIN_WEIGHT = -128
+REFERENCE_WEIGHT_SCALE = 128
 WEIGHT_SCALE        = 256
 
 # ─── Weight Memory Optimization (Loihi/TrueNorth/KIST) ──────────
-WEIGHT_BITS             = 4
-PACKED_MAX_WEIGHT       = 7
-PACKED_MIN_WEIGHT       = -8
+WEIGHT_BITS             = 8
+PACKED_MAX_WEIGHT       = 127
+PACKED_MIN_WEIGHT       = -128
 TIME_EMBEDDING          = 1
 AUXILIARY_LUTRAM         = 1
-PACKED_BUFFER_BYTES     = 421888
+TRACE_MAINTENANCE_MODE  = "global"
+TRACE_MAINTENANCE_ACTIVE_SET = 0
+TRACE_ACTIVE_CLEAR_THRESHOLD = 0
+PACKED_BUFFER_BYTES     = 262144
+
+# ─── Weight Tiling (future large-network path) ──────────────────
+WEIGHT_TILING_ENABLE            = 1
+WEIGHT_TILING_LARGE_ONLY        = 1
+WEIGHT_TILING_LARGE_CONN_MIN_WEIGHTS = 65536
+WEIGHT_TILING_SRC_CHUNK         = 196
+WEIGHT_TILING_DST_CHUNK         = 128
+WEIGHT_TILING_DOUBLE_BUFFER     = 0
+WEIGHT_TILING_ACTIVE_BUFFERS    = 1
+WEIGHT_TILING_ACTIVE_TILE_WEIGHTS = 25088
+WEIGHT_TILING_ACTIVE_TILE_BYTES = 25088
 
 # ─── FPGA Target ──────────────────────────────────────────────────
 FPGA_PART           = "xc7z020clg400-1"
-CLOCK_PERIOD_NS     = 10
+CLOCK_PERIOD_NS     = 12.5
 BOARD               = "tul.com.tw:pynq-z2:part0:1.0"
