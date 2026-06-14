@@ -8,7 +8,7 @@ Date: 2026-06-14
 `board_free_verifier_gate_no_board`
 
 No board execution was run. This review does not claim PYNQ-Z2 PL correctness,
-latency, throughput, energy, routed timing, or dataset accuracy.
+latency, throughput, energy, board execution correctness, or dataset accuracy.
 
 ## Scope
 
@@ -22,6 +22,7 @@ implementation slice:
 - Batch 1X architecture exploration sandbox
 - selected FC/EventConv runtime contract and resource report
 - EventConv Vivado OOC synthesis evidence
+- SpikeMold HLS/Vivado build evidence
 - PYNQ one-shot runtime API and CLI entrypoint
 
 ## Gate Results
@@ -37,6 +38,9 @@ implementation slice:
 | SpikeMold flat FC-LIF trace/readout/state match | PASS | `outputs/transport/batch_1b_transport_flat_fc_lif_smoke.json` |
 | EventConv C0-C5 artifacts present | PASS | `reports/batch_1c_eventconv_primitive_report.md` |
 | EventConv OOC synthesis evidence | PASS | `reports/eventconv_ooc_synthesis_report.md` |
+| HLS C-sim and synthesis/IP package | PASS | `reports/spikemold_build_evidence_report.md` |
+| integrated Vivado routed timing at 20 MHz | PASS | `outputs/spikemold_pynq_z2_timing.rpt` |
+| bit/HWH artifact hashes present | PASS | `outputs/spikemold_pynq_z2.bit`, `outputs/spikemold_pynq_z2.hwh` |
 | architecture sandbox preserves semantics | PASS | `outputs/architecture_sandbox/batch_1x_architecture_sandbox.json` |
 | selected runtime backend excludes probationary switch | PASS | `outputs/runtime/spikemold_runtime_contract.json` |
 | PYNQ one-shot runtime API exists | PASS | `software/python/spikepress/pynq_runtime.py` |
@@ -53,16 +57,21 @@ performance, or hardware readiness.
 The HLS public surface, generated config, RTL router/top selected fabric, and
 active router/integration testbenches are now inference-only.
 
+## Current Build Evidence
+
+The integrated SpikeMold build now has HLS C-sim pass, HLS synthesis/IP package,
+and routed Vivado bitstream evidence at 20 MHz. This remains a no-board result:
+`board_executed=false`.
+
 ## Required Next Gate
 
 PYNQ one-shot runtime API is present, but was not executed on the board in this
 gate. Before board claims:
 
-1. Remove or fully tie off remaining RTL router/coregroup compatibility residue.
-2. Build integrated Vivado design with the fixed runtime contract.
-3. Replace OOC timing/resource evidence with routed integrated reports.
-4. Run `scripts/run_spikemold_pynq_one_shot.py` on PYNQ-Z2 and record board
+1. Deploy `outputs/spikemold_pynq_z2.bit` and `outputs/spikemold_pynq_z2.hwh`.
+2. Run `scripts/run_spikemold_pynq_one_shot.py` on PYNQ-Z2 and record board
    JSON counters.
+3. Compare board readback with the SpikePress golden trace/readout hash.
 
 ## Verifier Command
 

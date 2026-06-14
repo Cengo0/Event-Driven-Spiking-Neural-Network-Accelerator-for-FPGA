@@ -22,11 +22,13 @@ NC='\033[0m'
 # Default configuration
 PART="xc7z020clg400-1"
 CLOCK="10ns"
+PROFILE="spikemold-top"
 TOP_FUNCTION="spikemold_top_hls"
 SRC_FILE="src/spikemold_top_hls.cpp"
 WORK_DIR="./hls_output"
 
 # Script location
+CALLER_DIR="$(pwd)"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 HLS_DIR="$(dirname "$SCRIPT_DIR")"
 PROJECT_ROOT="$(dirname "$(dirname "$HLS_DIR")")"
@@ -53,6 +55,14 @@ while [[ $# -gt 0 ]]; do
             CLOCK="$2"
             shift 2
             ;;
+        --profile)
+            PROFILE="$2"
+            shift 2
+            ;;
+        --work-dir)
+            WORK_DIR="$2"
+            shift 2
+            ;;
         --top)
             TOP_FUNCTION="$2"
             shift 2
@@ -65,6 +75,8 @@ while [[ $# -gt 0 ]]; do
             echo "  --verbose, -v  Verbose output"
             echo "  --part PART    Target FPGA part (default: xc7z020clg400-1)"
             echo "  --clock PERIOD Clock period (default: 10ns)"
+            echo "  --profile NAME Build profile: spikemold-top (default)"
+            echo "  --work-dir DIR HLS work directory (default: ./hls_output)"
             echo "  --top NAME     Top function name (default: spikemold_top_hls)"
             echo "  --help, -h     Show this message"
             echo ""
@@ -79,6 +91,22 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+case "$PROFILE" in
+    spikemold-top|spikemold)
+        TOP_FUNCTION="spikemold_top_hls"
+        SRC_FILE="src/spikemold_top_hls.cpp"
+        ;;
+    *)
+        echo -e "${RED}Unsupported profile: $PROFILE${NC}"
+        echo "Supported profiles: spikemold-top"
+        exit 1
+        ;;
+esac
+
+if [[ "$WORK_DIR" != /* ]]; then
+    WORK_DIR="$(realpath -m "$CALLER_DIR/$WORK_DIR")"
+fi
+
 # Change to HLS directory
 cd "$HLS_DIR"
 
@@ -87,6 +115,7 @@ echo -e "${CYAN}  SpikeMold HLS Build (v++ CLI)${NC}"
 echo -e "${CYAN}============================================${NC}"
 echo -e "Part:         ${GREEN}$PART${NC}"
 echo -e "Clock:        ${GREEN}$CLOCK${NC}"
+echo -e "Profile:      ${GREEN}$PROFILE${NC}"
 echo -e "Top Function: ${GREEN}$TOP_FUNCTION${NC}"
 echo -e "Source:       ${GREEN}$SRC_FILE${NC}"
 echo -e "Work Dir:     ${GREEN}$WORK_DIR${NC}"

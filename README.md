@@ -48,6 +48,13 @@ rtk python scripts/generate_eventconv_ooc_synthesis_report.py
 rtk python scripts/check_eventconv_ooc_synthesis_report.py
 rtk python scripts/generate_spikemold_runtime_artifacts.py
 rtk python scripts/check_spikemold_runtime_artifacts.py
+source /tools/Xilinx/2025.2/Vitis/settings64.sh
+rtk vitis-run --mode hls --csim --config hardware/hls/hls_csim_config.cfg --work_dir hardware/hls/hls_csim_output
+rtk bash hardware/hls/scripts/build_hls.sh --profile spikemold-top --work-dir hardware/hls/hls_output --clock 12.5ns --verbose
+source /tools/Xilinx/2025.2/Vivado/settings64.sh
+rtk env SPIKEMOLD_PL_CLK_MHZ=20 vivado -mode batch -source hardware/scripts/rebuild_integrated.tcl
+rtk python scripts/generate_spikemold_build_evidence_report.py
+rtk python scripts/check_spikemold_build_evidence_report.py
 rtk python scripts/check_verifier_gate.py
 rtk pytest software/python/tests
 ```
@@ -70,9 +77,10 @@ print(trace.to_dict()["counters"])
 
 ## Evidence Boundary
 
-Current evidence is software contract/golden only unless a report explicitly says
-HLS, RTL, or PYNQ-Z2 board execution was run. Do not infer board latency,
-throughput, or energy from software artifacts.
+Current evidence includes board-free software contracts, EventConv OOC synthesis,
+and integrated HLS/Vivado routed bitstream reports only when the corresponding
+reports exist and pass. Do not infer PYNQ-Z2 board correctness, latency,
+throughput, or energy unless a report explicitly records board execution.
 
 ## Main Files
 
@@ -81,6 +89,7 @@ throughput, or energy from software artifacts.
 - `golden_traces/v1/`: deterministic architecture-neutral traces
 - `scripts/check_spikemold_batch0_1a.py`: contract/artifact checker
 - `scripts/check_verifier_gate.py`: board-free verifier gate checker
+- `scripts/check_spikemold_build_evidence_report.py`: HLS/Vivado build evidence checker
 - `scripts/run_spikemold_pynq_one_shot.py`: PYNQ one-shot runtime CLI
 - `reports/`: current gate reports
 

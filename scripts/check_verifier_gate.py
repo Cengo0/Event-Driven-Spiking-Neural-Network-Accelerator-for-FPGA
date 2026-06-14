@@ -33,6 +33,7 @@ ARCH_SANDBOX_PATH = ROOT / "outputs" / "architecture_sandbox" / "batch_1x_archit
 RUNTIME_CONTRACT_PATH = ROOT / "outputs" / "runtime" / "spikemold_runtime_contract.json"
 RESOURCE_REPORT_PATH = ROOT / "outputs" / "resource" / "spikemold_runtime_resource_report.json"
 EVENTCONV_OOC_SYNTHESIS_PATH = ROOT / "outputs" / "resource" / "eventconv_ooc_synthesis_report.json"
+BUILD_EVIDENCE_PATH = ROOT / "outputs" / "resource" / "spikemold_build_evidence_report.json"
 PYNQ_ONESHOT_SCRIPT = ROOT / "scripts" / "run_spikemold_pynq_one_shot.py"
 INFERENCE_ONLY_SURFACE_FILES = [
     ROOT / "hardware" / "hls" / "include" / "spikemold_top_hls.h",
@@ -316,6 +317,40 @@ def check_runtime_resource() -> None:
         fail("resource report EventConv OOC synthesis hash mismatch")
 
 
+def check_build_evidence() -> None:
+    build = load_json(BUILD_EVIDENCE_PATH)
+    if build.get("schema") != "spikemold.hls_vivado_build_evidence.v1":
+        fail("SpikeMold build evidence schema mismatch")
+    if build.get("evidence_level") != "hls_csim_hls_synth_vivado_routed_no_board":
+        fail("SpikeMold build evidence level mismatch")
+    if build.get("board_executed") is not False:
+        fail("SpikeMold build evidence must not claim board execution")
+    if build.get("claim_boundary") != "hls_csim_hls_synth_vivado_routed_bitstream_only_no_board_execution":
+        fail("SpikeMold build evidence claim boundary mismatch")
+    if build.get("all_ok") is not True:
+        fail("SpikeMold build evidence all_ok must be true")
+
+    hls_csim = build.get("hls_csim", {})
+    hls_synthesis = build.get("hls_synthesis", {})
+    hls_csynth = build.get("hls_csynth", {})
+    routed = build.get("vivado_routed", {})
+    target = build.get("target", {})
+    if not isinstance(hls_csim, Mapping) or hls_csim.get("passed") is not True:
+        fail("SpikeMold HLS C-sim evidence must pass")
+    if not isinstance(hls_synthesis, Mapping) or hls_synthesis.get("passed") is not True:
+        fail("SpikeMold HLS synthesis evidence must pass")
+    if not isinstance(hls_csynth, Mapping) or hls_csynth.get("timing_estimate_meets_target") is not True:
+        fail("SpikeMold HLS csynth timing estimate must pass")
+    if hls_csynth.get("resources", {}).get("dsp") != 0:
+        fail("SpikeMold HLS csynth DSP usage must be zero")
+    if not isinstance(routed, Mapping) or routed.get("all_timing_met") is not True:
+        fail("SpikeMold routed timing evidence must pass")
+    if routed.get("bitstream_and_hwh_present") is not True:
+        fail("SpikeMold routed bit/HWH evidence missing")
+    if not isinstance(target, Mapping) or target.get("routed_clock_mhz") != 20.0:
+        fail("SpikeMold routed clock must be 20 MHz")
+
+
 def check_pynq_runtime_api() -> None:
     if PYNQ_ONESHOT_SCHEMA != "spikemold.pynq_oneshot_result.v1":
         fail("PYNQ one-shot schema mismatch")
@@ -379,9 +414,16 @@ def check_reports() -> None:
             "EventConv Vivado OOC synthesis evidence generated",
             "eventconv_ooc_synthesis_only_no_bitstream_no_board",
         ],
+        "reports/spikemold_build_evidence_report.md": [
+            "SpikeMold HLS/Vivado Build Evidence Report",
+            "HLS C-sim, HLS synthesis/IP package, and integrated Vivado route passed",
+            "hls_csim_hls_synth_vivado_routed_bitstream_only_no_board_execution",
+            "No board execution was run",
+        ],
         "reports/verifier_gate_review.md": [
             "Status: board-free verifier gate passed",
             "Inference-Only Scope",
+            "SpikeMold HLS/Vivado build evidence",
             "PYNQ one-shot runtime API",
             "No board execution was run",
         ],
@@ -397,6 +439,7 @@ def main() -> int:
     check_transport()
     check_architecture_sandbox()
     check_runtime_resource()
+    check_build_evidence()
     check_pynq_runtime_api()
     check_inference_only_surface()
     check_reports()
