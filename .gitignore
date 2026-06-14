@@ -78,7 +78,7 @@ hardware/hls/hls_output*/
 hardware/hls/hls_csim_output/
 hardware/hls/hls_csim_output*/
 hardware/hls/hls_synth_output*/
-hardware/hls/snn_top_hls/
+hardware/hls/*_top_hls/
 hardware/hls/.Xil/
 hardware/hls/_x/
 hardware/hls/vitis_journal.py

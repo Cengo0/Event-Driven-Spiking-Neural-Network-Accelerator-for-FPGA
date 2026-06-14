@@ -5,17 +5,18 @@
 # Usage: vivado -mode batch -source hardware/scripts/rebuild_integrated.tcl
 #-----------------------------------------------------------------------------
 
-set project_dir "/mnt/workspace/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA"
+set script_dir  [file dirname [file normalize [info script]]]
+set project_dir [file normalize [file join $script_dir "../.."]]
 set build_dir   "${project_dir}/hardware/build/spikemold_ednp_pynq_z2"
 set rtl_dir     "${project_dir}/hardware/hdl/rtl"
 set ip_repo     "${project_dir}/hardware/ip_repo"
 set output_dir  "${project_dir}/outputs"
 set part        "xc7z020clg400-1"
 # Integrated default clock for generated bitstream.
-# Override with SNN_PL_CLK_MHZ when sweeping lower/higher operating points.
+# Override with SPIKEMOLD_PL_CLK_MHZ when sweeping lower/higher operating points.
 set pl_clk_mhz 100
-if {[info exists ::env(SNN_PL_CLK_MHZ)] && $::env(SNN_PL_CLK_MHZ) ne ""} {
-    set pl_clk_mhz [expr {int($::env(SNN_PL_CLK_MHZ))}]
+if {[info exists ::env(SPIKEMOLD_PL_CLK_MHZ)] && $::env(SPIKEMOLD_PL_CLK_MHZ) ne ""} {
+    set pl_clk_mhz [expr {int($::env(SPIKEMOLD_PL_CLK_MHZ))}]
 }
 puts "Using processing_system7_0/FCLK_CLK0 frequency: ${pl_clk_mhz} MHz"
 
@@ -34,19 +35,15 @@ update_compile_order -fileset sources_1
 # Add IP repositories (packaged HLS and local RTL-as-IP cores)
 # Prefer freshly synthesized HLS output; fall back to cached ip_repo copies.
 set hls_ip_repo_generated "${project_dir}/hardware/hls/hls_output/hls/impl/ip"
-set hls_ip_repo_new "${ip_repo}/snn_top_hls_1_0"
-set hls_ip_repo_legacy "${ip_repo}/snn_top_hls"
+set hls_ip_repo_new "${ip_repo}/spikemold_top_hls_1_0"
 if {[file exists $hls_ip_repo_generated]} {
     set hls_ip_repo $hls_ip_repo_generated
 } elseif {[file exists $hls_ip_repo_new]} {
     set hls_ip_repo $hls_ip_repo_new
-} elseif {[file exists $hls_ip_repo_legacy]} {
-    set hls_ip_repo $hls_ip_repo_legacy
 } else {
     puts "ERROR: HLS IP repository not found in:"
     puts "  - $hls_ip_repo_generated"
     puts "  - $hls_ip_repo_new"
-    puts "  - $hls_ip_repo_legacy"
     exit 1
 }
 puts "Using HLS IP repository: $hls_ip_repo"

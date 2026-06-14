@@ -20,7 +20,7 @@ log_error() {
     echo -e "${RED}✗${NC} $1"
 }
 
-echo "SNN Accelerator Build Environment Verification"
+echo "SpikeMold-EDNP Build Environment Verification"
 echo "=============================================="
 echo ""
 

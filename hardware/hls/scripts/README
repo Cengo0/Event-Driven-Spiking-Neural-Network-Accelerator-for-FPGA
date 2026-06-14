@@ -49,7 +49,7 @@ After successful synthesis:
 
 ### Integration with Vivado
 
-Copy the generated IP to your project:
+Copy the generated IP to the SpikeMold project:
 ```bash
-cp -r hls_output/hls/impl/ip ../ip_repo/snn_top_hls
+cp -r hls_output/hls/impl/ip ../ip_repo/spikemold_top_hls_1_0
 ```

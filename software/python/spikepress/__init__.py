@@ -29,6 +29,13 @@ from .event_budget import (
     recommended_ednp_mini_config,
     summarize_trace_budgets,
 )
+from .spikemold_runtime_contract import (
+    SPIKEMOLD_RUNTIME_BACKEND_ID,
+    SPIKEMOLD_RUNTIME_CONTRACT_SCHEMA,
+    SPIKEMOLD_RUNTIME_RESOURCE_REPORT_SCHEMA,
+    build_spikemold_runtime_contract,
+    build_spikemold_runtime_resource_report,
+)
 from .network import (
     CompiledSpikePressTopology,
     SpikePressNeuronPopulation,
@@ -56,6 +63,9 @@ __all__ = [
     "EventBudgetLimits",
     "EventBudgetResult",
     "InputSpike",
+    "SPIKEMOLD_RUNTIME_BACKEND_ID",
+    "SPIKEMOLD_RUNTIME_CONTRACT_SCHEMA",
+    "SPIKEMOLD_RUNTIME_RESOURCE_REPORT_SCHEMA",
     "CompiledSpikePressTopology",
     "SpikePressNetwork",
     "SpikePressNeuronPopulation",
@@ -70,6 +80,8 @@ __all__ = [
     "SynapticUpdate",
     "build_spikemold_ednp_artifact",
     "build_batch_1b_transport_smoke",
+    "build_spikemold_runtime_contract",
+    "build_spikemold_runtime_resource_report",
     "event_word_type",
     "evaluate_trace_budget",
     "fc_lif_model",

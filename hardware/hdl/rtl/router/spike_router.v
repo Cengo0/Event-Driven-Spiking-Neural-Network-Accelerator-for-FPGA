@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // Title         : Spike Router Module
-// Project       : PYNQ-Z2 SNN Accelerator
+// Project       : SpikeMold-EDNP
 // File          : spike_router.v
 // Author        : Jiwoon Lee (@metr0jw)
 // Organization  : Kwangwoon University, Seoul, South Korea

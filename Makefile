@@ -102,10 +102,10 @@ hls:
 		cd $(HARDWARE_DIR)/hls && \
 		./scripts/build_hls.sh --clean; \
 		if [ -d hls_output/hls/impl/ip ]; then \
-			rm -rf ../ip_repo/snn_top_hls_1_0; \
+			rm -rf ../ip_repo/spikemold_top_hls_1_0; \
 			mkdir -p ../ip_repo; \
-			cp -a hls_output/hls/impl/ip ../ip_repo/snn_top_hls_1_0; \
-			echo "$(GREEN)✅ Synced HLS IP to hardware/ip_repo/snn_top_hls_1_0$(RESET)"; \
+			cp -a hls_output/hls/impl/ip ../ip_repo/spikemold_top_hls_1_0; \
+			echo "$(GREEN)✅ Synced HLS IP to hardware/ip_repo/spikemold_top_hls_1_0$(RESET)"; \
 		fi; \
 		echo "$(GREEN)✅ HLS build completed$(RESET)"; \
 	else \

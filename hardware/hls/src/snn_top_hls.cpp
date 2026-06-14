@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
-// Title         : SNN Top-Level HLS Module with On-Chip Learning
-// Project       : PYNQ-Z2 SNN Accelerator
+// Title         : SpikeMold-EDNP HLS Module with On-Chip Learning
+// Project       : SpikeMold-EDNP
 // File          : snn_top_hls.cpp
 // Author        : Jiwoon Lee (@metr0jw)
 // Organization  : Kwangwoon University, Seoul, South Korea

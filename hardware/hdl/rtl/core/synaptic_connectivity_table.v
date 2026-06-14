@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // Title         : Synaptic Connectivity Table - Sparse Inter-Group Connections
-// Project       : PYNQ-Z2 SNN Accelerator
+// Project       : SpikeMold-EDNP
 // File          : synaptic_connectivity_table.v
 // Author        : Jiwoon Lee (@metr0jw)
 // Organization  : Kwangwoon University, Seoul, South Korea

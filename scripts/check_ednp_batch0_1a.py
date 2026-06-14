@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -145,27 +146,27 @@ def check_batch1a() -> None:
 
 
 def check_removed_api_dependencies_excluded() -> None:
-    banned = [
-        "snn" + "_fpga" + "_accelerator",
-        "Neuron" + "Group",
-        "Syn" + "apses",
-        "SpikePress" + "Connection",
-        "compile_" + "ednp",
-        "class " + "EDNPArtifact",
-        "build_" + "ednp_artifact",
-        "read_" + "ednp_artifact",
-        "write_" + "ednp_artifact",
-        "SpikePress" + "CompiledEDNP",
-        "DEFAULT_" + "M3_LIMITS",
-        "recommended_" + "m3_config",
+    removed_api_patterns = [
+        r"snn[_-]fpga[_-]accelerator",
+        r"NeuronGroup",
+        r"Synapses",
+        r"SpikePressConnection",
+        r"compile_ednp",
+        r"class EDNPArtifact",
+        r"build_ednp_artifact",
+        r"read_ednp_artifact",
+        r"write_ednp_artifact",
+        r"SpikePressCompiledEDNP",
+        r"DEFAULT_M3_LIMITS",
+        r"recommended_m3_config",
     ]
     for path in SPIKEPRESS_SOURCE_FILES:
         if not path.exists():
             fail(f"missing SpikePress source file: {path}")
         text = path.read_text(encoding="utf-8")
-        for token in banned:
-            if token in text:
-                fail(f"removed API dependency found in {path}: {token}")
+        for pattern in removed_api_patterns:
+            if re.search(pattern, text):
+                fail(f"removed API dependency found in {path}: {pattern}")
 
 
 def main() -> int:
