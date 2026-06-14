@@ -31,6 +31,8 @@ source /home/jwlee/miniconda3/etc/profile.d/conda.sh
 conda activate fpga
 rtk python scripts/generate_ednp_batch1a_artifacts.py
 rtk python scripts/check_ednp_batch0_1a.py
+rtk python scripts/generate_batch1b_transport_artifacts.py
+rtk python scripts/check_batch1b_transport.py
 rtk pytest software/python/tests
 ```
 
