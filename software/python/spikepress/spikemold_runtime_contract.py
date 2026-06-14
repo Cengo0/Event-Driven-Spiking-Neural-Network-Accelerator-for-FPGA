@@ -31,9 +31,9 @@ def build_spikemold_runtime_contract(
 ) -> dict:
     """Build board-free contract for the SpikeMold runtime primitives."""
 
-    budget_limits = dict(event_budget["recommended_spikemold_mini_config"])  # type: ignore[index]
-    spikemold_mini = dict(transport_smoke["spikemold_mini_fc_lif"])  # type: ignore[index]
-    spikemold_mini_counters = dict(spikemold_mini["counters"])  # type: ignore[index]
+    budget_limits = dict(event_budget["recommended_flat_fc_lif_config"])  # type: ignore[index]
+    flat_fc_lif = dict(transport_smoke["flat_fc_lif"])  # type: ignore[index]
+    flat_fc_lif_counters = dict(flat_fc_lif["counters"])  # type: ignore[index]
     eventconv_counters = dict(eventconv_trace["counters"])  # type: ignore[index]
 
     contract = {
@@ -72,7 +72,7 @@ def build_spikemold_runtime_contract(
         },
         "primitives": {
             "flat_fc_lif": {
-                "trace_id": str(spikemold_mini["trace_id"]),
+                "trace_id": str(flat_fc_lif["trace_id"]),
                 "input_encoding": "EventWord64 input_spike",
                 "output_encoding": "EventWord64 commit/readout",
                 "artifact_schema": "spikemold.artifact.v1",
@@ -80,10 +80,10 @@ def build_spikemold_runtime_contract(
                 "weight_width_bits": int(budget_limits["weight_width_bits"]),
                 "max_input_events": int(budget_limits["max_input_events"]),
                 "max_generated_updates": int(budget_limits["max_generated_updates"]),
-                "expected_dma_calls_per_inference": int(spikemold_mini_counters["dma_calls"]),
-                "expected_axi_lite_commands_per_inference": int(spikemold_mini_counters["axi_lite_commands"]),
+                "expected_dma_calls_per_inference": int(flat_fc_lif_counters["dma_calls"]),
+                "expected_axi_lite_commands_per_inference": int(flat_fc_lif_counters["axi_lite_commands"]),
                 "python_calls_per_inference_inner_loop": 0,
-                "counters": spikemold_mini_counters,
+                "counters": flat_fc_lif_counters,
             },
             "eventconv_agu": {
                 "trace_id": str(eventconv_trace["trace_id"]),
@@ -118,7 +118,7 @@ def build_spikemold_runtime_resource_report(
     trace_results = dict(event_budget["trace_results"])  # type: ignore[index]
     fc_counters = dict(trace_results["fc_lif_tiny_v1"]["counters"])  # type: ignore[index]
     eventconv_counters = dict(eventconv_trace["counters"])  # type: ignore[index]
-    spikemold_mini_counters = dict(transport_smoke["spikemold_mini_fc_lif"]["counters"])  # type: ignore[index]
+    flat_fc_lif_counters = dict(transport_smoke["flat_fc_lif"]["counters"])  # type: ignore[index]
 
     report = {
         "schema": SPIKEMOLD_RUNTIME_RESOURCE_REPORT_SCHEMA,
@@ -146,8 +146,8 @@ def build_spikemold_runtime_resource_report(
                 "synapse_kernel_memory_bytes": 4,
                 "fifo_memory_bytes": 512,
                 "expected_ddr_bytes_per_inference": 0,
-                "expected_dma_calls_per_inference": int(spikemold_mini_counters["dma_calls"]),
-                "expected_axi_lite_commands_per_inference": int(spikemold_mini_counters["axi_lite_commands"]),
+                "expected_dma_calls_per_inference": int(flat_fc_lif_counters["dma_calls"]),
+                "expected_axi_lite_commands_per_inference": int(flat_fc_lif_counters["axi_lite_commands"]),
                 "event_update_histogram": fc_counters,
                 "compile_time_rejection_rules": [
                     "max_input_events",
@@ -195,7 +195,7 @@ def write_json(path: Path, payload: Mapping[str, object]) -> None:
 
 def load_spikemold_runtime_inputs(root: Path) -> tuple[dict, dict, dict]:
     return (
-        _load_json(root / "outputs" / "event_budget" / "recommended_spikemold_mini_config.json"),
-        _load_json(root / "outputs" / "transport" / "batch_1b_transport_spikemold_mini_smoke.json"),
+        _load_json(root / "outputs" / "event_budget" / "recommended_flat_fc_lif_config.json"),
+        _load_json(root / "outputs" / "transport" / "batch_1b_transport_flat_fc_lif_smoke.json"),
         _load_json(root / "golden_traces" / "v1" / "eventconv_8x8_tiny_v1.json"),
     )

@@ -27,8 +27,8 @@ from spikepress.pynq_runtime import PYNQ_ONESHOT_SCHEMA, SpikeMoldPynqRunConfig 
 REPORT_PATH = ROOT / "reports" / "verifier_gate_review.md"
 CONTRACT_DIR = ROOT / "contracts"
 TRACE_DIR = ROOT / "golden_traces" / "v1"
-EVENT_BUDGET_PATH = ROOT / "outputs" / "event_budget" / "recommended_spikemold_mini_config.json"
-TRANSPORT_PATH = ROOT / "outputs" / "transport" / "batch_1b_transport_spikemold_mini_smoke.json"
+EVENT_BUDGET_PATH = ROOT / "outputs" / "event_budget" / "recommended_flat_fc_lif_config.json"
+TRANSPORT_PATH = ROOT / "outputs" / "transport" / "batch_1b_transport_flat_fc_lif_smoke.json"
 ARCH_SANDBOX_PATH = ROOT / "outputs" / "architecture_sandbox" / "batch_1x_architecture_sandbox.json"
 RUNTIME_CONTRACT_PATH = ROOT / "outputs" / "runtime" / "spikemold_runtime_contract.json"
 RESOURCE_REPORT_PATH = ROOT / "outputs" / "resource" / "spikemold_runtime_resource_report.json"
@@ -204,16 +204,16 @@ def check_transport() -> None:
     for key in ["python_inner_loop_required", "random_ddr_inner_loop", "full_neuron_scan_primary"]:
         if assumptions.get(key) is not False:
             fail(f"transport forbidden assumption must be false: {key}")
-    spikemold_mini = transport.get("spikemold_mini_fc_lif", {})
-    if not isinstance(spikemold_mini, Mapping):
-        fail("transport missing SpikeMold-mini section")
+    flat_fc_lif = transport.get("flat_fc_lif", {})
+    if not isinstance(flat_fc_lif, Mapping):
+        fail("transport missing SpikeMold flat FC-LIF section")
     for key, value in [
         ("trace_match_rate", 1.0),
         ("readout_match", True),
         ("state_checksum_match", True),
     ]:
-        if spikemold_mini.get(key) != value:
-            fail(f"SpikeMold-mini {key} mismatch")
+        if flat_fc_lif.get(key) != value:
+            fail(f"SpikeMold flat FC-LIF {key} mismatch")
 
 
 def check_architecture_sandbox() -> None:
@@ -323,7 +323,7 @@ def check_reports() -> None:
             "Status: verifier gate complete",
             "No HLS, RTL, or board claim.",
         ],
-        "reports/batch_1b_transport_spikemold_mini_report.md": [
+        "reports/batch_1b_transport_flat_fc_lif_report.md": [
             "Board execution was not run",
             "software_transport_smoke_no_board",
         ],

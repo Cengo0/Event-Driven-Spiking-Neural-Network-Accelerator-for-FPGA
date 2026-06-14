@@ -6,7 +6,7 @@ Status: verifier gate complete
 
 - `golden_traces/v1/fc_lif_tiny_v1.json`
 - `golden_traces/v1/eventconv_8x8_tiny_v1.json`
-- `outputs/event_budget/recommended_spikemold_mini_config.json`
+- `outputs/event_budget/recommended_flat_fc_lif_config.json`
 - `software/python/spikepress/`
 
 ## Evidence Level

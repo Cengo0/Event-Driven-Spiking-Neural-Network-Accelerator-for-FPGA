@@ -6,7 +6,13 @@ from spikepress.spikemold_artifact import (
     read_spikemold_artifact,
     write_spikemold_artifact,
 )
-from spikepress.network import SpikePressNeuronPopulation, SpikePressProjection, SpikePressNetwork
+from spikepress.network import (
+    PACKED_MAX_WEIGHT,
+    PACKED_MIN_WEIGHT,
+    SpikePressNeuronPopulation,
+    SpikePressProjection,
+    SpikePressNetwork,
+)
 
 
 def _tiny_compiled_network():
@@ -44,8 +50,23 @@ def test_spikemold_artifact_clips_to_hardware_weight_range():
     compiled = _tiny_compiled_network()
     artifact = build_spikemold_artifact(
         compiled,
-        {"input_to_output": np.array([[99, -99, 0], [7, -8, 1]], dtype=np.int16)},
+        {
+            "input_to_output": np.array(
+                [
+                    [PACKED_MAX_WEIGHT + 1, PACKED_MIN_WEIGHT - 1, 0],
+                    [PACKED_MAX_WEIGHT, PACKED_MIN_WEIGHT, 1],
+                ],
+                dtype=np.int16,
+            )
+        },
     )
 
-    assert artifact.flat_weights.tolist() == [7, -8, 0, 7, -8, 1]
+    assert artifact.flat_weights.tolist() == [
+        PACKED_MAX_WEIGHT,
+        PACKED_MIN_WEIGHT,
+        0,
+        PACKED_MAX_WEIGHT,
+        PACKED_MIN_WEIGHT,
+        1,
+    ]
     assert artifact.manifest["contracts"]["trace_schema"] == "TRACE_SCHEMA_V1"

@@ -1,4 +1,4 @@
-# Batch 1B Transport + SpikeMold-mini Report
+# Batch 1B Transport + Flat FC-LIF Report
 
 Status: software transport smoke generated
 
@@ -11,8 +11,8 @@ latency, throughput, or energy.
 
 ## Generated
 
-- `outputs/transport/batch_1b_transport_spikemold_mini_smoke.json`
-- `reports/batch_1b_transport_spikemold_mini_report.md`
+- `outputs/transport/batch_1b_transport_flat_fc_lif_smoke.json`
+- `reports/batch_1b_transport_flat_fc_lif_report.md`
 
 ## Smoke Results
 
@@ -21,10 +21,10 @@ latency, throughput, or energy.
 | AXI-Lite register smoke | `True` |
 | DMA loopback smoke | `True` |
 | EventWord64 counter smoke | `True` |
-| SpikeMold-mini FC-LIF smoke | `True` |
+| SpikeMold flat FC-LIF smoke | `True` |
 | All OK | `True` |
 
-## SpikeMold-mini Counters
+## Flat FC-LIF Counters
 
 | Counter | Value |
 |---|---:|

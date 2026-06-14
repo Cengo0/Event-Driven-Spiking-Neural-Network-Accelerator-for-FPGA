@@ -126,7 +126,7 @@ def check_batch1a() -> None:
             fail(f"missing trace: {path}")
         check_trace(path)
 
-    budget = ROOT / "outputs" / "event_budget" / "recommended_spikemold_mini_config.json"
+    budget = ROOT / "outputs" / "event_budget" / "recommended_flat_fc_lif_config.json"
     if not budget.exists():
         fail(f"missing budget artifact: {budget}")
     budget_json = load_json(budget)

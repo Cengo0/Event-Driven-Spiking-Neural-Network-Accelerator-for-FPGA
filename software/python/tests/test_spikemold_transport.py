@@ -6,7 +6,7 @@ from spikepress.transport import (
     pack_input_spikes,
     run_axi_lite_smoke,
     run_dma_loopback,
-    run_spikemold_mini_fc_lif_smoke,
+    run_flat_fc_lif_smoke,
     run_eventword64_counter_smoke,
 )
 
@@ -45,9 +45,9 @@ def test_eventword64_counter_counts_input_words():
     assert counter["event_type_counts"]["invalid"] == 0
 
 
-def test_spikemold_mini_fc_lif_smoke_matches_golden_trace():
+def test_flat_fc_lif_smoke_matches_golden_trace():
     model = fc_lif_model("tiny", weights=[[3, 1], [2, 0]], thresholds=[5, 9])
-    smoke = run_spikemold_mini_fc_lif_smoke(
+    smoke = run_flat_fc_lif_smoke(
         model,
         [
             InputSpike(tick=0, src_id=0),

@@ -5,7 +5,7 @@ Status: active draft
 ## Purpose
 
 This is the minimal AXI-Lite control surface for SpikeMold transport smoke
-and SpikeMold mini. Wider SpikeMold backends may add registers, but they
+and the SpikeMold flat FC-LIF path. Wider SpikeMold backends may add registers, but they
 must preserve these addresses or provide an explicit compatibility shim.
 
 ## Registers

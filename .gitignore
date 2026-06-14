@@ -25,10 +25,6 @@ venv/
 env/
 .env/
 
-# AI-agent generated GitHub automation drafts
-.github/commands/gemini-*.toml
-.github/workflows/gemini-*.yml
-
 # Pytest
 .pytest_cache/
 
@@ -166,7 +162,6 @@ Thumbs.db
 package-lock.json
 e_project
 
-.gemini/
 gha-creds-*.json
 
 # ============================================================

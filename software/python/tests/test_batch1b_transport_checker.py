@@ -25,4 +25,4 @@ def test_batch1b_transport_generator_and_checker_pass():
     )
 
     assert check.returncode == 0, check.stderr + check.stdout
-    assert "PASS: Batch 1B transport + SpikeMold-mini smoke artifacts valid" in check.stdout
+    assert "PASS: Batch 1B transport + SpikeMold flat FC-LIF smoke artifacts valid" in check.stdout

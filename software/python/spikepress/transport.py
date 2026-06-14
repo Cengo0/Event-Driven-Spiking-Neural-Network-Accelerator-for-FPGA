@@ -23,7 +23,7 @@ TRANSPORT_SMOKE_SCHEMA = "spikemold.batch_1b_transport_smoke.v1"
 AXI_LITE_SMOKE_SCHEMA = "spikemold.axi_lite_smoke.v1"
 DMA_LOOPBACK_SCHEMA = "spikemold.dma_loopback_smoke.v1"
 EVENTWORD_COUNTER_SCHEMA = "spikemold.eventword64_counter_smoke.v1"
-SPIKEMOLD_MINI_SMOKE_SCHEMA = "spikemold.mini_fc_lif_smoke.v1"
+FLAT_FC_LIF_SMOKE_SCHEMA = "spikemold.flat_fc_lif_smoke.v1"
 EVIDENCE_LEVEL = "software_transport_smoke_no_board"
 
 REGISTER_OFFSETS: Mapping[str, int] = {
@@ -213,7 +213,7 @@ def run_eventword64_counter_smoke(words: Sequence[int]) -> Dict[str, object]:
     }
 
 
-def run_spikemold_mini_fc_lif_smoke(
+def run_flat_fc_lif_smoke(
     model: SpikePressModel,
     input_spikes: Iterable[InputSpike],
 ) -> Dict[str, object]:
@@ -235,7 +235,7 @@ def run_spikemold_mini_fc_lif_smoke(
     final_state_hash = sha256_json(trace_dict["final_state"])
     commit_hash = sha256_json(trace_dict["commits"])
     return {
-        "schema": SPIKEMOLD_MINI_SMOKE_SCHEMA,
+        "schema": FLAT_FC_LIF_SMOKE_SCHEMA,
         "evidence_level": EVIDENCE_LEVEL,
         "board_executed": False,
         "ok": True,
@@ -269,10 +269,10 @@ def build_batch_1b_transport_smoke(
     register_smoke = run_axi_lite_smoke()
     dma_loopback = run_dma_loopback(input_words)
     eventword_counter = run_eventword64_counter_smoke(input_words)
-    spikemold_mini = run_spikemold_mini_fc_lif_smoke(model, spikes)
+    flat_fc_lif = run_flat_fc_lif_smoke(model, spikes)
     all_ok = all(
         bool(section["ok"])
-        for section in [register_smoke, dma_loopback, eventword_counter, spikemold_mini]
+        for section in [register_smoke, dma_loopback, eventword_counter, flat_fc_lif]
     )
     return {
         "schema": TRANSPORT_SMOKE_SCHEMA,
@@ -288,5 +288,5 @@ def build_batch_1b_transport_smoke(
         "register_smoke": register_smoke,
         "dma_loopback": dma_loopback,
         "eventword64_counter": eventword_counter,
-        "spikemold_mini_fc_lif": spikemold_mini,
+        "flat_fc_lif": flat_fc_lif,
     }

@@ -35,7 +35,7 @@ if state[dst] >= threshold[dst]:
     state[dst] = reset_value[dst]
 ```
 
-The first SpikeMold mini contract uses reset-to-zero after fire. Later
+The first SpikeMold flat FC-LIF path uses reset-to-zero after fire. Later
 contracts may add subtract-threshold reset only if traces name that mode
 explicitly.
 

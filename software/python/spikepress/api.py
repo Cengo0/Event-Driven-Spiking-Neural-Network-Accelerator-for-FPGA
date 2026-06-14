@@ -75,7 +75,7 @@ class SpikePressModel:
         thresholds: Optional[Sequence[int]] = None,
     ) -> SpikePressFCLIFLayer:
         if self._layers:
-            raise ValueError("SpikeMold mini supports one FC-LIF layer")
+            raise ValueError("SpikeMold flat FC-LIF supports one FC-LIF layer")
         layer = SpikePressFCLIFLayer.create(name, weights, thresholds)
         self._layers.append(layer)
         return layer
@@ -137,7 +137,7 @@ class SpikePressModel:
 
     def _single_layer(self) -> SpikePressFCLIFLayer:
         if len(self._layers) != 1:
-            raise ValueError("SpikePressModel requires exactly one FC-LIF layer for SpikeMold mini")
+            raise ValueError("SpikePressModel requires exactly one FC-LIF layer for SpikeMold flat FC-LIF")
         return self._layers[0]
 
 

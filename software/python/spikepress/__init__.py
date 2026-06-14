@@ -28,9 +28,9 @@ from .spikemold_artifact import (
 from .event_budget import (
     EventBudgetLimits,
     EventBudgetResult,
-    DEFAULT_SPIKEMOLD_MINI_LIMITS,
+    DEFAULT_FLAT_FC_LIF_LIMITS,
     evaluate_trace_budget,
-    recommended_spikemold_mini_config,
+    recommended_flat_fc_lif_config,
     summarize_trace_budgets,
 )
 from .spikemold_runtime_contract import (
@@ -62,7 +62,7 @@ from .transport import (
     pack_trace_output_commits,
     run_axi_lite_smoke,
     run_dma_loopback,
-    run_spikemold_mini_fc_lif_smoke,
+    run_flat_fc_lif_smoke,
     run_eventword64_counter_smoke,
 )
 
@@ -70,7 +70,7 @@ __all__ = [
     "SpikeMoldContractTrace",
     "ActiveSetCommit",
     "ARCHITECTURE_SANDBOX_SCHEMA",
-    "DEFAULT_SPIKEMOLD_MINI_LIMITS",
+    "DEFAULT_FLAT_FC_LIF_LIMITS",
     "EventBudgetLimits",
     "EventBudgetResult",
     "InputSpike",
@@ -106,10 +106,10 @@ __all__ = [
     "pack_input_spikes",
     "pack_trace_output_commits",
     "read_spikemold_artifact",
-    "recommended_spikemold_mini_config",
+    "recommended_flat_fc_lif_config",
     "run_axi_lite_smoke",
     "run_dma_loopback",
-    "run_spikemold_mini_fc_lif_smoke",
+    "run_flat_fc_lif_smoke",
     "run_eventword64_counter_smoke",
     "run_spikemold_pynq_one_shot",
     "summarize_trace_budgets",

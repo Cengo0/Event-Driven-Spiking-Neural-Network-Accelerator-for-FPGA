@@ -26,22 +26,22 @@ Owns:
 Produces:
 
 - `golden_traces/v1/`
-- `outputs/event_budget/recommended_spikemold_mini_config.json`
+- `outputs/event_budget/recommended_flat_fc_lif_config.json`
 - `reports/batch_1a_software_foundation_report.md`
 
-## Subagent B: Transport + SpikeMold-mini
+## Subagent B: Transport + Flat FC-LIF
 
 Owns:
 
 - AXI-Lite smoke
 - DMA loopback
 - EventWord64 counter
-- SpikeMold-mini FC-LIF
+- SpikeMold flat FC-LIF path
 - minimal PYNQ runtime
 
 Produces:
 
-- `reports/batch_1b_transport_spikemold_mini_report.md`
+- `reports/batch_1b_transport_flat_fc_lif_report.md`
 
 ## Subagent C: EventConv Primitive
 
@@ -92,4 +92,3 @@ Every handoff must name:
 - tests run
 - evidence level reached
 - blocked items
-

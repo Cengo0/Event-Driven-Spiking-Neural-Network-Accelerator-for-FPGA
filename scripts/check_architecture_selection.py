@@ -9,8 +9,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORT_PATH = ROOT / "reports" / "architecture_selection_v1.md"
-BUDGET_PATH = ROOT / "outputs" / "event_budget" / "recommended_spikemold_mini_config.json"
-TRANSPORT_PATH = ROOT / "outputs" / "transport" / "batch_1b_transport_spikemold_mini_smoke.json"
+BUDGET_PATH = ROOT / "outputs" / "event_budget" / "recommended_flat_fc_lif_config.json"
+TRANSPORT_PATH = ROOT / "outputs" / "transport" / "batch_1b_transport_flat_fc_lif_smoke.json"
 C4_TRACE_PATH = ROOT / "golden_traces" / "v1" / "eventconv_8x8_tiny_v1.json"
 SANDBOX_PATH = ROOT / "outputs" / "architecture_sandbox" / "batch_1x_architecture_sandbox.json"
 
@@ -115,20 +115,20 @@ def main() -> int:
         fail("transport smoke all_ok is not true")
     if transport.get("board_executed") is not False:
         fail("architecture report must not rely on board execution")
-    spikemold_mini = transport.get("spikemold_mini_fc_lif", {})
-    if spikemold_mini.get("trace_match_rate") != 1.0:
-        fail("SpikeMold-mini trace_match_rate is not 1.0")
-    if spikemold_mini.get("readout_match") is not True:
-        fail("SpikeMold-mini readout_match is not true")
-    if spikemold_mini.get("state_checksum_match") is not True:
-        fail("SpikeMold-mini state_checksum_match is not true")
-    counters = spikemold_mini.get("counters", {})
+    flat_fc_lif = transport.get("flat_fc_lif", {})
+    if flat_fc_lif.get("trace_match_rate") != 1.0:
+        fail("SpikeMold flat FC-LIF trace_match_rate is not 1.0")
+    if flat_fc_lif.get("readout_match") is not True:
+        fail("SpikeMold flat FC-LIF readout_match is not true")
+    if flat_fc_lif.get("state_checksum_match") is not True:
+        fail("SpikeMold flat FC-LIF state_checksum_match is not true")
+    counters = flat_fc_lif.get("counters", {})
     if counters.get("dma_calls") != 2:
-        fail("SpikeMold-mini DMA call estimate mismatch")
+        fail("SpikeMold flat FC-LIF DMA call estimate mismatch")
     if counters.get("axi_lite_commands") != 8:
-        fail("SpikeMold-mini AXI-Lite command estimate mismatch")
+        fail("SpikeMold flat FC-LIF AXI-Lite command estimate mismatch")
     if counters.get("python_inner_loop_steps") != 0:
-        fail("SpikeMold-mini Python inner-loop count must be zero")
+        fail("SpikeMold flat FC-LIF Python inner-loop count must be zero")
 
     c4 = load_json(C4_TRACE_PATH)
     if c4.get("trace_id") != "eventconv_8x8_tiny_v1":

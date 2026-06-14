@@ -37,7 +37,7 @@ Reject or pivot when:
 - expected AXI-Lite commands per inference
 - event/update histogram
 
-## Initial SpikeMold-mini Budget
+## Initial Flat FC-LIF Budget
 
 The first board-oriented primitive should fit within a small fraction of the
 device:
@@ -50,4 +50,3 @@ device:
 - no full model stored as random DDR lookup in the inner loop
 
 These are not final performance limits. They are the first safe compile target.
-

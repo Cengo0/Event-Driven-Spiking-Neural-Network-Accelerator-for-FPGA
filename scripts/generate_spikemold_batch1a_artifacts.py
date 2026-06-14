@@ -61,7 +61,7 @@ def main() -> int:
             "eventconv_8x8_tiny_v1": eventconv_trace.to_dict(),
         }
     )
-    (event_budget_dir / "recommended_spikemold_mini_config.json").write_text(
+    (event_budget_dir / "recommended_flat_fc_lif_config.json").write_text(
         json.dumps(budget, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
@@ -74,7 +74,7 @@ Status: verifier gate complete
 
 - `golden_traces/v1/fc_lif_tiny_v1.json`
 - `golden_traces/v1/eventconv_8x8_tiny_v1.json`
-- `outputs/event_budget/recommended_spikemold_mini_config.json`
+- `outputs/event_budget/recommended_flat_fc_lif_config.json`
 - `software/python/spikepress/`
 
 ## Evidence Level

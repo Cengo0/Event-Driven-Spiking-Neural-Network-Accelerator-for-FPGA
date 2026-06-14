@@ -17,7 +17,7 @@ implementation slice:
 
 - Batch 0 contract freeze
 - Batch 1A SpikePress software foundation and architecture-neutral traces
-- Batch 1B transport and SpikeMold-mini software smoke artifacts
+- Batch 1B transport and SpikeMold flat FC-LIF software smoke artifacts
 - Batch 1C EventConv primitive artifacts
 - Batch 1X architecture exploration sandbox
 - selected FC/EventConv runtime contract and resource report
@@ -30,10 +30,10 @@ implementation slice:
 | contracts exist | PASS | `contracts/*.md` |
 | page/tile/coregroup policy is architecture-open | PASS | `contracts/ARCHITECTURE_PATTERN_POLICY_V1.md` |
 | trace schema and hashes match | PASS | `golden_traces/v1/*.json` |
-| event budget passes | PASS | `outputs/event_budget/recommended_spikemold_mini_config.json` |
+| event budget passes | PASS | `outputs/event_budget/recommended_flat_fc_lif_config.json` |
 | Python inner-loop count is zero | PASS | trace counters and runtime contract |
 | inner-loop DDR bytes are zero | PASS | trace counters and runtime/resource reports |
-| SpikeMold-mini trace/readout/state match | PASS | `outputs/transport/batch_1b_transport_spikemold_mini_smoke.json` |
+| SpikeMold flat FC-LIF trace/readout/state match | PASS | `outputs/transport/batch_1b_transport_flat_fc_lif_smoke.json` |
 | EventConv C0-C5 artifacts present | PASS | `reports/batch_1c_eventconv_primitive_report.md` |
 | architecture sandbox preserves semantics | PASS | `outputs/architecture_sandbox/batch_1x_architecture_sandbox.json` |
 | selected runtime backend excludes probationary switch | PASS | `outputs/runtime/spikemold_runtime_contract.json` |
