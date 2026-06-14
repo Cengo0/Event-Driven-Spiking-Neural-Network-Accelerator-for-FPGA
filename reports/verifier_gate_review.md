@@ -65,12 +65,15 @@ and routed Vivado bitstream evidence at 20 MHz. This remains a no-board result:
 
 ## Required Next Gate
 
-PYNQ one-shot runtime API is present, but was not executed on the board in this
-gate. Before board claims:
+PYNQ one-shot runtime API is present, but was not executed as part of this
+board-free gate. A separate HLS register board smoke exists in
+`reports/spikemold_board_smoke_report.md`.
 
-1. Deploy `outputs/spikemold_pynq_z2.bit` and `outputs/spikemold_pynq_z2.hwh`.
-2. Run `scripts/run_spikemold_pynq_one_shot.py` on PYNQ-Z2 and record board
-   JSON counters.
+Before neural correctness claims:
+
+1. Replace the legacy memory-base one-shot runtime with the current HLS
+   AXI-stream/DMA runtime.
+2. Run DMA stream smoke through `axi_dma_0`/`axi_dma_1`.
 3. Compare board readback with the SpikePress golden trace/readout hash.
 
 ## Verifier Command
