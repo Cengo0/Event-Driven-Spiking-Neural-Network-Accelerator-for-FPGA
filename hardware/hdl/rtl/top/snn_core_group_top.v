@@ -386,6 +386,14 @@ module snn_core_group_top #(
     reg [31:0]                    service_cycles_counter;
     reg [31:0]                    pl_busy_cycles_counter;
     reg [31:0]                    output_drain_cycles_counter;
+    reg [31:0]                    hls_direct_axis_accept_count;
+    reg [31:0]                    hls_direct_fifo_push_count;
+    reg [31:0]                    hls_direct_core_accept_count;
+    reg [31:0]                    hls_direct_axis_scalar_collision_count;
+    reg [31:0]                    hls_direct_axis_invalid_id_count;
+    reg [DIRECT_FIFO_PTR_WIDTH:0] hls_direct_fifo_count;
+    wire                          hls_direct_fifo_full;
+    wire                          hls_direct_fifo_empty;
     wire                          output_drain_busy;
 
     //=========================================================================
@@ -782,21 +790,21 @@ module snn_core_group_top #(
     wire                            hls_spike_capture_ready;
     wire                            hls_pending_ready;
     wire                            hls_spike_event;
-    wire                            hls_direct_raw;
-    wire                            hls_direct_flagged_raw;
-    wire                            hls_board_visible_dest_raw;
+    wire                            hls_direct_id_accepted;
+    wire                            hls_direct_flagged_compat_id;
+    wire                            hls_board_visible_compat_id;
     wire                            hls_direct_event;
     wire                            hls_direct_scalar_push;
     wire                            hls_router_event;
     wire [HLS_NEURON_ID_WIDTH-1:0]  hls_direct_axis_neuron_id;
     wire [HLS_WEIGHT_WIDTH-1:0]     hls_direct_axis_weight;
-    wire                            hls_direct_axis_raw;
-    wire                            hls_direct_axis_explicit_raw;
+    wire                            hls_direct_axis_id_accepted;
+    wire                            hls_direct_axis_explicit_id_accepted;
     wire                            hls_direct_axis_explicit_invalid;
     wire                            hls_direct_axis_ingress_invalid;
-    wire                            hls_direct_axis_compat_raw;
-    wire                            hls_direct_axis_flagged_raw;
-    wire                            hls_direct_axis_board_visible_raw;
+    wire                            hls_direct_axis_compat_id_accepted;
+    wire                            hls_direct_axis_flagged_compat_id;
+    wire                            hls_direct_axis_board_visible_compat_id;
     wire [GLOBAL_ID_WIDTH-1:0]      hls_direct_axis_dest_id;
     wire                            hls_scalar_id_in_range;
     wire                            hls_scalar_invalid;
@@ -825,8 +833,6 @@ module snn_core_group_top #(
     wire [LOCAL_ID_WIDTH-1:0]       hls_direct_pending_local_id;
     wire                            hls_direct_pending_group_valid;
     wire                            hls_direct_pending_ready;
-    wire                            hls_direct_fifo_full;
-    wire                            hls_direct_fifo_empty;
     wire                            hls_direct_fifo_push;
     wire                            hls_direct_fifo_pop;
     wire                            router_ext_spike_ready;
@@ -847,13 +853,6 @@ module snn_core_group_top #(
     reg [DIRECT_FIFO_ENTRY_WIDTH-1:0] hls_direct_fifo [0:DIRECT_FIFO_DEPTH-1];
     reg [DIRECT_FIFO_PTR_WIDTH-1:0]   hls_direct_fifo_wr_ptr;
     reg [DIRECT_FIFO_PTR_WIDTH-1:0]   hls_direct_fifo_rd_ptr;
-    reg [DIRECT_FIFO_PTR_WIDTH:0]     hls_direct_fifo_count;
-    reg [31:0]                        hls_direct_axis_accept_count;
-    reg [31:0]                        hls_direct_fifo_push_count;
-    reg [31:0]                        hls_direct_core_accept_count;
-    reg [31:0]                        hls_direct_axis_scalar_collision_count;
-    reg [31:0]                        hls_direct_axis_invalid_id_count;
-
     wire [DIRECT_FIFO_ENTRY_WIDTH-1:0] hls_direct_fifo_head;
 
     assign hls_weight_truncated = hls_spike_weight_mag;
@@ -867,7 +866,7 @@ module snn_core_group_top #(
         (hls_spike_out_weight    != hls_spike_wt_d);
     assign hls_pending_ready = (!hls_spike_out_valid || !hls_scalar_id_in_range)
         ? 1'b1
-        : (hls_direct_raw ? !hls_direct_fifo_full : router_ext_spike_ready);
+        : (hls_direct_id_accepted ? !hls_direct_fifo_full : router_ext_spike_ready);
     assign hls_spike_capture_event = hls_snn_enable &
                                      hls_spike_out_valid &
                                      !hls_spike_wait_clear &
@@ -879,22 +878,22 @@ module snn_core_group_top #(
     assign hls_spike_capture_ready = hls_snn_enable &
                                      hls_pending_ready;
 
-    hls_scalar_spike_id_guard #(
+    spikemold_scalar_id_guard #(
         .HLS_NEURON_ID_WIDTH(HLS_NEURON_ID_WIDTH),
         .GLOBAL_ID_WIDTH(GLOBAL_ID_WIDTH),
         .HLS_DIRECT_TILE_COMPAT(HLS_DIRECT_TILE_COMPAT),
         .STRICT_PHYSICAL_ID_INGRESS(STRICT_PHYSICAL_ID_INGRESS)
-    ) u_hls_scalar_spike_id_guard (
+    ) u_spikemold_scalar_id_guard (
         .neuron_id          (hls_spike_out_neuron_id),
         .tvalid             (hls_spike_out_valid),
         .global_id          (hls_global_id),
         .direct_dest_id     (hls_direct_dest_id),
         .id_in_range        (hls_scalar_id_in_range),
         .invalid            (hls_scalar_invalid),
-        .flagged_raw        (hls_direct_flagged_raw),
-        .board_visible_raw  (hls_board_visible_dest_raw),
-        .direct_raw         (hls_direct_raw),
-        .router_raw         ()
+        .flagged_compat_id        (hls_direct_flagged_compat_id),
+        .board_visible_compat_id  (hls_board_visible_compat_id),
+        .direct_id_accepted       (hls_direct_id_accepted),
+        .routed_id_accepted       ()
     );
     // Board-visible dst0 replay is physically partitioned as:
     //   source IDs      512..1023
@@ -903,14 +902,14 @@ module snn_core_group_top #(
     // direct flag.  Accept the unflagged dst0 range as direct too so generated
     // HLS variants that expose stripped physical destination IDs do not fall
     // back into the router external path.
-    assign hls_direct_event = hls_spike_event & hls_direct_raw;
+    assign hls_direct_event = hls_spike_event & hls_direct_id_accepted;
     // In board-visible direct replay the AXIS packet is the authoritative
     // destination event.  A same-cycle scalar sideband event is a compatibility
     // duplicate from the HLS ap_none path; acknowledge it so HLS can advance,
     // suppress the duplicate FIFO write, and expose the collision counter.
     assign hls_direct_scalar_push = hls_direct_event & !hls_direct_fifo_full &
                                     !hls_direct_axis_push;
-    assign hls_router_event = hls_spike_event & ~hls_direct_raw;
+    assign hls_router_event = hls_spike_event & ~hls_direct_id_accepted;
     assign hls_direct_weight_negative = hls_spike_weight_negative;
     assign hls_direct_weight_abs = hls_spike_weight_abs;
     assign hls_direct_weight_mag = hls_spike_weight_mag;
@@ -930,22 +929,22 @@ module snn_core_group_top #(
         .tvalid             (hls_direct_axis_tvalid),
         .tuser              (hls_direct_axis_tuser),
         .dest_id            (hls_direct_axis_dest_id),
-        .explicit_raw       (hls_direct_axis_explicit_raw),
+        .explicit_id_accepted     (hls_direct_axis_explicit_id_accepted),
         .explicit_invalid   (hls_direct_axis_explicit_invalid),
         .ingress_invalid    (hls_direct_axis_ingress_invalid),
         .compat_id_in_range (),
-        .flagged_raw        (hls_direct_axis_flagged_raw),
-        .board_visible_raw  (hls_direct_axis_board_visible_raw),
-        .compat_raw         (hls_direct_axis_compat_raw),
-        .direct_raw         (hls_direct_axis_raw)
+        .flagged_compat_id        (hls_direct_axis_flagged_compat_id),
+        .board_visible_compat_id  (hls_direct_axis_board_visible_compat_id),
+        .compat_id_accepted       (hls_direct_axis_compat_id_accepted),
+        .direct_id_accepted       (hls_direct_axis_id_accepted)
     );
     assign hls_direct_axis_tready = !hls_direct_fifo_full;
     assign hls_direct_axis_push = (HLS_DIRECT_TILE_COMPAT != 0) &
-                                  hls_direct_axis_raw &
+                                  hls_direct_axis_id_accepted &
                                   hls_direct_axis_tvalid &
                                   hls_direct_axis_tready;
     assign hls_direct_scalar_axis_collision =
-        hls_snn_enable & hls_direct_raw & hls_spike_out_valid & hls_direct_axis_push;
+        hls_snn_enable & hls_direct_id_accepted & hls_spike_out_valid & hls_direct_axis_push;
     assign hls_direct_axis_weight_negative =
         hls_direct_axis_weight[HLS_WEIGHT_WIDTH-1];
     assign hls_direct_axis_weight_abs = hls_direct_axis_weight_negative

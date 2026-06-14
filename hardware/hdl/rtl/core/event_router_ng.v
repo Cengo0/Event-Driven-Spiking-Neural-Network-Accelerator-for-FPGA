@@ -90,21 +90,21 @@ module event_router_ng #(
     output wire                         learn_weight_ready,
 `else
     // Inference mode: learning signals are tied off
-    output reg                          learn_spike_valid = 0,
-    output reg  [GLOBAL_ID_WIDTH-1:0]   learn_spike_src_id = 0,
-    input  wire                         learn_spike_ready = 1'b1,
+    output reg                          learn_spike_valid,
+    output reg  [GLOBAL_ID_WIDTH-1:0]   learn_spike_src_id,
+    input  wire                         learn_spike_ready,
 
     // Weight update path disabled - inputs tied to safe values
-    input  wire                         learn_weight_valid = 1'b0,
-    input  wire [GROUP_ID_WIDTH-1:0]    learn_weight_group = 0,
-    input  wire [LOCAL_ID_WIDTH-1:0]    learn_weight_src = 0,
-    input  wire [LOCAL_ID_WIDTH-1:0]    learn_weight_dst = 0,
-    input  wire [WEIGHT_WIDTH-1:0]      learn_weight_data = 0,
-    input  wire                         learn_weight_exc = 0,
-    input  wire                         learn_weight_is_inter = 0,
-    input  wire [GROUP_ID_WIDTH-1:0]    learn_weight_dst_group = 0,
-    input  wire [FANOUT_IDX_WIDTH-1:0]  learn_weight_fanout_idx = 0,
-    output wire                         learn_weight_ready;
+    input  wire                         learn_weight_valid,
+    input  wire [GROUP_ID_WIDTH-1:0]    learn_weight_group,
+    input  wire [LOCAL_ID_WIDTH-1:0]    learn_weight_src,
+    input  wire [LOCAL_ID_WIDTH-1:0]    learn_weight_dst,
+    input  wire [WEIGHT_WIDTH-1:0]      learn_weight_data,
+    input  wire                         learn_weight_exc,
+    input  wire                         learn_weight_is_inter,
+    input  wire [GROUP_ID_WIDTH-1:0]    learn_weight_dst_group,
+    input  wire [FANOUT_IDX_WIDTH-1:0]  learn_weight_fanout_idx,
+    output wire                         learn_weight_ready,
 `endif
 
     // --- Connectivity Table Interface ---

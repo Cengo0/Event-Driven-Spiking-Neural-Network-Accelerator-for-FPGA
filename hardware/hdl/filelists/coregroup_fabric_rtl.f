@@ -16,7 +16,8 @@ hardware/hdl/rtl/core/synaptic_connectivity_table.v
 # Common utilities
 hardware/hdl/rtl/common/direct_axis_id_decoder.v
 hardware/hdl/rtl/common/event_word64_decode.v
-hardware/hdl/rtl/common/hls_scalar_spike_id_guard.v
+hardware/hdl/rtl/common/spike_out_bridge.v
+hardware/hdl/rtl/common/spikemold_scalar_id_guard.v
 hardware/hdl/rtl/common/wide_control_decode.v
 
 # Event frontend (optional for board-free coverage)

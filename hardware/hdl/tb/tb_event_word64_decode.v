@@ -7,7 +7,7 @@ module tb_event_word64_decode;
     wire [9:0] x;
     wire [9:0] y;
     wire [7:0] channel;
-    wire polarity;
+    wire payload_sign;
     wire [7:0] payload_u8;
     wire signed [7:0] payload_s8;
     wire [5:0] layer_id;
@@ -28,7 +28,7 @@ module tb_event_word64_decode;
         .x(x),
         .y(y),
         .channel(channel),
-        .polarity(polarity),
+        .payload_sign(payload_sign),
         .payload_u8(payload_u8),
         .payload_s8(payload_s8),
         .layer_id(layer_id),
@@ -60,7 +60,7 @@ module tb_event_word64_decode;
         input [9:0] x_in;
         input [9:0] y_in;
         input [7:0] channel_in;
-        input polarity_in;
+        input payload_sign_in;
         input [7:0] payload_in;
         input [5:0] layer_in;
         input [4:0] tile_in;
@@ -71,7 +71,7 @@ module tb_event_word64_decode;
                 x_in,
                 y_in,
                 channel_in,
-                polarity_in,
+                payload_sign_in,
                 payload_in,
                 layer_in,
                 tile_in
@@ -80,15 +80,15 @@ module tb_event_word64_decode;
     endfunction
 
     initial begin
-        event_word = make_event(4'd0, 12'hABC, 10'd346, 10'd260, 8'd17, 1'b1, 8'hFB, 6'd12, 5'd19);
+        event_word = make_event(4'd0, 12'hABC, 10'd346, 10'd260, 8'd17, 1'b1, 8'd5, 6'd12, 5'd19);
         #1;
         check("decode event type", event_type == 4'd0);
         check("decode timestamp delta", timestamp_delta == 12'hABC);
         check("decode x coordinate", x == 10'd346);
         check("decode y coordinate", y == 10'd260);
         check("decode channel", channel == 8'd17);
-        check("decode polarity", polarity == 1'b1);
-        check("decode payload byte", payload_u8 == 8'hFB);
+        check("decode payload sign", payload_sign == 1'b1);
+        check("decode payload byte", payload_u8 == 8'd5);
         check("decode signed payload", payload_s8 == -8'sd5);
         check("decode layer/tile", layer_id == 6'd12 && tile_id == 5'd19);
         check("sensor type predicate", is_sensor_event == 1'b1 && is_neuron_event == 1'b0);

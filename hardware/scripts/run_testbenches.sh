@@ -77,6 +77,29 @@ run_test() {
 }
 
 #-----------------------------------------------------------------------------
+# Test 0: EventWord64 decoder
+#-----------------------------------------------------------------------------
+run_test "event_word64_decode" \
+    "$TB_DIR/tb_event_word64_decode.v" \
+    "$RTL_DIR/common/event_word64_decode.v"
+
+run_test "direct_axis_id_decoder" \
+    "$TB_DIR/tb_direct_axis_id_decoder.v" \
+    "$RTL_DIR/common/direct_axis_id_decoder.v"
+
+run_test "spikemold_scalar_id_guard" \
+    "$TB_DIR/tb_spikemold_scalar_id_guard.v" \
+    "$RTL_DIR/common/spikemold_scalar_id_guard.v"
+
+run_test "wide_control_decode" \
+    "$TB_DIR/tb_wide_control_decode.v" \
+    "$RTL_DIR/common/wide_control_decode.v"
+
+run_test "spike_out_bridge" \
+    "$TB_DIR/tb_spike_out_bridge.v" \
+    "$RTL_DIR/common/spike_out_bridge.v"
+
+#-----------------------------------------------------------------------------
 # Test 1: Core Group
 #-----------------------------------------------------------------------------
 run_test "core_group" \
