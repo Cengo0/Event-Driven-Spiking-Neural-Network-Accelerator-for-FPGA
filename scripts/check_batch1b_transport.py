@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check Batch 1B SpikeMold-EDNP transport smoke artifacts."""
+"""Check Batch 1B SpikeMold transport smoke artifacts."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ if str(PYTHON_ROOT) not in sys.path:
 from spikepress.transport import (  # noqa: E402
     AXI_LITE_SMOKE_SCHEMA,
     DMA_LOOPBACK_SCHEMA,
-    EDNP_MINI_SMOKE_SCHEMA,
+    SPIKEMOLD_MINI_SMOKE_SCHEMA,
     EVENTWORD_COUNTER_SCHEMA,
     TRANSPORT_SMOKE_SCHEMA,
 )
@@ -47,8 +47,8 @@ def require_section(root: dict, key: str, schema: str) -> dict:
 
 
 def main() -> int:
-    smoke_path = ROOT / "outputs" / "transport" / "batch_1b_transport_ednp_mini_smoke.json"
-    report_path = ROOT / "reports" / "batch_1b_transport_ednp_mini_report.md"
+    smoke_path = ROOT / "outputs" / "transport" / "batch_1b_transport_spikemold_mini_smoke.json"
+    report_path = ROOT / "reports" / "batch_1b_transport_spikemold_mini_report.md"
     if not smoke_path.exists():
         fail(f"missing smoke artifact: {smoke_path}")
     if not report_path.exists():
@@ -72,14 +72,14 @@ def main() -> int:
     require_section(smoke, "register_smoke", AXI_LITE_SMOKE_SCHEMA)
     require_section(smoke, "dma_loopback", DMA_LOOPBACK_SCHEMA)
     require_section(smoke, "eventword64_counter", EVENTWORD_COUNTER_SCHEMA)
-    ednp = require_section(smoke, "ednp_mini_fc_lif", EDNP_MINI_SMOKE_SCHEMA)
-    if ednp.get("trace_match_rate") != 1.0:
-        fail("EDNP-mini trace_match_rate is not 1.0")
-    if ednp.get("readout_match") is not True:
-        fail("EDNP-mini readout_match is not true")
-    if ednp.get("state_checksum_match") is not True:
-        fail("EDNP-mini state_checksum_match is not true")
-    counters = ednp.get("counters", {})
+    spikemold_mini = require_section(smoke, "spikemold_mini_fc_lif", SPIKEMOLD_MINI_SMOKE_SCHEMA)
+    if spikemold_mini.get("trace_match_rate") != 1.0:
+        fail("SpikeMold-mini trace_match_rate is not 1.0")
+    if spikemold_mini.get("readout_match") is not True:
+        fail("SpikeMold-mini readout_match is not true")
+    if spikemold_mini.get("state_checksum_match") is not True:
+        fail("SpikeMold-mini state_checksum_match is not true")
+    counters = spikemold_mini.get("counters", {})
     for key in ["input_event_count", "update_count", "active_count", "output_words", "dma_calls", "axi_lite_commands"]:
         if int(counters.get(key, -1)) < 0:
             fail(f"missing or invalid counter: {key}")
@@ -91,7 +91,7 @@ def main() -> int:
         if phrase not in text:
             fail(f"report missing evidence phrase: {phrase}")
 
-    print("PASS: Batch 1B transport + EDNP-mini smoke artifacts valid")
+    print("PASS: Batch 1B transport + SpikeMold-mini smoke artifacts valid")
     return 0
 
 

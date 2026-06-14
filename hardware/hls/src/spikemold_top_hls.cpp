@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
-// Title         : SpikeMold-EDNP HLS Module
-// Project       : SpikeMold-EDNP
+// Title         : SpikeMold HLS Module
+// Project       : SpikeMold
 // File          : spikemold_top_hls.cpp
 // Author        : Jiwoon Lee (@metr0jw)
 // Organization  : Kwangwoon University, Seoul, South Korea

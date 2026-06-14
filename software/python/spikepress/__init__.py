@@ -1,4 +1,4 @@
-"""SpikePress software API for SpikeMold-EDNP artifacts."""
+"""SpikePress software API for SpikeMold artifacts."""
 
 from .api import (
     SpikePressFCLIFLayer,
@@ -19,18 +19,18 @@ from .architecture_sandbox import (
     ARCHITECTURE_SANDBOX_SCHEMA,
     build_batch_1x_architecture_sandbox,
 )
-from .spikemold_ednp_artifact import (
-    SpikeMoldEDNPArtifact,
-    build_spikemold_ednp_artifact,
-    read_spikemold_ednp_artifact,
-    write_spikemold_ednp_artifact,
+from .spikemold_artifact import (
+    SpikeMoldArtifact,
+    build_spikemold_artifact,
+    read_spikemold_artifact,
+    write_spikemold_artifact,
 )
 from .event_budget import (
     EventBudgetLimits,
     EventBudgetResult,
-    DEFAULT_EDNP_MINI_LIMITS,
+    DEFAULT_SPIKEMOLD_MINI_LIMITS,
     evaluate_trace_budget,
-    recommended_ednp_mini_config,
+    recommended_spikemold_mini_config,
     summarize_trace_budgets,
 )
 from .spikemold_runtime_contract import (
@@ -62,7 +62,7 @@ from .transport import (
     pack_trace_output_commits,
     run_axi_lite_smoke,
     run_dma_loopback,
-    run_ednp_mini_fc_lif_smoke,
+    run_spikemold_mini_fc_lif_smoke,
     run_eventword64_counter_smoke,
 )
 
@@ -70,7 +70,7 @@ __all__ = [
     "SpikeMoldContractTrace",
     "ActiveSetCommit",
     "ARCHITECTURE_SANDBOX_SCHEMA",
-    "DEFAULT_EDNP_MINI_LIMITS",
+    "DEFAULT_SPIKEMOLD_MINI_LIMITS",
     "EventBudgetLimits",
     "EventBudgetResult",
     "InputSpike",
@@ -84,7 +84,7 @@ __all__ = [
     "SpikePressProjection",
     "SpikePressProjectionInfo",
     "REGISTER_OFFSETS",
-    "SpikeMoldEDNPArtifact",
+    "SpikeMoldArtifact",
     "SpikeMoldPynqRunConfig",
     "SpikeMoldPynqRunResult",
     "SpikeMoldRuntimeCounters",
@@ -92,7 +92,7 @@ __all__ = [
     "SpikePressFCLIFLayer",
     "SpikePressModel",
     "SynapticUpdate",
-    "build_spikemold_ednp_artifact",
+    "build_spikemold_artifact",
     "build_batch_1b_transport_smoke",
     "build_batch_1x_architecture_sandbox",
     "build_spikemold_runtime_contract",
@@ -105,15 +105,15 @@ __all__ = [
     "pack_spikemold_event_word64",
     "pack_input_spikes",
     "pack_trace_output_commits",
-    "read_spikemold_ednp_artifact",
-    "recommended_ednp_mini_config",
+    "read_spikemold_artifact",
+    "recommended_spikemold_mini_config",
     "run_axi_lite_smoke",
     "run_dma_loopback",
-    "run_ednp_mini_fc_lif_smoke",
+    "run_spikemold_mini_fc_lif_smoke",
     "run_eventword64_counter_smoke",
     "run_spikemold_pynq_one_shot",
     "summarize_trace_budgets",
-    "write_spikemold_ednp_artifact",
+    "write_spikemold_artifact",
 ]
 
 __version__ = "0.1.0"

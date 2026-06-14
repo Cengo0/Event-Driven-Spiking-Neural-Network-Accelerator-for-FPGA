@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check EDNP Batch 0 and initial Batch 1A artifacts."""
+"""Check SpikeMold Batch 0 and initial Batch 1A artifacts."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ from spikepress.event_budget import evaluate_trace_budget  # noqa: E402
 
 SPIKEPRESS_SOURCE_FILES = [
     ROOT / "software" / "python" / "spikepress" / "architecture_trace_generator.py",
-    ROOT / "software" / "python" / "spikepress" / "spikemold_ednp_artifact.py",
+    ROOT / "software" / "python" / "spikepress" / "spikemold_artifact.py",
     ROOT / "software" / "python" / "spikepress" / "event_budget.py",
     ROOT / "software" / "python" / "spikepress" / "api.py",
 ]
@@ -126,11 +126,11 @@ def check_batch1a() -> None:
             fail(f"missing trace: {path}")
         check_trace(path)
 
-    budget = ROOT / "outputs" / "event_budget" / "recommended_ednp_mini_config.json"
+    budget = ROOT / "outputs" / "event_budget" / "recommended_spikemold_mini_config.json"
     if not budget.exists():
         fail(f"missing budget artifact: {budget}")
     budget_json = load_json(budget)
-    if budget_json.get("schema") != "spikemold.ednp_event_budget.v1":
+    if budget_json.get("schema") != "spikemold.event_budget.v1":
         fail("event budget schema mismatch")
     if budget_json.get("all_ok") is not True:
         fail("event budget all_ok is not true")
@@ -153,12 +153,12 @@ def check_removed_api_dependencies_excluded() -> None:
         "Neuron" + "Group",
         "Syn" + "apses",
         "SpikePress" + "Connection",
-        "compile_" + "ednp",
-        "class " + "EDNP" + "Artifact",
-        "build_" + "ednp" + "_artifact",
-        "read_" + "ednp" + "_artifact",
-        "write_" + "ednp" + "_artifact",
-        "SpikePress" + "Compiled" + "EDNP",
+        "compile_" + "e" + "dnp",
+        "class " + "E" + "DNP" + "Artifact",
+        "build_" + "e" + "dnp" + "_artifact",
+        "read_" + "e" + "dnp" + "_artifact",
+        "write_" + "e" + "dnp" + "_artifact",
+        "SpikePress" + "Compiled" + "E" + "DNP",
         "DEFAULT_" + "M3" + "_LIMITS",
         "recommended_" + "m3" + "_config",
     ]
@@ -175,7 +175,7 @@ def main() -> int:
     check_contracts()
     check_batch1a()
     check_removed_api_dependencies_excluded()
-    print("PASS: EDNP Batch 0 + initial Batch 1A artifacts valid")
+    print("PASS: SpikeMold Batch 0 + initial Batch 1A artifacts valid")
     return 0
 
 

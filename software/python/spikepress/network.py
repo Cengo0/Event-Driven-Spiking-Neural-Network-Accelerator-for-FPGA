@@ -1,6 +1,6 @@
 """SpikePress network topology compiler.
 
-Provides a small API for defining EDNP-compatible SNN topologies with explicit
+Provides a small API for defining SpikeMold-compatible SNN topologies with explicit
 neuron populations and directed projections. The flat weight buffer layout is
 computed at compile time and maps to the SpikeMold hardware artifact contract.
 

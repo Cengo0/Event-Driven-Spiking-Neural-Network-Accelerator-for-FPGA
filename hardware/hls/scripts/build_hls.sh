@@ -1,7 +1,7 @@
 #!/bin/bash
 ##-----------------------------------------------------------------------------
 ## Title         : HLS Build Script (v++ CLI - Vitis 2025.2+)
-## Project       : SpikeMold-EDNP
+## Project       : SpikeMold
 ## File          : build_hls.sh
 ## Author        : Jiwoon Lee (@metr0jw)
 ## Organization  : Kwangwoon University, Seoul, South Korea
@@ -83,7 +83,7 @@ done
 cd "$HLS_DIR"
 
 echo -e "${CYAN}============================================${NC}"
-echo -e "${CYAN}  SpikeMold-EDNP HLS Build (v++ CLI)${NC}"
+echo -e "${CYAN}  SpikeMold HLS Build (v++ CLI)${NC}"
 echo -e "${CYAN}============================================${NC}"
 echo -e "Part:         ${GREEN}$PART${NC}"
 echo -e "Clock:        ${GREEN}$CLOCK${NC}"

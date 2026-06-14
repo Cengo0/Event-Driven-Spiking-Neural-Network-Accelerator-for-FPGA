@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Title         : SNN SpikeMold Coregroup Top - Hierarchical Neuromorphic Processor
+// Title         : SpikeMold Coregroup Top - Hierarchical Neuromorphic Processor
 // Project       : SpikeMold (HW) + SpikePress (SW)
 // File          : spikemold_coregroup_top.v
 // Author        : Jiwoon Lee (@metr0jw)
@@ -20,8 +20,8 @@
 //                 │  │         Event Router (NG)                │       │
 //                 │  │  - Round-robin arbitration               │       │
 //                 │  │  - Sparse inter-group routing            │       │
-//                 │  │  - Learning engine interface             │       │
 //                 │  │  - External sensor/host input            │       │
+//                 │  │  - Route-table lookup                    │       │
 //                 │  └──┬───┬───┬───┬───┬───┬────────┬───┬──────┘       │
 //                 │     │   │   │   │   │   │        │   │              │
 //                 │     ▼   ▼   ▼   ▼   ▼   ▼  ...   ▼   ▼              │
@@ -97,11 +97,10 @@ module spikemold_coregroup_top #(
     parameter HLS_WEIGHT_WIDTH      = `SNN_HLS_WEIGHT_WIDTH,
     parameter STRICT_PHYSICAL_ID_INGRESS = 0,
 `ifdef SPIKEMOLD_FABRIC_TOP_BOARD_VISIBLE
-    parameter HLS_DIRECT_TILE_COMPAT = 1,
+    parameter HLS_DIRECT_TILE_COMPAT = 1
 `else
-    parameter HLS_DIRECT_TILE_COMPAT = 0,
+    parameter HLS_DIRECT_TILE_COMPAT = 0
 `endif
-    parameter LEARN_NOTIFY_ENABLE   = `SNN_HLS_LEARNING_ENABLE
 )(
     //-------------------------------------------------------------------------
     // DDR Interface (directly from PS)
@@ -185,32 +184,6 @@ module spikemold_coregroup_top #(
     wire                            rtl_output_axis_enable;
     wire                            hls_spike_in_ready;
 
-    // HLS learned-weight update channel (HLS -> Event Router) - DISABLED FOR INFERENCE
-`ifdef SNN_CORE_GROUP_LEARNING_ENABLE
-    wire                            hls_learn_weight_valid;
-    wire [GROUP_ID_WIDTH-1:0]       hls_learn_weight_group;
-    wire [LOCAL_ID_WIDTH-1:0]       hls_learn_weight_src;
-    wire [LOCAL_ID_WIDTH-1:0]       hls_learn_weight_dst;
-    wire [WEIGHT_WIDTH-1:0]         hls_learn_weight_data;
-    wire                            hls_learn_weight_exc;
-    wire                            hls_learn_weight_is_inter;
-    wire [GROUP_ID_WIDTH-1:0]       hls_learn_weight_dst_group;
-    wire [FANOUT_IDX_WIDTH-1:0]     hls_learn_weight_fanout_idx;
-    wire                            rtl_learn_weight_ready;
-`else
-    // Inference mode: learning disabled - tie off to safe values
-    wire                            hls_learn_weight_valid = 1'b0;
-    wire [GROUP_ID_WIDTH-1:0]       hls_learn_weight_group = 0;
-    wire [LOCAL_ID_WIDTH-1:0]       hls_learn_weight_src = 0;
-    wire [LOCAL_ID_WIDTH-1:0]       hls_learn_weight_dst = 0;
-    wire [WEIGHT_WIDTH-1:0]         hls_learn_weight_data = 0;
-    wire                            hls_learn_weight_exc = 0;
-    wire                            hls_learn_weight_is_inter = 0;
-    wire [GROUP_ID_WIDTH-1:0]       hls_learn_weight_dst_group = 0;
-    wire [FANOUT_IDX_WIDTH-1:0]     hls_learn_weight_fanout_idx = 0;
-    wire                            rtl_learn_weight_ready = 1'b0;
-`endif
-
     wire                            hls_spikemold_enable;
     wire                            hls_spikemold_reset;
     wire                            rtl_spikemold_ready;
@@ -262,13 +235,6 @@ module spikemold_coregroup_top #(
     wire [NUM_GROUPS*THRESHOLD_WIDTH-1:0]       grp_in_threshold;
     wire [NUM_GROUPS-1:0]                       grp_in_ready;
 
-    // Weight config from event router → core groups
-    wire [NUM_GROUPS-1:0]                       grp_weight_we;
-    wire [LOCAL_ID_WIDTH-1:0]                   grp_weight_src;
-    wire [LOCAL_ID_WIDTH-1:0]                   grp_weight_dst;
-    wire [WEIGHT_WIDTH-1:0]                     grp_weight_data;
-    wire                                        grp_weight_exc;
-
     // Core group status
     wire [NUM_GROUPS*16-1:0]                    grp_spike_count;
     wire [NUM_GROUPS-1:0]                       grp_busy;
@@ -287,64 +253,6 @@ module spikemold_coregroup_top #(
     wire [WEIGHT_WIDTH-1:0]       ct_result_weight;
     wire                          ct_result_exc_inh;
     wire                          ct_result_entry_valid;
-
-    // Connectivity table config (from event router or decode logic)
-    wire                          ct_cfg_we;
-    wire [GROUP_ID_WIDTH-1:0]     ct_cfg_src_group;
-    wire [LOCAL_ID_WIDTH-1:0]     ct_cfg_src_neuron;
-    wire [FANOUT_IDX_WIDTH-1:0]   ct_cfg_fanout_idx;
-    wire                          ct_cfg_valid_bit;
-    wire [GROUP_ID_WIDTH-1:0]     ct_cfg_dst_group;
-    wire [LOCAL_ID_WIDTH-1:0]     ct_cfg_dst_neuron;
-    wire [WEIGHT_WIDTH-1:0]       ct_cfg_weight;
-    wire                          ct_cfg_exc_inh;
-
-    // Learning engine interface - DISABLED FOR INFERENCE MODE
-`ifdef SNN_CORE_GROUP_LEARNING_ENABLE
-    wire                          learn_spike_valid;
-    wire [GLOBAL_ID_WIDTH-1:0]    learn_spike_src_id;
-    wire                          learn_spike_ready;
-
-    // Enable learned-weight bridge from HLS to Event Router.
-    localparam                    LEARN_WEIGHT_BRIDGE_ENABLE = 1'b1;
-    wire                          learn_weight_valid_br;
-    wire [GROUP_ID_WIDTH-1:0]     learn_weight_group_br;
-    wire [LOCAL_ID_WIDTH-1:0]     learn_weight_src_br;
-    wire [LOCAL_ID_WIDTH-1:0]     learn_weight_dst_br;
-    wire [WEIGHT_WIDTH-1:0]       learn_weight_data_br;
-    wire                          learn_weight_exc_br;
-    wire                          learn_weight_is_inter_br;
-    wire [GROUP_ID_WIDTH-1:0]     learn_weight_dst_group_br;
-    wire [FANOUT_IDX_WIDTH-1:0]   learn_weight_fanout_idx_br;
-    wire                          learn_weight_ready_br;
-
-    assign learn_weight_valid_br      = LEARN_WEIGHT_BRIDGE_ENABLE ? hls_learn_weight_valid : 1'b0;
-    assign learn_weight_group_br      = LEARN_WEIGHT_BRIDGE_ENABLE ? hls_learn_weight_group : {GROUP_ID_WIDTH{1'b0}};
-    assign learn_weight_src_br        = LEARN_WEIGHT_BRIDGE_ENABLE ? hls_learn_weight_src : {LOCAL_ID_WIDTH{1'b0}};
-    assign learn_weight_dst_br        = LEARN_WEIGHT_BRIDGE_ENABLE ? hls_learn_weight_dst : {LOCAL_ID_WIDTH{1'b0}};
-    assign learn_weight_data_br       = LEARN_WEIGHT_BRIDGE_ENABLE ? hls_learn_weight_data : {WEIGHT_WIDTH{1'b0}};
-    assign learn_weight_exc_br        = LEARN_WEIGHT_BRIDGE_ENABLE ? hls_learn_weight_exc : 1'b0;
-    assign learn_weight_is_inter_br   = LEARN_WEIGHT_BRIDGE_ENABLE ? hls_learn_weight_is_inter : 1'b0;
-    assign learn_weight_dst_group_br  = LEARN_WEIGHT_BRIDGE_ENABLE ? hls_learn_weight_dst_group : {GROUP_ID_WIDTH{1'b0}};
-    assign learn_weight_fanout_idx_br = LEARN_WEIGHT_BRIDGE_ENABLE ? hls_learn_weight_fanout_idx : {FANOUT_IDX_WIDTH{1'b0}};
-`else
-    // Inference mode: learning disabled - tie off to safe values
-    wire                          learn_spike_valid = 1'b0;
-    wire [GLOBAL_ID_WIDTH-1:0]    learn_spike_src_id = 0;
-    wire                          learn_spike_ready = 1'b1;
-
-    localparam                    LEARN_WEIGHT_BRIDGE_ENABLE = 1'b0;
-    wire                          learn_weight_valid_br = 1'b0;
-    wire [GROUP_ID_WIDTH-1:0]     learn_weight_group_br = 0;
-    wire [LOCAL_ID_WIDTH-1:0]     learn_weight_src_br = 0;
-    wire [LOCAL_ID_WIDTH-1:0]     learn_weight_dst_br = 0;
-    wire [WEIGHT_WIDTH-1:0]       learn_weight_data_br = 0;
-    wire                          learn_weight_exc_br = 0;
-    wire                          learn_weight_is_inter_br = 0;
-    wire [GROUP_ID_WIDTH-1:0]     learn_weight_dst_group_br = 0;
-    wire [FANOUT_IDX_WIDTH-1:0]   learn_weight_fanout_idx_br = 0;
-    wire                          learn_weight_ready_br = 1'b0;
-`endif
 
     // Router status
     wire [31:0]                   routed_spike_count;
@@ -703,32 +611,6 @@ module spikemold_coregroup_top #(
         .s_axis_rtl_spikes_TDEST  (rtl_spike_axis_tdest),
         .s_axis_rtl_spikes_TUSER  (rtl_spike_axis_tuser),
 
- `ifdef SNN_CORE_GROUP_LEARNING_ENABLE
-        // HLS -> RTL learned-weight update interface
-        .learn_weight_valid      (hls_learn_weight_valid),
-        .learn_weight_group      (hls_learn_weight_group),
-        .learn_weight_src        (hls_learn_weight_src),
-        .learn_weight_dst        (hls_learn_weight_dst),
-        .learn_weight_data       (hls_learn_weight_data),
-        .learn_weight_exc        (hls_learn_weight_exc),
-        .learn_weight_is_inter   (hls_learn_weight_is_inter),
-        .learn_weight_dst_group  (hls_learn_weight_dst_group),
-        .learn_weight_fanout_idx (hls_learn_weight_fanout_idx),
-        .learn_weight_ready      (rtl_learn_weight_ready),
-`else
-        // Inference mode: learning disabled - tie off to safe values
-        .learn_weight_valid      (1'b0),
-        .learn_weight_group      (0),
-        .learn_weight_src        (0),
-        .learn_weight_dst        (0),
-        .learn_weight_data       (0),
-        .learn_weight_exc        (0),
-        .learn_weight_is_inter   (0),
-        .learn_weight_dst_group  (0),
-        .learn_weight_fanout_idx (0),
-        .learn_weight_ready      (1'b0),
-`endif
-
         // SpikeMold Control
         .spikemold_enable              (hls_spikemold_enable),
         .spikemold_reset               (hls_spikemold_reset),
@@ -847,6 +729,8 @@ module spikemold_coregroup_top #(
     reg                             direct_host_spike_valid;
     reg  [GLOBAL_ID_WIDTH-1:0]      direct_host_spike_id;
     reg  [NUM_GROUPS-1:0]           direct_host_spike_ready;
+    reg                             router_host_spike_valid;
+    reg  [GLOBAL_ID_WIDTH-1:0]      router_host_spike_id;
 
     localparam DIRECT_FIFO_ENTRY_WIDTH = GLOBAL_ID_WIDTH + WEIGHT_WIDTH + 1 + THRESHOLD_WIDTH;
 
@@ -1062,15 +946,10 @@ module spikemold_coregroup_top #(
     assign router_ext_spike_weight = hls_weight_truncated;
     assign router_ext_spike_exc = ~hls_spike_weight_negative;
 
-    // Event Router -> HLS output bridge
-    // Buffer post-spikes so HLS ready-token stalls do not drop one-cycle
-    // learning/output notifications.
-    //
-    // In direct active-tile compatibility mode, the host-visible output should
-    // reflect the physical core that actually fired.  Drain the core output
-    // FIFOs directly and keep the event router out of this replay-only path;
-    // the router learning notification is delayed by CT traversal and is not a
-    // dedicated host-output contract.
+    // Event Router -> HLS output bridge.
+    // Direct active-tile compatibility mode drains core output FIFOs directly.
+    // Routed mode observes the core spike exactly when the event router accepts
+    // it, preserving host-visible post-spike readout without a training hook.
     assign router_grp_spike_valid = (HLS_DIRECT_TILE_COMPAT != 0)
         ? {NUM_GROUPS{1'b0}}
         : grp_spike_valid;
@@ -1084,6 +963,8 @@ module spikemold_coregroup_top #(
         direct_host_spike_valid = 1'b0;
         direct_host_spike_id = {GLOBAL_ID_WIDTH{1'b0}};
         direct_host_spike_ready = {NUM_GROUPS{1'b0}};
+        router_host_spike_valid = 1'b0;
+        router_host_spike_id = {GLOBAL_ID_WIDTH{1'b0}};
         for (host_spike_i = 0; host_spike_i < NUM_GROUPS; host_spike_i = host_spike_i + 1) begin
             if (!direct_host_spike_valid && grp_spike_valid[host_spike_i]) begin
                 direct_host_spike_valid = 1'b1;
@@ -1093,15 +974,24 @@ module spikemold_coregroup_top #(
                     grp_spike_neuron_id[host_spike_i*LOCAL_ID_WIDTH +: LOCAL_ID_WIDTH]
                 };
             end
+            if (!router_host_spike_valid &&
+                grp_spike_valid[host_spike_i] &&
+                router_grp_spike_ready[host_spike_i]) begin
+                router_host_spike_valid = 1'b1;
+                router_host_spike_id = {
+                    host_spike_i[GROUP_ID_WIDTH-1:0],
+                    grp_spike_neuron_id[host_spike_i*LOCAL_ID_WIDTH +: LOCAL_ID_WIDTH]
+                };
+            end
         end
     end
 
     assign host_output_spike_valid_raw = (HLS_DIRECT_TILE_COMPAT != 0)
         ? direct_host_spike_valid
-        : learn_spike_valid;
+        : router_host_spike_valid;
     assign host_output_spike_id_raw = (HLS_DIRECT_TILE_COMPAT != 0)
         ? direct_host_spike_id
-        : learn_spike_src_id;
+        : router_host_spike_id;
     assign rtl_output_axis_enable = (HLS_DIRECT_TILE_COMPAT != 0);
 
     // Break the long path from coregroup output FIFO read/arbiter logic into
@@ -1125,7 +1015,7 @@ module spikemold_coregroup_top #(
         .NEURON_ID_WIDTH    (GLOBAL_ID_WIDTH),
         .WEIGHT_WIDTH       (HLS_WEIGHT_WIDTH),
         .FIFO_DEPTH         (256),
-        .INPUT_VALID_IS_PULSE(HLS_DIRECT_TILE_COMPAT != 0),
+        .INPUT_VALID_IS_PULSE(1),
         .OUTPUT_AXIS_ENABLE (HLS_DIRECT_TILE_COMPAT != 0)
     ) u_spike_out_bridge (
         .clk                 (pl_clk),
@@ -1154,9 +1044,6 @@ module spikemold_coregroup_top #(
         .output_emit_count   (output_bridge_emit_count),
         .output_drop_count   (output_bridge_drop_count)
     );
-
-    assign rtl_learn_weight_ready = LEARN_WEIGHT_BRIDGE_ENABLE ? learn_weight_ready_br : 1'b0;
-    assign learn_spike_ready      = 1'b1;
 
     // HLS ready/busy
     assign rtl_spike_in_ready = hls_spike_capture_ready;
@@ -1223,7 +1110,6 @@ module spikemold_coregroup_top #(
     // Variable: configure group_sizes in spikemold_params.yaml for mixed sizes.
     //=========================================================================
 
-    // Mux write enable: AXI config writes OR event router weight updates
     wire [NUM_GROUPS-1:0]     combined_weight_we;
     wire [LOCAL_ID_WIDTH-1:0] combined_weight_src [0:NUM_GROUPS-1];
     wire [LOCAL_ID_WIDTH-1:0] combined_weight_dst [0:NUM_GROUPS-1];
@@ -1233,16 +1119,11 @@ module spikemold_coregroup_top #(
     genvar g;
     generate
         for (g = 0; g < NUM_GROUPS; g = g + 1) begin : gen_weight_mux
-            // AXI config has priority over router weight updates
-            assign combined_weight_we[g]   = intra_weight_we_reg[g] | grp_weight_we[g];
-            assign combined_weight_src[g]  = intra_weight_we_reg[g] ?
-                                             intra_weight_src_reg : grp_weight_src;
-            assign combined_weight_dst[g]  = intra_weight_we_reg[g] ?
-                                             intra_weight_dst_reg : grp_weight_dst;
-            assign combined_weight_data[g] = intra_weight_we_reg[g] ?
-                                             intra_weight_data_reg : grp_weight_data;
-            assign combined_weight_exc[g]  = intra_weight_we_reg[g] ?
-                                             intra_weight_exc_reg : grp_weight_exc;
+            assign combined_weight_we[g]   = intra_weight_we_reg[g];
+            assign combined_weight_src[g]  = intra_weight_src_reg;
+            assign combined_weight_dst[g]  = intra_weight_dst_reg;
+            assign combined_weight_data[g] = intra_weight_data_reg;
+            assign combined_weight_exc[g]  = intra_weight_exc_reg;
         end
     endgenerate
 
@@ -1311,7 +1192,7 @@ module spikemold_coregroup_top #(
                 .clear_busy         (grp_clear_busy[g]),
                 .clear_done         (grp_clear_done[g]),
 
-                // Weight load (combined from AXI config + learning engine)
+                // Weight load from AXI config path
                 .weight_we          (combined_weight_we[g]),
                 .weight_src_id      (combined_weight_src[g]),
                 .weight_dst_id      (combined_weight_dst[g]),
@@ -1329,28 +1210,6 @@ module spikemold_coregroup_top #(
     // Synaptic Connectivity Table (Inter-Group Connections)
     //=========================================================================
 
-    // Mux: AXI config writes OR event router config writes
-    wire                          ct_cfg_we_mux;
-    wire [GROUP_ID_WIDTH-1:0]     ct_cfg_src_group_mux;
-    wire [LOCAL_ID_WIDTH-1:0]     ct_cfg_src_neuron_mux;
-    wire [FANOUT_IDX_WIDTH-1:0]   ct_cfg_fanout_idx_mux;
-    wire                          ct_cfg_valid_mux;
-    wire [GROUP_ID_WIDTH-1:0]     ct_cfg_dst_group_mux;
-    wire [LOCAL_ID_WIDTH-1:0]     ct_cfg_dst_neuron_mux;
-    wire [WEIGHT_WIDTH-1:0]       ct_cfg_weight_mux;
-    wire                          ct_cfg_exc_inh_mux;
-
-    // AXI config has priority
-    assign ct_cfg_we_mux         = ct_cfg_we_reg | ct_cfg_we;
-    assign ct_cfg_src_group_mux  = ct_cfg_we_reg ? ct_cfg_src_group_reg  : ct_cfg_src_group;
-    assign ct_cfg_src_neuron_mux = ct_cfg_we_reg ? ct_cfg_src_neuron_reg : ct_cfg_src_neuron;
-    assign ct_cfg_fanout_idx_mux = ct_cfg_we_reg ? ct_cfg_fanout_idx_reg : ct_cfg_fanout_idx;
-    assign ct_cfg_valid_mux      = ct_cfg_we_reg ? ct_cfg_valid_reg      : ct_cfg_valid_bit;
-    assign ct_cfg_dst_group_mux  = ct_cfg_we_reg ? ct_cfg_dst_group_reg  : ct_cfg_dst_group;
-    assign ct_cfg_dst_neuron_mux = ct_cfg_we_reg ? ct_cfg_dst_neuron_reg : ct_cfg_dst_neuron;
-    assign ct_cfg_weight_mux     = ct_cfg_we_reg ? ct_cfg_weight_reg     : ct_cfg_weight;
-    assign ct_cfg_exc_inh_mux    = ct_cfg_we_reg ? ct_cfg_exc_inh_reg    : ct_cfg_exc_inh;
-
     synaptic_connectivity_table #(
         .NUM_GROUPS         (NUM_GROUPS),
         .NEURONS_PER_GROUP  (NEURONS_PER_GROUP),
@@ -1361,15 +1220,15 @@ module spikemold_coregroup_top #(
         .rst_n              (rst_n_sync & ~hls_spikemold_reset),
 
         // Write port (config)
-        .cfg_we             (ct_cfg_we_mux),
-        .cfg_src_group      (ct_cfg_src_group_mux),
-        .cfg_src_neuron     (ct_cfg_src_neuron_mux),
-        .cfg_fanout_idx     (ct_cfg_fanout_idx_mux),
-        .cfg_valid          (ct_cfg_valid_mux),
-        .cfg_dst_group      (ct_cfg_dst_group_mux),
-        .cfg_dst_neuron     (ct_cfg_dst_neuron_mux),
-        .cfg_weight         (ct_cfg_weight_mux),
-        .cfg_exc_inh        (ct_cfg_exc_inh_mux),
+        .cfg_we             (ct_cfg_we_reg),
+        .cfg_src_group      (ct_cfg_src_group_reg),
+        .cfg_src_neuron     (ct_cfg_src_neuron_reg),
+        .cfg_fanout_idx     (ct_cfg_fanout_idx_reg),
+        .cfg_valid          (ct_cfg_valid_reg),
+        .cfg_dst_group      (ct_cfg_dst_group_reg),
+        .cfg_dst_neuron     (ct_cfg_dst_neuron_reg),
+        .cfg_weight         (ct_cfg_weight_reg),
+        .cfg_exc_inh        (ct_cfg_exc_inh_reg),
         .route_clear_start  (route_clear_start_reg),
 
         // Lookup port (from event router)
@@ -1400,8 +1259,7 @@ module spikemold_coregroup_top #(
         .NUM_GROUPS         (NUM_GROUPS),
         .NEURONS_PER_GROUP  (NEURONS_PER_GROUP),
         .WEIGHT_WIDTH       (WEIGHT_WIDTH),
-        .MAX_FANOUT_INTER   (MAX_FANOUT_INTER),
-        .LEARN_NOTIFY_ENABLE(LEARN_NOTIFY_ENABLE)
+        .MAX_FANOUT_INTER   (MAX_FANOUT_INTER)
     ) u_event_router (
         .clk                (pl_clk),
         .rst_n              (rst_n_sync & ~hls_spikemold_reset),
@@ -1426,23 +1284,6 @@ module spikemold_coregroup_top #(
         .ext_spike_exc      (router_ext_spike_exc),
         .ext_spike_ready    (router_ext_spike_ready),
 
-        // Learning engine observation
-        .learn_spike_valid  (learn_spike_valid),
-        .learn_spike_src_id (learn_spike_src_id),
-        .learn_spike_ready  (learn_spike_ready),
-
-        // Learning weight update (HLS -> Event Router bridge)
-        .learn_weight_valid     (learn_weight_valid_br),
-        .learn_weight_group     (learn_weight_group_br),
-        .learn_weight_src       (learn_weight_src_br),
-        .learn_weight_dst       (learn_weight_dst_br),
-        .learn_weight_data      (learn_weight_data_br),
-        .learn_weight_exc       (learn_weight_exc_br),
-        .learn_weight_is_inter  (learn_weight_is_inter_br),
-        .learn_weight_dst_group (learn_weight_dst_group_br),
-        .learn_weight_fanout_idx(learn_weight_fanout_idx_br),
-        .learn_weight_ready     (learn_weight_ready_br),
-
         // Connectivity table interface
         .ct_lookup_en       (ct_lookup_en),
         .ct_lookup_src_group(ct_lookup_src_group),
@@ -1455,24 +1296,6 @@ module spikemold_coregroup_top #(
         .ct_result_weight   (ct_result_weight),
         .ct_result_exc_inh  (ct_result_exc_inh),
         .ct_result_entry_valid(ct_result_entry_valid),
-
-        // Weight config passthrough
-        .grp_weight_we      (grp_weight_we),
-        .grp_weight_src     (grp_weight_src),
-        .grp_weight_dst     (grp_weight_dst),
-        .grp_weight_data    (grp_weight_data),
-        .grp_weight_exc     (grp_weight_exc),
-
-        // CT config passthrough
-        .ct_cfg_we          (ct_cfg_we),
-        .ct_cfg_src_group   (ct_cfg_src_group),
-        .ct_cfg_src_neuron  (ct_cfg_src_neuron),
-        .ct_cfg_fanout_idx  (ct_cfg_fanout_idx),
-        .ct_cfg_valid       (ct_cfg_valid_bit),
-        .ct_cfg_dst_group   (ct_cfg_dst_group),
-        .ct_cfg_dst_neuron  (ct_cfg_dst_neuron),
-        .ct_cfg_weight      (ct_cfg_weight),
-        .ct_cfg_exc_inh     (ct_cfg_exc_inh),
 
         // Status
         .routed_spike_count (routed_spike_count),

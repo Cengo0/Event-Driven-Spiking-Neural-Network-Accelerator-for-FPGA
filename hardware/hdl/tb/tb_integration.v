@@ -51,13 +51,6 @@ module tb_integration;
     wire [NUM_GROUPS*THRESHOLD_WIDTH-1:0]       grp_in_threshold;
     wire [NUM_GROUPS-1:0]                       grp_in_ready;
 
-    // Router weight config → core groups
-    wire [NUM_GROUPS-1:0]                       grp_weight_we;
-    wire [LOCAL_ID_WIDTH-1:0]                   grp_weight_src;
-    wire [LOCAL_ID_WIDTH-1:0]                   grp_weight_dst;
-    wire [WEIGHT_WIDTH-1:0]                     grp_weight_data;
-    wire                                        grp_weight_exc;
-
     // Core group status
     wire [NUM_GROUPS*16-1:0]                    grp_spike_count;
     wire [NUM_GROUPS-1:0]                       grp_busy;
@@ -82,27 +75,12 @@ module tb_integration;
     wire                        ct_result_exc_inh;
     wire                        ct_result_entry_valid;
 
-    wire                        ct_cfg_we;
-    wire [GROUP_ID_WIDTH-1:0]   ct_cfg_src_group;
-    wire [LOCAL_ID_WIDTH-1:0]   ct_cfg_src_neuron;
-    wire [FANOUT_IDX_WIDTH-1:0] ct_cfg_fanout_idx;
-    wire                        ct_cfg_valid_bit;
-    wire [GROUP_ID_WIDTH-1:0]   ct_cfg_dst_group;
-    wire [LOCAL_ID_WIDTH-1:0]   ct_cfg_dst_neuron;
-    wire [WEIGHT_WIDTH-1:0]     ct_cfg_weight;
-    wire                        ct_cfg_exc_inh;
-
     // External spike input
     reg                         ext_spike_valid;
     reg  [GLOBAL_ID_WIDTH-1:0]  ext_spike_neuron_id;
     reg  [WEIGHT_WIDTH-1:0]     ext_spike_weight;
     reg                         ext_spike_exc;
     wire                        ext_spike_ready;
-
-    // Learning engine interface
-    wire                        learn_spike_valid;
-    wire [GLOBAL_ID_WIDTH-1:0]  learn_spike_src_id;
-    reg                         learn_spike_ready;
 
     wire [31:0]                 routed_spike_count;
     wire                        router_busy;
@@ -133,16 +111,16 @@ module tb_integration;
     reg [WEIGHT_WIDTH-1:0]       host_weight_data;
     reg                          host_weight_exc;
 
-    // Mux CT config: host | router
-    wire ct_mux_we     = host_ct_we | ct_cfg_we;
-    wire [GROUP_ID_WIDTH-1:0]    ct_mux_sg  = host_ct_we ? host_ct_src_group  : ct_cfg_src_group;
-    wire [LOCAL_ID_WIDTH-1:0]    ct_mux_sn  = host_ct_we ? host_ct_src_neuron  : ct_cfg_src_neuron;
-    wire [FANOUT_IDX_WIDTH-1:0]  ct_mux_fi  = host_ct_we ? host_ct_fanout_idx  : ct_cfg_fanout_idx;
-    wire                         ct_mux_v   = host_ct_we ? host_ct_valid       : ct_cfg_valid_bit;
-    wire [GROUP_ID_WIDTH-1:0]    ct_mux_dg  = host_ct_we ? host_ct_dst_group  : ct_cfg_dst_group;
-    wire [LOCAL_ID_WIDTH-1:0]    ct_mux_dn  = host_ct_we ? host_ct_dst_neuron  : ct_cfg_dst_neuron;
-    wire [WEIGHT_WIDTH-1:0]      ct_mux_w   = host_ct_we ? host_ct_weight     : ct_cfg_weight;
-    wire                         ct_mux_exc = host_ct_we ? host_ct_exc_inh    : ct_cfg_exc_inh;
+    // Host/testbench owns route-table writes. Router is inference-only.
+    wire                         ct_mux_we  = host_ct_we;
+    wire [GROUP_ID_WIDTH-1:0]    ct_mux_sg  = host_ct_src_group;
+    wire [LOCAL_ID_WIDTH-1:0]    ct_mux_sn  = host_ct_src_neuron;
+    wire [FANOUT_IDX_WIDTH-1:0]  ct_mux_fi  = host_ct_fanout_idx;
+    wire                         ct_mux_v   = host_ct_valid;
+    wire [GROUP_ID_WIDTH-1:0]    ct_mux_dg  = host_ct_dst_group;
+    wire [LOCAL_ID_WIDTH-1:0]    ct_mux_dn  = host_ct_dst_neuron;
+    wire [WEIGHT_WIDTH-1:0]      ct_mux_w   = host_ct_weight;
+    wire                         ct_mux_exc = host_ct_exc_inh;
 
     // Mux weight config: host | router
     wire [NUM_GROUPS-1:0]     combined_weight_we;
@@ -154,11 +132,11 @@ module tb_integration;
     genvar g;
     generate
         for (g = 0; g < NUM_GROUPS; g = g + 1) begin : gen_weight_mux
-            assign combined_weight_we[g]   = host_weight_we[g] | grp_weight_we[g];
-            assign combined_weight_src[g]  = host_weight_we[g] ? host_weight_src  : grp_weight_src;
-            assign combined_weight_dst[g]  = host_weight_we[g] ? host_weight_dst  : grp_weight_dst;
-            assign combined_weight_data[g] = host_weight_we[g] ? host_weight_data : grp_weight_data;
-            assign combined_weight_exc[g]  = host_weight_we[g] ? host_weight_exc  : grp_weight_exc;
+            assign combined_weight_we[g]   = host_weight_we[g];
+            assign combined_weight_src[g]  = host_weight_src;
+            assign combined_weight_dst[g]  = host_weight_dst;
+            assign combined_weight_data[g] = host_weight_data;
+            assign combined_weight_exc[g]  = host_weight_exc;
         end
     endgenerate
 
@@ -283,19 +261,6 @@ module tb_integration;
         .ext_spike_weight   (ext_spike_weight),
         .ext_spike_exc      (ext_spike_exc),
         .ext_spike_ready    (ext_spike_ready),
-        .learn_spike_valid  (learn_spike_valid),
-        .learn_spike_src_id (learn_spike_src_id),
-        .learn_spike_ready  (learn_spike_ready),
-        .learn_weight_valid     (1'b0),
-        .learn_weight_group     ({GROUP_ID_WIDTH{1'b0}}),
-        .learn_weight_src       ({LOCAL_ID_WIDTH{1'b0}}),
-        .learn_weight_dst       ({LOCAL_ID_WIDTH{1'b0}}),
-        .learn_weight_data      ({WEIGHT_WIDTH{1'b0}}),
-        .learn_weight_exc       (1'b0),
-        .learn_weight_is_inter  (1'b0),
-        .learn_weight_dst_group ({GROUP_ID_WIDTH{1'b0}}),
-        .learn_weight_fanout_idx({FANOUT_IDX_WIDTH{1'b0}}),
-        .learn_weight_ready     (),
         .ct_lookup_en       (ct_lookup_en),
         .ct_lookup_src_group(ct_lookup_src_group),
         .ct_lookup_src_neuron(ct_lookup_src_neuron),
@@ -306,20 +271,6 @@ module tb_integration;
         .ct_result_weight   (ct_result_weight),
         .ct_result_exc_inh  (ct_result_exc_inh),
         .ct_result_entry_valid(ct_result_entry_valid),
-        .grp_weight_we      (grp_weight_we),
-        .grp_weight_src     (grp_weight_src),
-        .grp_weight_dst     (grp_weight_dst),
-        .grp_weight_data    (grp_weight_data),
-        .grp_weight_exc     (grp_weight_exc),
-        .ct_cfg_we          (ct_cfg_we),
-        .ct_cfg_src_group   (ct_cfg_src_group),
-        .ct_cfg_src_neuron  (ct_cfg_src_neuron),
-        .ct_cfg_fanout_idx  (ct_cfg_fanout_idx),
-        .ct_cfg_valid       (ct_cfg_valid_bit),
-        .ct_cfg_dst_group   (ct_cfg_dst_group),
-        .ct_cfg_dst_neuron  (ct_cfg_dst_neuron),
-        .ct_cfg_weight      (ct_cfg_weight),
-        .ct_cfg_exc_inh     (ct_cfg_exc_inh),
         .routed_spike_count (routed_spike_count),
         .router_ext_invalid_group_count(router_ext_invalid_group_count),
         .router_ct_invalid_entry_count(router_ct_invalid_entry_count),
@@ -457,17 +408,16 @@ module tb_integration;
         ext_spike_neuron_id <= 0;
         ext_spike_weight   <= 0;
         ext_spike_exc      <= 0;
-        learn_spike_ready  <= 1;
         host_ct_we         <= 0;
         host_weight_we     <= {NUM_GROUPS{1'b0}};
         host_weight_src    <= 0;
         host_weight_dst    <= 0;
         host_weight_data   <= 0;
-	        host_weight_exc    <= 0;
-	        accumulate_only    <= 0;
-	        commit_start_mask  <= {NUM_GROUPS{1'b0}};
-	        clear_start_mask   <= {NUM_GROUPS{1'b0}};
-	        global_threshold   <= 16'd10;
+        host_weight_exc    <= 0;
+        accumulate_only    <= 0;
+        commit_start_mask  <= {NUM_GROUPS{1'b0}};
+        clear_start_mask   <= {NUM_GROUPS{1'b0}};
+        global_threshold   <= 16'd10;
         global_leak_rate   <= 8'd0;     // No leak for deterministic testing
         global_refrac_period <= 8'd3;
 
@@ -481,15 +431,6 @@ module tb_integration;
     endtask
 
     //=========================================================================
-    // Monitor: count learn notifications
-    //=========================================================================
-    integer learn_count;
-    always @(posedge clk) begin
-        if (learn_spike_valid && learn_spike_ready)
-            learn_count = learn_count + 1;
-    end
-
-    //=========================================================================
     // Main Test
     //=========================================================================
     initial begin
@@ -498,7 +439,6 @@ module tb_integration;
                  NUM_GROUPS, NEURONS_PER_GROUP, NUM_GROUPS * NEURONS_PER_GROUP);
         $display("=========================================================");
 
-        learn_count = 0;
         do_reset;
 
         //---------------------------------------------------------------------
@@ -663,13 +603,6 @@ module tb_integration;
             check(12, "Sub-thresh inter-group: G1 n2 does not fire (w=5 < thresh=10)",
                   (get_grp_spike_count(1) == g1_before12));
         end
-
-        //---------------------------------------------------------------------
-        // TEST 13: Learning engine notification count
-        //---------------------------------------------------------------------
-        $display("\n--- Test 13: Learning Engine Notifications ---");
-        check(13, "Learning engine received at least 5 notifications",
-              (learn_count >= 5));
 
         //---------------------------------------------------------------------
         // TEST 14: Spike counter consistency

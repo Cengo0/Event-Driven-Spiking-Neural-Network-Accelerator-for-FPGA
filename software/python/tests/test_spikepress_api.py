@@ -11,7 +11,7 @@ def test_spikepress_fc_lif_compile_and_trace():
         thresholds=[5, 9],
     )
 
-    compiled = model.compile_spikemold_ednp()
+    compiled = model.compile_spikemold()
     trace = model.golden_trace(
         [
             InputSpike(tick=0, src_id=0),
@@ -20,7 +20,7 @@ def test_spikepress_fc_lif_compile_and_trace():
         ]
     ).to_dict()
 
-    assert compiled.artifact.manifest["schema"] == "spikemold.ednp_artifact.v1"
+    assert compiled.artifact.manifest["schema"] == "spikemold.artifact.v1"
     assert compiled.resource_report["python_inner_loop_required"] is False
     assert trace["counters"]["generated_update_count"] == 5
     assert trace["counters"]["commit_count"] == 1

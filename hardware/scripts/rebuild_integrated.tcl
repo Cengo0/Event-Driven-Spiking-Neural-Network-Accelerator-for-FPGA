@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------------
-# Rebuild SpikeMold-EDNP bitstream with RTL fixes
+# Rebuild SpikeMold bitstream with RTL fixes
 # Edge detector on spike_in_valid + hold register on spike_out
 #
 # Usage: vivado -mode batch -source hardware/scripts/rebuild_integrated.tcl
@@ -7,7 +7,7 @@
 
 set script_dir  [file dirname [file normalize [info script]]]
 set project_dir [file normalize [file join $script_dir "../.."]]
-set build_dir   "${project_dir}/hardware/build/spikemold_ednp_pynq_z2"
+set build_dir   "${project_dir}/hardware/build/spikemold_pynq_z2"
 set rtl_dir     "${project_dir}/hardware/hdl/rtl"
 set ip_repo     "${project_dir}/hardware/ip_repo"
 set output_dir  "${project_dir}/outputs"
@@ -24,7 +24,7 @@ puts "Using processing_system7_0/FCLK_CLK0 frequency: ${pl_clk_mhz} MHz"
 file delete -force $build_dir
 
 # Create project
-create_project spikemold_ednp_pynq_z2 $build_dir -part $part -force
+create_project spikemold_pynq_z2 $build_dir -part $part -force
 set_property target_language Verilog [current_project]
 # Use automatic source management so module-reference BD cells resolve correctly.
 set_property source_mgmt_mode All [current_project]
@@ -403,8 +403,8 @@ validate_bd_design
 save_bd_design
 
 # Generate BD wrapper
-make_wrapper -files [get_files ${build_dir}/spikemold_ednp_pynq_z2.srcs/sources_1/bd/design_1/design_1.bd] -top
-add_files -norecurse ${build_dir}/spikemold_ednp_pynq_z2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v
+make_wrapper -files [get_files ${build_dir}/spikemold_pynq_z2.srcs/sources_1/bd/design_1/design_1.bd] -top
+add_files -norecurse ${build_dir}/spikemold_pynq_z2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v
 
 # =============================================================================
 # Add RTL Sources (spike_router, lif_neuron_array, spikemold_integrated_top with fixes)
@@ -452,25 +452,25 @@ puts "===== Implementation Complete ====="
 # =============================================================================
 # Copy Outputs
 # =============================================================================
-set bit_file [glob -nocomplain ${build_dir}/spikemold_ednp_pynq_z2.runs/impl_1/*.bit]
-set hwh_file [glob -nocomplain ${build_dir}/spikemold_ednp_pynq_z2.gen/sources_1/bd/design_1/hw_handoff/*.hwh]
+set bit_file [glob -nocomplain ${build_dir}/spikemold_pynq_z2.runs/impl_1/*.bit]
+set hwh_file [glob -nocomplain ${build_dir}/spikemold_pynq_z2.gen/sources_1/bd/design_1/hw_handoff/*.hwh]
 
 if {$bit_file ne ""} {
-    file copy -force $bit_file ${output_dir}/spikemold_ednp_pynq_z2.bit
-    puts "Bitstream: ${output_dir}/spikemold_ednp_pynq_z2.bit"
+    file copy -force $bit_file ${output_dir}/spikemold_pynq_z2.bit
+    puts "Bitstream: ${output_dir}/spikemold_pynq_z2.bit"
 }
 if {$hwh_file ne ""} {
-    file copy -force $hwh_file ${output_dir}/spikemold_ednp_pynq_z2.hwh
-    puts "HWH: ${output_dir}/spikemold_ednp_pynq_z2.hwh"
+    file copy -force $hwh_file ${output_dir}/spikemold_pynq_z2.hwh
+    puts "HWH: ${output_dir}/spikemold_pynq_z2.hwh"
 }
 
 # Reports
 if {[catch {open_run impl_1} open_err]} {
     puts "WARNING: Could not open impl_1 for report generation: $open_err"
 } else {
-    report_utilization -file ${output_dir}/spikemold_ednp_pynq_z2_utilization.rpt
-    report_timing_summary -file ${output_dir}/spikemold_ednp_pynq_z2_timing.rpt
-    report_power -file ${output_dir}/spikemold_ednp_pynq_z2_power.rpt
+    report_utilization -file ${output_dir}/spikemold_pynq_z2_utilization.rpt
+    report_timing_summary -file ${output_dir}/spikemold_pynq_z2_timing.rpt
+    report_power -file ${output_dir}/spikemold_pynq_z2_power.rpt
 }
 
 puts "===== ALL DONE ====="

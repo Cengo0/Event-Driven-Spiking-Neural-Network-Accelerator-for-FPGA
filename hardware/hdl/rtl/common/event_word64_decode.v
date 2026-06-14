@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 //------------------------------------------------------------------------------
-// EventWord64 decoder for SpikeMold-EDNP transport smoke.
+// EventWord64 decoder for SpikeMold transport smoke.
 //
 // Layout from contracts/EVENT_FORMAT_V1.md:
 // [63:60] event_type

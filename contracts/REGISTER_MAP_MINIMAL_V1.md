@@ -4,8 +4,8 @@ Status: active draft
 
 ## Purpose
 
-This is the minimal AXI-Lite control surface for SpikeMold-EDNP transport smoke
-and SpikeMold-EDNP mini. Wider SpikeMold backends may add registers, but they
+This is the minimal AXI-Lite control surface for SpikeMold transport smoke
+and SpikeMold mini. Wider SpikeMold backends may add registers, but they
 must preserve these addresses or provide an explicit compatibility shim.
 
 ## Registers
@@ -31,6 +31,6 @@ must preserve these addresses or provide an explicit compatibility shim.
 ## Required Smoke Behavior
 
 - Soft reset clears counters.
-- DMA loopback can prove input/output path before EDNP execution.
+- DMA loopback can prove input/output path before SpikeMold execution.
 - Counter reads are stable after `STATUS.done = 1`.
 - Error status must include a nonzero `ERROR_CODE`.

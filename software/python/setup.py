@@ -17,7 +17,7 @@ setup(
     version="0.1.0",
     author="Jiwoon Lee",
     author_email="metr0jw@example.com",
-    description="SpikePress compiler API for SpikeMold-EDNP",
+    description="SpikePress compiler API for SpikeMold",
     long_description=(ROOT / "README.md").read_text(encoding="utf-8"),
     long_description_content_type="text/markdown",
     license="MIT",

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate Batch 1B SpikeMold-EDNP transport smoke artifacts."""
+"""Generate Batch 1B SpikeMold transport smoke artifacts."""
 
 from __future__ import annotations
 
@@ -34,12 +34,12 @@ def main() -> int:
         InputSpike(tick=2, src_id=0),
     ]
     smoke = build_batch_1b_transport_smoke(model, input_spikes)
-    smoke_path = output_dir / "batch_1b_transport_ednp_mini_smoke.json"
+    smoke_path = output_dir / "batch_1b_transport_spikemold_mini_smoke.json"
     smoke_path.write_text(json.dumps(smoke, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
-    ednp = smoke["ednp_mini_fc_lif"]
-    counters = ednp["counters"]
-    report = f"""# Batch 1B Transport + EDNP-mini Report
+    spikemold_mini = smoke["spikemold_mini_fc_lif"]
+    counters = spikemold_mini["counters"]
+    report = f"""# Batch 1B Transport + SpikeMold-mini Report
 
 Status: software transport smoke generated
 
@@ -52,8 +52,8 @@ latency, throughput, or energy.
 
 ## Generated
 
-- `outputs/transport/batch_1b_transport_ednp_mini_smoke.json`
-- `reports/batch_1b_transport_ednp_mini_report.md`
+- `outputs/transport/batch_1b_transport_spikemold_mini_smoke.json`
+- `reports/batch_1b_transport_spikemold_mini_report.md`
 
 ## Smoke Results
 
@@ -62,10 +62,10 @@ latency, throughput, or energy.
 | AXI-Lite register smoke | `{smoke["register_smoke"]["ok"]}` |
 | DMA loopback smoke | `{smoke["dma_loopback"]["ok"]}` |
 | EventWord64 counter smoke | `{smoke["eventword64_counter"]["ok"]}` |
-| EDNP-mini FC-LIF smoke | `{ednp["ok"]}` |
+| SpikeMold-mini FC-LIF smoke | `{spikemold_mini["ok"]}` |
 | All OK | `{smoke["all_ok"]}` |
 
-## EDNP-mini Counters
+## SpikeMold-mini Counters
 
 | Counter | Value |
 |---|---:|
@@ -89,7 +89,7 @@ latency, throughput, or energy.
 Replace software transport smoke with real PYNQ-Z2 board-captured output and
 register counters before making board execution or performance claims.
 """
-    (report_dir / "batch_1b_transport_ednp_mini_report.md").write_text(report, encoding="utf-8")
+    (report_dir / "batch_1b_transport_spikemold_mini_report.md").write_text(report, encoding="utf-8")
     return 0 if smoke["all_ok"] else 1
 
 

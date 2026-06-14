@@ -1,1 +1,0 @@
-open_checkpoint hardware/build/spikemold_ednp_pynq_z2/spikemold_ednp_pynq_z2.runs/impl_1/spikemold_integrated_top_routed.dcp; puts "CELLS: [get_cells -hierarchical -filter {NAME =~ *u_spike_router*}]"; puts "CELLS: [get_cells -hierarchical -filter {NAME =~ *u_neuron_array*}]"; quit

@@ -37,7 +37,7 @@ Reject or pivot when:
 - expected AXI-Lite commands per inference
 - event/update histogram
 
-## Initial EDNP-mini Budget
+## Initial SpikeMold-mini Budget
 
 The first board-oriented primitive should fit within a small fraction of the
 device:

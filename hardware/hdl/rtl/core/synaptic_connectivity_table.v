@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // Title         : Synaptic Connectivity Table - Sparse Inter-Group Connections
-// Project       : SpikeMold-EDNP
+// Project       : SpikeMold
 // File          : synaptic_connectivity_table.v
 // Author        : Jiwoon Lee (@metr0jw)
 // Organization  : Kwangwoon University, Seoul, South Korea
@@ -12,12 +12,12 @@
 //   addr = {src_group(3), src_neuron(7), fanout_idx(4)} = 14 bits
 //   Total: 16,384 entries
 //
-// Data Format (16 bits):
-//   [15]     valid       — entry is active
-//   [14:12]  dst_group   — destination coregroup ID
-//   [11:5]   dst_neuron  — destination neuron within group
-//   [4:1]    weight      — 4-bit synaptic weight (unsigned magnitude)
-//   [0]      exc_inh     — 1=excitatory, 0=inhibitory
+// Data Format:
+//   [MSB] valid
+//   [GROUP_ID_WIDTH] dst_group
+//   [LOCAL_ID_WIDTH] dst_neuron
+//   [WEIGHT_WIDTH] weight
+//   [0] exc_inh, 1=excitatory, 0=inhibitory
 //
 // Read Interface:
 //   Given a source spike (src_group, src_neuron), the event router
@@ -55,6 +55,7 @@ module synaptic_connectivity_table #(
     input  wire [LOCAL_ID_WIDTH-1:0]  cfg_dst_neuron,
     input  wire [WEIGHT_WIDTH-1:0]    cfg_weight,
     input  wire                       cfg_exc_inh,
+    input  wire                       route_clear_start,
 
     // --- Lookup Port (Query from Event Router) ---
     input  wire                       lookup_en,
@@ -68,7 +69,14 @@ module synaptic_connectivity_table #(
     output reg  [LOCAL_ID_WIDTH-1:0]  result_dst_neuron,
     output reg  [WEIGHT_WIDTH-1:0]    result_weight,
     output reg                        result_exc_inh,
-    output reg                        result_entry_valid  // The "valid" bit from table
+    output reg                        result_entry_valid,  // The "valid" bit from table
+
+    // --- Route table lifecycle/status ABI ---
+    output reg                        route_clear_busy,
+    output reg                        route_clear_done,
+    output reg  [31:0]                route_entry_count,
+    output reg  [31:0]                route_checksum,
+    output reg  [31:0]                route_write_error_count
 );
 
     //=========================================================================
@@ -77,9 +85,11 @@ module synaptic_connectivity_table #(
     localparam TABLE_ADDR_WIDTH = GROUP_ID_WIDTH + LOCAL_ID_WIDTH + FANOUT_IDX_WIDTH;
     localparam TABLE_DEPTH      = 1 << TABLE_ADDR_WIDTH;
     localparam TABLE_DATA_WIDTH = 1 + GROUP_ID_WIDTH + LOCAL_ID_WIDTH + WEIGHT_WIDTH + 1; // 16 bits
+    localparam [TABLE_ADDR_WIDTH-1:0] TABLE_LAST_ADDR = TABLE_DEPTH - 1;
 
     // Connection memory
     reg [TABLE_DATA_WIDTH-1:0] conn_mem [0:TABLE_DEPTH-1];
+    reg [TABLE_ADDR_WIDTH-1:0] clear_addr;
 
     // Address construction
     wire [TABLE_ADDR_WIDTH-1:0] wr_addr = {cfg_src_group, cfg_src_neuron, cfg_fanout_idx};
@@ -94,10 +104,55 @@ module synaptic_connectivity_table #(
         cfg_exc_inh
     };
 
-    // Port A: Write (config)
+    wire [31:0] checksum_addr_word = {
+        {(32-TABLE_ADDR_WIDTH){1'b0}},
+        wr_addr
+    };
+    wire [31:0] checksum_data_word = {
+        {(32-TABLE_DATA_WIDTH){1'b0}},
+        wr_data
+    };
+
+    // Port A: Write/clear (config)
     always @(posedge clk) begin
-        if (cfg_we)
-            conn_mem[wr_addr] <= wr_data;
+        if (!rst_n) begin
+            route_clear_busy        <= 1'b0;
+            route_clear_done        <= 1'b0;
+            route_entry_count       <= 32'd0;
+            route_checksum          <= 32'd0;
+            route_write_error_count <= 32'd0;
+            clear_addr              <= {TABLE_ADDR_WIDTH{1'b0}};
+        end else begin
+            route_clear_done <= 1'b0;
+
+            if (route_clear_busy) begin
+                conn_mem[clear_addr] <= {TABLE_DATA_WIDTH{1'b0}};
+                if (cfg_we && route_write_error_count != 32'hFFFFFFFF)
+                    route_write_error_count <= route_write_error_count + 32'd1;
+
+                if (clear_addr == TABLE_LAST_ADDR) begin
+                    route_clear_busy <= 1'b0;
+                    route_clear_done <= 1'b1;
+                    clear_addr       <= {TABLE_ADDR_WIDTH{1'b0}};
+                end else begin
+                    clear_addr <= clear_addr + 1'b1;
+                end
+            end else if (route_clear_start) begin
+                route_clear_busy        <= 1'b1;
+                route_clear_done        <= 1'b0;
+                clear_addr              <= {TABLE_ADDR_WIDTH{1'b0}};
+                route_entry_count       <= 32'd0;
+                route_checksum          <= 32'd0;
+                route_write_error_count <= 32'd0;
+            end else if (cfg_we) begin
+                conn_mem[wr_addr] <= wr_data;
+                if (cfg_valid) begin
+                    if (route_entry_count != 32'hFFFFFFFF)
+                        route_entry_count <= route_entry_count + 32'd1;
+                    route_checksum <= route_checksum + checksum_addr_word + checksum_data_word;
+                end
+            end
+        end
     end
 
     // Port B: Read (lookup) — 1 cycle latency for BRAM

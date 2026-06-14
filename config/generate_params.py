@@ -187,7 +187,6 @@ def compute_derived(cfg: dict) -> dict:
     logical_bits = clog2(d['total_logical_neurons']) if d['total_logical_neurons'] > 0 else 0
     d['hls_neuron_id_width'] = max(d['global_id_width'], logical_bits)
     hls_cfg = cfg.get('hls', {})
-    d['hls_learning_enable'] = 1 if hls_cfg.get('learning_enable', True) else 0
     d['hls_smoke_commands_enable'] = 1 if hls_cfg.get('smoke_commands_enable', True) else 0
     d['hls_cnn_descriptor_page_enable'] = 1 if hls_cfg.get('cnn_descriptor_page_enable', True) else 0
 
@@ -355,7 +354,6 @@ def generate_verilog(cfg: dict, derived: dict) -> str:
         f'`define SNN_HLS_NEURON_ID_WIDTH {derived["hls_neuron_id_width"]}',
         f'`define SNN_HLS_MAX_NEURONS     {derived["hls_max_neurons"]}',
         f'`define SNN_HLS_WEIGHT_WIDTH    {hls["hls_weight_width"]}',
-        f'`define SNN_HLS_LEARNING_ENABLE {derived["hls_learning_enable"]}',
         f'`define SNN_HLS_SMOKE_COMMANDS_ENABLE {derived["hls_smoke_commands_enable"]}',
         f'`define SNN_HLS_CNN_DESCRIPTOR_PAGE_ENABLE {derived["hls_cnn_descriptor_page_enable"]}',
         f'',
@@ -460,7 +458,6 @@ def generate_python(cfg: dict, derived: dict) -> str:
         f'HLS_NEURON_ID_WIDTH = {derived["hls_neuron_id_width"]}',
         f'HLS_MAX_NEURONS     = {derived["hls_max_neurons"]}',
         f'HLS_WEIGHT_WIDTH    = {hls["hls_weight_width"]}',
-        f'HLS_LEARNING_ENABLE = {derived["hls_learning_enable"]}',
         f'HLS_SMOKE_COMMANDS_ENABLE = {derived["hls_smoke_commands_enable"]}',
         f'HLS_CNN_DESCRIPTOR_PAGE_ENABLE = {derived["hls_cnn_descriptor_page_enable"]}',
         f'NEURON_ID_WIDTH     = GLOBAL_ID_WIDTH  # Alias',
@@ -632,9 +629,6 @@ def generate_hls(cfg: dict, derived: dict) -> str:
         f'const int SNN_HLS_NEURON_ID_WIDTH = {derived["hls_neuron_id_width"]};',
         f'const int SNN_HLS_MAX_NEURONS     = {derived["hls_max_neurons"]};',
         f'const int SNN_HLS_WEIGHT_WIDTH    = {hls["hls_weight_width"]};',
-        f'#ifndef SNN_HLS_LEARNING_ENABLE',
-        f'#define SNN_HLS_LEARNING_ENABLE {derived["hls_learning_enable"]}',
-        f'#endif',
         f'#ifndef SNN_HLS_SMOKE_COMMANDS_ENABLE',
         f'#define SNN_HLS_SMOKE_COMMANDS_ENABLE {derived["hls_smoke_commands_enable"]}',
         f'#endif',

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent board-free verifier gate for SpikePress + SpikeMold-EDNP."""
+"""Independent board-free verifier gate for SpikePress + SpikeMold."""
 
 from __future__ import annotations
 
@@ -27,25 +27,39 @@ from spikepress.pynq_runtime import PYNQ_ONESHOT_SCHEMA, SpikeMoldPynqRunConfig 
 REPORT_PATH = ROOT / "reports" / "verifier_gate_review.md"
 CONTRACT_DIR = ROOT / "contracts"
 TRACE_DIR = ROOT / "golden_traces" / "v1"
-EVENT_BUDGET_PATH = ROOT / "outputs" / "event_budget" / "recommended_ednp_mini_config.json"
-TRANSPORT_PATH = ROOT / "outputs" / "transport" / "batch_1b_transport_ednp_mini_smoke.json"
+EVENT_BUDGET_PATH = ROOT / "outputs" / "event_budget" / "recommended_spikemold_mini_config.json"
+TRANSPORT_PATH = ROOT / "outputs" / "transport" / "batch_1b_transport_spikemold_mini_smoke.json"
 ARCH_SANDBOX_PATH = ROOT / "outputs" / "architecture_sandbox" / "batch_1x_architecture_sandbox.json"
 RUNTIME_CONTRACT_PATH = ROOT / "outputs" / "runtime" / "spikemold_runtime_contract.json"
 RESOURCE_REPORT_PATH = ROOT / "outputs" / "resource" / "spikemold_runtime_resource_report.json"
 PYNQ_ONESHOT_SCRIPT = ROOT / "scripts" / "run_spikemold_pynq_one_shot.py"
-HLS_INFERENCE_ONLY_FILES = [
+INFERENCE_ONLY_SURFACE_FILES = [
     ROOT / "hardware" / "hls" / "include" / "spikemold_top_hls.h",
     ROOT / "hardware" / "hls" / "src" / "spikemold_top_hls.cpp",
     ROOT / "hardware" / "hls" / "test" / "tb_spikemold_top_hls.cpp",
     ROOT / "hardware" / "scripts" / "rebuild_integrated.tcl",
     ROOT / "hardware" / "hdl" / "rtl" / "top" / "spikemold_integrated_top.v",
+    ROOT / "hardware" / "hdl" / "rtl" / "top" / "spikemold_coregroup_top.v",
+    ROOT / "hardware" / "hdl" / "rtl" / "core" / "event_router_ng.v",
+    ROOT / "hardware" / "hdl" / "tb" / "tb_router_ct.v",
+    ROOT / "hardware" / "hdl" / "tb" / "tb_integration.v",
+    ROOT / "config" / "generated" / "spikemold_params.vh",
+    ROOT / "config" / "generated" / "spikemold_params.py",
+    ROOT / "config" / "generated" / "spikemold_params.h",
 ]
-FORBIDDEN_HLS_SURFACE_TOKENS = [
+FORBIDDEN_INFERENCE_SURFACE_TOKENS = [
     "learning_params_t",
+    "learn_spike",
     "learn_weight",
     "MODE_TRAIN_STDP",
     "reward_signal",
     "debug_learning_active",
+    "SNN_EVENT_ROUTER_LEARNING_ENABLE",
+    "SNN_CORE_GROUP_LEARNING_ENABLE",
+    "SNN_HLS_LEARNING_ENABLE",
+    "LEARN_NOTIFY_ENABLE",
+    "ST_LEARN_NOTIFY",
+    "ST_WEIGHT_FWD",
     "STDP",
     "R-STDP",
     "rstdp",
@@ -165,7 +179,7 @@ def check_traces() -> None:
 
 def check_event_budget() -> None:
     budget = load_json(EVENT_BUDGET_PATH)
-    if budget.get("schema") != "spikemold.ednp_event_budget.v1":
+    if budget.get("schema") != "spikemold.event_budget.v1":
         fail("event budget schema mismatch")
     if budget.get("all_ok") is not True:
         fail("event budget all_ok must be true")
@@ -190,16 +204,16 @@ def check_transport() -> None:
     for key in ["python_inner_loop_required", "random_ddr_inner_loop", "full_neuron_scan_primary"]:
         if assumptions.get(key) is not False:
             fail(f"transport forbidden assumption must be false: {key}")
-    ednp = transport.get("ednp_mini_fc_lif", {})
-    if not isinstance(ednp, Mapping):
-        fail("transport missing EDNP-mini section")
+    spikemold_mini = transport.get("spikemold_mini_fc_lif", {})
+    if not isinstance(spikemold_mini, Mapping):
+        fail("transport missing SpikeMold-mini section")
     for key, value in [
         ("trace_match_rate", 1.0),
         ("readout_match", True),
         ("state_checksum_match", True),
     ]:
-        if ednp.get(key) != value:
-            fail(f"EDNP-mini {key} mismatch")
+        if spikemold_mini.get(key) != value:
+            fail(f"SpikeMold-mini {key} mismatch")
 
 
 def check_architecture_sandbox() -> None:
@@ -289,12 +303,12 @@ def check_pynq_runtime_api() -> None:
             fail(f"PYNQ one-shot script missing phrase: {phrase}")
 
 
-def check_hls_inference_only_surface() -> None:
-    for path in HLS_INFERENCE_ONLY_FILES:
+def check_inference_only_surface() -> None:
+    for path in INFERENCE_ONLY_SURFACE_FILES:
         if not path.exists():
-            fail(f"missing HLS inference-only surface file: {path}")
+            fail(f"missing inference-only surface file: {path}")
         text = path.read_text(encoding="utf-8")
-        for token in FORBIDDEN_HLS_SURFACE_TOKENS:
+        for token in FORBIDDEN_INFERENCE_SURFACE_TOKENS:
             if token in text:
                 fail(f"{path} still exposes removed learning token: {token}")
 
@@ -309,7 +323,7 @@ def check_reports() -> None:
             "Status: verifier gate complete",
             "No HLS, RTL, or board claim.",
         ],
-        "reports/batch_1b_transport_ednp_mini_report.md": [
+        "reports/batch_1b_transport_spikemold_mini_report.md": [
             "Board execution was not run",
             "software_transport_smoke_no_board",
         ],
@@ -330,12 +344,12 @@ def check_reports() -> None:
         ],
         "reports/spikemold_runtime_resource_report.md": [
             "board_free_runtime_contract_no_board",
-            "Learning engine is outside the selected backend.",
+            "spikemold_fc_eventconv",
             "Vivado synthesis must replace LUT/FF/BRAM/timing estimates",
         ],
         "reports/verifier_gate_review.md": [
             "Status: board-free verifier gate passed",
-            "Learning engine scope",
+            "Inference-Only Scope",
             "PYNQ one-shot runtime API",
             "No board execution was run",
         ],
@@ -352,7 +366,7 @@ def main() -> int:
     check_architecture_sandbox()
     check_runtime_resource()
     check_pynq_runtime_api()
-    check_hls_inference_only_surface()
+    check_inference_only_surface()
     check_reports()
     print("PASS: verifier gate review artifacts valid")
     return 0

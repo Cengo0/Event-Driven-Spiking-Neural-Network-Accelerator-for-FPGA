@@ -57,11 +57,11 @@ latency, throughput, or energy.
 
 ## Selected Backend
 
-`spikemold_ednp_fc_eventconv`
+`spikemold_fc_eventconv`
 
 The runtime contract exposes two selected primitives:
 
-- `flat_fc_lif`: small FC/readout path from EDNP-mini
+- `flat_fc_lif`: small FC/readout path from SpikeMold-mini
 - `eventconv_agu`: shared-kernel EventConv AGU plus near-memory state and active-set commit
 
 ## Required Runtime Invariants

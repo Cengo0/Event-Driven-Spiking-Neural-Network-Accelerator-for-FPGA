@@ -1,4 +1,4 @@
-"""Minimal SpikePress API for SpikeMold-EDNP Batch 1A.
+"""Minimal SpikePress API for SpikeMold.
 
 This module is inference-only. It intentionally exposes only compile and trace
 generation objects.
@@ -12,7 +12,7 @@ from typing import Dict, Iterable, Mapping, Optional, Sequence
 import numpy as np
 
 from .architecture_trace_generator import InputSpike, SpikeMoldContractTrace, generate_fc_lif_trace
-from .spikemold_ednp_artifact import SpikeMoldEDNPArtifact, build_spikemold_ednp_artifact
+from .spikemold_artifact import SpikeMoldArtifact, build_spikemold_artifact
 from .event_budget import EventBudgetResult, evaluate_trace_budget
 from .network import SpikePressNeuronPopulation, SpikePressProjection, SpikePressNetwork
 
@@ -53,12 +53,12 @@ class SpikePressFCLIFLayer:
 @dataclass(frozen=True)
 class SpikePressCompileResult:
     model_name: str
-    artifact: SpikeMoldEDNPArtifact
+    artifact: SpikeMoldArtifact
     resource_report: Mapping[str, object]
 
 
 class SpikePressModel:
-    """Small inference-only model authoring surface for SpikeMold-EDNP mini."""
+    """Small inference-only model authoring surface for SpikeMold."""
 
     def __init__(self, name: str):
         self.name = name
@@ -75,12 +75,12 @@ class SpikePressModel:
         thresholds: Optional[Sequence[int]] = None,
     ) -> SpikePressFCLIFLayer:
         if self._layers:
-            raise ValueError("Batch 1A SpikeMold-EDNP mini supports one FC-LIF layer")
+            raise ValueError("SpikeMold mini supports one FC-LIF layer")
         layer = SpikePressFCLIFLayer.create(name, weights, thresholds)
         self._layers.append(layer)
         return layer
 
-    def compile_spikemold_ednp(self, *, target: str = "pynq-z2") -> SpikePressCompileResult:
+    def compile_spikemold(self, *, target: str = "pynq-z2") -> SpikePressCompileResult:
         layer = self._single_layer()
         network = SpikePressNetwork()
         input_population = network.add_population(SpikePressNeuronPopulation(layer.input_size, "input"))
@@ -89,7 +89,7 @@ class SpikePressModel:
             SpikePressProjection(input_population, output_population, name=f"input_to_{layer.name}")
         )
         compiled_network = network.compile()
-        artifact = build_spikemold_ednp_artifact(
+        artifact = build_spikemold_artifact(
             compiled_network,
             {f"input_to_{layer.name}": layer.weights},
             target=target,
@@ -137,7 +137,7 @@ class SpikePressModel:
 
     def _single_layer(self) -> SpikePressFCLIFLayer:
         if len(self._layers) != 1:
-            raise ValueError("SpikePressModel requires exactly one FC-LIF layer for SpikeMold-EDNP mini")
+            raise ValueError("SpikePressModel requires exactly one FC-LIF layer for SpikeMold mini")
         return self._layers[0]
 
 

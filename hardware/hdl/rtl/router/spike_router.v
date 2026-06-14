@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // Title         : Spike Router Module
-// Project       : SpikeMold-EDNP
+// Project       : SpikeMold
 // File          : spike_router.v
 // Author        : Jiwoon Lee (@metr0jw)
 // Organization  : Kwangwoon University, Seoul, South Korea

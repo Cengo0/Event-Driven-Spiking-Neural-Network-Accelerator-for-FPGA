@@ -9,8 +9,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORT_PATH = ROOT / "reports" / "architecture_selection_v1.md"
-BUDGET_PATH = ROOT / "outputs" / "event_budget" / "recommended_ednp_mini_config.json"
-TRANSPORT_PATH = ROOT / "outputs" / "transport" / "batch_1b_transport_ednp_mini_smoke.json"
+BUDGET_PATH = ROOT / "outputs" / "event_budget" / "recommended_spikemold_mini_config.json"
+TRANSPORT_PATH = ROOT / "outputs" / "transport" / "batch_1b_transport_spikemold_mini_smoke.json"
 C4_TRACE_PATH = ROOT / "golden_traces" / "v1" / "eventconv_8x8_tiny_v1.json"
 SANDBOX_PATH = ROOT / "outputs" / "architecture_sandbox" / "batch_1x_architecture_sandbox.json"
 
@@ -98,7 +98,7 @@ def main() -> int:
     )
 
     budget = load_json(BUDGET_PATH)
-    if budget.get("schema") != "spikemold.ednp_event_budget.v1":
+    if budget.get("schema") != "spikemold.event_budget.v1":
         fail("event budget schema mismatch")
     if budget.get("all_ok") is not True:
         fail("event budget all_ok is not true")
@@ -115,20 +115,20 @@ def main() -> int:
         fail("transport smoke all_ok is not true")
     if transport.get("board_executed") is not False:
         fail("architecture report must not rely on board execution")
-    ednp = transport.get("ednp_mini_fc_lif", {})
-    if ednp.get("trace_match_rate") != 1.0:
-        fail("EDNP-mini trace_match_rate is not 1.0")
-    if ednp.get("readout_match") is not True:
-        fail("EDNP-mini readout_match is not true")
-    if ednp.get("state_checksum_match") is not True:
-        fail("EDNP-mini state_checksum_match is not true")
-    counters = ednp.get("counters", {})
+    spikemold_mini = transport.get("spikemold_mini_fc_lif", {})
+    if spikemold_mini.get("trace_match_rate") != 1.0:
+        fail("SpikeMold-mini trace_match_rate is not 1.0")
+    if spikemold_mini.get("readout_match") is not True:
+        fail("SpikeMold-mini readout_match is not true")
+    if spikemold_mini.get("state_checksum_match") is not True:
+        fail("SpikeMold-mini state_checksum_match is not true")
+    counters = spikemold_mini.get("counters", {})
     if counters.get("dma_calls") != 2:
-        fail("EDNP-mini DMA call estimate mismatch")
+        fail("SpikeMold-mini DMA call estimate mismatch")
     if counters.get("axi_lite_commands") != 8:
-        fail("EDNP-mini AXI-Lite command estimate mismatch")
+        fail("SpikeMold-mini AXI-Lite command estimate mismatch")
     if counters.get("python_inner_loop_steps") != 0:
-        fail("EDNP-mini Python inner-loop count must be zero")
+        fail("SpikeMold-mini Python inner-loop count must be zero")
 
     c4 = load_json(C4_TRACE_PATH)
     if c4.get("trace_id") != "eventconv_8x8_tiny_v1":

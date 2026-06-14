@@ -8,7 +8,7 @@ Trace files are JSON objects:
 
 ```json
 {
-  "schema": "spikemold.ednp_trace.v1",
+  "schema": "spikemold.trace.v1",
   "trace_id": "name",
   "target": "architecture-neutral",
   "metadata": {},

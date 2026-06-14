@@ -165,7 +165,7 @@ def main() -> int:
     report_text = REPORT_PATH.read_text(encoding="utf-8")
     for phrase in [
         "board_free_runtime_contract_no_board",
-        "spikemold_ednp_fc_eventconv",
+        "spikemold_fc_eventconv",
         "Python inner loop required: `False`",
         "random DDR inner loop: `False`",
         "full-neuron scan primary: `False`",

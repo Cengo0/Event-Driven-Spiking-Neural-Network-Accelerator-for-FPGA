@@ -26,22 +26,22 @@ Owns:
 Produces:
 
 - `golden_traces/v1/`
-- `outputs/event_budget/recommended_ednp_mini_config.json`
+- `outputs/event_budget/recommended_spikemold_mini_config.json`
 - `reports/batch_1a_software_foundation_report.md`
 
-## Subagent B: Transport + EDNP-mini
+## Subagent B: Transport + SpikeMold-mini
 
 Owns:
 
 - AXI-Lite smoke
 - DMA loopback
 - EventWord64 counter
-- EDNP-mini FC-LIF
+- SpikeMold-mini FC-LIF
 - minimal PYNQ runtime
 
 Produces:
 
-- `reports/batch_1b_transport_ednp_mini_report.md`
+- `reports/batch_1b_transport_spikemold_mini_report.md`
 
 ## Subagent C: EventConv Primitive
 

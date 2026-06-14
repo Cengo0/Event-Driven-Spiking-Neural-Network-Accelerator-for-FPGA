@@ -1,11 +1,11 @@
-# SpikePress + SpikeMold-EDNP Architecture Contract V1
+# SpikePress + SpikeMold Architecture Contract V1
 
 Status: active draft
 Target: PYNQ-Z2 / Zynq-7020
 
 ## Purpose
 
-This contract defines the execution boundary for the first SpikeMold-EDNP
+This contract defines the execution boundary for the first SpikeMold
 backend. It is architecture-neutral. Flat pipelines, coregroups, pages, tiles,
 block-sparse layouts, and shared-kernel EventConv AGUs are allowed only when
 they preserve the trace semantics and pass the same evidence gates.
@@ -23,7 +23,7 @@ they preserve the trace semantics and pass the same evidence gates.
 
 ## Backend Boundary
 
-The SpikeMold-EDNP backend consumes:
+The SpikeMold backend consumes:
 
 - target specification
 - integer model artifact

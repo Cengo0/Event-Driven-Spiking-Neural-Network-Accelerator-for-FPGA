@@ -1,4 +1,4 @@
-# Batch 1B Transport + EDNP-mini Report
+# Batch 1B Transport + SpikeMold-mini Report
 
 Status: software transport smoke generated
 
@@ -11,8 +11,8 @@ latency, throughput, or energy.
 
 ## Generated
 
-- `outputs/transport/batch_1b_transport_ednp_mini_smoke.json`
-- `reports/batch_1b_transport_ednp_mini_report.md`
+- `outputs/transport/batch_1b_transport_spikemold_mini_smoke.json`
+- `reports/batch_1b_transport_spikemold_mini_report.md`
 
 ## Smoke Results
 
@@ -21,10 +21,10 @@ latency, throughput, or energy.
 | AXI-Lite register smoke | `True` |
 | DMA loopback smoke | `True` |
 | EventWord64 counter smoke | `True` |
-| EDNP-mini FC-LIF smoke | `True` |
+| SpikeMold-mini FC-LIF smoke | `True` |
 | All OK | `True` |
 
-## EDNP-mini Counters
+## SpikeMold-mini Counters
 
 | Counter | Value |
 |---|---:|

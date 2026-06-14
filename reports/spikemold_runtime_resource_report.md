@@ -16,16 +16,12 @@ latency, throughput, or energy.
 
 ## Selected Backend
 
-`spikemold_ednp_fc_eventconv`
+`spikemold_fc_eventconv`
 
 The runtime contract exposes two selected primitives:
 
-- `flat_fc_lif`: small FC/readout path from EDNP-mini
+- `flat_fc_lif`: small FC/readout path from SpikeMold-mini
 - `eventconv_agu`: shared-kernel EventConv AGU plus near-memory state and active-set commit
-
-Learning engine is outside the selected backend. STDP/R-STDP or on-chip
-learning interfaces are not evidence for this runtime/resource gate and must not
-be used for correctness, latency, throughput, or board-readiness claims.
 
 ## Required Runtime Invariants
 

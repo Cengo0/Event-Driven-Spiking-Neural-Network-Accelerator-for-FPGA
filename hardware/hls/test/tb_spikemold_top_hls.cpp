@@ -141,7 +141,7 @@ void test_control_registers() {
     print_result("Threshold output matches", h.threshold_out == 51);
     print_result("Leak output matches", h.leak_rate_out == 100);
     print_result("Status ready bit mirrors core", h.status_reg[0] == 1);
-    print_result("Learning status bit is reserved zero", h.status_reg[2] == 0);
+    print_result("Reserved status bit is zero", h.status_reg[2] == 0);
 }
 
 void test_spike_input() {

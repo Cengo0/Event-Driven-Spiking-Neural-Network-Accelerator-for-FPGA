@@ -25,7 +25,7 @@
     "commits_sha256": "30de5eca3b8968a9d86fc09a48fb5e2ed5f1af122142338a69d7672c3aeb394a",
     "final_state_sha256": "3157a79e6d8094094777ae6cd59e858b4c889327db95c7e3db410034490ba235",
     "input_sha256": "4f53352986544abce855aaf7fa666337bce0ef50a3d344c70e9559d593a8e451",
-    "trace_sha256": "af2f515089986d391690213c5e8e93e0b6e492252d9169994ede849202f15537",
+    "trace_sha256": "1928bb39f22ae883828cf61ab9361cafebcf52178261da5ce1ce61b54e6616f7",
     "updates_sha256": "226ed8970a51f20b88ef0da96a30bec45b5cbd64190184670d22cdd3ee654028"
   },
   "inputs": [
@@ -53,7 +53,7 @@
     "reset_mode": "zero",
     "weight_storage": "explicit_sparse"
   },
-  "schema": "spikemold.ednp_trace.v1",
+  "schema": "spikemold.trace.v1",
   "target": "architecture-neutral",
   "trace_id": "fc_lif_tiny_v1",
   "updates": [

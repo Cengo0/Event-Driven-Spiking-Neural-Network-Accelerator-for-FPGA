@@ -1,7 +1,7 @@
-"""Architecture-neutral SpikeMold-EDNP trace generation.
+"""Architecture-neutral SpikeMold trace generation.
 
 The objects in this module are small deterministic golden builders for the
-SpikePress + SpikeMold-EDNP contract. They do not model a full training stack.
+SpikePress + SpikeMold contract. They do not model a full training stack.
 They generate trace records that flat pipelines, coregroups, page/block sparse
 experiments, and EventConv AGU candidates can consume without semantic changes.
 """
@@ -17,7 +17,7 @@ from typing import Dict, Iterable, List, Mapping, MutableMapping, Optional, Sequ
 
 INT32_MIN = -(1 << 31)
 INT32_MAX = (1 << 31) - 1
-TRACE_SCHEMA = "spikemold.ednp_trace.v1"
+TRACE_SCHEMA = "spikemold.trace.v1"
 
 
 def _clamp_i32(value: int) -> int:

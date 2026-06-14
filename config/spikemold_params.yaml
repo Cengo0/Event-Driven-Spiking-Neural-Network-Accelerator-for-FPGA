@@ -63,7 +63,6 @@ weights:
 hls:
   hls_weight_width: 8
   fixed_point_frac_bits: 8
-  learning_enable: false
   smoke_commands_enable: false
   cnn_descriptor_page_enable: true
 target:

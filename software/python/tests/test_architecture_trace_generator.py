@@ -10,7 +10,7 @@ from spikepress.architecture_trace_generator import (
 from spikepress.event_budget import (
     EventBudgetLimits,
     evaluate_trace_budget,
-    recommended_ednp_mini_config,
+    recommended_spikemold_mini_config,
 )
 
 
@@ -111,10 +111,10 @@ def test_event_budget_accepts_tiny_trace_and_rejects_overflow():
     assert rejected.failures == ("limit_exceeded:input_event_count:1>0",)
 
 
-def test_recommended_ednp_mini_config_exposes_runtime_guards():
-    config = recommended_ednp_mini_config()
+def test_recommended_spikemold_mini_config_exposes_runtime_guards():
+    config = recommended_spikemold_mini_config()
 
     assert config["target"] == "pynq-z2"
-    assert config["primitive"] == "ednp-mini-fc-lif"
+    assert config["primitive"] == "spikemold-mini-fc-lif"
     assert config["python_inner_loop_steps"] == 0
     assert config["ddr_bytes_inner_loop"] == 0

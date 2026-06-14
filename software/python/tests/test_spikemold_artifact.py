@@ -1,10 +1,10 @@
 import numpy as np
 
-from spikepress.spikemold_ednp_artifact import (
+from spikepress.spikemold_artifact import (
     ARTIFACT_SCHEMA,
-    build_spikemold_ednp_artifact,
-    read_spikemold_ednp_artifact,
-    write_spikemold_ednp_artifact,
+    build_spikemold_artifact,
+    read_spikemold_artifact,
+    write_spikemold_artifact,
 )
 from spikepress.network import SpikePressNeuronPopulation, SpikePressProjection, SpikePressNetwork
 
@@ -17,7 +17,7 @@ def _tiny_compiled_network():
     return network.compile()
 
 
-def test_spikemold_ednp_artifact_roundtrip(tmp_path):
+def test_spikemold_artifact_roundtrip(tmp_path):
     compiled = _tiny_compiled_network()
     weights = {
         "input_to_output": np.array(
@@ -25,11 +25,11 @@ def test_spikemold_ednp_artifact_roundtrip(tmp_path):
             dtype=np.int8,
         )
     }
-    artifact = build_spikemold_ednp_artifact(compiled, weights, artifact_id="tiny")
+    artifact = build_spikemold_artifact(compiled, weights, artifact_id="tiny")
     path = tmp_path / "artifact.json"
-    write_spikemold_ednp_artifact(path, artifact)
+    write_spikemold_artifact(path, artifact)
 
-    loaded = read_spikemold_ednp_artifact(path)
+    loaded = read_spikemold_artifact(path)
 
     assert loaded.manifest["schema"] == ARTIFACT_SCHEMA
     assert loaded.manifest["target"] == "pynq-z2"
@@ -40,9 +40,9 @@ def test_spikemold_ednp_artifact_roundtrip(tmp_path):
     assert loaded.sha256 == artifact.sha256
 
 
-def test_spikemold_ednp_artifact_clips_to_hardware_weight_range():
+def test_spikemold_artifact_clips_to_hardware_weight_range():
     compiled = _tiny_compiled_network()
-    artifact = build_spikemold_ednp_artifact(
+    artifact = build_spikemold_artifact(
         compiled,
         {"input_to_output": np.array([[99, -99, 0], [7, -8, 1]], dtype=np.int16)},
     )

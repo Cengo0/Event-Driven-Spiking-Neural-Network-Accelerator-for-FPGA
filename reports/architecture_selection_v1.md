@@ -15,7 +15,7 @@ replace them.
 
 | Candidate | Pattern | Evidence | Gate |
 |---|---|---|---:|
-| A flat EDNP-mini event pipeline | flat event/update/state/readout | Batch 1B software transport smoke | PASS |
+| A flat SpikeMold-mini event pipeline | flat event/update/state/readout | Batch 1B software transport smoke | PASS |
 | D shared-kernel EventConv AGU | AGU plus state plus active-set commit | Batch 1C C0-C5 RTL xsim | PASS |
 | B coregroup partition | local state plus router | Batch 1X board-free trace replay sandbox | DEFER |
 | C page/block sparse execution | page/block sparse descriptor path | Batch 1X board-free trace replay sandbox | DEFER |
@@ -25,15 +25,15 @@ replace them.
 
 | Trace | Schema | Purpose |
 |---|---|---|
-| `golden_traces/v1/fc_lif_tiny_v1.json` | `spikemold.ednp_trace.v1` | flat FC-LIF readout correctness |
-| `golden_traces/v1/eventconv_agu_c0_tiny_v1.json` | `spikemold.ednp_trace.v1` | trace-locked tiny EventConv AGU correctness |
-| `golden_traces/v1/eventconv_8x8_tiny_v1.json` | `spikemold.ednp_trace.v1` | signed 3x3 EventConv scale-up correctness |
+| `golden_traces/v1/fc_lif_tiny_v1.json` | `spikemold.trace.v1` | flat FC-LIF readout correctness |
+| `golden_traces/v1/eventconv_agu_c0_tiny_v1.json` | `spikemold.trace.v1` | trace-locked tiny EventConv AGU correctness |
+| `golden_traces/v1/eventconv_8x8_tiny_v1.json` | `spikemold.trace.v1` | signed 3x3 EventConv scale-up correctness |
 
 ## 3. Workloads Used
 
 | Workload | Inputs | Updates | Active | Commits | Evidence |
 |---|---:|---:|---:|---:|---|
-| EDNP-mini FC-LIF | 3 | 5 | 2 | 1 | `outputs/transport/batch_1b_transport_ednp_mini_smoke.json` |
+| SpikeMold-mini FC-LIF | 3 | 5 | 2 | 1 | `outputs/transport/batch_1b_transport_spikemold_mini_smoke.json` |
 | EventConv C0 tiny | 1 | 4 | 4 | 0 | `scripts/check_batch1c_eventconv.py` |
 | EventConv C4 scale | 2 | 12 | 12 | 0 | `tb_spike_conv_c4_scaleup`: 46 PASS, 0 FAIL |
 | EventConv C5 backpressure | 0 new inputs | 0 new updates | 4 read | 2 emitted | `tb_spike_conv_commit_backpressure`: 31 PASS, 0 FAIL |
@@ -42,7 +42,7 @@ replace them.
 
 | Candidate | trace_match_rate | readout_match | state_checksum_match | Result |
 |---|---:|---:|---:|---:|
-| A flat EDNP-mini event pipeline | 1.0 | true | true | PASS |
+| A flat SpikeMold-mini event pipeline | 1.0 | true | true | PASS |
 | D shared-kernel EventConv AGU | 1.0 | true | true | PASS |
 | B coregroup partition | 1.0 in Batch 1X sandbox | true | true | DEFER |
 | C page/block sparse execution | 1.0 in Batch 1X sandbox | true | true | DEFER |
@@ -54,7 +54,7 @@ These are pre-synthesis estimates. They are fit checks, not routed utilization.
 
 | Candidate | LUT estimate | FF estimate | BRAM estimate | DSP estimate | FIFO memory | max clock estimate |
 |---|---:|---:|---:|---:|---:|---:|
-| A flat EDNP-mini event pipeline | < 1000 | < 1000 | 1-2 BRAM | 0 | <= 512 B | 125 MHz target, not routed |
+| A flat SpikeMold-mini event pipeline | < 1000 | < 1000 | 1-2 BRAM | 0 | <= 512 B | 125 MHz target, not routed |
 | D shared-kernel EventConv AGU C4 | < 1500 | < 1200 | 1-2 BRAM | 0 | <= 512 B | 125 MHz target, xsim only |
 | B coregroup partition | < 1300 | < 1100 | <= 2 BRAM | 0 | <= 2048 B | board-free estimate |
 | C page/block sparse execution | < 1000 | < 900 | <= 3 BRAM | 0 | page FIFO + 8 KiB page buffer | board-free estimate |
@@ -62,13 +62,13 @@ These are pre-synthesis estimates. They are fit checks, not routed utilization.
 
 ## 5. Performance Estimate Table
 
-Cycle estimates are board-free. `cycle_count` for EDNP-mini is from the
+Cycle estimates are board-free. `cycle_count` for SpikeMold-mini is from the
 software transport smoke model. EventConv values are xsim-bounded by the
 testbench waits, not measured PL performance.
 
 | Candidate | cycles per input event | cycles per generated update | cycles per active commit | maximum supported event count | stall count |
 |---|---:|---:|---:|---:|---:|
-| A flat EDNP-mini event pipeline | 8 model cycles / 3 inputs | 8 model cycles / 5 updates | 8 model cycles / 1 output | 1024 by current budget | 0 in smoke |
+| A flat SpikeMold-mini event pipeline | 8 model cycles / 3 inputs | 8 model cycles / 5 updates | 8 model cycles / 1 output | 1024 by current budget | 0 in smoke |
 | D shared-kernel EventConv AGU C4/C5 | <= 256 cycles / 2 inputs in TB | <= 256 cycles / 12 updates in TB | <= 128 cycles / 12 active in TB plus C5 held-output stalls | 1024 by current budget, 64-state TB | C5 records `output_backpressure_cycle_count > 0` |
 | B coregroup partition | 128 cycles / 5 inputs in sandbox | 128 cycles / 17 updates in sandbox | active-set only in sandbox | 256 by local FIFO estimate | 0 estimated |
 | C page/block sparse execution | 177 cycles / 5 inputs in sandbox | 177 cycles / 17 updates in sandbox | active-set only in sandbox | 256 updates per page | 0 estimated |
@@ -78,7 +78,7 @@ testbench waits, not measured PL performance.
 
 | Candidate | state reads | state writes | DDR bursts | DDR bytes | BRAM bytes |
 |---|---:|---:|---:|---:|---:|
-| A flat EDNP-mini event pipeline | 5 | 6 | 0 inner-loop | 0 inner-loop | small local state/FIFO |
+| A flat SpikeMold-mini event pipeline | 5 | 6 | 0 inner-loop | 0 inner-loop | small local state/FIFO |
 | D shared-kernel EventConv AGU C4 | 12 | 12 | 0 inner-loop | 0 inner-loop | 64 states, active IDs, 3x3 kernel |
 | B coregroup partition | 17 | 18 | 0 inner-loop | 0 inner-loop | 3072 B estimated |
 | C page/block sparse execution | 17 | 18 | 4 burst transfers estimated | 0 inner-loop, 264 B burst traffic | 8704 B estimated |
@@ -86,7 +86,7 @@ testbench waits, not measured PL performance.
 
 ## Resource Budget Field Table
 
-| Field | A flat EDNP-mini event pipeline | D shared-kernel EventConv AGU C4 |
+| Field | A flat SpikeMold-mini event pipeline | D shared-kernel EventConv AGU C4 |
 |---|---:|---:|
 | state memory bytes | <= 2048 B by current 512 active / 32-bit budget | 128 B state plus 128 B active IDs in C4 TB |
 | synapse/kernel memory bytes | 6 B for tiny FC-LIF trace weights | 9 B signed 3x3 kernel |
@@ -94,13 +94,13 @@ testbench waits, not measured PL performance.
 | expected DDR bytes per inference | 0 inner-loop DDR bytes | 0 inner-loop DDR bytes |
 | expected DMA calls per inference | 2 in software transport smoke | not board-run; runtime ABI next |
 | expected AXI-Lite commands per inference | 8 in software transport smoke | not board-run; runtime ABI next |
-| event/update histogram | `outputs/event_budget/recommended_ednp_mini_config.json` | `outputs/event_budget/recommended_ednp_mini_config.json` |
+| event/update histogram | `outputs/event_budget/recommended_spikemold_mini_config.json` | `outputs/event_budget/recommended_spikemold_mini_config.json` |
 
 ## 6. Runtime Complexity Table
 
 | Candidate | DMA calls per inference | AXI-Lite commands per inference | Python calls per inference | Runtime risk |
 |---|---:|---:|---:|---|
-| A flat EDNP-mini event pipeline | 2 in smoke | 8 in smoke | 0 inner-loop | board runtime still needed |
+| A flat SpikeMold-mini event pipeline | 2 in smoke | 8 in smoke | 0 inner-loop | board runtime still needed |
 | D shared-kernel EventConv AGU | not board-run | not board-run | 0 inner-loop by contract | needs runtime wrapper |
 | B coregroup partition | 2 estimated | 8 estimated | 0 inner-loop | router/commit complexity |
 | C page/block sparse execution | 6 estimated | 8 estimated | 0 inner-loop | page overhead can dominate |
@@ -111,7 +111,7 @@ testbench waits, not measured PL performance.
 Winner for next implementation stage: **E hybrid backend**, restricted to the
 two proven components:
 
-- A flat EDNP-mini path for small FC/readout workloads
+- A flat SpikeMold-mini path for small FC/readout workloads
 - D shared-kernel EventConv AGU plus near-memory state plus active-set commit
   for convolutional event workloads
 

@@ -20,9 +20,9 @@
 set hls_ip_repo "../hls/hls_output/hls/impl/ip"
 set bd_name "design_1"
 
-# Current SpikeMold-EDNP build output.
+# Current SpikeMold build output.
 set project_candidates [list \
-    "../build/spikemold_ednp_pynq_z2/spikemold_ednp_pynq_z2.xpr" \
+    "../build/spikemold_pynq_z2/spikemold_pynq_z2.xpr" \
 ]
 
 set proj_xpr ""

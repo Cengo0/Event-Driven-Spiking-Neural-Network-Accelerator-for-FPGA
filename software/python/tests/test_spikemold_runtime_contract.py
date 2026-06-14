@@ -9,7 +9,7 @@ from spikepress.spikemold_runtime_contract import (
 
 def test_spikemold_runtime_contract_and_resource_report():
     event_budget = {
-        "recommended_ednp_mini_config": {
+        "recommended_spikemold_mini_config": {
             "state_width_bits": 32,
             "weight_width_bits": 16,
             "max_input_events": 1024,
@@ -31,7 +31,7 @@ def test_spikemold_runtime_contract_and_resource_report():
         },
     }
     transport_smoke = {
-        "ednp_mini_fc_lif": {
+        "spikemold_mini_fc_lif": {
             "trace_id": "batch_1b_tiny_fc_lif_output_golden",
             "counters": {
                 "input_event_count": 3,

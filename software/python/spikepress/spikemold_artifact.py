@@ -1,4 +1,4 @@
-"""Minimal SpikeMold-EDNP compiler artifact helpers."""
+"""Minimal SpikeMold compiler artifact helpers."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ import numpy as np
 from .network import CompiledSpikePressTopology
 
 
-ARTIFACT_SCHEMA = "spikemold.ednp_artifact.v1"
+ARTIFACT_SCHEMA = "spikemold.artifact.v1"
 
 
 def _sha256_bytes(data: bytes) -> str:
@@ -25,7 +25,7 @@ def _canonical_json(value: object) -> str:
 
 
 @dataclass(frozen=True)
-class SpikeMoldEDNPArtifact:
+class SpikeMoldArtifact:
     manifest: Mapping[str, object]
     flat_weights: np.ndarray
 
@@ -34,14 +34,14 @@ class SpikeMoldEDNPArtifact:
         return str(self.manifest["hashes"]["artifact_sha256"])  # type: ignore[index]
 
 
-def build_spikemold_ednp_artifact(
+def build_spikemold_artifact(
     compiled: CompiledSpikePressTopology,
     weight_dict: Mapping[str, np.ndarray],
     *,
     target: str = "pynq-z2",
-    artifact_id: str = "spikemold_ednp_artifact",
-) -> SpikeMoldEDNPArtifact:
-    """Build a minimal hardware-deployable SpikeMold-EDNP artifact manifest."""
+    artifact_id: str = "spikemold_artifact",
+) -> SpikeMoldArtifact:
+    """Build a minimal hardware-deployable SpikeMold artifact manifest."""
 
     flat = compiled.pack_weights(dict(weight_dict)).astype(np.int8, copy=False)
     flat_bytes = flat.tobytes()
@@ -97,15 +97,15 @@ def build_spikemold_ednp_artifact(
     manifest["hashes"]["artifact_sha256"] = _sha256_bytes(  # type: ignore[index]
         _canonical_json(manifest).encode("utf-8")
     )
-    return SpikeMoldEDNPArtifact(manifest=manifest, flat_weights=flat.copy())
+    return SpikeMoldArtifact(manifest=manifest, flat_weights=flat.copy())
 
 
-def write_spikemold_ednp_artifact(path: Path, artifact: SpikeMoldEDNPArtifact) -> None:
+def write_spikemold_artifact(path: Path, artifact: SpikeMoldArtifact) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(artifact.manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
-def read_spikemold_ednp_artifact(path: Path) -> SpikeMoldEDNPArtifact:
+def read_spikemold_artifact(path: Path) -> SpikeMoldArtifact:
     manifest = json.loads(path.read_text(encoding="utf-8"))
     if manifest.get("schema") != ARTIFACT_SCHEMA:
         raise ValueError(f"unsupported artifact schema: {manifest.get('schema')}")
@@ -124,4 +124,4 @@ def read_spikemold_ednp_artifact(path: Path) -> SpikeMoldEDNPArtifact:
     expected_artifact_hash = manifest_without_artifact_hash["hashes"].pop("artifact_sha256", None)
     if expected_artifact_hash != _sha256_bytes(_canonical_json(manifest_without_artifact_hash).encode("utf-8")):
         raise ValueError("artifact hash mismatch")
-    return SpikeMoldEDNPArtifact(manifest=manifest, flat_weights=flat)
+    return SpikeMoldArtifact(manifest=manifest, flat_weights=flat)

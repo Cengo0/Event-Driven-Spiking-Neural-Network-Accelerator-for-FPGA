@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // Title         : LIF Neuron Array - SDP BRAM/DSP Optimized (v3)
-// Project       : SpikeMold-EDNP
+// Project       : SpikeMold
 // File          : lif_neuron_array.v
 // Author        : Jiwoon Lee (@metr0jw)
 // Organization  : Kwangwoon University, Seoul, South Korea
