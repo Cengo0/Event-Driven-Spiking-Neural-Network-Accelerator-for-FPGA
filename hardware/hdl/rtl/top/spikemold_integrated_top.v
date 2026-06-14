@@ -439,7 +439,7 @@ module spikemold_integrated_top #(
     assign cfg_service_cycles_counter = pl_service_cycles_latched;
 
     //=========================================================================
-    // SNN Status
+    // SpikeMold Status
     //=========================================================================
     assign bd_spikemold_ready = ~router_busy & ~neuron_array_busy;
     assign bd_spikemold_busy  = router_busy | neuron_array_busy;

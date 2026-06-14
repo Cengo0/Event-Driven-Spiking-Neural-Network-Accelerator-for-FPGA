@@ -21,6 +21,7 @@ implementation slice:
 - Batch 1C EventConv primitive artifacts
 - Batch 1X architecture exploration sandbox
 - selected FC/EventConv runtime contract and resource report
+- EventConv Vivado OOC synthesis evidence
 - PYNQ one-shot runtime API and CLI entrypoint
 
 ## Gate Results
@@ -35,6 +36,7 @@ implementation slice:
 | inner-loop DDR bytes are zero | PASS | trace counters and runtime/resource reports |
 | SpikeMold flat FC-LIF trace/readout/state match | PASS | `outputs/transport/batch_1b_transport_flat_fc_lif_smoke.json` |
 | EventConv C0-C5 artifacts present | PASS | `reports/batch_1c_eventconv_primitive_report.md` |
+| EventConv OOC synthesis evidence | PASS | `reports/eventconv_ooc_synthesis_report.md` |
 | architecture sandbox preserves semantics | PASS | `outputs/architecture_sandbox/batch_1x_architecture_sandbox.json` |
 | selected runtime backend excludes probationary switch | PASS | `outputs/runtime/spikemold_runtime_contract.json` |
 | PYNQ one-shot runtime API exists | PASS | `software/python/spikepress/pynq_runtime.py` |
@@ -57,13 +59,13 @@ PYNQ one-shot runtime API is present, but was not executed on the board in this
 gate. Before board claims:
 
 1. Remove or fully tie off remaining RTL router/coregroup compatibility residue.
-2. Run Vivado synthesis for selected FC/EventConv primitives.
-3. Replace analytic LUT/FF/BRAM/timing estimates with routed reports.
+2. Build integrated Vivado design with the fixed runtime contract.
+3. Replace OOC timing/resource evidence with routed integrated reports.
 4. Run `scripts/run_spikemold_pynq_one_shot.py` on PYNQ-Z2 and record board
    JSON counters.
 
 ## Verifier Command
 
 ```bash
-python scripts/check_verifier_gate.py
+rtk python scripts/check_verifier_gate.py
 ```

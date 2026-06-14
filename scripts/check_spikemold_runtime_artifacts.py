@@ -23,6 +23,7 @@ from spikepress.spikemold_runtime_contract import (  # noqa: E402
 
 ABI_PATH = ROOT / "outputs" / "runtime" / "spikemold_runtime_contract.json"
 RESOURCE_PATH = ROOT / "outputs" / "resource" / "spikemold_runtime_resource_report.json"
+EVENTCONV_OOC_SYNTHESIS_PATH = ROOT / "outputs" / "resource" / "eventconv_ooc_synthesis_report.json"
 REPORT_PATH = ROOT / "reports" / "spikemold_runtime_resource_report.md"
 
 
@@ -50,7 +51,7 @@ def check_hash(payload: dict, hash_key: str) -> None:
 
 
 def main() -> int:
-    for path in [ABI_PATH, RESOURCE_PATH, REPORT_PATH]:
+    for path in [ABI_PATH, RESOURCE_PATH, EVENTCONV_OOC_SYNTHESIS_PATH, REPORT_PATH]:
         if not path.exists():
             fail(f"missing artifact: {path}")
 
@@ -101,6 +102,8 @@ def main() -> int:
         fail("resource report schema mismatch")
     if resource.get("selected_backend") != SPIKEMOLD_RUNTIME_BACKEND_ID:
         fail("resource report backend mismatch")
+    if resource.get("evidence_level") != "board_free_resource_report_with_eventconv_ooc_synthesis":
+        fail("resource report evidence level mismatch")
     if resource.get("board_executed") is not False:
         fail("resource report must not claim board execution")
     if resource.get("runtime_contract_sha256") != abi["hashes"]["runtime_contract_sha256"]:
@@ -160,6 +163,34 @@ def main() -> int:
         fail("eventconv generated update histogram mismatch")
     if eventconv_hist.get("python_inner_loop_steps") != 0:
         fail("eventconv Python inner-loop histogram must be zero")
+
+    eventconv_ooc = load_json(EVENTCONV_OOC_SYNTHESIS_PATH)
+    eventconv_ooc_evidence = resource.get("eventconv_ooc_synthesis", {})
+    if eventconv_ooc.get("schema") != "spikemold.eventconv_ooc_synthesis.v1":
+        fail("EventConv OOC synthesis schema mismatch")
+    if eventconv_ooc.get("board_executed") is not False:
+        fail("EventConv OOC synthesis must not claim board execution")
+    if eventconv_ooc.get("claim_boundary") != "eventconv_ooc_synthesis_only_no_bitstream_no_board":
+        fail("EventConv OOC synthesis claim boundary mismatch")
+    if eventconv_ooc.get("all_blocks_synthesized") is not True:
+        fail("EventConv OOC synthesis all_blocks_synthesized must be true")
+    if eventconv_ooc.get("all_timing_met") is not True:
+        fail("EventConv OOC synthesis all_timing_met must be true")
+    if eventconv_ooc.get("all_dsp_zero") is not True:
+        fail("EventConv OOC synthesis all_dsp_zero must be true")
+    if eventconv_ooc.get("all_bram_tile_zero") is not True:
+        fail("EventConv OOC synthesis all_bram_tile_zero must be true")
+    if eventconv_ooc_evidence.get("synthesis_report_sha256") != eventconv_ooc["hashes"]["synthesis_report_sha256"]:
+        fail("EventConv OOC synthesis hash link mismatch")
+    aggregate = eventconv_ooc.get("aggregate_utilization", {})
+    if eventconv_report.get("lut_estimate_upper_bound", 0) < aggregate.get("slice_luts_used", 0):
+        fail("eventconv LUT upper bound below OOC synthesis result")
+    if eventconv_report.get("ff_estimate_upper_bound", 0) < aggregate.get("slice_registers_used", 0):
+        fail("eventconv FF upper bound below OOC synthesis result")
+    if eventconv_report.get("dsp_estimate") != aggregate.get("dsp_used"):
+        fail("eventconv DSP estimate must match OOC synthesis result")
+    if eventconv_report.get("vivado_ooc_synthesis", {}).get("claim_boundary") != eventconv_ooc.get("claim_boundary"):
+        fail("eventconv resource report missing OOC synthesis evidence")
     check_hash(resource, "resource_report_sha256")
 
     report_text = REPORT_PATH.read_text(encoding="utf-8")
@@ -169,7 +200,8 @@ def main() -> int:
         "Python inner loop required: `False`",
         "random DDR inner loop: `False`",
         "full-neuron scan primary: `False`",
-        "Vivado synthesis must replace LUT/FF/BRAM/timing estimates",
+        "EventConv OOC Synthesis",
+        "outputs/resource/eventconv_ooc_synthesis_report.json",
     ]:
         if phrase not in report_text:
             fail(f"report missing phrase: {phrase}")

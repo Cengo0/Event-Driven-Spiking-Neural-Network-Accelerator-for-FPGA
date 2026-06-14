@@ -58,7 +58,7 @@ These are pre-synthesis estimates. They are fit checks, not routed utilization.
 | D shared-kernel EventConv AGU C4 | < 1500 | < 1200 | 1-2 BRAM | 0 | <= 512 B | 125 MHz target, xsim only |
 | B coregroup partition | < 1300 | < 1100 | <= 2 BRAM | 0 | <= 2048 B | board-free estimate |
 | C page/block sparse execution | < 1000 | < 900 | <= 3 BRAM | 0 | page FIFO + 8 KiB page buffer | board-free estimate |
-| E hybrid backend | sum of A + D per deployed layer | sum of A + D per deployed layer | local state plus small kernel memory | 0 expected | bounded per primitive | 125 MHz target, needs synth |
+| E hybrid backend | sum of A + D per deployed layer | sum of A + D per deployed layer | local state plus small kernel memory | 0 expected | bounded per deployed block | EventConv OOC synthesis done at 20 MHz; integrated/routed timing still needed |
 
 ## 5. Performance Estimate Table
 
@@ -72,7 +72,7 @@ testbench waits, not measured PL performance.
 | D shared-kernel EventConv AGU C4/C5 | <= 256 cycles / 2 inputs in TB | <= 256 cycles / 12 updates in TB | <= 128 cycles / 12 active in TB plus C5 held-output stalls | 1024 by current budget, 64-state TB | C5 records `output_backpressure_cycle_count > 0` |
 | B coregroup partition | 128 cycles / 5 inputs in sandbox | 128 cycles / 17 updates in sandbox | active-set only in sandbox | 256 by local FIFO estimate | 0 estimated |
 | C page/block sparse execution | 177 cycles / 5 inputs in sandbox | 177 cycles / 17 updates in sandbox | active-set only in sandbox | 256 updates per page | 0 estimated |
-| E hybrid backend | component-dependent | component-dependent | active-set only for selected primitives | compiler budget constrained | must be measured before board claim |
+| E hybrid backend | component-dependent | component-dependent | active-set only for selected blocks | compiler budget constrained | must be measured before board claim |
 
 ## Memory Table
 
@@ -82,7 +82,7 @@ testbench waits, not measured PL performance.
 | D shared-kernel EventConv AGU C4 | 12 | 12 | 0 inner-loop | 0 inner-loop | 64 states, active IDs, 3x3 kernel |
 | B coregroup partition | 17 | 18 | 0 inner-loop | 0 inner-loop | 3072 B estimated |
 | C page/block sparse execution | 17 | 18 | 4 burst transfers estimated | 0 inner-loop, 264 B burst traffic | 8704 B estimated |
-| E hybrid backend | trace-dependent | trace-dependent | 0 inner-loop required | 0 inner-loop required | bounded per selected primitive |
+| E hybrid backend | trace-dependent | trace-dependent | 0 inner-loop required | 0 inner-loop required | bounded per deployed block |
 
 ## Resource Budget Field Table
 
@@ -156,13 +156,12 @@ Pivot rules:
 
 ## 9. Recommended Next Implementation Stage
 
-1. Add a board-free runtime contract for the selected FC/EventConv primitives.
+1. Add a board-free runtime contract for the selected FC/EventConv blocks.
 2. Generate compiler-visible resource reports for FC-LIF and EventConv artifacts.
 3. Keep Batch 1X sandbox artifacts for coregroup/page/tile probation without
    switching the mainline.
-4. Run Vivado synthesis for the selected RTL primitives and replace analytic
-   estimates with utilization and timing reports.
-5. Add PYNQ-Z2 board smoke only after the bitstream/runtime contract is fixed.
+4. Use EventConv OOC synthesis evidence to constrain the resource report.
+5. Build the integrated bitstream/runtime contract and run PYNQ-Z2 board smoke.
 
 ## Batch 1X Sandbox Update
 

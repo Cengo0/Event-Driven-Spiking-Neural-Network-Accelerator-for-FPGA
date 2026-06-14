@@ -43,6 +43,9 @@ rtk python scripts/check_batch1c_eventconv.py
 rtk python scripts/generate_batch1x_architecture_sandbox_artifacts.py
 rtk python scripts/check_batch1x_architecture_sandbox.py
 rtk python scripts/check_architecture_selection.py
+rtk bash hardware/scripts/run_eventconv_ooc_synthesis.sh
+rtk python scripts/generate_eventconv_ooc_synthesis_report.py
+rtk python scripts/check_eventconv_ooc_synthesis_report.py
 rtk python scripts/generate_spikemold_runtime_artifacts.py
 rtk python scripts/check_spikemold_runtime_artifacts.py
 rtk python scripts/check_verifier_gate.py

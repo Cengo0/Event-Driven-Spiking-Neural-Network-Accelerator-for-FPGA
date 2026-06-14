@@ -32,6 +32,7 @@ TRANSPORT_PATH = ROOT / "outputs" / "transport" / "batch_1b_transport_flat_fc_li
 ARCH_SANDBOX_PATH = ROOT / "outputs" / "architecture_sandbox" / "batch_1x_architecture_sandbox.json"
 RUNTIME_CONTRACT_PATH = ROOT / "outputs" / "runtime" / "spikemold_runtime_contract.json"
 RESOURCE_REPORT_PATH = ROOT / "outputs" / "resource" / "spikemold_runtime_resource_report.json"
+EVENTCONV_OOC_SYNTHESIS_PATH = ROOT / "outputs" / "resource" / "eventconv_ooc_synthesis_report.json"
 PYNQ_ONESHOT_SCRIPT = ROOT / "scripts" / "run_spikemold_pynq_one_shot.py"
 INFERENCE_ONLY_SURFACE_FILES = [
     ROOT / "hardware" / "hls" / "include" / "spikemold_top_hls.h",
@@ -273,6 +274,8 @@ def check_runtime_resource() -> None:
         fail("resource report schema mismatch")
     if resource.get("selected_backend") != SPIKEMOLD_RUNTIME_BACKEND_ID:
         fail("resource backend mismatch")
+    if resource.get("evidence_level") != "board_free_resource_report_with_eventconv_ooc_synthesis":
+        fail("resource evidence level mismatch")
     if resource.get("board_executed") is not False:
         fail("resource report must not claim board execution")
     if resource.get("runtime_contract_sha256") != hashes.get("runtime_contract_sha256"):
@@ -287,6 +290,30 @@ def check_runtime_resource() -> None:
     ]:
         if failure_modes.get(key) is not False:
             fail(f"resource forbidden mode must be false: {key}")
+
+    eventconv_ooc = load_json(EVENTCONV_OOC_SYNTHESIS_PATH)
+    if eventconv_ooc.get("schema") != "spikemold.eventconv_ooc_synthesis.v1":
+        fail("EventConv OOC synthesis schema mismatch")
+    if eventconv_ooc.get("evidence_level") != "vivado_ooc_synthesis_no_board":
+        fail("EventConv OOC synthesis evidence level mismatch")
+    if eventconv_ooc.get("board_executed") is not False:
+        fail("EventConv OOC synthesis must not claim board execution")
+    if eventconv_ooc.get("claim_boundary") != "eventconv_ooc_synthesis_only_no_bitstream_no_board":
+        fail("EventConv OOC synthesis claim boundary mismatch")
+    if eventconv_ooc.get("all_blocks_synthesized") is not True:
+        fail("EventConv OOC synthesis all_blocks_synthesized must be true")
+    if eventconv_ooc.get("all_timing_met") is not True:
+        fail("EventConv OOC synthesis all_timing_met must be true")
+    if eventconv_ooc.get("all_dsp_zero") is not True:
+        fail("EventConv OOC synthesis all_dsp_zero must be true")
+    if eventconv_ooc.get("all_bram_tile_zero") is not True:
+        fail("EventConv OOC synthesis all_bram_tile_zero must be true")
+
+    resource_ooc = resource.get("eventconv_ooc_synthesis", {})
+    if not isinstance(resource_ooc, Mapping):
+        fail("resource report missing EventConv OOC synthesis evidence")
+    if resource_ooc.get("synthesis_report_sha256") != eventconv_ooc["hashes"]["synthesis_report_sha256"]:
+        fail("resource report EventConv OOC synthesis hash mismatch")
 
 
 def check_pynq_runtime_api() -> None:
@@ -345,7 +372,12 @@ def check_reports() -> None:
         "reports/spikemold_runtime_resource_report.md": [
             "board_free_runtime_contract_no_board",
             "spikemold_fc_eventconv",
-            "Vivado synthesis must replace LUT/FF/BRAM/timing estimates",
+            "EventConv OOC Synthesis",
+        ],
+        "reports/eventconv_ooc_synthesis_report.md": [
+            "EventConv Vivado OOC Synthesis Report",
+            "EventConv Vivado OOC synthesis evidence generated",
+            "eventconv_ooc_synthesis_only_no_bitstream_no_board",
         ],
         "reports/verifier_gate_review.md": [
             "Status: board-free verifier gate passed",

@@ -111,19 +111,51 @@ def build_spikemold_runtime_resource_report(
     transport_smoke: Mapping[str, object],
     eventconv_trace: Mapping[str, object],
     runtime_contract: Mapping[str, object],
+    eventconv_ooc_synthesis: Mapping[str, object] | None = None,
     target: str = "pynq-z2",
 ) -> dict:
-    """Build compiler-visible pre-synthesis resource report."""
+    """Build compiler-visible resource report."""
 
     trace_results = dict(event_budget["trace_results"])  # type: ignore[index]
     fc_counters = dict(trace_results["fc_lif_tiny_v1"]["counters"])  # type: ignore[index]
     eventconv_counters = dict(eventconv_trace["counters"])  # type: ignore[index]
     flat_fc_lif_counters = dict(transport_smoke["flat_fc_lif"]["counters"])  # type: ignore[index]
+    eventconv_lut_upper_bound = 1500
+    eventconv_ff_upper_bound = 1200
+    eventconv_bram_upper_bound = 2
+    eventconv_dsp_estimate = 0
+    eventconv_ooc_evidence = None
+
+    if eventconv_ooc_synthesis is not None:
+        aggregate = dict(eventconv_ooc_synthesis["aggregate_utilization"])  # type: ignore[index]
+        synth_hashes = dict(eventconv_ooc_synthesis["hashes"])  # type: ignore[index]
+        eventconv_lut_upper_bound = max(eventconv_lut_upper_bound, int(aggregate["slice_luts_used"]) + 512)
+        eventconv_ff_upper_bound = max(eventconv_ff_upper_bound, int(aggregate["slice_registers_used"]) + 512)
+        eventconv_bram_upper_bound = max(eventconv_bram_upper_bound, int(aggregate["block_ram_tile_used"]))
+        eventconv_dsp_estimate = int(aggregate["dsp_used"])
+        eventconv_ooc_evidence = {
+            "schema": eventconv_ooc_synthesis["schema"],
+            "evidence_level": eventconv_ooc_synthesis["evidence_level"],
+            "board_executed": eventconv_ooc_synthesis["board_executed"],
+            "claim_boundary": eventconv_ooc_synthesis["claim_boundary"],
+            "target_clock_mhz": eventconv_ooc_synthesis["target_clock_mhz"],
+            "target_clock_period_ns": eventconv_ooc_synthesis["target_clock_period_ns"],
+            "all_blocks_synthesized": eventconv_ooc_synthesis["all_blocks_synthesized"],
+            "all_timing_met": eventconv_ooc_synthesis["all_timing_met"],
+            "all_dsp_zero": eventconv_ooc_synthesis["all_dsp_zero"],
+            "all_bram_tile_zero": eventconv_ooc_synthesis["all_bram_tile_zero"],
+            "aggregate_utilization": aggregate,
+            "synthesis_report_sha256": synth_hashes["synthesis_report_sha256"],
+        }
 
     report = {
         "schema": SPIKEMOLD_RUNTIME_RESOURCE_REPORT_SCHEMA,
         "target": target,
-        "evidence_level": "board_free_pre_synthesis_estimate",
+        "evidence_level": (
+            "board_free_resource_report_with_eventconv_ooc_synthesis"
+            if eventconv_ooc_evidence is not None
+            else "board_free_pre_synthesis_estimate"
+        ),
         "board_executed": False,
         "runtime_contract_sha256": runtime_contract["hashes"]["runtime_contract_sha256"],  # type: ignore[index]
         "selected_backend": SPIKEMOLD_RUNTIME_BACKEND_ID,
@@ -161,10 +193,10 @@ def build_spikemold_runtime_resource_report(
             },
             "eventconv_agu": {
                 "trace_id": str(eventconv_trace["trace_id"]),
-                "lut_estimate_upper_bound": 1500,
-                "ff_estimate_upper_bound": 1200,
-                "bram_estimate_upper_bound": 2,
-                "dsp_estimate": 0,
+                "lut_estimate_upper_bound": eventconv_lut_upper_bound,
+                "ff_estimate_upper_bound": eventconv_ff_upper_bound,
+                "bram_estimate_upper_bound": eventconv_bram_upper_bound,
+                "dsp_estimate": eventconv_dsp_estimate,
                 "state_memory_bytes": 128,
                 "synapse_kernel_memory_bytes": 9,
                 "active_id_memory_bytes": 128,
@@ -184,6 +216,9 @@ def build_spikemold_runtime_resource_report(
             },
         },
     }
+    if eventconv_ooc_evidence is not None:
+        report["eventconv_ooc_synthesis"] = eventconv_ooc_evidence
+        report["resource_reports"]["eventconv_agu"]["vivado_ooc_synthesis"] = eventconv_ooc_evidence  # type: ignore[index]
     report["hashes"] = {"resource_report_sha256": sha256_json(report)}
     return report
 

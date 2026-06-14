@@ -292,13 +292,13 @@ void spikemold_top_hls(
     // AXI4-Stream Weight Read (for debugging)
     hls::stream<axis_weight_t> &m_axis_weights,
     
-    // Verilog Interface - Spike Input (to SNN core) — RTL-width IDs
+    // Verilog Interface - Spike Input (to SpikeMold coregroup) - RTL-width IDs
     ap_uint<1> &spike_in_valid,
     rtl_nid_t &spike_in_neuron_id,
     ap_int<8> &spike_in_weight,
     ap_uint<1> spike_in_ready,
     
-    // Verilog Interface - Spike Output (from SNN core) — RTL-width IDs
+    // Verilog Interface - Spike Output (from SpikeMold coregroup) - RTL-width IDs
     ap_uint<1> spike_out_valid,
     rtl_nid_t spike_out_neuron_id,
     ap_int<8> spike_out_weight,

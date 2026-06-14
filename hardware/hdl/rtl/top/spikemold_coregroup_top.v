@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Title         : SpikeMold Coregroup Top - Hierarchical Neuromorphic Processor
+// Title         : SpikeMold Coregroup Top - Event-Driven Backend
 // Project       : SpikeMold (HW) + SpikePress (SW)
 // File          : spikemold_coregroup_top.v
 // Author        : Jiwoon Lee (@metr0jw)
@@ -30,7 +30,7 @@
 //                 │  │ N0││ N1││ N2││ N3││ N4│     │ N14││ N15│         │
 //                 │  └───┘└───┘└───┘└───┘└───┘     └────┘└────┘         │
 //                 │                                                     │
-//                 │  Variable group sizes: Ni = SNN_GROUP_SIZE_i        │
+//                 │  Variable group sizes: Ni from generated config      │
 //                 │  Default: all 128 (16 × 128 = 2048 neurons)         │
 //                 │  Bus width: LOCAL_ID_WIDTH = clog2(max(Ni))         │
 //                 └─────────────────────────────────────────────────────┘
@@ -75,7 +75,7 @@
 `include "spikemold_params.vh"
 
 module spikemold_coregroup_top #(
-    // SpikeMold Coregroup Parameters (defaults from spikemold_params.yaml via spikemold_params.vh)
+    // SpikeMold Coregroup parameters (defaults from spikemold_params.yaml via spikemold_params.vh)
     parameter NUM_GROUPS            = `SNN_NUM_GROUPS,
     parameter NEURONS_PER_GROUP     = `SNN_NEURONS_PER_GROUP,
     parameter WEIGHT_WIDTH          = `SNN_WEIGHT_WIDTH,
@@ -1102,7 +1102,7 @@ module spikemold_coregroup_top #(
     //=========================================================================
     // SpikeMold Coregroup Instantiations
     //=========================================================================
-    // Each group has its own NEURONS_PER_GROUP from SNN_GROUP_SIZE_x defines.
+    // Each group has its own NEURONS_PER_GROUP from generated group-size defines.
     // All groups share the same LOCAL_ID_WIDTH (= clog2(max(group_sizes)))
     // for uniform interconnect bus widths.
     //
@@ -1130,7 +1130,7 @@ module spikemold_coregroup_top #(
     generate
         for (g = 0; g < NUM_GROUPS; g = g + 1) begin : gen_core_groups
 
-            // Per-group neuron count: maps genvar g → SNN_GROUP_SIZE_x define.
+            // Per-group neuron count: maps genvar g to generated group-size define.
             // All groups use uniform LOCAL_ID_WIDTH for bus compatibility.
             localparam THIS_NPG =
                 (g ==  0) ? `SNN_GROUP_SIZE_0  :

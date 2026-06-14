@@ -114,7 +114,7 @@ set_property -dict [list \
     CONFIG.c_s_axis_s2mm_tdata_width {32} \
 ] [get_bd_cells axi_dma_1]
 
-# --- HLS SNN IP ---
+# --- SpikeMold HLS IP ---
 create_bd_cell -type ip -vlnv xilinx.com:hls:spikemold_top_hls:1.0 spikemold_top_hls_0
 
 # --- Config Regs ---

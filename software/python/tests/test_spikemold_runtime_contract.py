@@ -69,6 +69,33 @@ def test_spikemold_runtime_contract_and_resource_report():
         eventconv_trace=eventconv_trace,
         runtime_contract=runtime_contract,
     )
+    eventconv_ooc_synthesis = {
+        "schema": "spikemold.eventconv_ooc_synthesis.v1",
+        "evidence_level": "vivado_ooc_synthesis_no_board",
+        "board_executed": False,
+        "claim_boundary": "eventconv_ooc_synthesis_only_no_bitstream_no_board",
+        "target_clock_mhz": 20.0,
+        "target_clock_period_ns": 50.0,
+        "all_blocks_synthesized": True,
+        "all_timing_met": True,
+        "all_dsp_zero": True,
+        "all_bram_tile_zero": True,
+        "aggregate_utilization": {
+            "slice_luts_used": 3161,
+            "slice_registers_used": 2708,
+            "block_ram_tile_used": 0,
+            "dsp_used": 0,
+            "min_wns_ns": 35.876,
+        },
+        "hashes": {"synthesis_report_sha256": "abc123"},
+    }
+    resource_with_synthesis = build_spikemold_runtime_resource_report(
+        event_budget=event_budget,
+        transport_smoke=transport_smoke,
+        eventconv_trace=eventconv_trace,
+        runtime_contract=runtime_contract,
+        eventconv_ooc_synthesis=eventconv_ooc_synthesis,
+    )
 
     assert runtime_contract["schema"] == SPIKEMOLD_RUNTIME_CONTRACT_SCHEMA
     assert runtime_contract["selected_backend"] == SPIKEMOLD_RUNTIME_BACKEND_ID
@@ -82,3 +109,10 @@ def test_spikemold_runtime_contract_and_resource_report():
     assert resource["resource_reports"]["eventconv_agu"]["state_memory_bytes"] == 128
     assert resource["resource_reports"]["eventconv_agu"]["dsp_estimate"] == 0
     assert resource["resource_reports"]["eventconv_agu"]["expected_dma_calls_per_inference"] == 2
+    assert resource_with_synthesis["evidence_level"] == "board_free_resource_report_with_eventconv_ooc_synthesis"
+    assert resource_with_synthesis["eventconv_ooc_synthesis"]["synthesis_report_sha256"] == "abc123"
+    assert resource_with_synthesis["resource_reports"]["eventconv_agu"]["lut_estimate_upper_bound"] == 3673
+    assert resource_with_synthesis["resource_reports"]["eventconv_agu"]["ff_estimate_upper_bound"] == 3220
+    assert resource_with_synthesis["resource_reports"]["eventconv_agu"]["vivado_ooc_synthesis"][
+        "claim_boundary"
+    ] == "eventconv_ooc_synthesis_only_no_bitstream_no_board"

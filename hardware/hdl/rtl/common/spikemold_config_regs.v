@@ -23,7 +23,7 @@
 //   0x1C  NEURON_SPIKE_CNT[R]  [31:0] neuron spike count
 //   0x20  STATUS          [R]  [0] fifo_overflow, [8:1] active_neurons
 //   0x24  THROUGHPUT      [R]  [31:0] first-spike latency counter
-//   0x28  VERSION         [R]  [31:0] = 0x534E4E01 ("SNN" + v1)
+//   0x28  VERSION         [R]  [31:0] = 0x534D3031 ("SM01")
 //   0x2C  SERVICE_CYCLES  [R]  [31:0] service-time counter
 //   0x30  OUTPUT_BR_STATUS[R]  [0] output FIFO overflow, [8:1] FIFO level, [9] FIFO nonempty
 //   0x34  OUTPUT_BR_DROPS [R]  [31:0] output bridge dropped-event count
@@ -155,6 +155,7 @@ module spikemold_config_regs #(
     localparam [4:0] ADDR_OUTPUT_BR_EMITS     = 5'h0F;  // 0x3C
     localparam [4:0] ADDR_PL_BUSY_CYCLES      = 5'h10;  // 0x40
     localparam [4:0] ADDR_OUTPUT_DRAIN_CYCLES = 5'h11;  // 0x44
+    localparam [31:0] SPIKEMOLD_CONFIG_VERSION = 32'h534D3031;  // "SM01"
 
     //=========================================================================
     // AXI4-Lite State Machine
@@ -367,7 +368,7 @@ module spikemold_config_regs #(
                     ADDR_NEURON_SPIKE_CNT:  r_data <= neuron_spike_count;
                     ADDR_STATUS:            r_data <= {23'd0, active_neurons, fifo_overflow};
                     ADDR_THROUGHPUT:        r_data <= throughput_counter;
-                    ADDR_VERSION:           r_data <= 32'h534E4E01;  // "SNN" + v1
+                    ADDR_VERSION:           r_data <= SPIKEMOLD_CONFIG_VERSION;
                     ADDR_SERVICE_CYCLES:    r_data <= service_cycles_counter;
                     ADDR_OUTPUT_BR_STATUS:  r_data <= output_bridge_status;
                     ADDR_OUTPUT_BR_DROPS:   r_data <= output_bridge_drop_count;

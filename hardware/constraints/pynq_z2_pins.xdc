@@ -5,7 +5,7 @@
 ## Author        : Jiwoon Lee (@metr0jw)
 ## Organization  : Kwangwoon University, Seoul, South Korea
 ## Contact       : jwlee@linux.com
-## Description   : Additional constraints for SNN-specific pins
+## Description   : Additional constraints for SpikeMold-specific pins
 ##-----------------------------------------------------------------------------
 
 ## This file only contains constraints for pins actually used by the SpikeMold backend
@@ -15,8 +15,8 @@
 ## Example: If you're using specific pins not in your design, uncomment and modify:
 
 
-## Custom LED assignments for SNN status (if different from default)
-# set_property -dict { PACKAGE_PIN R14   IOSTANDARD LVCMOS33 } [get_ports { snn_status_led[0] }]
+## Custom LED assignments for SpikeMold status (if different from default)
+# set_property -dict { PACKAGE_PIN R14   IOSTANDARD LVCMOS33 } [get_ports { spikemold_status_led[0] }]
 
 
 ## Note: Most pin assignments are already in pynq_z2_v1.0.xdc

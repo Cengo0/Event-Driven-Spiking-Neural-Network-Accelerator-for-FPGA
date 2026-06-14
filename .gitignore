@@ -80,7 +80,6 @@ hardware/hls/_x/
 hardware/hls/vitis_journal.py
 
 # HLS test binaries
-hardware/hls/test/tb_snn_top
 hardware/hls/test/tb_*
 !hardware/hls/test/tb_*.cpp
 
