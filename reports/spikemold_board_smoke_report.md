@@ -53,5 +53,6 @@ spikemold_top_hls_0
 
 ## Next Gate
 
-Run DMA stream smoke through `axi_dma_0`/`axi_dma_1` and compare board output
-words/counters with the SpikePress golden trace contract.
+DMA weight stream smoke is recorded separately in
+`reports/spikemold_dma_weight_smoke_report.md`. Next gate is `axi_dma_0`
+spike-stream smoke and SpikePress golden trace comparison.

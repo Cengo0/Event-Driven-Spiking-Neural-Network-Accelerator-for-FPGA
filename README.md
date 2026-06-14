@@ -66,10 +66,13 @@ Live PYNQ-Z2 board smoke is separate from the board-free verifier gate:
 ```bash
 rtk python scripts/generate_spikemold_board_smoke_report.py
 rtk python scripts/check_spikemold_board_smoke_report.py
+rtk python scripts/generate_spikemold_dma_weight_smoke_report.py
+rtk python scripts/check_spikemold_dma_weight_smoke_report.py
 ```
 
 The current board smoke report proves overlay load, HLS AXI-Lite register
-access, `ap_done`, and `version_reg` readback only. DMA stream output
+access, `ap_done`, and `version_reg` readback. The DMA weight smoke report
+adds `axi_dma_1` weight-load/checkpoint readback proof. Spike input/output
 correctness is the next gate.
 
 ## Minimal SpikePress Example
@@ -104,8 +107,10 @@ throughput, or energy unless a report explicitly records board execution.
 - `scripts/check_verifier_gate.py`: board-free verifier gate checker
 - `scripts/check_spikemold_build_evidence_report.py`: HLS/Vivado build evidence checker
 - `scripts/check_spikemold_board_smoke_report.py`: PYNQ-Z2 board smoke checker
+- `scripts/check_spikemold_dma_weight_smoke_report.py`: PYNQ-Z2 DMA weight smoke checker
 - `scripts/run_spikemold_pynq_one_shot.py`: PYNQ one-shot runtime CLI
 - `scripts/run_spikemold_pynq_hls_register_smoke.py`: current-bitstream PYNQ smoke CLI
+- `scripts/run_spikemold_pynq_dma_weight_smoke.py`: current-bitstream AXI DMA smoke CLI
 - `reports/`: current gate reports
 
 ## License
