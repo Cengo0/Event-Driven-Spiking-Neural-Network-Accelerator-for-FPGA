@@ -116,6 +116,12 @@ data/*
 !data/.gitkeep
 models/*
 !models/.gitkeep
+software/python/data/
+*.pth
+*.pt
+*.onnx
+*.npz
+*.npy
 
 # Outputs are generated build artifacts. Release bundles collect the selected
 # bit/HWH/report set explicitly instead of tracking ad-hoc local outputs.
@@ -134,10 +140,6 @@ notes/
 CLAUDE.md
 AGENTS.md
 .claude/
-
-# Local non-release snapshots. These are operator-only references and must not
-# be committed as active sources.
-archive/
 
 # Local non-release snapshots. These are operator-only references and must not
 # be committed as active sources.
