@@ -12,12 +12,13 @@ module tb_core_group;
     parameter LOCAL_ID_WIDTH     = `SNN_LOCAL_ID_WIDTH;
 
     reg clk = 0;
-    always #5 clk = ~clk;
+    always #6.25 clk = ~clk;
     reg rst_n, enable;
     reg ext_spike_valid;
     reg [LOCAL_ID_WIDTH-1:0] ext_spike_dest_id;
     reg [WEIGHT_WIDTH-1:0] ext_spike_weight;
     reg ext_spike_exc_inh;
+    reg [THRESHOLD_WIDTH-1:0] ext_spike_threshold;
     wire ext_spike_ready;
     wire out_spike_valid;
     wire [LOCAL_ID_WIDTH-1:0] out_spike_neuron_id;
@@ -25,6 +26,14 @@ module tb_core_group;
     reg [THRESHOLD_WIDTH-1:0] global_threshold;
     reg [LEAK_WIDTH-1:0] global_leak_rate;
     reg [REFRAC_WIDTH-1:0] global_refrac_period;
+    reg accumulate_only;
+    reg commit_start;
+    reg [THRESHOLD_WIDTH-1:0] commit_threshold;
+    wire commit_busy;
+    wire commit_done;
+    reg clear_start;
+    wire clear_busy;
+    wire clear_done;
     reg weight_we;
     reg [LOCAL_ID_WIDTH-1:0] weight_src_id, weight_dst_id;
     reg [WEIGHT_WIDTH-1:0] weight_data;
@@ -41,11 +50,16 @@ module tb_core_group;
         .clk(clk), .rst_n(rst_n), .enable(enable),
         .ext_spike_valid(ext_spike_valid), .ext_spike_dest_id(ext_spike_dest_id),
         .ext_spike_weight(ext_spike_weight), .ext_spike_exc_inh(ext_spike_exc_inh),
+        .ext_spike_threshold(ext_spike_threshold),
         .ext_spike_ready(ext_spike_ready),
         .out_spike_valid(out_spike_valid), .out_spike_neuron_id(out_spike_neuron_id),
         .out_spike_ready(out_spike_ready),
         .global_threshold(global_threshold), .global_leak_rate(global_leak_rate),
         .global_refrac_period(global_refrac_period),
+        .accumulate_only(accumulate_only), .commit_start(commit_start),
+        .commit_threshold(commit_threshold), .commit_busy(commit_busy),
+        .commit_done(commit_done), .clear_start(clear_start),
+        .clear_busy(clear_busy), .clear_done(clear_done),
         .weight_we(weight_we), .weight_src_id(weight_src_id),
         .weight_dst_id(weight_dst_id), .weight_data(weight_data),
         .weight_exc(weight_exc),
@@ -84,12 +98,48 @@ module tb_core_group;
     end
     endtask
 
+    task automatic wait_idle;
+        integer t;
+    begin
+        t = 0;
+        while ((u_dut.fifo_count != 0 || u_dut.state != 4'd0) && t < 300000) begin
+            @(posedge clk);
+            t = t + 1;
+        end
+        repeat(2) @(posedge clk);
+    end
+    endtask
+
     task automatic wait_spikes;
         input integer expected;
         integer t;
     begin
         t = 0;
         while (spike_count < expected && t < 300000) begin
+            @(posedge clk);
+            t = t + 1;
+        end
+        repeat(5) @(posedge clk);
+    end
+    endtask
+
+    task automatic wait_commit_done;
+        integer t;
+    begin
+        t = 0;
+        while (!commit_done && t < 300000) begin
+            @(posedge clk);
+            t = t + 1;
+        end
+        repeat(5) @(posedge clk);
+    end
+    endtask
+
+    task automatic wait_clear_done;
+        integer t;
+    begin
+        t = 0;
+        while (!clear_done && t < 300000) begin
             @(posedge clk);
             t = t + 1;
         end
@@ -107,6 +157,7 @@ module tb_core_group;
         ext_spike_dest_id <= dest;
         ext_spike_weight  <= w;
         ext_spike_exc_inh <= exc;
+        ext_spike_threshold <= global_threshold;
         @(posedge clk);
         while (!ext_spike_ready) @(posedge clk);
         ext_spike_valid   <= 0;
@@ -131,8 +182,11 @@ module tb_core_group;
     begin
         rst_n <= 0; enable <= 0;
         ext_spike_valid <= 0; out_spike_ready <= 1;
+        ext_spike_threshold <= 0;
         global_threshold <= 16'd10; global_leak_rate <= 8'd0;
         global_refrac_period <= 8'd5;
+        accumulate_only <= 0; commit_start <= 0; commit_threshold <= 16'd10;
+        clear_start <= 0;
         weight_we <= 0; weight_src_id <= 0; weight_dst_id <= 0;
         weight_data <= 0; weight_exc <= 0;
         repeat(20) @(posedge clk);
@@ -310,6 +364,219 @@ module tb_core_group;
             wait_done;
             check(15, "After leak decay sub-threshold stays sub-thresh", spike_count == sc);
             global_leak_rate <= 8'd0;
+        end
+
+        // TEST 16: Inhibitory input must not be a firing trigger.
+        $display("\n--- Test 16: Inhibitory Cannot Trigger Fire ---");
+        begin : t16
+            reg [15:0] sc;
+            wait_done;
+            sc = spike_count;
+            u_dut.neuron_state_mem[7'd41] = {
+                {{(DATA_WIDTH-5){1'b0}}, 5'd20},
+                {REFRAC_WIDTH{1'b0}}
+            };
+            inject_spike(7'd41, 8'd1, 1'b0);
+            wait_done;
+            check(16, "Inhibitory input does not fire even from high membrane", spike_count == sc);
+        end
+
+        // TEST 17: Recurrent routing must hold a non-zero event when full.
+        $display("\n--- Test 17: Recurrent FIFO Full Hold ---");
+        begin : t17
+            reg [LOCAL_ID_WIDTH-1:0] held_idx;
+            reg [LOCAL_ID_WIDTH-1:0] held_wr_ptr;
+            do_reset;
+            @(negedge clk);
+            u_dut.state = 4'd7;  // ST_INTRA_ROUTE
+            u_dut.wm_dout = {1'b1, {{(WEIGHT_WIDTH-4){1'b0}}, 4'd9}};
+            u_dut.intra_scan_idx = 7'd3;
+            u_dut.fifo_count = SPIKE_BUFFER_DEPTH;
+            held_idx = u_dut.intra_scan_idx;
+            held_wr_ptr = u_dut.fifo_wr_ptr;
+            @(posedge clk);
+            repeat(1) @(negedge clk);
+            check(17, "Full FIFO holds current recurrent event",
+                  u_dut.state == 4'd7 &&
+                  u_dut.intra_scan_idx == held_idx &&
+                  u_dut.fifo_wr_ptr == held_wr_ptr);
+            do_reset;
+        end
+
+        // TEST 18: Accumulate-only suppresses early fire, commit scan emits.
+        $display("\n--- Test 18: Accumulate-Only Commit Scan ---");
+        begin : t18
+            reg [15:0] sc;
+            reg seen_commit_spike;
+            integer i;
+            do_reset;
+            wait_done;
+            sc = spike_count;
+            out_spike_ready <= 0;
+            accumulate_only <= 1;
+            inject_spike(7'd25, 8'd6, 1'b1);
+            wait_done;
+            inject_spike(7'd25, 8'd6, 1'b1);
+            wait_done;
+            check(18, "Accumulate-only prevents early threshold fire", spike_count == sc);
+
+            wait_idle;
+            commit_threshold <= global_threshold;
+            @(posedge clk);
+            commit_start <= 1;
+            @(posedge clk);
+            commit_start <= 0;
+            wait_commit_done;
+
+            seen_commit_spike = 0;
+            for (i = 0; i < 100; i = i + 1) begin
+                @(posedge clk);
+                if (out_spike_valid && out_spike_neuron_id == 7'd25)
+                    seen_commit_spike = 1;
+            end
+            check(19, "Commit scan emits accumulated thresholded neuron",
+                  spike_count == sc + 1 && seen_commit_spike);
+            out_spike_ready <= 1;
+            accumulate_only <= 0;
+            repeat(10) @(posedge clk);
+        end
+
+        // TEST 20: Clear destination group state before commit.
+        $display("\n--- Test 20: Selected Group Clear ---");
+        begin : t20
+            reg [15:0] sc;
+            reg seen_spike;
+            integer i;
+            do_reset;
+            wait_done;
+            sc = spike_count;
+            accumulate_only <= 1;
+            inject_spike(7'd27, 8'd6, 1'b1);
+            wait_done;
+            inject_spike(7'd27, 8'd6, 1'b1);
+            wait_done;
+
+            @(posedge clk);
+            clear_start <= 1;
+            @(posedge clk);
+            clear_start <= 0;
+            wait_clear_done;
+            wait_idle;
+
+            commit_threshold <= global_threshold;
+            @(posedge clk);
+            commit_start <= 1;
+            @(posedge clk);
+            commit_start <= 0;
+            wait_commit_done;
+
+            seen_spike = 0;
+            for (i = 0; i < 100; i = i + 1) begin
+                @(posedge clk);
+                if (out_spike_valid)
+                    seen_spike = 1;
+            end
+            check(20, "Clear removes accumulated membrane before commit",
+                  spike_count == sc && !seen_spike && !clear_busy);
+            accumulate_only <= 0;
+            repeat(10) @(posedge clk);
+        end
+
+        // TEST 21: External FIFO write must exactly follow ext_spike_ready.
+        $display("\n--- Test 21: External Write Matches Ready During Commit ---");
+        begin : t21
+            integer i;
+            integer timeout;
+            reg write_while_not_ready;
+            reg ready_blocked_seen;
+            integer fifo_count_before;
+
+            do_reset;
+            wait_idle;
+            commit_threshold <= global_threshold;
+            @(posedge clk);
+            commit_start <= 1;
+            @(posedge clk);
+            commit_start <= 0;
+
+            timeout = 0;
+            while (!commit_busy && timeout < 1000) begin
+                @(posedge clk);
+                timeout = timeout + 1;
+            end
+
+            fifo_count_before = u_dut.fifo_count;
+            write_while_not_ready = 0;
+            ready_blocked_seen = 0;
+
+            @(negedge clk);
+            ext_spike_valid <= 1;
+            ext_spike_dest_id <= 7'd31;
+            ext_spike_weight <= 8'd1;
+            ext_spike_exc_inh <= 1'b1;
+            ext_spike_threshold <= global_threshold;
+            for (i = 0; i < 5; i = i + 1) begin
+                @(posedge clk);
+                #1;
+                if (!ext_spike_ready)
+                    ready_blocked_seen = 1;
+                if (!ext_spike_ready && u_dut.fifo_count != fifo_count_before)
+                    write_while_not_ready = 1;
+            end
+            @(negedge clk);
+            ext_spike_valid <= 0;
+            wait_commit_done;
+            check(21, "Commit-low ready prevents external FIFO write",
+                  ready_blocked_seen && !write_while_not_ready &&
+                  u_dut.fifo_count == fifo_count_before);
+        end
+
+        // TEST 22: Clear also blocks external writes through the same ready path.
+        $display("\n--- Test 22: External Write Matches Ready During Clear ---");
+        begin : t22
+            integer i;
+            integer timeout;
+            reg write_while_not_ready;
+            reg ready_blocked_seen;
+            integer fifo_count_before;
+
+            do_reset;
+            wait_idle;
+            @(posedge clk);
+            clear_start <= 1;
+            @(posedge clk);
+            clear_start <= 0;
+
+            timeout = 0;
+            while (!clear_busy && timeout < 1000) begin
+                @(posedge clk);
+                timeout = timeout + 1;
+            end
+
+            fifo_count_before = u_dut.fifo_count;
+            write_while_not_ready = 0;
+            ready_blocked_seen = 0;
+
+            @(negedge clk);
+            ext_spike_valid <= 1;
+            ext_spike_dest_id <= 7'd32;
+            ext_spike_weight <= 8'd1;
+            ext_spike_exc_inh <= 1'b1;
+            ext_spike_threshold <= global_threshold;
+            for (i = 0; i < 5; i = i + 1) begin
+                @(posedge clk);
+                #1;
+                if (!ext_spike_ready)
+                    ready_blocked_seen = 1;
+                if (!ext_spike_ready && u_dut.fifo_count != fifo_count_before)
+                    write_while_not_ready = 1;
+            end
+            @(negedge clk);
+            ext_spike_valid <= 0;
+            wait_clear_done;
+            check(22, "Clear-low ready prevents external FIFO write",
+                  ready_blocked_seen && !write_while_not_ready &&
+                  u_dut.fifo_count == fifo_count_before);
         end
 
         $display("\n=========================================================");

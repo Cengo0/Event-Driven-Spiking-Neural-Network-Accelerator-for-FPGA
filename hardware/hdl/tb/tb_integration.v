@@ -34,7 +34,7 @@ module tb_integration;
     reg enable;
 
     initial clk = 0;
-    always #5 clk = ~clk;  // 100 MHz
+    always #6.25 clk = ~clk;  // 80 MHz
 
     //-------------------------------------------------------------------------
     // Wires between modules
@@ -48,6 +48,7 @@ module tb_integration;
     wire [NUM_GROUPS*LOCAL_ID_WIDTH-1:0]        grp_in_dest_id;
     wire [NUM_GROUPS*WEIGHT_WIDTH-1:0]          grp_in_weight;
     wire [NUM_GROUPS-1:0]                       grp_in_exc;
+    wire [NUM_GROUPS*THRESHOLD_WIDTH-1:0]       grp_in_threshold;
     wire [NUM_GROUPS-1:0]                       grp_in_ready;
 
     // Router weight config → core groups
@@ -60,6 +61,13 @@ module tb_integration;
     // Core group status
     wire [NUM_GROUPS*16-1:0]                    grp_spike_count;
     wire [NUM_GROUPS-1:0]                       grp_busy;
+    reg                                         accumulate_only;
+    reg [NUM_GROUPS-1:0]                        commit_start_mask;
+    wire [NUM_GROUPS-1:0]                       commit_busy;
+    wire [NUM_GROUPS-1:0]                       commit_done;
+    reg [NUM_GROUPS-1:0]                        clear_start_mask;
+    wire [NUM_GROUPS-1:0]                       clear_busy;
+    wire [NUM_GROUPS-1:0]                       clear_done;
 
     // Router ↔ CT
     wire                        ct_lookup_en;
@@ -98,6 +106,12 @@ module tb_integration;
 
     wire [31:0]                 routed_spike_count;
     wire                        router_busy;
+    wire [31:0]                 router_ext_invalid_group_count;
+    wire [31:0]                 router_ct_invalid_entry_count;
+    wire [31:0]                 router_ct_invalid_dst_count;
+    wire [31:0]                 router_fanout_scan_count;
+    wire [31:0]                 router_route_miss_count;
+    wire [31:0]                 router_backpressure_stall_count;
 
     //-------------------------------------------------------------------------
     // Host CT config
@@ -160,6 +174,8 @@ module tb_integration;
     //-------------------------------------------------------------------------
     generate
         for (g = 0; g < NUM_GROUPS; g = g + 1) begin : gen_cg
+            assign grp_in_threshold[g*THRESHOLD_WIDTH +: THRESHOLD_WIDTH] = global_threshold;
+
             core_group #(
                 .GROUP_ID           (g),
                 .NEURONS_PER_GROUP  (NEURONS_PER_GROUP),
@@ -177,6 +193,7 @@ module tb_integration;
                 .ext_spike_dest_id  (grp_in_dest_id[g*LOCAL_ID_WIDTH +: LOCAL_ID_WIDTH]),
                 .ext_spike_weight   (grp_in_weight[g*WEIGHT_WIDTH +: WEIGHT_WIDTH]),
                 .ext_spike_exc_inh  (grp_in_exc[g]),
+                .ext_spike_threshold(grp_in_threshold[g*THRESHOLD_WIDTH +: THRESHOLD_WIDTH]),
                 .ext_spike_ready    (grp_in_ready[g]),
                 .out_spike_valid    (grp_spike_valid[g]),
                 .out_spike_neuron_id(grp_spike_neuron_id[g*LOCAL_ID_WIDTH +: LOCAL_ID_WIDTH]),
@@ -184,6 +201,14 @@ module tb_integration;
                 .global_threshold   (global_threshold),
                 .global_leak_rate   (global_leak_rate),
                 .global_refrac_period(global_refrac_period),
+                .accumulate_only    (accumulate_only),
+                .commit_start       (commit_start_mask[g]),
+                .commit_threshold   (global_threshold),
+                .commit_busy        (commit_busy[g]),
+                .commit_done        (commit_done[g]),
+                .clear_start        (clear_start_mask[g]),
+                .clear_busy         (clear_busy[g]),
+                .clear_done         (clear_done[g]),
                 .weight_we          (combined_weight_we[g]),
                 .weight_src_id      (combined_weight_src[g]),
                 .weight_dst_id      (combined_weight_dst[g]),
@@ -215,6 +240,7 @@ module tb_integration;
         .cfg_dst_neuron     (ct_mux_dn),
         .cfg_weight         (ct_mux_w),
         .cfg_exc_inh        (ct_mux_exc),
+        .route_clear_start  (1'b0),
         .lookup_en          (ct_lookup_en),
         .lookup_src_group   (ct_lookup_src_group),
         .lookup_src_neuron  (ct_lookup_src_neuron),
@@ -224,7 +250,12 @@ module tb_integration;
         .result_dst_neuron  (ct_result_dst_neuron),
         .result_weight      (ct_result_weight),
         .result_exc_inh     (ct_result_exc_inh),
-        .result_entry_valid (ct_result_entry_valid)
+        .result_entry_valid (ct_result_entry_valid),
+        .route_clear_busy   (),
+        .route_clear_done   (),
+        .route_entry_count  (),
+        .route_checksum     (),
+        .route_write_error_count()
     );
 
     //-------------------------------------------------------------------------
@@ -290,6 +321,12 @@ module tb_integration;
         .ct_cfg_weight      (ct_cfg_weight),
         .ct_cfg_exc_inh     (ct_cfg_exc_inh),
         .routed_spike_count (routed_spike_count),
+        .router_ext_invalid_group_count(router_ext_invalid_group_count),
+        .router_ct_invalid_entry_count(router_ct_invalid_entry_count),
+        .router_ct_invalid_dst_count(router_ct_invalid_dst_count),
+        .router_fanout_scan_count(router_fanout_scan_count),
+        .router_route_miss_count(router_route_miss_count),
+        .router_backpressure_stall_count(router_backpressure_stall_count),
         .router_busy        (router_busy)
     );
 
@@ -426,8 +463,11 @@ module tb_integration;
         host_weight_src    <= 0;
         host_weight_dst    <= 0;
         host_weight_data   <= 0;
-        host_weight_exc    <= 0;
-        global_threshold   <= 16'd10;
+	        host_weight_exc    <= 0;
+	        accumulate_only    <= 0;
+	        commit_start_mask  <= {NUM_GROUPS{1'b0}};
+	        clear_start_mask   <= {NUM_GROUPS{1'b0}};
+	        global_threshold   <= 16'd10;
         global_leak_rate   <= 8'd0;     // No leak for deterministic testing
         global_refrac_period <= 8'd3;
 
@@ -674,6 +714,118 @@ module tb_integration;
                 check(16, "Stress: at least 5 additional spikes",
                       (sc_sum_after > sc_sum_before + 5));
             end
+        end
+
+        //---------------------------------------------------------------------
+        // TEST 17: All-group accumulate-only commit
+        //---------------------------------------------------------------------
+        $display("\n--- Test 17: All-Group Commit Scan ---");
+        begin : test17_block
+            integer cg;
+            integer wait_i;
+            reg [NUM_GROUPS*16-1:0] before_counts;
+            reg [NUM_GROUPS-1:0] seen_done;
+            reg all_counts_incremented;
+            do_reset;
+            wait_all_idle;
+
+            accumulate_only <= 1;
+            for (cg = 0; cg < NUM_GROUPS; cg = cg + 1) begin
+                before_counts[cg*16 +: 16] = get_grp_spike_count(cg);
+                inject_ext_spike({cg[GROUP_ID_WIDTH-1:0], 4'd2}, 8'd12, 1'b1);
+                wait_all_idle;
+            end
+
+            all_counts_incremented = 0;
+            for (cg = 0; cg < NUM_GROUPS; cg = cg + 1) begin
+                if (get_grp_spike_count(cg) != before_counts[cg*16 +: 16])
+                    all_counts_incremented = 1;
+            end
+            check(17, "All-group accumulate-only has no early fire",
+                  all_counts_incremented == 0);
+
+            seen_done = {NUM_GROUPS{1'b0}};
+            @(posedge clk);
+            commit_start_mask <= {NUM_GROUPS{1'b1}};
+            @(posedge clk);
+            commit_start_mask <= {NUM_GROUPS{1'b0}};
+            for (wait_i = 0; wait_i < 2000; wait_i = wait_i + 1) begin
+                @(posedge clk);
+                seen_done = seen_done | commit_done;
+            end
+            wait_all_idle;
+            repeat (2000) @(posedge clk);
+            wait_all_idle;
+
+            all_counts_incremented = 1;
+            for (cg = 0; cg < NUM_GROUPS; cg = cg + 1) begin
+                if (get_grp_spike_count(cg) != before_counts[cg*16 +: 16] + 1)
+                    all_counts_incremented = 0;
+            end
+            check(18, "All-group commit increments every group once",
+                  all_counts_incremented && seen_done == {NUM_GROUPS{1'b1}});
+            check(19, "All-group commit drains output FIFOs",
+                  grp_spike_valid == {NUM_GROUPS{1'b0}} &&
+                  grp_busy == {NUM_GROUPS{1'b0}} &&
+                  !router_busy);
+            accumulate_only <= 0;
+        end
+
+        //---------------------------------------------------------------------
+        // TEST 20: Selected group clear before commit
+        //---------------------------------------------------------------------
+        $display("\n--- Test 20: Selected Group Clear ---");
+        begin : test20_block
+            integer wait_i;
+            reg [15:0] g1_before;
+            reg [15:0] g2_before;
+            reg [NUM_GROUPS-1:0] seen_clear_done;
+            reg [NUM_GROUPS-1:0] seen_commit_done;
+            do_reset;
+            wait_all_idle;
+
+            accumulate_only <= 1;
+            g1_before = get_grp_spike_count(1);
+            g2_before = get_grp_spike_count(2);
+            inject_ext_spike({2'd1, 4'd3}, 8'd12, 1'b1);
+            wait_all_idle;
+            inject_ext_spike({2'd2, 4'd3}, 8'd12, 1'b1);
+            wait_all_idle;
+            check(20, "Selected-clear setup has no early fire",
+                  get_grp_spike_count(1) == g1_before &&
+                  get_grp_spike_count(2) == g2_before);
+
+            seen_clear_done = {NUM_GROUPS{1'b0}};
+            @(posedge clk);
+            clear_start_mask <= 4'b0010;
+            @(posedge clk);
+            clear_start_mask <= {NUM_GROUPS{1'b0}};
+            for (wait_i = 0; wait_i < 1000; wait_i = wait_i + 1) begin
+                @(posedge clk);
+                seen_clear_done = seen_clear_done | clear_done;
+            end
+            wait_all_idle;
+
+            seen_commit_done = {NUM_GROUPS{1'b0}};
+            @(posedge clk);
+            commit_start_mask <= 4'b0110;
+            @(posedge clk);
+            commit_start_mask <= {NUM_GROUPS{1'b0}};
+            for (wait_i = 0; wait_i < 2000; wait_i = wait_i + 1) begin
+                @(posedge clk);
+                seen_commit_done = seen_commit_done | commit_done;
+            end
+            wait_all_idle;
+            repeat (1000) @(posedge clk);
+            wait_all_idle;
+
+            check(21, "Selected clear suppresses cleared group only",
+                  get_grp_spike_count(1) == g1_before &&
+                  get_grp_spike_count(2) == g2_before + 1 &&
+                  (seen_clear_done & 4'b0010) == 4'b0010 &&
+                  (seen_commit_done & 4'b0110) == 4'b0110 &&
+                  clear_busy == {NUM_GROUPS{1'b0}});
+            accumulate_only <= 0;
         end
 
         //---------------------------------------------------------------------

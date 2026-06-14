@@ -1,14 +1,14 @@
 #-----------------------------------------------------------------------------
-# Title         : PYNQ-Z2 SNN Accelerator Makefile
-# Project       : PYNQ-Z2 SNN Accelerator
+# Title         : SpikeMold + SpikePress Makefile
+# Project       : SpikeMold (HW) + SpikePress (SW)
 # File          : Makefile
 # Author        : Jiwoon Lee (@metr0jw)
 # Organization  : Kwangwoon University, Seoul, South Korea
-# Description   : Top-level Makefile for the complete SNN accelerator project
+# Description   : Top-level Makefile for the SpikeMold/SpikePress research stack
 #-----------------------------------------------------------------------------
 
 # Project information
-PROJECT_NAME = PYNQ-Z2 SNN Accelerator
+PROJECT_NAME = SpikeMold (HW) + SpikePress (SW)
 VERSION = 1.0.0
 AUTHOR = Jiwoon Lee (@metr0jw)
 
@@ -171,7 +171,7 @@ verify-parity:
 	@./scripts/verify_sw_hw_parity.sh
 	@echo "$(GREEN)✅ SW/HW parity verification completed$(RESET)"
 
-# Legacy compatibility
+# Compatibility aliases
 .PHONY: software
 software: install
 

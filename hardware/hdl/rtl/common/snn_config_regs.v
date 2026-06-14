@@ -1,14 +1,14 @@
 //-----------------------------------------------------------------------------
 // Title         : SNN Configuration Register File (AXI4-Lite Slave)
-// Project       : PYNQ-Z2 SNN Accelerator
+// Project       : SpikeMold (HW) + SpikePress (SW)
 // File          : snn_config_regs.v
 // Author        : Jiwoon Lee (@metr0jw)
 // Organization  : Kwangwoon University, Seoul, South Korea
 // Contact       : jwlee@linux.com
 // Description   : AXI4-Lite slave register file for runtime configuration
-//                 of the SNN accelerator's RTL modules (spike router and
+//                 of the SNN accelerator's RTL modules (event routing and
 //                 LIF neuron array). Provides PS-accessible registers for:
-//                 - Router/neuron connectivity programming
+//                 - Fabric/neuron connectivity programming
 //                 - Global neuron parameter tuning
 //                 - Performance monitoring and status readback
 //
@@ -25,12 +25,18 @@
 //   0x24  THROUGHPUT      [R]  [31:0] first-spike latency counter
 //   0x28  VERSION         [R]  [31:0] = 0x534E4E01 ("SNN" + v1)
 //   0x2C  SERVICE_CYCLES  [R]  [31:0] service-time counter
+//   0x30  OUTPUT_BR_STATUS[R]  [0] output FIFO overflow, [8:1] FIFO level, [9] FIFO nonempty
+//   0x34  OUTPUT_BR_DROPS [R]  [31:0] output bridge dropped-event count
+//   0x38  OUTPUT_BR_EVENTS[R]  [31:0] output bridge observed-event count
+//   0x3C  OUTPUT_BR_EMITS [R]  [31:0] output bridge emitted-word count
+//   0x40  PL_BUSY_CYCLES [R]  [31:0] PL/fabric busy-cycle counter
+//   0x44  OUTPUT_DRAIN_CYCLES[R] [31:0] output-drain busy-cycle counter
 //-----------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
 
 module snn_config_regs #(
-    parameter C_S_AXI_ADDR_WIDTH = 6,
+    parameter C_S_AXI_ADDR_WIDTH = 7,
     parameter C_S_AXI_DATA_WIDTH = 32
 )(
     //=========================================================================
@@ -116,27 +122,39 @@ module snn_config_regs #(
     input  wire                              fifo_overflow,
     input  wire [7:0]                        active_neurons,
     input  wire [31:0]                       throughput_counter,
-    input  wire [31:0]                       service_cycles_counter
+    input  wire [31:0]                       service_cycles_counter,
+    input  wire [31:0]                       pl_busy_cycles_counter,
+    input  wire [31:0]                       output_drain_cycles_counter,
+    input  wire [31:0]                       output_bridge_status,
+    input  wire [31:0]                       output_bridge_drop_count,
+    input  wire [31:0]                       output_bridge_event_count,
+    input  wire [31:0]                       output_bridge_emit_count
 );
 
     // AXI4-Lite interface parameters
-    (* X_INTERFACE_PARAMETER = "PROTOCOL AXI4LITE, DATA_WIDTH 32, ADDR_WIDTH 6" *)
+    (* X_INTERFACE_PARAMETER = "PROTOCOL AXI4LITE, DATA_WIDTH 32, ADDR_WIDTH 7" *)
 
     //=========================================================================
-    // Register Address Decode (word-aligned, [5:2] selects register)
+    // Register Address Decode (word-aligned, [6:2] selects register)
     //=========================================================================
-    localparam ADDR_CONFIG_CTRL      = 4'h0;   // 0x00
-    localparam ADDR_CONFIG_ADDR      = 4'h1;   // 0x04
-    localparam ADDR_CONFIG_WDATA     = 4'h2;   // 0x08
-    localparam ADDR_CONFIG_RDATA     = 4'h3;   // 0x0C
-    localparam ADDR_THRESHOLD        = 4'h4;   // 0x10
-    localparam ADDR_NEURON_PARAMS    = 4'h5;   // 0x14
-    localparam ADDR_ROUTER_SPIKE_CNT = 4'h6;   // 0x18
-    localparam ADDR_NEURON_SPIKE_CNT = 4'h7;   // 0x1C
-    localparam ADDR_STATUS           = 4'h8;   // 0x20
-    localparam ADDR_THROUGHPUT       = 4'h9;   // 0x24
-    localparam ADDR_VERSION          = 4'hA;   // 0x28
-    localparam ADDR_SERVICE_CYCLES   = 4'hB;   // 0x2C
+    localparam [4:0] ADDR_CONFIG_CTRL         = 5'h00;  // 0x00
+    localparam [4:0] ADDR_CONFIG_ADDR         = 5'h01;  // 0x04
+    localparam [4:0] ADDR_CONFIG_WDATA        = 5'h02;  // 0x08
+    localparam [4:0] ADDR_CONFIG_RDATA        = 5'h03;  // 0x0C
+    localparam [4:0] ADDR_THRESHOLD           = 5'h04;  // 0x10
+    localparam [4:0] ADDR_NEURON_PARAMS       = 5'h05;  // 0x14
+    localparam [4:0] ADDR_ROUTER_SPIKE_CNT    = 5'h06;  // 0x18
+    localparam [4:0] ADDR_NEURON_SPIKE_CNT    = 5'h07;  // 0x1C
+    localparam [4:0] ADDR_STATUS              = 5'h08;  // 0x20
+    localparam [4:0] ADDR_THROUGHPUT          = 5'h09;  // 0x24
+    localparam [4:0] ADDR_VERSION             = 5'h0A;  // 0x28
+    localparam [4:0] ADDR_SERVICE_CYCLES      = 5'h0B;  // 0x2C
+    localparam [4:0] ADDR_OUTPUT_BR_STATUS    = 5'h0C;  // 0x30
+    localparam [4:0] ADDR_OUTPUT_BR_DROPS     = 5'h0D;  // 0x34
+    localparam [4:0] ADDR_OUTPUT_BR_EVENTS    = 5'h0E;  // 0x38
+    localparam [4:0] ADDR_OUTPUT_BR_EMITS     = 5'h0F;  // 0x3C
+    localparam [4:0] ADDR_PL_BUSY_CYCLES      = 5'h10;  // 0x40
+    localparam [4:0] ADDR_OUTPUT_DRAIN_CYCLES = 5'h11;  // 0x44
 
     //=========================================================================
     // AXI4-Lite State Machine
@@ -233,7 +251,7 @@ module snn_config_regs #(
     // Register Write Logic
     //=========================================================================
     wire write_en = aw_ready && s_axi_awvalid && w_ready && s_axi_wvalid;
-    wire [3:0] write_addr = aw_addr[C_S_AXI_ADDR_WIDTH-1:2];  // Word address
+    wire [4:0] write_addr = aw_addr[C_S_AXI_ADDR_WIDTH-1:2];  // Word address
 
     always @(posedge s_axi_aclk) begin
         if (!s_axi_aresetn) begin
@@ -327,7 +345,7 @@ module snn_config_regs #(
     //=========================================================================
     // Register Read Logic
     //=========================================================================
-    wire [3:0] read_addr = ar_addr[C_S_AXI_ADDR_WIDTH-1:2];
+    wire [4:0] read_addr = ar_addr[C_S_AXI_ADDR_WIDTH-1:2];
 
     always @(posedge s_axi_aclk) begin
         if (!s_axi_aresetn) begin
@@ -351,6 +369,12 @@ module snn_config_regs #(
                     ADDR_THROUGHPUT:        r_data <= throughput_counter;
                     ADDR_VERSION:           r_data <= 32'h534E4E01;  // "SNN" + v1
                     ADDR_SERVICE_CYCLES:    r_data <= service_cycles_counter;
+                    ADDR_OUTPUT_BR_STATUS:  r_data <= output_bridge_status;
+                    ADDR_OUTPUT_BR_DROPS:   r_data <= output_bridge_drop_count;
+                    ADDR_OUTPUT_BR_EVENTS:  r_data <= output_bridge_event_count;
+                    ADDR_OUTPUT_BR_EMITS:   r_data <= output_bridge_emit_count;
+                    ADDR_PL_BUSY_CYCLES:    r_data <= pl_busy_cycles_counter;
+                    ADDR_OUTPUT_DRAIN_CYCLES: r_data <= output_drain_cycles_counter;
                     default:                r_data <= 32'hDEADBEEF;
                 endcase
             end else if (r_valid && s_axi_rready) begin

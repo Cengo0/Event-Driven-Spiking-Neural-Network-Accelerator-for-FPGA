@@ -19,12 +19,13 @@ Author: Jiwoon Lee (@metr0jw)
 
 import argparse
 import math
-import os
 import sys
-from datetime import datetime
 from pathlib import Path
 
 import yaml
+
+
+GENERATED_NOTICE = "Generated deterministically from config/snn_params.yaml"
 
 
 def clog2(n: int) -> int:
@@ -49,6 +50,7 @@ def load_config(config_path: str) -> dict:
 def compute_derived(cfg: dict) -> dict:
     """Compute all derived parameters from base config values."""
     arch = cfg['architecture']
+    router = cfg.get('router', {})
     widths = cfg['widths']
 
     # --- Flexible group sizes ---------------------------------------------------
@@ -83,8 +85,26 @@ def compute_derived(cfg: dict) -> dict:
     d['local_id_width'] = clog2(max_neurons_per_group)
     d['global_id_width'] = d['group_id_width'] + d['local_id_width']
     d['fanout_idx_width'] = clog2(max_fanout_inter)
+    d['router_max_fanout'] = int(router.get('max_fanout', 32))
+    d['router_delay_width'] = int(router.get('delay_width', 8))
+    d['router_mapping_mode'] = str(router.get('mapping_mode', 'table')).strip().lower()
+    d['router_direct_map_windows'] = int(router.get('direct_map_windows', 1))
+    d['router_conn_ram_style'] = str(router.get('conn_ram_style', 'block')).strip().lower()
+    if d['router_mapping_mode'] not in ('table', 'direct_offset', 'hybrid_direct_offset'):
+        raise ValueError("router.mapping_mode must be 'table', 'direct_offset', or 'hybrid_direct_offset'")
+    if d['router_direct_map_windows'] < 1 or d['router_direct_map_windows'] > 16:
+        raise ValueError("router.direct_map_windows must be in [1, 16]")
+    if d['router_max_fanout'] < 1:
+        raise ValueError("router.max_fanout must be >= 1")
+    if d['router_delay_width'] < 1 or d['router_delay_width'] > 8:
+        raise ValueError("router.delay_width must be in [1, 8]")
+    if d['router_conn_ram_style'] not in ('block', 'distributed'):
+        raise ValueError("router.conn_ram_style must be 'block' or 'distributed'")
+    d['router_use_direct_offset_map'] = 1 if d['router_mapping_mode'] in ('direct_offset', 'hybrid_direct_offset') else 0
+    d['router_use_table_fallback'] = 1 if d['router_mapping_mode'] == 'hybrid_direct_offset' else 0
+    d['router_conn_ram_style_dist'] = 1 if d['router_conn_ram_style'] == 'distributed' else 0
 
-    # Aggregate counts (backward compat aliases)
+    # Aggregate counts used by RTL and software generators.
     d['max_neurons'] = total_neurons
 
     # HLS compatibility aliases (hls_neuron_id_width computed after topology)
@@ -143,7 +163,7 @@ def compute_derived(cfg: dict) -> dict:
         d['max_dst_neurons'] = max_dst_neurons
         d['total_logical_neurons'] = ng_id_start[-1]  # sum of all group sizes
     else:
-        # Fallback: no topology defined, use legacy N×N
+        # Fallback: no topology defined, use reference N×N
         d['neuron_groups'] = []
         d['connections'] = []
         d['num_connections'] = 0
@@ -166,6 +186,10 @@ def compute_derived(cfg: dict) -> dict:
     # HLS logical neuron space (NeuronGroups) may be larger (e.g., 4890 → 13 bits).
     logical_bits = clog2(d['total_logical_neurons']) if d['total_logical_neurons'] > 0 else 0
     d['hls_neuron_id_width'] = max(d['global_id_width'], logical_bits)
+    hls_cfg = cfg.get('hls', {})
+    d['hls_learning_enable'] = 1 if hls_cfg.get('learning_enable', True) else 0
+    d['hls_smoke_commands_enable'] = 1 if hls_cfg.get('smoke_commands_enable', True) else 0
+    d['hls_cnn_descriptor_page_enable'] = 1 if hls_cfg.get('cnn_descriptor_page_enable', True) else 0
 
     # Neuron state width (packed BRAM word):
     #   [v_mem(DATA_WIDTH)] [refrac(REFRAC_WIDTH)]
@@ -178,10 +202,71 @@ def compute_derived(cfg: dict) -> dict:
     aux_storage = wm.get('auxiliary_storage', 'bram')
     d['auxiliary_lutram'] = 1 if aux_storage == 'lutram' else 0
 
+    # --- Trace Maintenance (neuromorphic-pure branch) -----------------------
+    tm = cfg.get('trace_maintenance', {})
+    d['trace_maintenance_mode'] = str(tm.get('mode', 'global')).strip().lower()
+    if d['trace_maintenance_mode'] not in ('global', 'active_set'):
+        raise ValueError("trace_maintenance.mode must be 'global' or 'active_set'")
+    d['trace_maintenance_active_set'] = 1 if d['trace_maintenance_mode'] == 'active_set' else 0
+    d['trace_active_clear_threshold'] = int(tm.get('active_clear_threshold', 0))
+    if d['trace_active_clear_threshold'] < 0 or d['trace_active_clear_threshold'] > 255:
+        raise ValueError("trace_maintenance.active_clear_threshold must be in [0, 255]")
+
     # Packed buffer size: ceil(max_weight_buffer_size * weight_bits / 8)
     wb = d['weight_bits']
     total_bits = d['max_weight_buffer_size'] * wb
     d['packed_buffer_bytes'] = (total_bits + 7) // 8
+
+    # --- Weight Tiling (future large-projection residency) --------------------
+    wt = cfg.get('weight_tiling', {})
+    d['weight_tiling_enable'] = 1 if wt.get('enable', False) else 0
+    d['weight_tiling_large_only'] = 1 if wt.get('large_only', True) else 0
+    d['weight_tiling_large_conn_min_weights'] = int(wt.get('large_conn_min_weights', 65536))
+    d['weight_tiling_src_chunk'] = int(wt.get('src_chunk', 196))
+    d['weight_tiling_dst_chunk'] = int(wt.get('dst_chunk', 128))
+    d['weight_tiling_double_buffer'] = 1 if wt.get('double_buffer', False) else 0
+    if d['weight_tiling_large_conn_min_weights'] < 1:
+        raise ValueError("weight_tiling.large_conn_min_weights must be >= 1")
+    if d['weight_tiling_src_chunk'] < 1:
+        raise ValueError("weight_tiling.src_chunk must be >= 1")
+    if d['weight_tiling_dst_chunk'] < 1:
+        raise ValueError("weight_tiling.dst_chunk must be >= 1")
+    d['weight_tiling_active_buffers'] = 2 if d['weight_tiling_double_buffer'] else 1
+    d['weight_tiling_active_tile_weights'] = (
+        d['weight_tiling_src_chunk'] *
+        d['weight_tiling_dst_chunk'] *
+        d['weight_tiling_active_buffers']
+    )
+    d['weight_tiling_active_tile_bytes'] = (
+        d['weight_tiling_active_tile_weights'] * d['weight_bits'] + 7
+    ) // 8
+
+    resident_offset = 0
+    resident_weight_entries = 0
+    tiled_weight_entries = 0
+    for conn in d.get('connections', []):
+        tiled = bool(
+            d['weight_tiling_enable'] and
+            (
+                not d['weight_tiling_large_only'] or
+                int(conn['num_weights']) >= d['weight_tiling_large_conn_min_weights']
+            )
+        )
+        conn['tiled'] = 1 if tiled else 0
+        if tiled:
+            conn['resident_weight_offset'] = -1
+            tiled_weight_entries += int(conn['num_weights'])
+        else:
+            conn['resident_weight_offset'] = resident_offset
+            resident_offset += int(conn['num_weights'])
+            resident_weight_entries += int(conn['num_weights'])
+
+    if not d.get('connections'):
+        resident_weight_entries = d['max_weight_buffer_size']
+
+    d['resident_weight_logical_entries'] = resident_weight_entries
+    d['resident_weight_buffer_size'] = max(1, resident_weight_entries)
+    d['tiled_weight_entries'] = tiled_weight_entries
 
     return d
 
@@ -202,16 +287,14 @@ def generate_verilog(cfg: dict, derived: dict) -> str:
     widths = cfg['widths']
     weights = cfg['weights']
     hls = cfg['hls']
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
     num_groups = derived['num_groups']
     group_sizes = derived['group_sizes']
     max_npg = derived['max_neurons_per_group']
 
     lines = [
         f'// =============================================================================',
-        f'// SNN Accelerator Parameters — AUTO-GENERATED from snn_params.yaml',
-        f'// Generated: {timestamp}',
+        f'// SpikeMold Fabric Parameters - AUTO-GENERATED from snn_params.yaml',
+        f'// {GENERATED_NOTICE}',
         f'// DO NOT EDIT — modify config/snn_params.yaml and run generate_params.py',
         f'// =============================================================================',
         f'',
@@ -223,6 +306,12 @@ def generate_verilog(cfg: dict, derived: dict) -> str:
         f'`define SNN_NEURONS_PER_GROUP   {max_npg}   // max(group_sizes) — bus width driver',
         f'`define SNN_MAX_NEURONS_PER_GROUP {max_npg}',
         f'`define SNN_MAX_FANOUT_INTER    {arch["max_fanout_inter"]}',
+        f'`define SNN_ROUTER_MAX_FANOUT   {derived["router_max_fanout"]}',
+        f'`define SNN_ROUTER_DELAY_WIDTH  {derived["router_delay_width"]}',
+        f'`define SNN_ROUTER_USE_DIRECT_OFFSET_MAP {derived["router_use_direct_offset_map"]}',
+        f'`define SNN_ROUTER_USE_TABLE_FALLBACK {derived["router_use_table_fallback"]}',
+        f'`define SNN_ROUTER_DIRECT_MAP_WINDOWS {derived["router_direct_map_windows"]}',
+        f'`define SNN_ROUTER_CONN_RAM_STYLE_DIST {derived["router_conn_ram_style_dist"]}',
         f'`define SNN_SPIKE_BUFFER_DEPTH  {arch["spike_buffer_depth"]}',
     ]
 
@@ -266,9 +355,15 @@ def generate_verilog(cfg: dict, derived: dict) -> str:
         f'`define SNN_HLS_NEURON_ID_WIDTH {derived["hls_neuron_id_width"]}',
         f'`define SNN_HLS_MAX_NEURONS     {derived["hls_max_neurons"]}',
         f'`define SNN_HLS_WEIGHT_WIDTH    {hls["hls_weight_width"]}',
+        f'`define SNN_HLS_LEARNING_ENABLE {derived["hls_learning_enable"]}',
+        f'`define SNN_HLS_SMOKE_COMMANDS_ENABLE {derived["hls_smoke_commands_enable"]}',
+        f'`define SNN_HLS_CNN_DESCRIPTOR_PAGE_ENABLE {derived["hls_cnn_descriptor_page_enable"]}',
         f'',
         f'// ─── NeuronGroup Weight Buffer ─────────────────────────────────────',
         f'`define SNN_MAX_WEIGHT_BUFFER_SIZE {derived["max_weight_buffer_size"]}',
+        f'`define SNN_RESIDENT_WEIGHT_BUFFER_SIZE {derived["resident_weight_buffer_size"]}',
+        f'`define SNN_RESIDENT_WEIGHT_LOGICAL_ENTRIES {derived["resident_weight_logical_entries"]}',
+        f'`define SNN_TILED_WEIGHT_ENTRIES {derived["tiled_weight_entries"]}',
         f'`define SNN_NUM_CONNECTIONS       {derived["num_connections"]}',
         f'`define SNN_NUM_NEURON_GROUPS     {derived["num_neuron_groups"]}',
         f'',
@@ -276,7 +371,20 @@ def generate_verilog(cfg: dict, derived: dict) -> str:
         f'`define SNN_WEIGHT_BITS           {derived["weight_bits"]}',
         f'`define SNN_TIME_EMBEDDING        {derived["time_embedding"]}',
         f'`define SNN_AUXILIARY_LUTRAM      {derived["auxiliary_lutram"]}',
+        f'`define SNN_TRACE_MAINTENANCE_ACTIVE_SET {derived["trace_maintenance_active_set"]}',
+        f'`define SNN_TRACE_ACTIVE_CLEAR_THRESHOLD {derived["trace_active_clear_threshold"]}',
         f'`define SNN_PACKED_BUFFER_BYTES   {derived["packed_buffer_bytes"]}',
+        f'',
+        f'// ─── Weight Tiling (future large-network path) ───────────────────',
+        f'`define SNN_WEIGHT_TILING_ENABLE  {derived["weight_tiling_enable"]}',
+        f'`define SNN_WEIGHT_TILING_LARGE_ONLY {derived["weight_tiling_large_only"]}',
+        f'`define SNN_WEIGHT_TILING_LARGE_CONN_MIN_WEIGHTS {derived["weight_tiling_large_conn_min_weights"]}',
+        f'`define SNN_WEIGHT_TILING_SRC_CHUNK {derived["weight_tiling_src_chunk"]}',
+        f'`define SNN_WEIGHT_TILING_DST_CHUNK {derived["weight_tiling_dst_chunk"]}',
+        f'`define SNN_WEIGHT_TILING_DOUBLE_BUFFER {derived["weight_tiling_double_buffer"]}',
+        f'`define SNN_WEIGHT_TILING_ACTIVE_BUFFERS {derived["weight_tiling_active_buffers"]}',
+        f'`define SNN_WEIGHT_TILING_ACTIVE_TILE_WEIGHTS {derived["weight_tiling_active_tile_weights"]}',
+        f'`define SNN_WEIGHT_TILING_ACTIVE_TILE_BYTES {derived["weight_tiling_active_tile_bytes"]}',
         f'',
         f'`endif // SNN_PARAMS_VH',
     ]
@@ -294,25 +402,30 @@ def generate_python(cfg: dict, derived: dict) -> str:
     weights = cfg['weights']
     hls = cfg['hls']
     target = cfg['target']
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
     num_groups = derived['num_groups']
     group_sizes = derived['group_sizes']
     max_npg = derived['max_neurons_per_group']
 
     lines = [
         f'"""',
-        f'SNN Accelerator Parameters — AUTO-GENERATED from snn_params.yaml',
+        f'SpikeMold Fabric Parameters - AUTO-GENERATED from snn_params.yaml',
         f'',
-        f'Generated: {timestamp}',
+        GENERATED_NOTICE,
         f'DO NOT EDIT — modify config/snn_params.yaml and run generate_params.py',
         f'"""',
         f'',
         f'# ─── Core Architecture ─────────────────────────────────────────────',
         f'NUM_GROUPS          = {num_groups}',
-        f'NEURONS_PER_GROUP   = {max_npg}   # max(GROUP_SIZES) — backward compat',
+        f'NEURONS_PER_GROUP   = {max_npg}   # max(GROUP_SIZES)',
         f'MAX_NEURONS_PER_GROUP = {max_npg}',
         f'MAX_FANOUT_INTER    = {arch["max_fanout_inter"]}',
+        f'ROUTER_MAX_FANOUT   = {derived["router_max_fanout"]}',
+        f'ROUTER_DELAY_WIDTH  = {derived["router_delay_width"]}',
+        f'ROUTER_USE_DIRECT_OFFSET_MAP = {derived["router_use_direct_offset_map"]}',
+        f'ROUTER_USE_TABLE_FALLBACK = {derived["router_use_table_fallback"]}',
+        f'ROUTER_DIRECT_MAP_WINDOWS = {derived["router_direct_map_windows"]}',
+        f'ROUTER_CONN_RAM_STYLE = "{derived["router_conn_ram_style"]}"',
+        f'ROUTER_CONN_RAM_STYLE_DIST = {derived["router_conn_ram_style_dist"]}',
         f'SPIKE_BUFFER_DEPTH  = {arch["spike_buffer_depth"]}',
         f'',
         f'# ─── Per-Group Neuron Counts ────────────────────────────────────────',
@@ -347,6 +460,9 @@ def generate_python(cfg: dict, derived: dict) -> str:
         f'HLS_NEURON_ID_WIDTH = {derived["hls_neuron_id_width"]}',
         f'HLS_MAX_NEURONS     = {derived["hls_max_neurons"]}',
         f'HLS_WEIGHT_WIDTH    = {hls["hls_weight_width"]}',
+        f'HLS_LEARNING_ENABLE = {derived["hls_learning_enable"]}',
+        f'HLS_SMOKE_COMMANDS_ENABLE = {derived["hls_smoke_commands_enable"]}',
+        f'HLS_CNN_DESCRIPTOR_PAGE_ENABLE = {derived["hls_cnn_descriptor_page_enable"]}',
         f'NEURON_ID_WIDTH     = GLOBAL_ID_WIDTH  # Alias',
         f'',
     ]
@@ -362,6 +478,9 @@ def generate_python(cfg: dict, derived: dict) -> str:
             f'NUM_NEURON_GROUPS       = {derived["num_neuron_groups"]}',
             f'NUM_CONNECTIONS         = {derived["num_connections"]}',
             f'MAX_WEIGHT_BUFFER_SIZE  = {derived["max_weight_buffer_size"]}',
+            f'RESIDENT_WEIGHT_BUFFER_SIZE = {derived["resident_weight_buffer_size"]}',
+            f'RESIDENT_WEIGHT_LOGICAL_ENTRIES = {derived["resident_weight_logical_entries"]}',
+            f'TILED_WEIGHT_ENTRIES    = {derived["tiled_weight_entries"]}',
             f'MAX_SRC_NEURONS         = {derived["max_src_neurons"]}',
             f'MAX_DST_NEURONS         = {derived["max_dst_neurons"]}',
             f'TOTAL_LOGICAL_NEURONS   = {derived["total_logical_neurons"]}',
@@ -377,6 +496,8 @@ def generate_python(cfg: dict, derived: dict) -> str:
             lines.append(f'    {{"name": "{c["name"]}", "src_group": {c["src_group"]}, '
                          f'"dst_group": {c["dst_group"]}, "src_size": {c["src_size"]}, '
                          f'"dst_size": {c["dst_size"]}, "weight_offset": {c["weight_offset"]}, '
+                         f'"resident_weight_offset": {c["resident_weight_offset"]}, '
+                         f'"tiled": {bool(c["tiled"])}, '
                          f'"num_weights": {c["num_weights"]}, '
                          f'"src_id_start": {c["src_id_start"]}, '
                          f'"dst_id_start": {c["dst_id_start"]}}},')
@@ -386,8 +507,11 @@ def generate_python(cfg: dict, derived: dict) -> str:
         ]
     else:
         lines += [
-            f'# ─── Legacy N×N weight memory (no connection topology) ─────────────',
+            f'# ─── Reference N×N weight memory (no connection topology) ─────────────',
             f'MAX_WEIGHT_BUFFER_SIZE  = {derived["max_weight_buffer_size"]}',
+            f'RESIDENT_WEIGHT_BUFFER_SIZE = {derived["resident_weight_buffer_size"]}',
+            f'RESIDENT_WEIGHT_LOGICAL_ENTRIES = {derived["resident_weight_logical_entries"]}',
+            f'TILED_WEIGHT_ENTRIES    = {derived["tiled_weight_entries"]}',
             f'NUM_CONNECTIONS         = 0',
             f'NUM_NEURON_GROUPS       = 0',
             f'CONNECTIONS             = []',
@@ -402,10 +526,10 @@ def generate_python(cfg: dict, derived: dict) -> str:
         f'FIXED_POINT_FRAC_BITS = {hls["fixed_point_frac_bits"]}',
         f'FIXED_POINT_SCALE     = 1 << FIXED_POINT_FRAC_BITS  # {1 << hls["fixed_point_frac_bits"]}',
         f'',
-        f'# ─── Legacy 8-bit weight constants (backward compat) ──────────────',
-        f'LEGACY_MAX_WEIGHT   = 127',
-        f'LEGACY_MIN_WEIGHT   = -128',
-        f'LEGACY_WEIGHT_SCALE = 128',
+        f'# ─── Reference signed 8-bit packed weight constants ──────────────',
+        f'REFERENCE_MAX_WEIGHT = 127',
+        f'REFERENCE_MIN_WEIGHT = -128',
+        f'REFERENCE_WEIGHT_SCALE = 128',
         f'WEIGHT_SCALE        = {1 << widths["weight_width"]}',
         f'',
         f'# ─── Weight Memory Optimization (Loihi/TrueNorth/KIST) ──────────',
@@ -414,7 +538,21 @@ def generate_python(cfg: dict, derived: dict) -> str:
         f'PACKED_MIN_WEIGHT       = {-(1 << (derived["weight_bits"] - 1))}',
         f'TIME_EMBEDDING          = {derived["time_embedding"]}',
         f'AUXILIARY_LUTRAM         = {derived["auxiliary_lutram"]}',
+        f'TRACE_MAINTENANCE_MODE  = "{derived["trace_maintenance_mode"]}"',
+        f'TRACE_MAINTENANCE_ACTIVE_SET = {derived["trace_maintenance_active_set"]}',
+        f'TRACE_ACTIVE_CLEAR_THRESHOLD = {derived["trace_active_clear_threshold"]}',
         f'PACKED_BUFFER_BYTES     = {derived["packed_buffer_bytes"]}',
+        f'',
+        f'# ─── Weight Tiling (future large-network path) ──────────────────',
+        f'WEIGHT_TILING_ENABLE            = {derived["weight_tiling_enable"]}',
+        f'WEIGHT_TILING_LARGE_ONLY        = {derived["weight_tiling_large_only"]}',
+        f'WEIGHT_TILING_LARGE_CONN_MIN_WEIGHTS = {derived["weight_tiling_large_conn_min_weights"]}',
+        f'WEIGHT_TILING_SRC_CHUNK         = {derived["weight_tiling_src_chunk"]}',
+        f'WEIGHT_TILING_DST_CHUNK         = {derived["weight_tiling_dst_chunk"]}',
+        f'WEIGHT_TILING_DOUBLE_BUFFER     = {derived["weight_tiling_double_buffer"]}',
+        f'WEIGHT_TILING_ACTIVE_BUFFERS    = {derived["weight_tiling_active_buffers"]}',
+        f'WEIGHT_TILING_ACTIVE_TILE_WEIGHTS = {derived["weight_tiling_active_tile_weights"]}',
+        f'WEIGHT_TILING_ACTIVE_TILE_BYTES = {derived["weight_tiling_active_tile_bytes"]}',
         f'',
         f'# ─── FPGA Target ──────────────────────────────────────────────────',
         f'FPGA_PART           = "{target["fpga_part"]}"',
@@ -439,15 +577,13 @@ def generate_hls(cfg: dict, derived: dict) -> str:
     widths = cfg['widths']
     weights = cfg['weights']
     hls = cfg['hls']
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
     num_groups = derived['num_groups']
     max_npg = derived['max_neurons_per_group']
 
     lines = [
         f'// =============================================================================',
-        f'// SNN Accelerator Parameters — AUTO-GENERATED from snn_params.yaml',
-        f'// Generated: {timestamp}',
+        f'// SpikeMold Fabric Parameters - AUTO-GENERATED from snn_params.yaml',
+        f'// {GENERATED_NOTICE}',
         f'// DO NOT EDIT — modify config/snn_params.yaml and run generate_params.py',
         f'// =============================================================================',
         f'',
@@ -459,6 +595,12 @@ def generate_hls(cfg: dict, derived: dict) -> str:
         f'const int SNN_NEURONS_PER_GROUP     = {max_npg};  // max(group_sizes)',
         f'const int SNN_MAX_NEURONS_PER_GROUP = {max_npg};',
         f'const int SNN_MAX_FANOUT_INTER      = {arch["max_fanout_inter"]};',
+        f'const int SNN_ROUTER_MAX_FANOUT     = {derived["router_max_fanout"]};',
+        f'const int SNN_ROUTER_DELAY_WIDTH    = {derived["router_delay_width"]};',
+        f'const int SNN_ROUTER_USE_DIRECT_OFFSET_MAP = {derived["router_use_direct_offset_map"]};',
+        f'const int SNN_ROUTER_USE_TABLE_FALLBACK = {derived["router_use_table_fallback"]};',
+        f'const int SNN_ROUTER_DIRECT_MAP_WINDOWS = {derived["router_direct_map_windows"]};',
+        f'const int SNN_ROUTER_CONN_RAM_STYLE_DIST = {derived["router_conn_ram_style_dist"]};',
         f'const int SNN_SPIKE_BUFFER_DEPTH    = {arch["spike_buffer_depth"]};',
         f'const int SNN_TOTAL_NEURONS         = {derived["total_neurons"]};',
         f'',
@@ -490,6 +632,15 @@ def generate_hls(cfg: dict, derived: dict) -> str:
         f'const int SNN_HLS_NEURON_ID_WIDTH = {derived["hls_neuron_id_width"]};',
         f'const int SNN_HLS_MAX_NEURONS     = {derived["hls_max_neurons"]};',
         f'const int SNN_HLS_WEIGHT_WIDTH    = {hls["hls_weight_width"]};',
+        f'#ifndef SNN_HLS_LEARNING_ENABLE',
+        f'#define SNN_HLS_LEARNING_ENABLE {derived["hls_learning_enable"]}',
+        f'#endif',
+        f'#ifndef SNN_HLS_SMOKE_COMMANDS_ENABLE',
+        f'#define SNN_HLS_SMOKE_COMMANDS_ENABLE {derived["hls_smoke_commands_enable"]}',
+        f'#endif',
+        f'#ifndef SNN_HLS_CNN_DESCRIPTOR_PAGE_ENABLE',
+        f'#define SNN_HLS_CNN_DESCRIPTOR_PAGE_ENABLE {derived["hls_cnn_descriptor_page_enable"]}',
+        f'#endif',
         f'',
     ]
 
@@ -506,6 +657,9 @@ def generate_hls(cfg: dict, derived: dict) -> str:
             f'#define SNN_NUM_NEURON_GROUPS_PP      {derived["num_neuron_groups"]}',
             f'#define SNN_NUM_CONNECTIONS_PP         {derived["num_connections"]}',
             f'const int SNN_MAX_WEIGHT_BUFFER_SIZE  = {derived["max_weight_buffer_size"]};',
+            f'const int SNN_RESIDENT_WEIGHT_BUFFER_SIZE = {derived["resident_weight_buffer_size"]};',
+            f'const int SNN_RESIDENT_WEIGHT_LOGICAL_ENTRIES = {derived["resident_weight_logical_entries"]};',
+            f'const int SNN_TILED_WEIGHT_ENTRIES    = {derived["tiled_weight_entries"]};',
             f'const int SNN_MAX_SRC_NEURONS         = {derived["max_src_neurons"]};',
             f'const int SNN_MAX_DST_NEURONS         = {derived["max_dst_neurons"]};',
             f'const int SNN_TOTAL_LOGICAL_NEURONS   = {derived["total_logical_neurons"]};',
@@ -527,14 +681,19 @@ def generate_hls(cfg: dict, derived: dict) -> str:
             lines.append(f'const int SNN_CONN_{i}_SRC_SIZE       = {c["src_size"]};')
             lines.append(f'const int SNN_CONN_{i}_DST_SIZE       = {c["dst_size"]};')
             lines.append(f'const int SNN_CONN_{i}_WEIGHT_OFFSET  = {c["weight_offset"]};')
+            lines.append(f'const int SNN_CONN_{i}_RESIDENT_WEIGHT_OFFSET = {c["resident_weight_offset"]};')
+            lines.append(f'const int SNN_CONN_{i}_TILED          = {c["tiled"]};')
             lines.append(f'const int SNN_CONN_{i}_NUM_WEIGHTS    = {c["num_weights"]};')
             lines.append(f'const int SNN_CONN_{i}_SRC_ID_START   = {c["src_id_start"]};')
             lines.append(f'const int SNN_CONN_{i}_DST_ID_START   = {c["dst_id_start"]};')
             lines.append(f'')
     else:
         lines += [
-            f'// ─── Legacy N×N weight memory (no connection topology defined) ─',
+            f'// ─── Reference N×N weight memory (no connection topology defined) ─',
             f'const int SNN_MAX_WEIGHT_BUFFER_SIZE  = {derived["max_weight_buffer_size"]};',
+            f'const int SNN_RESIDENT_WEIGHT_BUFFER_SIZE = {derived["resident_weight_buffer_size"]};',
+            f'const int SNN_RESIDENT_WEIGHT_LOGICAL_ENTRIES = {derived["resident_weight_logical_entries"]};',
+            f'const int SNN_TILED_WEIGHT_ENTRIES    = {derived["tiled_weight_entries"]};',
             f'const int SNN_NUM_CONNECTIONS         = 0;',
             f'const int SNN_NUM_NEURON_GROUPS       = 0;',
             f'#define SNN_NUM_NEURON_GROUPS_PP      0',
@@ -547,7 +706,20 @@ def generate_hls(cfg: dict, derived: dict) -> str:
         f'#define SNN_WEIGHT_BITS           {derived["weight_bits"]}',
         f'#define SNN_TIME_EMBEDDING        {derived["time_embedding"]}',
         f'#define SNN_AUXILIARY_LUTRAM      {derived["auxiliary_lutram"]}',
+        f'#define SNN_TRACE_MAINTENANCE_ACTIVE_SET {derived["trace_maintenance_active_set"]}',
+        f'#define SNN_TRACE_ACTIVE_CLEAR_THRESHOLD {derived["trace_active_clear_threshold"]}',
         f'const int SNN_PACKED_BUFFER_BYTES = {derived["packed_buffer_bytes"]};',
+        f'',
+        f'// ─── Weight Tiling (future large-network path) ───────────────────',
+        f'#define SNN_WEIGHT_TILING_ENABLE {derived["weight_tiling_enable"]}',
+        f'#define SNN_WEIGHT_TILING_LARGE_ONLY {derived["weight_tiling_large_only"]}',
+        f'#define SNN_WEIGHT_TILING_LARGE_CONN_MIN_WEIGHTS {derived["weight_tiling_large_conn_min_weights"]}',
+        f'#define SNN_WEIGHT_TILING_SRC_CHUNK {derived["weight_tiling_src_chunk"]}',
+        f'#define SNN_WEIGHT_TILING_DST_CHUNK {derived["weight_tiling_dst_chunk"]}',
+        f'#define SNN_WEIGHT_TILING_DOUBLE_BUFFER {derived["weight_tiling_double_buffer"]}',
+        f'#define SNN_WEIGHT_TILING_ACTIVE_BUFFERS {derived["weight_tiling_active_buffers"]}',
+        f'#define SNN_WEIGHT_TILING_ACTIVE_TILE_WEIGHTS {derived["weight_tiling_active_tile_weights"]}',
+        f'#define SNN_WEIGHT_TILING_ACTIVE_TILE_BYTES {derived["weight_tiling_active_tile_bytes"]}',
         f'',
         f'// ─── Fixed-Point (ap_fixed<16,8>) ─────────────────────────────────',
         f'const int SNN_FIXED_POINT_FRAC_BITS = {hls["fixed_point_frac_bits"]};',
@@ -599,7 +771,7 @@ def main():
 
     # Print summary
     arch = cfg['architecture']
-    print(f"SNN Parameter Generator")
+    print("SpikeMold Parameter Generator")
     print(f"  Config: {config_path}")
     print(f"  Output: {out_dir}/")
     group_sizes = derived['group_sizes']

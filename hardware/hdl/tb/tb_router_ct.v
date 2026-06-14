@@ -21,6 +21,8 @@ module tb_router_ct;
     parameter LOCAL_ID_WIDTH    = `SNN_LOCAL_ID_WIDTH;
     parameter GLOBAL_ID_WIDTH   = `SNN_GLOBAL_ID_WIDTH;
     parameter FANOUT_IDX_WIDTH  = `SNN_FANOUT_IDX_WIDTH;
+    localparam CT_ADDR_WIDTH    = GROUP_ID_WIDTH + LOCAL_ID_WIDTH + FANOUT_IDX_WIDTH;
+    localparam CT_DATA_WIDTH    = 1 + GROUP_ID_WIDTH + LOCAL_ID_WIDTH + WEIGHT_WIDTH + 1;
 
     //-------------------------------------------------------------------------
     // Clock / Reset
@@ -30,7 +32,7 @@ module tb_router_ct;
     reg enable;
 
     initial clk = 0;
-    always #5 clk = ~clk;  // 100 MHz
+    always #6.25 clk = ~clk;  // 80 MHz
 
     //-------------------------------------------------------------------------
     // Router Signals
@@ -83,6 +85,12 @@ module tb_router_ct;
     wire [WEIGHT_WIDTH-1:0]     ct_result_weight;
     wire                        ct_result_exc_inh;
     wire                        ct_result_entry_valid;
+    reg                         route_clear_start;
+    wire                        route_clear_busy;
+    wire                        route_clear_done;
+    wire [31:0]                 route_entry_count;
+    wire [31:0]                 route_checksum;
+    wire [31:0]                 route_write_error_count;
 
     // Router weight/CT config passthrough
     wire [NUM_GROUPS-1:0]       grp_weight_we;
@@ -102,7 +110,15 @@ module tb_router_ct;
     wire                        ct_cfg_exc_inh;
 
     wire [31:0]                 routed_spike_count;
+    wire [31:0]                 router_ext_invalid_group_count;
+    wire [31:0]                 router_ct_invalid_entry_count;
+    wire [31:0]                 router_ct_invalid_dst_count;
+    wire [31:0]                 router_fanout_scan_count;
+    wire [31:0]                 router_route_miss_count;
+    wire [31:0]                 router_backpressure_stall_count;
     wire                        router_busy;
+    integer                     expected_route_entry_count;
+    reg [31:0]                  expected_route_checksum;
 
     //-------------------------------------------------------------------------
     // Direct CT config signals (host/testbench driven)
@@ -201,6 +217,12 @@ module tb_router_ct;
         .ct_cfg_exc_inh     (ct_cfg_exc_inh),
 
         .routed_spike_count (routed_spike_count),
+        .router_ext_invalid_group_count(router_ext_invalid_group_count),
+        .router_ct_invalid_entry_count(router_ct_invalid_entry_count),
+        .router_ct_invalid_dst_count(router_ct_invalid_dst_count),
+        .router_fanout_scan_count(router_fanout_scan_count),
+        .router_route_miss_count(router_route_miss_count),
+        .router_backpressure_stall_count(router_backpressure_stall_count),
         .router_busy        (router_busy)
     );
 
@@ -225,6 +247,7 @@ module tb_router_ct;
         .cfg_dst_neuron     (ct_wr_dst_n),
         .cfg_weight         (ct_wr_w),
         .cfg_exc_inh        (ct_wr_exc),
+        .route_clear_start  (route_clear_start),
 
         .lookup_en          (ct_lookup_en),
         .lookup_src_group   (ct_lookup_src_group),
@@ -236,7 +259,12 @@ module tb_router_ct;
         .result_dst_neuron  (ct_result_dst_neuron),
         .result_weight      (ct_result_weight),
         .result_exc_inh     (ct_result_exc_inh),
-        .result_entry_valid (ct_result_entry_valid)
+        .result_entry_valid (ct_result_entry_valid),
+        .route_clear_busy   (route_clear_busy),
+        .route_clear_done   (route_clear_done),
+        .route_entry_count  (route_entry_count),
+        .route_checksum     (route_checksum),
+        .route_write_error_count(route_write_error_count)
     );
 
     //-------------------------------------------------------------------------
@@ -293,6 +321,57 @@ module tb_router_ct;
         host_ct_exc_inh    <= exc;
         @(posedge clk);
         host_ct_we <= 0;
+        if (v) begin
+            expected_route_entry_count = expected_route_entry_count + 1;
+            expected_route_checksum = expected_route_checksum +
+                                      ct_checksum_word(sg, sn, fi, v, dg, dn, w, exc);
+        end
+    end
+    endtask
+
+    function [31:0] ct_checksum_word;
+        input [GROUP_ID_WIDTH-1:0]   sg;
+        input [LOCAL_ID_WIDTH-1:0]   sn;
+        input [FANOUT_IDX_WIDTH-1:0] fi;
+        input                        v;
+        input [GROUP_ID_WIDTH-1:0]   dg;
+        input [LOCAL_ID_WIDTH-1:0]   dn;
+        input [WEIGHT_WIDTH-1:0]     w;
+        input                        exc;
+        reg [CT_ADDR_WIDTH-1:0]      addr_word;
+        reg [CT_DATA_WIDTH-1:0]      data_word;
+    begin
+        addr_word = {sg, sn, fi};
+        data_word = {v, dg, dn, w, exc};
+        ct_checksum_word = {
+            {(32-CT_ADDR_WIDTH){1'b0}},
+            addr_word
+        } + {
+            {(32-CT_DATA_WIDTH){1'b0}},
+            data_word
+        };
+    end
+    endfunction
+
+    task automatic start_route_clear;
+    begin
+        @(posedge clk);
+        route_clear_start <= 1'b1;
+        @(posedge clk);
+        route_clear_start <= 1'b0;
+    end
+    endtask
+
+    task automatic wait_route_clear_done;
+        integer timeout;
+    begin
+        timeout = 0;
+        while (!route_clear_done && timeout < 40000) begin
+            @(posedge clk);
+            timeout = timeout + 1;
+        end
+        if (timeout >= 40000)
+            $display("[WARN] wait_route_clear_done timed out");
     end
     endtask
 
@@ -331,6 +410,9 @@ module tb_router_ct;
         host_ct_dst_neuron <= 0;
         host_ct_weight     <= 0;
         host_ct_exc_inh    <= 0;
+        route_clear_start  <= 0;
+        expected_route_entry_count = 0;
+        expected_route_checksum = 32'd0;
 
         repeat (20) @(posedge clk);
         rst_n <= 1;
@@ -391,6 +473,18 @@ module tb_router_ct;
         //---------------------------------------------------------------------
         check(1, "Router idle after reset", (!router_busy));
         check(2, "Spike counter == 0", (routed_spike_count == 0));
+        check(30, "Route runtime counters reset to zero",
+              router_ext_invalid_group_count == 0 &&
+              router_ct_invalid_entry_count == 0 &&
+              router_ct_invalid_dst_count == 0 &&
+              router_fanout_scan_count == 0 &&
+              router_route_miss_count == 0 &&
+              router_backpressure_stall_count == 0);
+        check(31, "Route table lifecycle status reset to zero",
+              route_entry_count == 0 &&
+              route_checksum == 0 &&
+              route_write_error_count == 0 &&
+              !route_clear_busy);
 
         //---------------------------------------------------------------------
         // TEST 3: External spike routing (direct to group/neuron)
@@ -461,7 +555,11 @@ module tb_router_ct;
         //---------------------------------------------------------------------
         delivered_count = 0;
         learn_notify_count = 0;
-        begin
+        begin : test10_block
+            integer fanout_before;
+            integer invalid_entry_before;
+            fanout_before = router_fanout_scan_count;
+            invalid_entry_before = router_ct_invalid_entry_count;
             // Group 0, neuron 10 fires
             @(posedge clk);
             grp_spike_valid[0] <= 1;
@@ -479,6 +577,10 @@ module tb_router_ct;
                   (delivered_count >= 1 && delivered_neurons[0] == 7'd50));
             check(12, "CT lookup weight 7",
                   (delivered_count >= 1 && delivered_weights[0] == 8'd7));
+            check(32, "CT lookup scanned valid entry plus terminator",
+                  (router_fanout_scan_count >= fanout_before + 2));
+            check(33, "CT terminator increments invalid-entry counter",
+                  (router_ct_invalid_entry_count >= invalid_entry_before + 1));
         end
 
         //---------------------------------------------------------------------
@@ -489,6 +591,63 @@ module tb_router_ct;
               (learn_notify_count >= 1));
         check(14, "Learn src_id = {group0, neuron10}",
               (learn_notify_ids[0] == {4'd0, 7'd10}));
+
+        //---------------------------------------------------------------------
+        // TEST 27-29: Learning notification holds valid until ready
+        //---------------------------------------------------------------------
+        $display("\n--- Test 27-29: Learning Notification Backpressure ---");
+        begin : test_learn_notify_backpressure
+            integer hold_timeout;
+            integer i;
+            integer notify_before;
+            reg saw_valid_while_not_ready;
+            reg valid_dropped_while_not_ready;
+            reg [GLOBAL_ID_WIDTH-1:0] held_src_id;
+
+            program_ct_entry(4'd4, 7'd33, 4'd0, 1'b0, 4'd0, 7'd0, 8'd0, 1'b0);
+            repeat (5) @(posedge clk);
+
+            notify_before = learn_notify_count;
+            saw_valid_while_not_ready = 0;
+            valid_dropped_while_not_ready = 0;
+            learn_spike_ready <= 0;
+
+            @(posedge clk);
+            grp_spike_valid[4] <= 1;
+            grp_spike_neuron_id[4*LOCAL_ID_WIDTH +: LOCAL_ID_WIDTH] <= 7'd33;
+            @(posedge clk);
+            while (!grp_spike_ready[4]) @(posedge clk);
+            grp_spike_valid[4] <= 0;
+
+            hold_timeout = 0;
+            while (!learn_spike_valid && hold_timeout < 200) begin
+                @(posedge clk);
+                hold_timeout = hold_timeout + 1;
+            end
+            held_src_id = learn_spike_src_id;
+
+            for (i = 0; i < 5; i = i + 1) begin
+                @(posedge clk);
+                #1;
+                if (learn_spike_valid && !learn_spike_ready)
+                    saw_valid_while_not_ready = 1;
+                if (!learn_spike_valid && !learn_spike_ready)
+                    valid_dropped_while_not_ready = 1;
+            end
+
+            check(27, "Learn notification valid asserted under backpressure",
+                  saw_valid_while_not_ready);
+            check(28, "Learn notification id held while not ready",
+                  learn_spike_valid && !valid_dropped_while_not_ready &&
+                  learn_spike_src_id == held_src_id &&
+                  held_src_id == {4'd4, 7'd33});
+
+            learn_spike_ready <= 1;
+            wait_router_idle;
+            repeat (5) @(posedge clk);
+            check(29, "Held learn notification handshakes once after ready",
+                  learn_notify_count == notify_before + 1 && !learn_spike_valid);
+        end
 
         //---------------------------------------------------------------------
         // TEST 15: Multi-fanout (3 connections from one source)
@@ -624,12 +783,93 @@ module tb_router_ct;
         end
 
         //---------------------------------------------------------------------
+        // TEST 25-26: Learned-weight ready/valid under router backpressure
+        //---------------------------------------------------------------------
+        $display("\n--- Test 25-26: Learn Weight Ready/Valid Backpressure ---");
+        begin : test_learn_weight_backpressure
+            integer lw_timeout;
+            reg saw_busy_lw;
+            reg saw_ready_low_before_valid;
+            reg saw_ready_low_while_valid;
+            reg saw_weight_we_while_busy;
+            reg saw_weight_we_after_ready;
+
+            program_ct_entry(4'd0, 7'd12, 4'd0, 1'b1, 4'd3, 7'd44, 8'd6, 1'b1);
+            program_ct_entry(4'd0, 7'd12, 4'd1, 1'b0, 4'd0, 7'd0, 8'd0, 1'b0);
+            repeat (5) @(posedge clk);
+
+            // Keep a routed spike blocked in the router so learn_weight_ready
+            // deasserts.  HLS is expected to hold learn_weight_valid until the
+            // router returns ready.
+            grp_in_ready[3] <= 0;
+            @(posedge clk);
+            grp_spike_valid[0] <= 1;
+            grp_spike_neuron_id[0*LOCAL_ID_WIDTH +: LOCAL_ID_WIDTH] <= 7'd12;
+            @(posedge clk);
+            while (!grp_spike_ready[0]) @(posedge clk);
+            grp_spike_valid[0] <= 0;
+
+            saw_busy_lw = 0;
+            saw_ready_low_before_valid = 0;
+            saw_ready_low_while_valid = 0;
+            saw_weight_we_while_busy = 0;
+            lw_timeout = 0;
+            while (!(router_busy && !learn_weight_ready) && lw_timeout < 200) begin
+                @(posedge clk);
+                #1;
+                if (router_busy) saw_busy_lw = 1;
+                if (!learn_weight_ready) saw_ready_low_before_valid = 1;
+                if (grp_weight_we[5]) saw_weight_we_while_busy = 1;
+                lw_timeout = lw_timeout + 1;
+            end
+            #1;
+            if (router_busy) saw_busy_lw = 1;
+            if (!learn_weight_ready) saw_ready_low_before_valid = 1;
+
+            learn_weight_valid  <= 1;
+            learn_weight_group  <= 4'd5;
+            learn_weight_src    <= 7'd11;
+            learn_weight_dst    <= 7'd21;
+            learn_weight_data   <= 8'd19;
+            learn_weight_exc    <= 1;
+            learn_weight_is_inter <= 0;
+            for (lw_timeout = 0; lw_timeout < 3; lw_timeout = lw_timeout + 1) begin
+                @(posedge clk);
+                #1;
+                if (!learn_weight_ready) saw_ready_low_while_valid = 1;
+                if (grp_weight_we[5]) saw_weight_we_while_busy = 1;
+            end
+
+            check(25, "Learn-weight ready deasserts while router is busy",
+                  saw_busy_lw && (saw_ready_low_before_valid || saw_ready_low_while_valid) && !saw_weight_we_while_busy);
+
+            grp_in_ready[3] <= 1;
+            saw_weight_we_after_ready = 0;
+            for (lw_timeout = 0; lw_timeout < 100; lw_timeout = lw_timeout + 1) begin
+                @(posedge clk);
+                #1;
+                if (grp_weight_we[5]) saw_weight_we_after_ready = 1;
+                if (saw_weight_we_after_ready) begin
+                    learn_weight_valid <= 0;
+                end
+            end
+
+            learn_weight_valid <= 0;
+            wait_router_idle;
+            repeat (5) @(posedge clk);
+            check(26, "Held learn-weight update forwards after ready",
+                  saw_weight_we_after_ready);
+        end
+
+        //---------------------------------------------------------------------
         // TEST 21: Backpressure handling (grp_in_ready = 0)
         //---------------------------------------------------------------------
         $display("\n--- Test 21: Backpressure ---");
         begin : test21_block
             integer bp_timeout;
+            integer stall_before;
             reg saw_busy;
+            stall_before = router_backpressure_stall_count;
             // Temporarily block group 3 from accepting spikes
             grp_in_ready[3] <= 0;
 
@@ -654,6 +894,8 @@ module tb_router_ct;
             wait_router_idle;
             repeat (10) @(posedge clk);
             check(22, "Router completes after backpressure release", !router_busy);
+            check(34, "Router backpressure stall counter increments",
+                  (router_backpressure_stall_count > stall_before));
         end
 
         //---------------------------------------------------------------------
@@ -662,6 +904,7 @@ module tb_router_ct;
         $display("\n--- Test 23: Max Fanout (16 entries) ---");
         begin : test23_block
             integer fi;
+            integer fanout_before;
             // Program all 16 fanout entries for group 3 neuron 0
             for (fi = 0; fi < 16; fi = fi + 1) begin
                 program_ct_entry(
@@ -677,6 +920,7 @@ module tb_router_ct;
             repeat (5) @(posedge clk);
 
             delivered_count = 0;
+            fanout_before = router_fanout_scan_count;
             @(posedge clk);
             grp_spike_valid[3] <= 1;
             grp_spike_neuron_id[3*LOCAL_ID_WIDTH +: LOCAL_ID_WIDTH] <= 7'd0;
@@ -689,6 +933,8 @@ module tb_router_ct;
 
             check(23, "Max fanout: 16 deliveries",
                   (delivered_count == 16));
+            check(35, "Max fanout scans exactly 16 CT entries",
+                  (router_fanout_scan_count == fanout_before + 16));
         end
 
         //---------------------------------------------------------------------
@@ -696,7 +942,13 @@ module tb_router_ct;
         //---------------------------------------------------------------------
         $display("\n--- Test 24: No Connections in CT ---");
         learn_notify_count = 0;
-        begin
+        begin : test24_block
+            integer invalid_entry_before;
+            integer route_miss_before;
+            integer fanout_before;
+            invalid_entry_before = router_ct_invalid_entry_count;
+            route_miss_before = router_route_miss_count;
+            fanout_before = router_fanout_scan_count;
             // Group 10, neuron 99 has no CT entries
             @(posedge clk);
             grp_spike_valid[10] <= 1;
@@ -710,6 +962,71 @@ module tb_router_ct;
 
             check(24, "No CT entries: learn notify still sent",
                   (learn_notify_count >= 1));
+            check(36, "No CT entries increments route-miss counter",
+                  (router_route_miss_count == route_miss_before + 1));
+            check(37, "No CT entries scans one missing entry",
+                  (router_ct_invalid_entry_count == invalid_entry_before + 1 &&
+                   router_fanout_scan_count == fanout_before + 1));
+        end
+
+        //---------------------------------------------------------------------
+        // TEST 38-42: Route table clear/status protocol
+        //---------------------------------------------------------------------
+        $display("\n--- Test 38-42: Route Table Clear/Status ---");
+        begin : test_route_clear_status
+            integer miss_before_clear_check;
+
+            repeat (5) @(posedge clk);
+            check(38, "Route entry count/checksum track valid CT writes",
+                  route_entry_count == expected_route_entry_count &&
+                  route_checksum == expected_route_checksum &&
+                  route_entry_count > 0);
+
+            start_route_clear;
+            repeat (2) @(posedge clk);
+            host_ct_we         <= 1;
+            host_ct_src_group  <= 4'd0;
+            host_ct_src_neuron <= 7'd10;
+            host_ct_fanout_idx <= 4'd0;
+            host_ct_valid      <= 1'b1;
+            host_ct_dst_group  <= 4'd3;
+            host_ct_dst_neuron <= 7'd50;
+            host_ct_weight     <= 8'd7;
+            host_ct_exc_inh    <= 1'b1;
+            @(posedge clk);
+            host_ct_we <= 0;
+            wait_route_clear_done;
+            repeat (5) @(posedge clk);
+            check(39, "Write during route clear is rejected and counted",
+                  route_write_error_count > 0);
+
+            start_route_clear;
+            wait_route_clear_done;
+            expected_route_entry_count = 0;
+            expected_route_checksum = 32'd0;
+            repeat (5) @(posedge clk);
+            check(40, "Clean route clear resets count/checksum/error",
+                  route_entry_count == 0 &&
+                  route_checksum == 0 &&
+                  route_write_error_count == 0 &&
+                  !route_clear_busy);
+
+            delivered_count = 0;
+            learn_notify_count = 0;
+            miss_before_clear_check = router_route_miss_count;
+            @(posedge clk);
+            grp_spike_valid[0] <= 1;
+            grp_spike_neuron_id[0*LOCAL_ID_WIDTH +: LOCAL_ID_WIDTH] <= 7'd10;
+            @(posedge clk);
+            while (!grp_spike_ready[0]) @(posedge clk);
+            grp_spike_valid[0] <= 0;
+            wait_router_idle;
+            repeat (20) @(posedge clk);
+            check(41, "Cleared route table no longer delivers old entry",
+                  delivered_count == 0);
+            check(42, "Cleared route lookup records a route miss",
+                  router_route_miss_count == miss_before_clear_check + 1 &&
+                  learn_notify_count >= 1);
         end
 
         //---------------------------------------------------------------------
