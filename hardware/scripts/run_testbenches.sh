@@ -108,6 +108,12 @@ run_test "spike_conv_state_update" \
     "$RTL_DIR/core/spike_conv_agu.v" \
     "$RTL_DIR/core/spike_conv_state_update.v"
 
+run_test "spike_conv_active_commit" \
+    "$TB_DIR/tb_spike_conv_active_commit.v" \
+    "$RTL_DIR/core/spike_conv_agu.v" \
+    "$RTL_DIR/core/spike_conv_state_update.v" \
+    "$RTL_DIR/core/spike_conv_active_commit.v"
+
 #-----------------------------------------------------------------------------
 # Test 1: Core Group
 #-----------------------------------------------------------------------------

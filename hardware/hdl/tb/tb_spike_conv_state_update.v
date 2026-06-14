@@ -32,11 +32,13 @@ module tb_spike_conv_state_update;
     wire [31:0] conv_updates_generated;
     wire [31:0] conv_address_errors;
     wire [(STATE_COUNT*STATE_WIDTH)-1:0] state_flat;
+    wire [(STATE_COUNT*16)-1:0] active_id_flat;
     wire [STATE_COUNT-1:0] active_mask;
     wire [31:0] active_neuron_count;
     wire [31:0] state_read_count;
     wire [31:0] state_write_count;
     wire [31:0] update_count;
+    wire [31:0] commit_reset_count;
     wire [31:0] invalid_dest_count;
     wire signed [31:0] state_checksum;
 
@@ -86,12 +88,17 @@ module tb_spike_conv_state_update;
         .s_axis_update_tdata(update_tdata),
         .update_weight(update_weight),
         .s_axis_update_tready(update_tready),
+        .s_axis_reset_tvalid(1'b0),
+        .s_axis_reset_tdest(16'd0),
+        .s_axis_reset_tready(),
         .state_flat(state_flat),
+        .active_id_flat(active_id_flat),
         .active_mask(active_mask),
         .active_neuron_count(active_neuron_count),
         .state_read_count(state_read_count),
         .state_write_count(state_write_count),
         .update_count(update_count),
+        .commit_reset_count(commit_reset_count),
         .invalid_dest_count(invalid_dest_count),
         .state_checksum(state_checksum)
     );
@@ -159,7 +166,12 @@ module tb_spike_conv_state_update;
         check("C2 state reads match trace", state_read_count == 32'd4);
         check("C2 state writes match trace", state_write_count == 32'd4);
         check("C2 active count matches trace", active_neuron_count == 32'd4);
+        check("C2 active id[0] matches update order", active_id_flat[0*16 +: 16] == 16'd3);
+        check("C2 active id[1] matches update order", active_id_flat[1*16 +: 16] == 16'd2);
+        check("C2 active id[2] matches update order", active_id_flat[2*16 +: 16] == 16'd1);
+        check("C2 active id[3] matches update order", active_id_flat[3*16 +: 16] == 16'd0);
         check("C2 no invalid destination", invalid_dest_count == 32'd0);
+        check("C2 no commit resets", commit_reset_count == 32'd0);
         check("C2 no AGU address errors", conv_address_errors == 32'd0);
         check("C2 state[0] matches trace", state_flat[0*STATE_WIDTH +: STATE_WIDTH] == 16'd4);
         check("C2 state[1] matches trace", state_flat[1*STATE_WIDTH +: STATE_WIDTH] == 16'd3);

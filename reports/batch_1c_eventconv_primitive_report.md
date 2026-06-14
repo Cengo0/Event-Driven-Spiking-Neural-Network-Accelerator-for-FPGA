@@ -1,6 +1,6 @@
 # Batch 1C EventConv Primitive Report
 
-Status: C0/C1/C2 board-free gate passed
+Status: C0/C1/C2/C3 board-free gate passed
 
 ## Evidence Level
 
@@ -14,8 +14,10 @@ latency, throughput, or energy.
 - `golden_traces/v1/eventconv_agu_c0_tiny_v1.json`
 - `hardware/hdl/rtl/core/spike_conv_agu.v`
 - `hardware/hdl/rtl/core/spike_conv_state_update.v`
+- `hardware/hdl/rtl/core/spike_conv_active_commit.v`
 - `hardware/hdl/tb/tb_spike_conv_agu.v`
 - `hardware/hdl/tb/tb_spike_conv_state_update.v`
+- `hardware/hdl/tb/tb_spike_conv_active_commit.v`
 
 ## Gate Results
 
@@ -23,8 +25,8 @@ latency, throughput, or energy.
 |---|---:|---|
 | C0 trace-locked tiny case | PASS | `scripts/check_batch1c_eventconv.py` |
 | C1 AGU-only | PASS | Vivado xsim `tb_spike_conv_agu`: 19 PASS, 0 FAIL |
-| C2 AGU + state update | PASS | Vivado xsim `tb_spike_conv_state_update`: 14 PASS, 0 FAIL |
-| C3 AGU + active-set commit | PENDING | not implemented |
+| C2 AGU + state update | PASS | Vivado xsim `tb_spike_conv_state_update`: 19 PASS, 0 FAIL |
+| C3 AGU + active-set commit | PASS | Vivado xsim `tb_spike_conv_active_commit`: 36 PASS, 0 FAIL |
 | C4 scale-up | PENDING | waits for C3 |
 
 ## C0 Trace Contract
@@ -58,6 +60,30 @@ Expected state after the C0 spike:
 - state reads: `4`
 - state writes: `4`
 
+## C3 Active Commit Contract
+
+The active-set commit stage consumes the C2 active-id list. It checks only
+active destinations, not the whole state array.
+
+For the trace-locked high-threshold readout:
+
+- active commit read count: `4`
+- commit output count: `0`
+- active commit readout checksum: `0`
+- full-neuron scan count: `0`
+- commit reset count: `0`
+
+The testbench also runs a positive-threshold check at threshold `3` to prove
+readout emission order and reset-to-zero semantics:
+
+| Order | Destination | State |
+|---:|---:|---:|
+| 0 | 1 | 3 |
+| 1 | 0 | 4 |
+
+After the positive-threshold readout, committed destinations `1` and `0` reset
+to zero, active count compacts from `4` to `2`, and state checksum becomes `3`.
+
 ## Runtime Assumptions
 
 - Python inner loop required: `False`
@@ -67,5 +93,5 @@ Expected state after the C0 spike:
 
 ## Next Gate
 
-Implement C3 by adding active-set commit/readout on top of the C2 state RAM and
-checking commit output against `eventconv_agu_c0_tiny_v1`.
+Implement C4 by scaling the EventConv primitive beyond the tiny 2x2 kernel case
+while preserving trace correctness and active-set commit counters.
