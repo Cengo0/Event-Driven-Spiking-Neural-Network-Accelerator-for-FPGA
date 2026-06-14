@@ -1,0 +1,104 @@
+{
+  "commits": [],
+  "counters": {
+    "active_neuron_count": 4,
+    "commit_count": 0,
+    "ddr_bytes_inner_loop": 0,
+    "generated_update_count": 4,
+    "input_event_count": 1,
+    "python_inner_loop_steps": 0,
+    "state_reads": 4,
+    "state_writes": 4
+  },
+  "final_state": {
+    "0": 4,
+    "1": 3,
+    "2": 2,
+    "3": 1
+  },
+  "hashes": {
+    "commits_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "final_state_sha256": "4683de120b07b8d46f2153f7c12932e44f99d6a07bd21dc568651604cbe1222d",
+    "input_sha256": "aa6e45d90851270d9b2931de1c23ed03aeaf70769a2a0a721261cebed33809b1",
+    "trace_sha256": "ca8d46b4df77f4816c21918481f637b4d2108802485c9ffd96fefca7e8a8a716",
+    "updates_sha256": "583df4c2824e8293da173bbba2ba753bc965b858d27e27e8b17092a88a6ac36f"
+  },
+  "inputs": [
+    {
+      "channel": 0,
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 0,
+      "tick": 0,
+      "x": 1,
+      "y": 1
+    }
+  ],
+  "metadata": {
+    "input_shape": [
+      1,
+      3,
+      3
+    ],
+    "kernel_shape": [
+      1,
+      1,
+      2,
+      2
+    ],
+    "output_shape": [
+      1,
+      2,
+      2
+    ],
+    "padding": 0,
+    "primitive": "eventconv_agu",
+    "stride": 1,
+    "weight_storage": "shared_kernel"
+  },
+  "schema": "spikemold.ednp_trace.v1",
+  "target": "architecture-neutral",
+  "trace_id": "eventconv_agu_c0_tiny_v1",
+  "updates": [
+    {
+      "channel": 0,
+      "dst_id": 3,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1,
+      "x": 1,
+      "y": 1
+    },
+    {
+      "channel": 0,
+      "dst_id": 2,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 2,
+      "x": 0,
+      "y": 1
+    },
+    {
+      "channel": 0,
+      "dst_id": 1,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 3,
+      "x": 1,
+      "y": 0
+    },
+    {
+      "channel": 0,
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 4,
+      "x": 0,
+      "y": 0
+    }
+  ]
+}

@@ -18,6 +18,8 @@ Active path:
 - event/update budget checks
 - SpikeMold-EDNP artifact JSON roundtrip
 - Batch 0/1A contract verification
+- Batch 1B software transport smoke
+- Batch 1C EventConv AGU C0/C1 RTL smoke
 
 Out of scope for the current EDNP mainline:
 
@@ -33,6 +35,8 @@ rtk python scripts/generate_ednp_batch1a_artifacts.py
 rtk python scripts/check_ednp_batch0_1a.py
 rtk python scripts/generate_batch1b_transport_artifacts.py
 rtk python scripts/check_batch1b_transport.py
+rtk python scripts/generate_batch1c_eventconv_artifacts.py
+rtk python scripts/check_batch1c_eventconv.py
 rtk pytest software/python/tests
 ```
 

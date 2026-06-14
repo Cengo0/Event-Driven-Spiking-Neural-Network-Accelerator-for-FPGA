@@ -1,175 +1,165 @@
-//-----------------------------------------------------------------------------
-// Title       : Testbench for Spike Convolution AGU
-// Description : Verification of Loihi-style convolutional address generation
-//-----------------------------------------------------------------------------
-
 `timescale 1ns / 1ps
-`include "snn_params.vh"
 
 module tb_spike_conv_agu;
+    localparam KERNEL_SIZE = 2;
+    localparam INPUT_WIDTH = 3;
+    localparam INPUT_HEIGHT = 3;
+    localparam NUM_CHANNELS = 1;
+    localparam OUTPUT_CHANNELS = 1;
+    localparam STRIDE = 1;
+    localparam PADDING = 0;
+    localparam KERNEL_WEIGHT_BITS = 8;
+    localparam KERNEL_WORDS = OUTPUT_CHANNELS * NUM_CHANNELS * KERNEL_SIZE * KERNEL_SIZE;
 
-    //=========================================================================
-    // Parameters
-    //=========================================================================
-    localparam CLK_PERIOD_NS = 12.5;  // 80 MHz clock
+    reg clk = 1'b0;
+    always #6.25 clk = ~clk;
 
-    localparam KERNEL_SIZE     = 3;
-    localparam INPUT_WIDTH     = 8;
-    localparam INPUT_HEIGHT    = 8;
-    localparam NUM_CHANNELS    = 2;
-    localparam STRIDE          = 1;
-
-    //=========================================================================
-    // DUT Instance
-    //=========================================================================
-    wire [31:0] conv_spikes_processed;
-    wire [31:0] conv_address_errors;
-
-    spike_conv_agu #(
-        .KERNEL_SIZE     (KERNEL_SIZE),
-        .INPUT_WIDTH     (INPUT_WIDTH),
-        .INPUT_HEIGHT    (INPUT_HEIGHT),
-        .NUM_CHANNELS    (NUM_CHANNELS),
-        .STRIDE          (STRIDE)
-    ) dut (
-        .clk                 (clk),
-        .rst_n               (rst_n),
-        .enable              (enable),
-
-        .s_axis_spike_tvalid (s_axis_spike_tvalid),
-        .s_axis_spike_tdata  (s_axis_spike_tdata),
-        .s_axis_spike_tready (s_axis_spike_tready),
-
-        .m_axis_spike_tvalid (m_axis_spike_tvalid),
-        .m_axis_spike_tdata  (m_axis_spike_tdata),
-        .m_axis_spike_tready (m_axis_spike_tready),
-
-        .kernel_weight_out   (),
-        .kernel_weight_in    ()
-
-    );
-
-    //=========================================================================
-    // Clock Generation
-    //=========================================================================
-    reg clk = 0;
-    always begin
-        #(`CLK_PERIOD_NS/2) clk = ~clk;
-    end
-
-    //=========================================================================
-    // Reset and Enable Control
-    //=========================================================================
-    reg rst_n = 0;
-    reg enable = 0;
-
-    initial begin
-        // Apply reset
-        rst_n = 0;
-        #(`CLK_PERIOD_NS * 10);
-        rst_n = 1;
-        enable = 1;
-    end
-
-    //=========================================================================
-    // AXI-Stream Input Interface
-    //=========================================================================
+    reg rst_n;
+    reg enable;
     reg s_axis_spike_tvalid;
     reg [31:0] s_axis_spike_tdata;
-
     wire s_axis_spike_tready;
-
-    //=========================================================================
-    // AXI-Stream Output Interface
-    //=========================================================================
     wire m_axis_spike_tvalid;
     wire [31:0] m_axis_spike_tdata;
-    reg m_axis_spike_tready = 0;
+    reg m_axis_spike_tready;
+    wire [KERNEL_WEIGHT_BITS-1:0] kernel_weight_out;
+    reg [(KERNEL_WORDS*KERNEL_WEIGHT_BITS)-1:0] kernel_weight_flat;
+    wire [31:0] conv_spikes_processed;
+    wire [31:0] conv_updates_generated;
+    wire [31:0] conv_address_errors;
 
-    //=========================================================================
-    // Test Tasks
-    //=========================================================================
+    integer pass_count = 0;
+    integer fail_count = 0;
+    integer outputs_seen;
+    integer cycles;
+    reg [15:0] expected_dest [0:3];
+    reg [15:0] expected_weight_idx [0:3];
+    reg [7:0] expected_weight [0:3];
 
-    task send_spike;
-        input [7:0] x, y, channel;
+    spike_conv_agu #(
+        .KERNEL_SIZE(KERNEL_SIZE),
+        .INPUT_WIDTH(INPUT_WIDTH),
+        .INPUT_HEIGHT(INPUT_HEIGHT),
+        .NUM_CHANNELS(NUM_CHANNELS),
+        .OUTPUT_CHANNELS(OUTPUT_CHANNELS),
+        .STRIDE(STRIDE),
+        .PADDING(PADDING),
+        .KERNEL_WEIGHT_BITS(KERNEL_WEIGHT_BITS)
+    ) dut (
+        .clk(clk),
+        .rst_n(rst_n),
+        .enable(enable),
+        .s_axis_spike_tvalid(s_axis_spike_tvalid),
+        .s_axis_spike_tdata(s_axis_spike_tdata),
+        .s_axis_spike_tready(s_axis_spike_tready),
+        .m_axis_spike_tvalid(m_axis_spike_tvalid),
+        .m_axis_spike_tdata(m_axis_spike_tdata),
+        .m_axis_spike_tready(m_axis_spike_tready),
+        .kernel_weight_out(kernel_weight_out),
+        .kernel_weight_flat(kernel_weight_flat),
+        .conv_spikes_processed(conv_spikes_processed),
+        .conv_updates_generated(conv_updates_generated),
+        .conv_address_errors(conv_address_errors)
+    );
+
+    task automatic check;
+        input [255:0] desc;
+        input cond;
         begin
-            s_axis_spike_tvalid = 1;
-            s_axis_spike_tdata = {x, y, channel, 8'd0};
+            if (cond) begin
+                pass_count = pass_count + 1;
+                $display("[PASS] %0s", desc);
+            end else begin
+                fail_count = fail_count + 1;
+                $display("[FAIL] %0s", desc);
+            end
+        end
+    endtask
+
+    task automatic reset_dut;
+        begin
+            rst_n = 1'b0;
+            enable = 1'b0;
+            s_axis_spike_tvalid = 1'b0;
+            s_axis_spike_tdata = 32'd0;
+            m_axis_spike_tready = 1'b0;
+            repeat (4) @(posedge clk);
+            @(negedge clk);
+            rst_n = 1'b1;
+            enable = 1'b1;
             @(posedge clk);
-            while (!s_axis_spike_tready) @(posedge clk);
-            s_axis_spike_tvalid = 0;
+            @(negedge clk);
         end
     endtask
 
-    task wait_for_output;
+    task automatic send_spike;
+        input [7:0] x;
+        input [7:0] y;
+        input [7:0] channel;
         begin
-            @(posedge m_axis_spike_tvalid);
-            #1;
+            @(negedge clk);
+            s_axis_spike_tdata = {x, y, channel, 8'd0};
+            s_axis_spike_tvalid = 1'b1;
+            @(posedge clk);
+            check("input spike accepted in idle", s_axis_spike_tready == 1'b1);
+            @(negedge clk);
+            s_axis_spike_tvalid = 1'b0;
         end
     endtask
-
-    //=========================================================================
-    // Test Sequences
-    //=========================================================================
-
-    integer i, j, c;
-    reg [31:0] output_count;
 
     initial begin
-        $display("========================================");
-        $display("Spike Convolution AGU Testbench");
-        $display("Kernel Size: %d", KERNEL_SIZE);
-        $display("Input: %dx%d @ %d channels", INPUT_WIDTH, INPUT_HEIGHT, NUM_CHANNELS);
-        $display("Stride: %d", STRIDE);
-        $display("========================================");
+        kernel_weight_flat = {8'd4, 8'd3, 8'd2, 8'd1};
+        expected_dest[0] = 16'd3;
+        expected_dest[1] = 16'd2;
+        expected_dest[2] = 16'd1;
+        expected_dest[3] = 16'd0;
+        expected_weight_idx[0] = 16'd0;
+        expected_weight_idx[1] = 16'd1;
+        expected_weight_idx[2] = 16'd2;
+        expected_weight_idx[3] = 16'd3;
+        expected_weight[0] = 8'd1;
+        expected_weight[1] = 8'd2;
+        expected_weight[2] = 8'd3;
+        expected_weight[3] = 8'd4;
 
-        // Wait for reset
-        @(negedge rst_n);
-        @(posedge rst_n);
+        reset_dut();
 
-        // Test 1: Single spike at center
-        $display("\n[Test 1] Single spike at (4,4) channel 0");
-        output_count = 0;
-        send_spike(4, 4, 0);
-        wait_for_output;
-        $display("Output: dest_id=%h weight_idx=%d", m_axis_spike_tdata[31:0], m_axis_spike_tdata[15:0]);
-        output_count = output_count + 1;
+        check("AGU starts idle-ready", s_axis_spike_tready == 1'b1);
+        send_spike(8'd1, 8'd1, 8'd0);
 
-        // Test 2: Spike at corner
-        $display("\n[Test 2] Single spike at (0,0) channel 1");
-        send_spike(0, 0, 1);
-        wait_for_output;
-        $display("Output: dest_id=%h weight_idx=%d", m_axis_spike_tdata[31:0], m_axis_spike_tdata[15:0]);
-        output_count = output_count + 1;
-
-        // Test 3: Multiple spikes across different channels
-        $display("\n[Test 3] Spike scan across all channels");
-        for (c = 0; c < NUM_CHANNELS; c = c + 1) begin
-            send_spike(4, 4, c);
-            wait_for_output;
-            $display("Channel %d: dest_id=%h weight_idx=%d", c,
-                     m_axis_spike_tdata[31:0], m_axis_spike_tdata[15:0]);
-            output_count = output_count + 1;
+        m_axis_spike_tready = 1'b1;
+        outputs_seen = 0;
+        cycles = 0;
+        while (outputs_seen < 4 && cycles < 40) begin
+            @(posedge clk);
+            #1;
+            if (m_axis_spike_tvalid) begin
+                check("trace-locked destination id",
+                      m_axis_spike_tdata[31:16] == expected_dest[outputs_seen]);
+                check("trace-locked weight index",
+                      m_axis_spike_tdata[15:0] == expected_weight_idx[outputs_seen]);
+                check("selected shared-kernel weight",
+                      kernel_weight_out == expected_weight[outputs_seen]);
+                outputs_seen = outputs_seen + 1;
+            end
+            cycles = cycles + 1;
         end
 
-        // Test 4: Edge spike (should produce invalid destination)
-        $display("\n[Test 4] Edge spike at (7,7) - near boundary");
-        send_spike(7, 7, 0);
-        wait_for_output;
-        $display("Output: dest_id=%h weight_idx=%d", m_axis_spike_tdata[31:0], m_axis_spike_tdata[15:0]);
-        output_count = output_count + 1;
+        check("AGU emitted four trace updates", outputs_seen == 4);
+        repeat (4) @(posedge clk);
+        #1;
+        check("AGU returns to idle after scan", s_axis_spike_tready == 1'b1 && !m_axis_spike_tvalid);
+        check("input spike counter matches trace", conv_spikes_processed == 32'd1);
+        check("generated update counter matches trace", conv_updates_generated == 32'd4);
+        check("center tiny case has no address errors", conv_address_errors == 32'd0);
 
-        // Summary
-        #(`CLK_PERIOD_NS * 10);
-        $display("\n========================================");
-        $display("Test Complete");
-        $display("Total outputs: %d", output_count);
-        $display("Spikes processed: %d", dut.conv_spikes_processed);
-        $display("Address errors: %d", dut.conv_address_errors);
-        $display("========================================");
-
-        #(`CLK_PERIOD_NS * 5);
+        $display("Results: %0d PASS, %0d FAIL", pass_count, fail_count);
+        if (fail_count == 0) begin
+            $display("*** ALL TESTS PASSED ***");
+        end else begin
+            $display("*** SOME TESTS FAILED ***");
+            $fatal(1);
+        end
         $finish;
     end
-
 endmodule

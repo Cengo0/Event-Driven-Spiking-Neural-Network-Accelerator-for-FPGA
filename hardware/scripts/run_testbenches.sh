@@ -99,6 +99,10 @@ run_test "spike_out_bridge" \
     "$TB_DIR/tb_spike_out_bridge.v" \
     "$RTL_DIR/common/spike_out_bridge.v"
 
+run_test "spike_conv_agu" \
+    "$TB_DIR/tb_spike_conv_agu.v" \
+    "$RTL_DIR/core/spike_conv_agu.v"
+
 #-----------------------------------------------------------------------------
 # Test 1: Core Group
 #-----------------------------------------------------------------------------
