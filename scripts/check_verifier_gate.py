@@ -33,6 +33,24 @@ ARCH_SANDBOX_PATH = ROOT / "outputs" / "architecture_sandbox" / "batch_1x_archit
 RUNTIME_CONTRACT_PATH = ROOT / "outputs" / "runtime" / "spikemold_runtime_contract.json"
 RESOURCE_REPORT_PATH = ROOT / "outputs" / "resource" / "spikemold_runtime_resource_report.json"
 PYNQ_ONESHOT_SCRIPT = ROOT / "scripts" / "run_spikemold_pynq_one_shot.py"
+HLS_INFERENCE_ONLY_FILES = [
+    ROOT / "hardware" / "hls" / "include" / "spikemold_top_hls.h",
+    ROOT / "hardware" / "hls" / "src" / "spikemold_top_hls.cpp",
+    ROOT / "hardware" / "hls" / "test" / "tb_spikemold_top_hls.cpp",
+    ROOT / "hardware" / "scripts" / "rebuild_integrated.tcl",
+    ROOT / "hardware" / "hdl" / "rtl" / "top" / "spikemold_integrated_top.v",
+]
+FORBIDDEN_HLS_SURFACE_TOKENS = [
+    "learning_params_t",
+    "learn_weight",
+    "MODE_TRAIN_STDP",
+    "reward_signal",
+    "debug_learning_active",
+    "STDP",
+    "R-STDP",
+    "rstdp",
+    "stdp",
+]
 
 REQUIRED_CONTRACTS = [
     "ARCHITECTURE_CONTRACT_V1.md",
@@ -271,6 +289,16 @@ def check_pynq_runtime_api() -> None:
             fail(f"PYNQ one-shot script missing phrase: {phrase}")
 
 
+def check_hls_inference_only_surface() -> None:
+    for path in HLS_INFERENCE_ONLY_FILES:
+        if not path.exists():
+            fail(f"missing HLS inference-only surface file: {path}")
+        text = path.read_text(encoding="utf-8")
+        for token in FORBIDDEN_HLS_SURFACE_TOKENS:
+            if token in text:
+                fail(f"{path} still exposes removed learning token: {token}")
+
+
 def check_reports() -> None:
     required_reports = {
         "reports/batch_0_contract_freeze_report.md": [
@@ -324,6 +352,7 @@ def main() -> int:
     check_architecture_sandbox()
     check_runtime_resource()
     check_pynq_runtime_api()
+    check_hls_inference_only_surface()
     check_reports()
     print("PASS: verifier gate review artifacts valid")
     return 0

@@ -96,16 +96,6 @@ module spikemold_integrated_top #(
     wire [0:0]  bd_spikemold_reset;
     wire        bd_spikemold_ready;
     wire        bd_spikemold_busy;
-    wire        bd_learn_weight_valid;
-    wire [3:0]  bd_learn_weight_group;
-    wire [6:0]  bd_learn_weight_src;
-    wire [6:0]  bd_learn_weight_dst;
-    wire [7:0]  bd_learn_weight_data;
-    wire        bd_learn_weight_exc;
-    wire        bd_learn_weight_is_inter;
-    wire [3:0]  bd_learn_weight_dst_group;
-    wire [3:0]  bd_learn_weight_fanout_idx;
-    wire        bd_learn_weight_ready;
 
     // Config
     wire        cfg_router_config_we;
@@ -129,7 +119,7 @@ module spikemold_integrated_top #(
     wire [31:0] neuron_throughput_counter;
     wire [15:0] threshold_out;
     wire [15:0] leak_rate_out;
-    wire [0:0]  debug_learning_active;
+    wire [0:0]  debug_reserved_zero;
 
     // Router config command queue
     localparam ROUTER_CFG_CMD_FIFO_DEPTH = 16;
@@ -166,8 +156,6 @@ module spikemold_integrated_top #(
     wire                       neuron_array_busy;
 
     assign rst_n = rst_n_vec[0];
-    assign bd_learn_weight_ready = 1'b1;
-
     //=========================================================================
     // Block Design Instantiation
     //=========================================================================
@@ -198,7 +186,7 @@ module spikemold_integrated_top #(
         // Clock/Reset
         .clk_100mhz             (clk),
         .rst_n_sync              (rst_n_vec),
-        .debug_learning_active   (debug_learning_active),
+        .debug_reserved_zero     (debug_reserved_zero),
 
         // HLS -> RTL spike (BD port names match HLS ap_none ports)
         .spike_in_valid          (bd_spike_in_valid),
@@ -211,17 +199,6 @@ module spikemold_integrated_top #(
         .spike_out_neuron_id     (bd_spike_out_neuron_id),
         .spike_out_weight        (bd_spike_out_weight),
         .spike_out_ready         (bd_spike_out_ready),
-        // HLS learned-weight bridge (kept connected for synthesis consistency)
-        .learn_weight_valid      (bd_learn_weight_valid),
-        .learn_weight_group      (bd_learn_weight_group),
-        .learn_weight_src        (bd_learn_weight_src),
-        .learn_weight_dst        (bd_learn_weight_dst),
-        .learn_weight_data       (bd_learn_weight_data),
-        .learn_weight_exc        (bd_learn_weight_exc),
-        .learn_weight_is_inter   (bd_learn_weight_is_inter),
-        .learn_weight_dst_group  (bd_learn_weight_dst_group),
-        .learn_weight_fanout_idx (bd_learn_weight_fanout_idx),
-        .learn_weight_ready      (bd_learn_weight_ready),
 
         // SpikeMold Control
         .spikemold_enable              (bd_spikemold_enable),

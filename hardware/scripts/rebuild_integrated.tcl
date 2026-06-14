@@ -258,8 +258,6 @@ connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins spikemold_top_hl
 connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins spikemold_top_hls_0/s_axis_data_TDEST]
 connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins spikemold_top_hls_0/s_axis_data_TUSER]
 
-# Reward signal is s_axilite register (not standalone port), no tie-off needed
-
 # =============================================================================
 # HLS ↔ RTL External Ports  (connected in spikemold_integrated_top.v wrapper)
 # =============================================================================
@@ -296,29 +294,6 @@ connect_bd_net [get_bd_ports spike_out_valid]                    [get_bd_pins sp
 connect_bd_net [get_bd_ports spike_out_neuron_id]               [get_bd_pins spikemold_top_hls_0/spike_out_neuron_id]
 connect_bd_net [get_bd_ports spike_out_weight]                   [get_bd_pins spikemold_top_hls_0/spike_out_weight]
 connect_bd_net [get_bd_pins spikemold_top_hls_0/spike_out_ready]      [get_bd_ports spike_out_ready]
-
-# HLS -> RTL: learned weight update channel
-create_bd_port -dir O learn_weight_valid -type data
-create_bd_port -dir O -from 3 -to 0 learn_weight_group -type data
-create_bd_port -dir O -from 6 -to 0 learn_weight_src -type data
-create_bd_port -dir O -from 6 -to 0 learn_weight_dst -type data
-create_bd_port -dir O -from 7 -to 0 learn_weight_data -type data
-create_bd_port -dir O learn_weight_exc -type data
-create_bd_port -dir O learn_weight_is_inter -type data
-create_bd_port -dir O -from 3 -to 0 learn_weight_dst_group -type data
-create_bd_port -dir O -from 3 -to 0 learn_weight_fanout_idx -type data
-create_bd_port -dir I learn_weight_ready -type data
-
-connect_bd_net [get_bd_pins spikemold_top_hls_0/learn_weight_valid]      [get_bd_ports learn_weight_valid]
-connect_bd_net [get_bd_pins spikemold_top_hls_0/learn_weight_group]      [get_bd_ports learn_weight_group]
-connect_bd_net [get_bd_pins spikemold_top_hls_0/learn_weight_src]        [get_bd_ports learn_weight_src]
-connect_bd_net [get_bd_pins spikemold_top_hls_0/learn_weight_dst]        [get_bd_ports learn_weight_dst]
-connect_bd_net [get_bd_pins spikemold_top_hls_0/learn_weight_data]       [get_bd_ports learn_weight_data]
-connect_bd_net [get_bd_pins spikemold_top_hls_0/learn_weight_exc]        [get_bd_ports learn_weight_exc]
-connect_bd_net [get_bd_pins spikemold_top_hls_0/learn_weight_is_inter]   [get_bd_ports learn_weight_is_inter]
-connect_bd_net [get_bd_pins spikemold_top_hls_0/learn_weight_dst_group]  [get_bd_ports learn_weight_dst_group]
-connect_bd_net [get_bd_pins spikemold_top_hls_0/learn_weight_fanout_idx] [get_bd_ports learn_weight_fanout_idx]
-connect_bd_net [get_bd_ports learn_weight_ready]                    [get_bd_pins spikemold_top_hls_0/learn_weight_ready]
 
 # SpikeMold Control
 create_bd_port -dir O spikemold_enable -type data
@@ -376,11 +351,11 @@ connect_bd_net [get_bd_ports cfg_service_cycles_counter]              [get_bd_pi
 # existing top-level wrapper wiring regardless of configured FCLK frequency.
 create_bd_port -dir O clk_100mhz -type clk
 create_bd_port -dir O rst_n_sync -type rst
-create_bd_port -dir O debug_learning_active -type data
+create_bd_port -dir O debug_reserved_zero -type data
 
 connect_bd_net [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_ports clk_100mhz]
 connect_bd_net [get_bd_pins proc_sys_reset_0/peripheral_aresetn] [get_bd_ports rst_n_sync]
-connect_bd_net [get_bd_pins const_zero_1bit/dout] [get_bd_ports debug_learning_active]
+connect_bd_net [get_bd_pins const_zero_1bit/dout] [get_bd_ports debug_reserved_zero]
 
 # HLS threshold/leak connected via spikemold_integrated_top.v wrapper, not via config_regs
 # (config_regs doesn't have hls_spikemold_enable/hls_threshold/hls_leak_rate ports)
@@ -401,8 +376,8 @@ foreach seg [get_bd_addr_segs -of_objects [get_bd_addr_spaces processing_system7
     
     if {[string match "*spikemold_top_hls*" $seg_name]} {
         set_property offset 0x43C00000 $seg
-        # Expose full HLS AXI-Lite register map (up to 0x9C in current IP).
-        # Keeping this at 128B hides version/reward registers above 0x7F and
+        # Expose full HLS AXI-Lite register map.
+        # Keeping this at 128B hides status/version registers above 0x7F and
         # makes on-board IP/version parity checks impossible.
         set_property range 4K $seg
         puts "  -> HLS at 0x43C00000 (range 4K)"

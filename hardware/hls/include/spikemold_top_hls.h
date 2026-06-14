@@ -5,7 +5,7 @@
 // Author        : Jiwoon Lee (@metr0jw)
 // Organization  : Kwangwoon University, Seoul, South Korea
 // Contact       : jwlee@linux.com
-// Description   : Header for unified HLS top-level with on-chip learning
+// Description   : Header for inference-only SpikeMold HLS top-level
 //-----------------------------------------------------------------------------
 
 #ifndef SPIKEMOLD_TOP_HLS_H
@@ -189,7 +189,6 @@ const int VERSION_ID     = 0x20260221;
 // Operation Modes (use #define for switch-case compatibility)
 //=============================================================================
 #define MODE_INFERENCE 0       // Forward inference only
-#define MODE_TRAIN_STDP 1      // On-chip STDP learning
 #define MODE_CHECKPOINT 2      // Stream weights to DDR/PS
 // mode_reg[31:16] can optionally hold checkpoint chunk size (words):
 //   0 -> single-frame checkpoint (TLAST at final word only)
@@ -204,10 +203,8 @@ typedef ap_uint<SNN_GROUP_ID_WIDTH> group_id_t;
 typedef ap_uint<SNN_LOCAL_ID_WIDTH> local_id_t;
 typedef ap_uint<SNN_FANOUT_IDX_WIDTH> fanout_idx_t;
 typedef ap_int<WEIGHT_WIDTH> weight_t;              // HLS AXI interface: signed 8-bit
-typedef ap_int<16> weight_delta_t;
 typedef ap_uint<TIMESTAMP_WIDTH> spike_time_t;
 
-// NOTE: HLS STDP engine uses packed_weight_t (configurable SNN_WEIGHT_BITS).
 // AXI-Stream packets still use 8-bit weight_t for interface compatibility.
 // RTL spikemold_coregroup.v uses unsigned 8-bit magnitude [0, 255] + 1-bit exc/inh flag.
 const packed_weight_t MAX_WEIGHT = PACKED_MAX_WEIGHT;
@@ -239,34 +236,6 @@ typedef ap_axiu<32, 1, 1, 1> axis_weight_t;
 
 // Data packet (for encoder input frames) - 32-bit wide (4 pixels per beat)
 typedef ap_axiu<32, 1, 1, 1> axis_data_t;
-
-//=============================================================================
-// Learning Parameters Structure
-//=============================================================================
-struct learning_params_t {
-    // STDP parameters (all used in HLS STDP engine)
-    ap_fixed<16,8> a_plus;          // LTP amplitude — scales Δw in LTP (used)
-    ap_fixed<16,8> a_minus;         // LTD amplitude — scales Δw in LTD (used)
-    ap_uint<16> tau_plus;           // Pre-trace time constant (host-side, for computing trace_decay)
-    ap_uint<16> tau_minus;          // Post-trace time constant (host-side, for computing trace_decay)
-    ap_uint<16> stdp_window;        // Reserved (global decay makes window implicit)
-    ap_fixed<16,8> learning_rate;   // Global learning rate — final scale on all weight updates (used)
-    
-    // R-STDP parameters
-    bool rstdp_enable;              // Enable reward-modulated STDP (used)
-    ap_fixed<16,8> trace_decay;     // Trace decay rate per timestep (used in decay_all_traces)
-    ap_fixed<16,8> reward_scale;    // Reward signal scaling in R-STDP (used)
-};
-
-//=============================================================================
-// Weight Update Structure
-//=============================================================================
-struct weight_update_t {
-    neuron_id_t pre_id;
-    neuron_id_t post_id;
-    weight_delta_t delta;
-    spike_time_t timestamp;
-};
 
 //=============================================================================
 // Encoder Configuration
@@ -302,7 +271,6 @@ void spikemold_top_hls(
     ap_uint<32> config_reg,
     ap_uint<32> mode_reg,
     ap_uint<32> time_steps_reg,
-    learning_params_t learning_params,
     encoder_config_t encoder_config,
     ap_uint<32> &status_reg,
     ap_uint<32> &spike_count_reg,
@@ -324,9 +292,6 @@ void spikemold_top_hls(
     // AXI4-Stream Weight Read (for debugging)
     hls::stream<axis_weight_t> &m_axis_weights,
     
-    // Reward signal input (for R-STDP)
-    ap_int<8> reward_signal,
-    
     // Verilog Interface - Spike Input (to SNN core) — RTL-width IDs
     ap_uint<1> &spike_in_valid,
     rtl_nid_t &spike_in_neuron_id,
@@ -339,18 +304,6 @@ void spikemold_top_hls(
     ap_int<8> spike_out_weight,
     ap_uint<1> &spike_out_ready,
 
-    // Verilog Interface - Learned weight update (HLS -> Event Router)
-    ap_uint<1> &learn_weight_valid,
-    group_id_t &learn_weight_group,
-    local_id_t &learn_weight_src,
-    local_id_t &learn_weight_dst,
-    ap_uint<8> &learn_weight_data,
-    ap_uint<1> &learn_weight_exc,
-    ap_uint<1> &learn_weight_is_inter,
-    group_id_t &learn_weight_dst_group,
-    fanout_idx_t &learn_weight_fanout_idx,
-    ap_uint<1> learn_weight_ready,
-    
     // Verilog Interface - Control signals
     ap_uint<1> &spikemold_enable,
     ap_uint<1> &spikemold_reset,

@@ -147,9 +147,9 @@ def check_batch1a() -> None:
 
 
 def check_removed_api_dependencies_excluded() -> None:
-    removed_accelerator_alias = r"[_-]".join(("snn", "fpga", "accelerator"))
+    removed_legacy_api_alias = r"[_-]".join(("snn", "fpga", "accelerator"))
     removed_api_patterns = [
-        removed_accelerator_alias,
+        removed_legacy_api_alias,
         "Neuron" + "Group",
         "Syn" + "apses",
         "SpikePress" + "Connection",

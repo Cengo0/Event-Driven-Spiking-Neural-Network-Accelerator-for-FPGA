@@ -45,21 +45,20 @@ implementation slice:
 
 Learning engine scope is excluded from the selected contribution path. The
 selected backend is `spikemold_ednp_fc_eventconv`, covering inference-only
-FC-LIF and shared-kernel EventConv primitives. STDP/R-STDP or on-chip learning
+FC-LIF and shared-kernel EventConv primitives. Training or on-chip adaptation
 paths are not evidence for the v3.6 gate and must not be used to claim
 correctness, performance, or hardware readiness.
 
-Existing learning-related hardware interfaces, if present while cleanup is in
-progress, are treated as out-of-scope compatibility residue until removed or
-replaced by inference-only ports. They are not part of the selected backend.
+The HLS public surface and integrated BD wrapper are now inference-only. Any
+remaining RTL router/coregroup compatibility residue is outside the selected
+backend until removed or replaced by inference-only ports.
 
 ## Required Next Gate
 
 PYNQ one-shot runtime API is present, but was not executed on the board in this
 gate. Before board claims:
 
-1. Remove or fully tie off remaining learning-engine interfaces from selected
-   SpikeMold hardware surfaces.
+1. Remove or fully tie off remaining RTL router/coregroup compatibility residue.
 2. Run Vivado synthesis for selected FC/EventConv primitives.
 3. Replace analytic LUT/FF/BRAM/timing estimates with routed reports.
 4. Run `scripts/run_spikemold_pynq_one_shot.py` on PYNQ-Z2 and record board

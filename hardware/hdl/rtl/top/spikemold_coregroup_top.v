@@ -150,7 +150,7 @@ module spikemold_coregroup_top #(
     //=========================================================================
     wire pl_clk;
     wire rst_n_sync;
-    wire debug_learning_active;
+    wire debug_hls_reserved_zero;
 
     //=========================================================================
     // HLS <-> RTL Interface Signals (from Block Design)
@@ -667,7 +667,7 @@ module spikemold_coregroup_top #(
         .rst_n_sync          (rst_n_sync),
 
         // Debug
-        .debug_learning_active (debug_learning_active),
+        .debug_reserved_zero   (debug_hls_reserved_zero),
 
         // HLS -> RTL Spike Interface
         .spike_in_valid          (hls_spike_out_valid),
