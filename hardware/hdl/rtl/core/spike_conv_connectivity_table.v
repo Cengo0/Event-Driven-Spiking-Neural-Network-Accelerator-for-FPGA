@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
-// Title       : Spike Convolution Connectivity Table - Loihi-style Shared Weights
+// Title       : Spike Convolution Connectivity Table - shared-kernel EventConv
 // Description : BRAM-based convolutional connectivity with shared kernel weights.
 //
-// This module implements Intel Loihi's approach to convolution:
+// This module implements shared-kernel EventConv:
 // - Shared kernel weights stored in small BRAM (3x3 or 5x5)
 // - Event-driven address generation for receptive field
 // - Add-only accumulation (no DSP blocks needed)
@@ -24,7 +24,7 @@
 //-----------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
-`include "snn_params.vh"
+`include "spikemold_params.vh"
 
 module spike_conv_connectivity_table #(
     parameter KERNEL_SIZE         = 3,          // Kernel size: 3 or 5

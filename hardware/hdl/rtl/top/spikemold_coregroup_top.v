@@ -1,14 +1,14 @@
 //-----------------------------------------------------------------------------
-// Title         : SNN Core Group Top - Hierarchical Neuromorphic Processor
+// Title         : SNN SpikeMold Coregroup Top - Hierarchical Neuromorphic Processor
 // Project       : SpikeMold (HW) + SpikePress (SW)
-// File          : snn_core_group_top.v
+// File          : spikemold_coregroup_top.v
 // Author        : Jiwoon Lee (@metr0jw)
 // Organization  : Kwangwoon University, Seoul, South Korea
 // Contact       : jwlee@linux.com
-// Description   : Top-level integration of the Core Group architecture:
+// Description   : Top-level integration of the SpikeMold Coregroup architecture:
 //
 //                 ┌─────────────────────────────────────────────────────┐
-//                 │              snn_core_group_top                     │
+//                 │              spikemold_coregroup_top                     │
 //                 │                                                     │
 //                 │  ┌─────────────────┐    ┌──────────────────┐        │
 //                 │  │ design_1_wrapper│    │  Synaptic Conn.  │        │
@@ -72,10 +72,10 @@
 //-----------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
-`include "snn_params.vh"
+`include "spikemold_params.vh"
 
-module snn_core_group_top #(
-    // Core Group Parameters (defaults from snn_params.yaml via snn_params.vh)
+module spikemold_coregroup_top #(
+    // SpikeMold Coregroup Parameters (defaults from spikemold_params.yaml via spikemold_params.vh)
     parameter NUM_GROUPS            = `SNN_NUM_GROUPS,
     parameter NEURONS_PER_GROUP     = `SNN_NEURONS_PER_GROUP,
     parameter WEIGHT_WIDTH          = `SNN_WEIGHT_WIDTH,
@@ -96,7 +96,7 @@ module snn_core_group_top #(
     parameter HLS_MAX_NEURONS       = `SNN_TOTAL_NEURONS,
     parameter HLS_WEIGHT_WIDTH      = `SNN_HLS_WEIGHT_WIDTH,
     parameter STRICT_PHYSICAL_ID_INGRESS = 0,
-`ifdef SNN_FABRIC_TOP_BOARD_VISIBLE
+`ifdef SPIKEMOLD_FABRIC_TOP_BOARD_VISIBLE
     parameter HLS_DIRECT_TILE_COMPAT = 1,
 `else
     parameter HLS_DIRECT_TILE_COMPAT = 0,
@@ -211,10 +211,10 @@ module snn_core_group_top #(
     wire                            rtl_learn_weight_ready = 1'b0;
 `endif
 
-    wire                            hls_snn_enable;
-    wire                            hls_snn_reset;
-    wire                            rtl_snn_ready;
-    wire                            rtl_snn_busy;
+    wire                            hls_spikemold_enable;
+    wire                            hls_spikemold_reset;
+    wire                            rtl_spikemold_ready;
+    wire                            rtl_spikemold_busy;
     wire [15:0]                     hls_threshold_out;
     wire [15:0]                     hls_leak_rate_out;
 
@@ -246,7 +246,7 @@ module snn_core_group_top #(
     wire [NUM_GROUPS*LOCAL_ID_WIDTH-1:0]        router_grp_spike_neuron_id;
     wire [NUM_GROUPS-1:0]                       router_grp_spike_ready;
 
-    // Event router / direct HLS replay → core group input spikes.
+    // Event router / direct HLS replay → coregroup input spikes.
     // Direct active-tile replay bypasses the inter-group router so it preserves
     // the compatibility board-visible inference contract while the router remains
     // responsible for recurrent/inter-group fanout.
@@ -574,7 +574,7 @@ module snn_core_group_top #(
     reg [31:0] spike_sum_stage1 [0:3];  // 4 partial sums of up to 4 groups each
     integer si;
     always @(posedge pl_clk) begin
-        if (!rst_n_sync || hls_snn_reset) begin
+        if (!rst_n_sync || hls_spikemold_reset) begin
             for (si = 0; si < 4; si = si + 1)
                 spike_sum_stage1[si] <= 0;
             total_neuron_spikes <= 0;
@@ -729,11 +729,11 @@ module snn_core_group_top #(
         .learn_weight_ready      (1'b0),
 `endif
 
-        // SNN Control
-        .snn_enable              (hls_snn_enable),
-        .snn_reset               (hls_snn_reset),
-        .snn_ready               (rtl_snn_ready),
-        .snn_busy                (rtl_snn_busy),
+        // SpikeMold Control
+        .spikemold_enable              (hls_spikemold_enable),
+        .spikemold_reset               (hls_spikemold_reset),
+        .spikemold_ready               (rtl_spikemold_ready),
+        .spikemold_busy                (rtl_spikemold_busy),
 
         // HLS Neuron Parameters
         .threshold_out           (hls_threshold_out),
@@ -867,7 +867,7 @@ module snn_core_group_top #(
     assign hls_pending_ready = (!hls_spike_out_valid || !hls_scalar_id_in_range)
         ? 1'b1
         : (hls_direct_id_accepted ? !hls_direct_fifo_full : router_ext_spike_ready);
-    assign hls_spike_capture_event = hls_snn_enable &
+    assign hls_spike_capture_event = hls_spikemold_enable &
                                      hls_spike_out_valid &
                                      !hls_spike_wait_clear &
                                      hls_pending_ready;
@@ -875,7 +875,7 @@ module snn_core_group_top #(
                              hls_scalar_id_in_range;
     assign hls_scalar_invalid_event = hls_spike_capture_event &
                                       hls_scalar_invalid;
-    assign hls_spike_capture_ready = hls_snn_enable &
+    assign hls_spike_capture_ready = hls_spikemold_enable &
                                      hls_pending_ready;
 
     spikemold_scalar_id_guard #(
@@ -944,7 +944,7 @@ module snn_core_group_top #(
                                   hls_direct_axis_tvalid &
                                   hls_direct_axis_tready;
     assign hls_direct_scalar_axis_collision =
-        hls_snn_enable & hls_direct_id_accepted & hls_spike_out_valid & hls_direct_axis_push;
+        hls_spikemold_enable & hls_direct_id_accepted & hls_spike_out_valid & hls_direct_axis_push;
     assign hls_direct_axis_weight_negative =
         hls_direct_axis_weight[HLS_WEIGHT_WIDTH-1];
     assign hls_direct_axis_weight_abs = hls_direct_axis_weight_negative
@@ -986,7 +986,7 @@ module snn_core_group_top #(
                                  (!hls_direct_pending_group_valid || hls_direct_pending_ready);
 
     always @(posedge pl_clk) begin
-        if (!rst_n_sync || hls_snn_reset) begin
+        if (!rst_n_sync || hls_spikemold_reset) begin
             hls_spike_valid_d       <= 1'b0;
             hls_spike_accepted_d    <= 1'b0;
             hls_spike_nid_d         <= {HLS_NEURON_ID_WIDTH{1'b0}};
@@ -1001,7 +1001,7 @@ module snn_core_group_top #(
             hls_direct_axis_scalar_collision_count <= 32'd0;
             hls_direct_axis_invalid_id_count <= 32'd0;
         end else begin
-            if (!hls_snn_enable) begin
+            if (!hls_spikemold_enable) begin
                 hls_spike_valid_d <= 1'b0;
                 hls_spike_accepted_d <= 1'b0;
                 hls_spike_nid_d   <= {HLS_NEURON_ID_WIDTH{1'b0}};
@@ -1104,12 +1104,12 @@ module snn_core_group_top #(
         : learn_spike_src_id;
     assign rtl_output_axis_enable = (HLS_DIRECT_TILE_COMPAT != 0);
 
-    // Break the long path from core-group output FIFO read/arbiter logic into
+    // Break the long path from coregroup output FIFO read/arbiter logic into
     // the host-output bridge FIFO write-enable.  The HLS-facing output contract
     // is tokenized and frame-oriented, so one cycle of staging is acceptable
     // and makes the 80 MHz route closure deterministic.
     always @(posedge pl_clk) begin
-        if (!rst_n_sync || hls_snn_reset || !hls_snn_enable) begin
+        if (!rst_n_sync || hls_spikemold_reset || !hls_spikemold_enable) begin
             host_output_spike_valid_q <= 1'b0;
             host_output_spike_id_q    <= {GLOBAL_ID_WIDTH{1'b0}};
         end else begin
@@ -1130,8 +1130,8 @@ module snn_core_group_top #(
     ) u_spike_out_bridge (
         .clk                 (pl_clk),
         .rst_n               (rst_n_sync),
-        .enable              (hls_snn_enable),
-        .clear               (hls_snn_reset),
+        .enable              (hls_spikemold_enable),
+        .clear               (hls_spikemold_reset),
         .neuron_spike_valid  (host_output_spike_valid_q),
         .neuron_spike_id     (host_output_spike_id_q),
         .spike_out_ready_token(hls_spike_in_ready),
@@ -1160,10 +1160,10 @@ module snn_core_group_top #(
 
     // HLS ready/busy
     assign rtl_spike_in_ready = hls_spike_capture_ready;
-    assign rtl_snn_ready      = !router_busy &
+    assign rtl_spikemold_ready      = !router_busy &
                                 (grp_busy == {NUM_GROUPS{1'b0}}) &
                                 hls_direct_fifo_empty;
-    assign rtl_snn_busy       = router_busy |
+    assign rtl_spikemold_busy       = router_busy |
                                 (grp_busy != {NUM_GROUPS{1'b0}}) |
                                 !hls_direct_fifo_empty;
     assign output_drain_busy  = !hls_direct_fifo_empty |
@@ -1171,12 +1171,12 @@ module snn_core_group_top #(
                                 rtl_spike_axis_tvalid;
 
     always @(posedge pl_clk) begin
-        if (!rst_n_sync || hls_snn_reset) begin
+        if (!rst_n_sync || hls_spikemold_reset) begin
             service_cycles_counter <= 32'd0;
             pl_busy_cycles_counter <= 32'd0;
             output_drain_cycles_counter <= 32'd0;
         end else begin
-            if (hls_snn_enable && rtl_snn_busy) begin
+            if (hls_spikemold_enable && rtl_spikemold_busy) begin
                 if (service_cycles_counter != 32'hFFFFFFFF) begin
                     service_cycles_counter <= service_cycles_counter + 32'd1;
                 end
@@ -1184,7 +1184,7 @@ module snn_core_group_top #(
                     pl_busy_cycles_counter <= pl_busy_cycles_counter + 32'd1;
                 end
             end
-            if (hls_snn_enable && output_drain_busy && output_drain_cycles_counter != 32'hFFFFFFFF) begin
+            if (hls_spikemold_enable && output_drain_busy && output_drain_cycles_counter != 32'hFFFFFFFF) begin
                 output_drain_cycles_counter <= output_drain_cycles_counter + 32'd1;
             end
         end
@@ -1213,14 +1213,14 @@ module snn_core_group_top #(
     endgenerate
 
     //=========================================================================
-    // Core Group Instantiations
+    // SpikeMold Coregroup Instantiations
     //=========================================================================
     // Each group has its own NEURONS_PER_GROUP from SNN_GROUP_SIZE_x defines.
     // All groups share the same LOCAL_ID_WIDTH (= clog2(max(group_sizes)))
     // for uniform interconnect bus widths.
     //
     // Default: 16 × 128 = 2048 neurons (all groups identical).
-    // Variable: configure group_sizes in snn_params.yaml for mixed sizes.
+    // Variable: configure group_sizes in spikemold_params.yaml for mixed sizes.
     //=========================================================================
 
     // Mux write enable: AXI config writes OR event router weight updates
@@ -1269,7 +1269,7 @@ module snn_core_group_top #(
                 (g == 14) ? `SNN_GROUP_SIZE_14 :
                             `SNN_GROUP_SIZE_15 ;
 
-            core_group #(
+            spikemold_coregroup #(
                 .GROUP_ID           (g),
                 .NEURONS_PER_GROUP  (THIS_NPG),
                 .LOCAL_ID_WIDTH     (LOCAL_ID_WIDTH),
@@ -1282,8 +1282,8 @@ module snn_core_group_top #(
                 .ENABLE_INTRA_RECURRENCE(HLS_DIRECT_TILE_COMPAT ? 0 : 1)
             ) u_core_group (
                 .clk                (pl_clk),
-                .rst_n              (rst_n_sync & ~hls_snn_reset),
-                .enable             (hls_snn_enable),
+                .rst_n              (rst_n_sync & ~hls_spikemold_reset),
+                .enable             (hls_spikemold_enable),
 
                 // External spike input (from event router)
                 .ext_spike_valid    (grp_in_valid[g]),
@@ -1358,7 +1358,7 @@ module snn_core_group_top #(
         .MAX_FANOUT_INTER   (MAX_FANOUT_INTER)
     ) u_connectivity_table (
         .clk                (pl_clk),
-        .rst_n              (rst_n_sync & ~hls_snn_reset),
+        .rst_n              (rst_n_sync & ~hls_spikemold_reset),
 
         // Write port (config)
         .cfg_we             (ct_cfg_we_mux),
@@ -1404,8 +1404,8 @@ module snn_core_group_top #(
         .LEARN_NOTIFY_ENABLE(LEARN_NOTIFY_ENABLE)
     ) u_event_router (
         .clk                (pl_clk),
-        .rst_n              (rst_n_sync & ~hls_snn_reset),
-        .enable             (hls_snn_enable),
+        .rst_n              (rst_n_sync & ~hls_spikemold_reset),
+        .enable             (hls_spikemold_enable),
 
         // Core group spike outputs (FROM groups)
         .grp_spike_valid    (router_grp_spike_valid),

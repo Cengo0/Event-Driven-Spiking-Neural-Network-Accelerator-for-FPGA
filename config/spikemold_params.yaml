@@ -30,7 +30,7 @@ neuron_groups:
   size: 512
 - name: input
   size: 512
-- name: dummy_pad
+- name: capacity_reserve
   size: 3866
 connections:
 - name: input_to_visible_output

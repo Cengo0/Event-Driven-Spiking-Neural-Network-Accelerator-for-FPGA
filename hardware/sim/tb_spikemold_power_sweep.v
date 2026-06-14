@@ -1,9 +1,9 @@
-// hardware/sim/tb_snn_power_sweep.v
+// hardware/sim/tb_spikemold_power_sweep.v
 // Testbench for power analysis sweep (Spike Density vs Power)
 
 `timescale 1ns / 1ps
 
-module tb_snn_power_sweep;
+module tb_spikemold_power_sweep;
 
     //-------------------------------------------------------------------------
     // Parameters
@@ -121,7 +121,7 @@ module tb_snn_power_sweep;
 
         // VCD generation
         $dumpfile("power_sweep.vcd");
-        $dumpvars(0, tb_snn_power_sweep);
+        $dumpvars(0, tb_spikemold_power_sweep);
 
         $display("--- Starting Spike Density Sweep: 10%% ---");
         generate_aer_stream(0.10, 50);

@@ -118,7 +118,7 @@ vivado:
 	@echo "$(YELLOW)Running Vivado synthesis check...$(RESET)"
 	@if command -v $(VIVADO) >/dev/null 2>&1; then \
 		cd $(HARDWARE_DIR)/scripts && \
-		$(VIVADO) -mode batch -source synth_core_group.tcl; \
+		$(VIVADO) -mode batch -source synth_spikemold_coregroup.tcl; \
 		echo "$(GREEN)✅ Vivado synthesis completed$(RESET)"; \
 	else \
 		echo "$(RED)❌ Vivado not found$(RESET)"; \

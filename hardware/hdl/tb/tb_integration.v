@@ -176,7 +176,7 @@ module tb_integration;
         for (g = 0; g < NUM_GROUPS; g = g + 1) begin : gen_cg
             assign grp_in_threshold[g*THRESHOLD_WIDTH +: THRESHOLD_WIDTH] = global_threshold;
 
-            core_group #(
+            spikemold_coregroup #(
                 .GROUP_ID           (g),
                 .NEURONS_PER_GROUP  (NEURONS_PER_GROUP),
                 .DATA_WIDTH         (DATA_WIDTH),

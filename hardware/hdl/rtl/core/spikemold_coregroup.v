@@ -1,11 +1,11 @@
 //-----------------------------------------------------------------------------
-// Title         : Core Group - Hierarchical Neuron Core with Local Projections
+// Title         : SpikeMold Coregroup - Hierarchical Neuron Core with Local Projections
 // Project       : SpikeMold (HW) + SpikePress (SW)
-// File          : core_group.v
+// File          : spikemold_coregroup.v
 // Author        : Jiwoon Lee (@metr0jw)
 // Organization  : Kwangwoon University, Seoul, South Korea
 // Contact       : jwlee@linux.com
-// Description   : A neuron core group containing:
+// Description   : A neuron coregroup containing:
 //                 - N time-multiplexed LIF neurons (SDP BRAM state)
 //                 - Dense local weight memory [N x N] for intra-group synapses
 //                 - Intra-group spike recurrence (fire → weight lookup → internal)
@@ -30,9 +30,9 @@
 //-----------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
-`include "snn_params.vh"
+`include "spikemold_params.vh"
 
-module core_group #(
+module spikemold_coregroup #(
     parameter GROUP_ID              = 0,
     parameter NEURONS_PER_GROUP     = `SNN_NEURONS_PER_GROUP,
     parameter DATA_WIDTH            = `SNN_DATA_WIDTH,
@@ -581,7 +581,7 @@ module core_group #(
 
                     //------------------------------------------------------
                     // Commit scan: threshold accumulated membrane state
-                    // without relying on a dummy input spike.
+                    // without relying on a synthetic input spike.
                     //------------------------------------------------------
                     ST_COMMIT_RD: begin
                         commit_addr_hold <= ns_rd_addr;

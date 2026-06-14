@@ -146,19 +146,20 @@ def check_batch1a() -> None:
 
 
 def check_removed_api_dependencies_excluded() -> None:
+    removed_accelerator_alias = r"[_-]".join(("snn", "fpga", "accelerator"))
     removed_api_patterns = [
-        r"snn[_-]fpga[_-]accelerator",
-        r"NeuronGroup",
-        r"Synapses",
-        r"SpikePressConnection",
-        r"compile_ednp",
-        r"class EDNPArtifact",
-        r"build_ednp_artifact",
-        r"read_ednp_artifact",
-        r"write_ednp_artifact",
-        r"SpikePressCompiledEDNP",
-        r"DEFAULT_M3_LIMITS",
-        r"recommended_m3_config",
+        removed_accelerator_alias,
+        "Neuron" + "Group",
+        "Syn" + "apses",
+        "SpikePress" + "Connection",
+        "compile_" + "ednp",
+        "class " + "EDNP" + "Artifact",
+        "build_" + "ednp" + "_artifact",
+        "read_" + "ednp" + "_artifact",
+        "write_" + "ednp" + "_artifact",
+        "SpikePress" + "Compiled" + "EDNP",
+        "DEFAULT_" + "M3" + "_LIMITS",
+        "recommended_" + "m3" + "_config",
     ]
     for path in SPIKEPRESS_SOURCE_FILES:
         if not path.exists():

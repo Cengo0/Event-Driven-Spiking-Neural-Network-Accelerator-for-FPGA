@@ -27,21 +27,21 @@ echo ""
 # Check source files
 echo "Checking source files..."
 
-if [ -f "hardware/hls/src/snn_top_hls.cpp" ]; then
+if [ -f "hardware/hls/src/spikemold_top_hls.cpp" ]; then
     log_info "HLS kernel source found"
 else
     log_error "HLS kernel source NOT found"
     exit 1
 fi
 
-if [ -f "hardware/hls/include/snn_top_hls.h" ]; then
+if [ -f "hardware/hls/include/spikemold_top_hls.h" ]; then
     log_info "HLS kernel header found"
 else
     log_error "HLS kernel header NOT found"
     exit 1
 fi
 
-if [ -f "hardware/hls/test/test_snn_top_hls.cpp" ]; then
+if [ -f "hardware/hls/test/test_spikemold_top_hls.cpp" ]; then
     log_info "HLS testbench found"
 else
     log_error "HLS testbench NOT found"
@@ -51,7 +51,7 @@ fi
 echo ""
 echo "Checking scripts..."
 
-if [ -f "hardware/scripts/synth_core_group.tcl" ]; then
+if [ -f "hardware/scripts/synth_spikemold_coregroup.tcl" ]; then
     log_info "Synthesis script found"
 else
     log_error "Synthesis script NOT found"
@@ -92,7 +92,7 @@ fi
 echo ""
 echo "Checking tools..."
 
-# Check v++ (replaces deprecated vitis_hls)
+# Check v++ (supersedes vitis_hls)
 if command -v v++ &> /dev/null; then
     VPP_VER=$(v++ --version 2>&1 | head -n 1)
     log_info "v++ compiler found: ${VPP_VER}"
@@ -122,6 +122,6 @@ echo "  ./run_testbenches.sh"
 echo ""
 echo "To run synthesis:"
 echo "  cd hardware/scripts"
-echo "  vivado -mode batch -source synth_core_group.tcl"
+echo "  vivado -mode batch -source synth_spikemold_coregroup.tcl"
 echo ""
 echo "Estimated build time: 20-40 minutes"

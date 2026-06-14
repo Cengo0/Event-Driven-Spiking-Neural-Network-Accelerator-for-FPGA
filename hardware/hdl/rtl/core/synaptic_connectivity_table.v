@@ -14,7 +14,7 @@
 //
 // Data Format (16 bits):
 //   [15]     valid       — entry is active
-//   [14:12]  dst_group   — destination core group ID
+//   [14:12]  dst_group   — destination coregroup ID
 //   [11:5]   dst_neuron  — destination neuron within group
 //   [4:1]    weight      — 4-bit synaptic weight (unsigned magnitude)
 //   [0]      exc_inh     — 1=excitatory, 0=inhibitory
@@ -30,7 +30,7 @@
 //-----------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
-`include "snn_params.vh"
+`include "spikemold_params.vh"
 
 module synaptic_connectivity_table #(
     parameter NUM_GROUPS        = `SNN_NUM_GROUPS,

@@ -8,7 +8,7 @@
 //-----------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
-`include "snn_params.vh"
+`include "spikemold_params.vh"
 
 module spike_conv_agu #(
     parameter KERNEL_SIZE = 3,

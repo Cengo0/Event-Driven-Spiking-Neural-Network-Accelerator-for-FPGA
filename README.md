@@ -23,7 +23,7 @@ Active path:
 
 Out of scope for the current EDNP mainline:
 
-- removed pre-EDNP HW/SW API
+- removed HW/SW API
 - Python-controlled inner loops as runtime architecture
 
 ## Quick Check

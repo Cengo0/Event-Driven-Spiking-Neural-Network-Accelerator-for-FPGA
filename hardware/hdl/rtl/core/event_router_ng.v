@@ -13,7 +13,7 @@
 //                 5. External sensors (AXI4-Stream input)
 //
 // Operation:
-//   When a core group outputs a spike:
+//   When a coregroup outputs a spike:
 //   1. Arbiter selects one source (round-robin among groups + external)
 //   2. Connectivity table lookup: iterate fanout_idx for inter-group connections
 //   3. Route spikes to destination core groups
@@ -28,7 +28,7 @@
 //-----------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
-`include "snn_params.vh"
+`include "spikemold_params.vh"
 
 module event_router_ng #(
     parameter NUM_GROUPS        = `SNN_NUM_GROUPS,
@@ -50,12 +50,12 @@ module event_router_ng #(
     input  wire                         rst_n,
     input  wire                         enable,
 
-    // --- Core Group Spike Output Ports (spikes FROM groups) ---
+    // --- SpikeMold Coregroup Spike Output Ports (spikes FROM groups) ---
     input  wire [NUM_GROUPS-1:0]        grp_spike_valid,
     input  wire [NUM_GROUPS*LOCAL_ID_WIDTH-1:0] grp_spike_neuron_id,
     output reg  [NUM_GROUPS-1:0]        grp_spike_ready,
 
-    // --- Core Group Spike Input Ports (spikes TO groups) ---
+    // --- SpikeMold Coregroup Spike Input Ports (spikes TO groups) ---
     output reg  [NUM_GROUPS-1:0]        grp_in_valid,
     output reg  [NUM_GROUPS*LOCAL_ID_WIDTH-1:0]  grp_in_dest_id,
     output reg  [NUM_GROUPS*WEIGHT_WIDTH-1:0]    grp_in_weight,
@@ -284,7 +284,7 @@ module event_router_ng #(
                                 ct_cfg_weight     <= learn_weight_data;
                                 ct_cfg_exc_inh    <= learn_weight_exc;
                             end else begin
-                                // Forward to appropriate core group
+                                // Forward to appropriate coregroup
                                 grp_weight_we[learn_weight_group] <= 1;
                                 grp_weight_src  <= learn_weight_src;
                                 grp_weight_dst  <= learn_weight_dst;
@@ -385,7 +385,7 @@ module event_router_ng #(
                     ST_CT_DELIVER: begin
 `ifdef SNN_EVENT_ROUTER_LEARNING_ENABLE
                         if (ct_result_valid && ct_result_entry_valid) begin
-                            // Deliver spike to destination core group
+                            // Deliver spike to destination coregroup
                             if (ct_result_dst_group >= NUM_GROUPS) begin
                                 // Invalid destination group — skip to next fanout
                                 ct_invalid_dst_counter <= ct_invalid_dst_counter + 1'b1;
@@ -412,7 +412,7 @@ module event_router_ng #(
 `else
                         // Inference-only mode: no learning notify, just return to idle
                         if (ct_result_valid && ct_result_entry_valid) begin
-                            // Deliver spike to destination core group
+                            // Deliver spike to destination coregroup
                             if (ct_result_dst_group >= NUM_GROUPS) begin
                                 ct_invalid_dst_counter <= ct_invalid_dst_counter + 1'b1;
                                 state <= ST_CT_NEXT;

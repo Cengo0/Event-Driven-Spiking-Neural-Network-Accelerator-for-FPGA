@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
-// Title         : SNN Top-Level HLS Testbench
+// Title         : SpikeMold Top-Level HLS Testbench
 // Project       : PYNQ-Z2 SpikeMold
-// File          : tb_snn_top_hls.cpp
+// File          : tb_spikemold_top_hls.cpp
 // Author        : Jiwoon Lee (@metr0jw)
 // Organization  : Kwangwoon University, Seoul, South Korea
 // Contact       : jwlee@linux.com
@@ -11,12 +11,19 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
-#include "../include/snn_top_hls.h"
+#include "../include/spikemold_top_hls.h"
 
 // Test configuration
 #define NUM_TEST_SPIKES 20
 #define NUM_TIMESTEPS 100
 #define VERBOSE 1
+
+static const neuron_id_t TEST_FIRST_PRE_ID = SNN_CONN_0_SRC_ID_START;
+static const neuron_id_t TEST_SECOND_PRE_ID = SNN_CONN_0_SRC_ID_START + 2;
+static const neuron_id_t TEST_POST_ID = SNN_CONN_0_DST_ID_START;
+static const rtl_nid_t TEST_POST_RTL_ID = (rtl_nid_t)SNN_CONN_0_DST_ID_START;
+static const int TEST_FIRST_WEIGHT_INDEX = 0;
+static const int TEST_SECOND_WEIGHT_INDEX = 2 * SNN_CONN_0_DST_SIZE;
 
 // Error counter
 int error_count = 0;
@@ -29,13 +36,25 @@ void print_result(const char* test_name, bool passed) {
     if (!passed) error_count++;
 }
 
+void drain_spike_stream(hls::stream<axis_spike_t> &stream) {
+    while (!stream.empty()) {
+        stream.read();
+    }
+}
+
+void drain_weight_stream(hls::stream<axis_weight_t> &stream) {
+    while (!stream.empty()) {
+        stream.read();
+    }
+}
+
 axis_spike_t create_spike(neuron_id_t neuron_id, int8_t weight, uint16_t timestamp) {
     axis_spike_t pkt;
     pkt.data = 0;
     pkt.data(SPIKE_PKT_ID_HI, SPIKE_PKT_ID_LO) = neuron_id;
     pkt.data(SPIKE_PKT_WGT_HI, SPIKE_PKT_WGT_LO) = (ap_uint<8>)weight;
     pkt.data(SPIKE_PKT_TS_HI, SPIKE_PKT_TS_LO) =
-        timestamp(SPIKE_PKT_TS_HI - SPIKE_PKT_TS_LO, 0);
+        (ap_uint<SPIKE_PKT_TS_HI - SPIKE_PKT_TS_LO + 1>)timestamp;
     pkt.keep = 0xF;
     pkt.strb = 0xF;
     pkt.last = 1;
@@ -48,9 +67,11 @@ axis_spike_t create_spike(neuron_id_t neuron_id, int8_t weight, uint16_t timesta
 axis_weight_t create_weight_packet(neuron_id_t pre_id, neuron_id_t post_id, int8_t weight) {
     axis_weight_t pkt;
     pkt.data = 0;
-    pkt.data(NEURON_ID_WIDTH - 1, 0) = pre_id;
-    pkt.data(2 * NEURON_ID_WIDTH - 1, NEURON_ID_WIDTH) = post_id;
-    pkt.data(2 * NEURON_ID_WIDTH + 7, 2 * NEURON_ID_WIDTH) = (ap_uint<8>)weight;
+    pkt.data(WEIGHT_LOAD_PKT_PRE_HI, WEIGHT_LOAD_PKT_PRE_LO) =
+        (ap_uint<WEIGHT_LOAD_PKT_ID_WIDTH>)pre_id;
+    pkt.data(WEIGHT_LOAD_PKT_POST_HI, WEIGHT_LOAD_PKT_POST_LO) =
+        (ap_uint<WEIGHT_LOAD_PKT_ID_WIDTH>)post_id;
+    pkt.data(WEIGHT_LOAD_PKT_WGT_HI, WEIGHT_LOAD_PKT_WGT_LO) = (ap_uint<8>)weight;
     pkt.keep = 0xF;
     pkt.strb = 0xF;
     pkt.last = 1;
@@ -108,17 +129,17 @@ void test_control_registers() {
     ap_int<8> reward_signal = 0;
     
     // Verilog interface (simulated)
-    ap_uint<1> spike_in_valid, spike_out_ready, snn_enable, snn_reset;
-    neuron_id_t spike_in_neuron_id;
+    ap_uint<1> spike_in_valid, spike_out_ready, spikemold_enable, spikemold_reset;
+    rtl_nid_t spike_in_neuron_id;
     ap_int<8> spike_in_weight;
     ap_uint<16> threshold_out, leak_rate_out;
     
     ap_uint<1> spike_in_ready = 1;
     ap_uint<1> spike_out_valid = 0;
-    neuron_id_t spike_out_neuron_id = 0;
+    rtl_nid_t spike_out_neuron_id = 0;
     ap_int<8> spike_out_weight = 0;
-    ap_uint<1> snn_ready = 1;
-    ap_uint<1> snn_busy = 0;
+    ap_uint<1> spikemold_ready = 1;
+    ap_uint<1> spikemold_busy = 0;
     ap_uint<1> learn_weight_valid = 0;
     group_id_t learn_weight_group = 0;
     local_id_t learn_weight_src = 0;
@@ -134,7 +155,7 @@ void test_control_registers() {
     ctrl_reg = 0x02;  // Reset bit
     config_reg = (100 << 16) | 51;  // leak_rate=100, threshold=51
     
-        snn_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
+        spikemold_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
                     status_reg, spike_count_reg,
                     weight_sum_reg, version_reg, s_axis_spikes, s_axis_data, s_axis_weights,
                     m_axis_spikes,
@@ -144,10 +165,10 @@ void test_control_registers() {
                 learn_weight_valid, learn_weight_group, learn_weight_src, learn_weight_dst,
                 learn_weight_data, learn_weight_exc, learn_weight_is_inter,
                 learn_weight_dst_group, learn_weight_fanout_idx, learn_weight_ready,
-                snn_enable, snn_reset, threshold_out, leak_rate_out,
-                snn_ready, snn_busy);
+                spikemold_enable, spikemold_reset, threshold_out, leak_rate_out,
+                spikemold_ready, spikemold_busy);
     
-    print_result("Reset signal routed", snn_reset == 1);
+    print_result("Reset signal routed", spikemold_reset == 1);
     print_result("Version register set", version_reg == VERSION_ID);
     print_result("Threshold routed", threshold_out == 51);
     print_result("Leak rate routed", leak_rate_out == 100);
@@ -155,7 +176,7 @@ void test_control_registers() {
     // Test enable
     ctrl_reg = 0x01;  // Enable bit
     
-        snn_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
+        spikemold_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
                     status_reg, spike_count_reg,
                     weight_sum_reg, version_reg, s_axis_spikes, s_axis_data, s_axis_weights,
                     m_axis_spikes,
@@ -165,10 +186,10 @@ void test_control_registers() {
                 learn_weight_valid, learn_weight_group, learn_weight_src, learn_weight_dst,
                 learn_weight_data, learn_weight_exc, learn_weight_is_inter,
                 learn_weight_dst_group, learn_weight_fanout_idx, learn_weight_ready,
-                snn_enable, snn_reset, threshold_out, leak_rate_out,
-                snn_ready, snn_busy);
+                spikemold_enable, spikemold_reset, threshold_out, leak_rate_out,
+                spikemold_ready, spikemold_busy);
     
-    print_result("Enable signal routed", snn_enable == 1);
+    print_result("Enable signal routed", spikemold_enable == 1);
 }
 
 //=============================================================================
@@ -192,17 +213,17 @@ void test_spike_input() {
     ap_uint<32> status_reg, spike_count_reg, weight_sum_reg, version_reg;
     ap_int<8> reward_signal = 0;
     
-    ap_uint<1> spike_in_valid, spike_out_ready, snn_enable, snn_reset;
-    neuron_id_t spike_in_neuron_id;
+    ap_uint<1> spike_in_valid, spike_out_ready, spikemold_enable, spikemold_reset;
+    rtl_nid_t spike_in_neuron_id;
     ap_int<8> spike_in_weight;
     ap_uint<16> threshold_out, leak_rate_out;
     
     ap_uint<1> spike_in_ready = 1;
     ap_uint<1> spike_out_valid = 0;
-    neuron_id_t spike_out_neuron_id = 0;
+    rtl_nid_t spike_out_neuron_id = 0;
     ap_int<8> spike_out_weight = 0;
-    ap_uint<1> snn_ready = 1;
-    ap_uint<1> snn_busy = 0;
+    ap_uint<1> spikemold_ready = 1;
+    ap_uint<1> spikemold_busy = 0;
     ap_uint<1> learn_weight_valid = 0;
     group_id_t learn_weight_group = 0;
     local_id_t learn_weight_src = 0;
@@ -223,7 +244,7 @@ void test_spike_input() {
     bool ids_ok = true;
     bool weights_ok = true;
     for (int t = 0; t < 10; t++) {
-        snn_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
+        spikemold_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
                 status_reg, spike_count_reg,
                 weight_sum_reg, version_reg, s_axis_spikes, s_axis_data, s_axis_weights,
                 m_axis_spikes,
@@ -233,8 +254,8 @@ void test_spike_input() {
                 learn_weight_valid, learn_weight_group, learn_weight_src, learn_weight_dst,
                 learn_weight_data, learn_weight_exc, learn_weight_is_inter,
                 learn_weight_dst_group, learn_weight_fanout_idx, learn_weight_ready,
-                snn_enable, snn_reset, threshold_out, leak_rate_out,
-                    snn_ready, snn_busy);
+                spikemold_enable, spikemold_reset, threshold_out, leak_rate_out,
+                    spikemold_ready, spikemold_busy);
         
         if (spike_in_valid) {
             int expected_id = spikes_received;
@@ -277,17 +298,17 @@ void test_spike_output() {
     ap_uint<32> status_reg, spike_count_reg, weight_sum_reg, version_reg;
     ap_int<8> reward_signal = 0;
     
-    ap_uint<1> spike_in_valid, spike_out_ready, snn_enable, snn_reset;
-    neuron_id_t spike_in_neuron_id;
+    ap_uint<1> spike_in_valid, spike_out_ready, spikemold_enable, spikemold_reset;
+    rtl_nid_t spike_in_neuron_id;
     ap_int<8> spike_in_weight;
     ap_uint<16> threshold_out, leak_rate_out;
     
     ap_uint<1> spike_in_ready = 1;
     ap_uint<1> spike_out_valid = 0;
-    neuron_id_t spike_out_neuron_id = 0;
+    rtl_nid_t spike_out_neuron_id = 0;
     ap_int<8> spike_out_weight = 0;
-    ap_uint<1> snn_ready = 1;
-    ap_uint<1> snn_busy = 0;
+    ap_uint<1> spikemold_ready = 1;
+    ap_uint<1> spikemold_busy = 0;
     ap_uint<1> learn_weight_valid = 0;
     group_id_t learn_weight_group = 0;
     local_id_t learn_weight_src = 0;
@@ -316,7 +337,7 @@ void test_spike_output() {
             spike_out_valid = 0;
         }
         
-        snn_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
+        spikemold_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
                 status_reg, spike_count_reg,
                 weight_sum_reg, version_reg, s_axis_spikes, s_axis_data, s_axis_weights,
                 m_axis_spikes,
@@ -326,8 +347,8 @@ void test_spike_output() {
                 learn_weight_valid, learn_weight_group, learn_weight_src, learn_weight_dst,
                 learn_weight_data, learn_weight_exc, learn_weight_is_inter,
                 learn_weight_dst_group, learn_weight_fanout_idx, learn_weight_ready,
-                snn_enable, snn_reset, threshold_out, leak_rate_out,
-                    snn_ready, snn_busy);
+                spikemold_enable, spikemold_reset, threshold_out, leak_rate_out,
+                    spikemold_ready, spikemold_busy);
     }
     
     // Check output stream
@@ -381,17 +402,17 @@ void test_stdp_learning() {
     ap_uint<32> status_reg, spike_count_reg, weight_sum_reg, version_reg;
     ap_int<8> reward_signal = 0;
     
-    ap_uint<1> spike_in_valid, spike_out_ready, snn_enable, snn_reset;
-    neuron_id_t spike_in_neuron_id;
+    ap_uint<1> spike_in_valid, spike_out_ready, spikemold_enable, spikemold_reset;
+    rtl_nid_t spike_in_neuron_id;
     ap_int<8> spike_in_weight;
     ap_uint<16> threshold_out, leak_rate_out;
     
     ap_uint<1> spike_in_ready = 1;
     ap_uint<1> spike_out_valid = 0;
-    neuron_id_t spike_out_neuron_id = 0;
+    rtl_nid_t spike_out_neuron_id = 0;
     ap_int<8> spike_out_weight = 0;
-    ap_uint<1> snn_ready = 1;
-    ap_uint<1> snn_busy = 0;
+    ap_uint<1> spikemold_ready = 1;
+    ap_uint<1> spikemold_busy = 0;
     ap_uint<1> learn_weight_valid = 0;
     group_id_t learn_weight_group = 0;
     local_id_t learn_weight_src = 0;
@@ -405,7 +426,7 @@ void test_stdp_learning() {
     
     // First, reset to initialize
     ctrl_reg = 0x02;
-    snn_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
+    spikemold_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
                 status_reg, spike_count_reg,
                 weight_sum_reg, version_reg, s_axis_spikes, s_axis_data, s_axis_weights,
                 m_axis_spikes,
@@ -415,20 +436,18 @@ void test_stdp_learning() {
                 learn_weight_valid, learn_weight_group, learn_weight_src, learn_weight_dst,
                 learn_weight_data, learn_weight_exc, learn_weight_is_inter,
                 learn_weight_dst_group, learn_weight_fanout_idx, learn_weight_ready,
-                snn_enable, snn_reset, threshold_out, leak_rate_out,
-                snn_ready, snn_busy);
+                spikemold_enable, spikemold_reset, threshold_out, leak_rate_out,
+                spikemold_ready, spikemold_busy);
     
     // Enable with learning
     ctrl_reg = 0x09;
     
-    // Scenario: Pre-spike at t=5 from input neuron 0 (group 0),
-    //           Post-spike at t=10 from hidden neuron 784 (group 1, first neuron)
-    //           Connection 0: input(0-783) -> hidden(784-2831)
-    // Should cause LTP on weight_memory[weight_index(0, 784)]
-    s_axis_spikes.write(create_spike(0, 10, 5));
+    // Scenario on connection 0 from generated SpikeMold topology:
+    // pre spike from TEST_FIRST_PRE_ID, then post spike from TEST_POST_ID.
+    s_axis_spikes.write(create_spike(TEST_FIRST_PRE_ID, 10, 5));
     
     for (int t = 0; t < 5; t++) {
-        snn_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
+        spikemold_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
                 status_reg, spike_count_reg,
                 weight_sum_reg, version_reg, s_axis_spikes, s_axis_data, s_axis_weights,
                 m_axis_spikes,
@@ -438,21 +457,21 @@ void test_stdp_learning() {
                 learn_weight_valid, learn_weight_group, learn_weight_src, learn_weight_dst,
                 learn_weight_data, learn_weight_exc, learn_weight_is_inter,
                 learn_weight_dst_group, learn_weight_fanout_idx, learn_weight_ready,
-                snn_enable, snn_reset, threshold_out, leak_rate_out,
-                    snn_ready, snn_busy);
+                spikemold_enable, spikemold_reset, threshold_out, leak_rate_out,
+                    spikemold_ready, spikemold_busy);
     }
     
-    // Now simulate post-synaptic spike from hidden neuron 784
+    // Now simulate post-synaptic spike.
     for (int t = 5; t < 15; t++) {
         if (t == 10) {
             spike_out_valid = 1;
-            spike_out_neuron_id = 784;  // First neuron in hidden group
+            spike_out_neuron_id = TEST_POST_RTL_ID;
             spike_out_weight = 20;
         } else {
             spike_out_valid = 0;
         }
         
-        snn_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
+        spikemold_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
                 status_reg, spike_count_reg,
                 weight_sum_reg, version_reg, s_axis_spikes, s_axis_data, s_axis_weights,
                 m_axis_spikes,
@@ -462,8 +481,8 @@ void test_stdp_learning() {
                 learn_weight_valid, learn_weight_group, learn_weight_src, learn_weight_dst,
                 learn_weight_data, learn_weight_exc, learn_weight_is_inter,
                 learn_weight_dst_group, learn_weight_fanout_idx, learn_weight_ready,
-                snn_enable, snn_reset, threshold_out, leak_rate_out,
-                    snn_ready, snn_busy);
+                spikemold_enable, spikemold_reset, threshold_out, leak_rate_out,
+                    spikemold_ready, spikemold_busy);
     }
     
     // Check learning status
@@ -471,6 +490,8 @@ void test_stdp_learning() {
     print_result("Learning enabled in status", learning_active);
     
     std::cout << "  Weight sum (sample): " << weight_sum_reg << std::endl;
+    drain_spike_stream(m_axis_spikes);
+    drain_weight_stream(m_axis_weights);
 }
 
 //=============================================================================
@@ -498,17 +519,17 @@ void test_rstdp_learning() {
     ap_uint<32> status_reg, spike_count_reg, weight_sum_reg, version_reg;
     ap_int<8> reward_signal = 64;  // Positive reward
     
-    ap_uint<1> spike_in_valid, spike_out_ready, snn_enable, snn_reset;
-    neuron_id_t spike_in_neuron_id;
+    ap_uint<1> spike_in_valid, spike_out_ready, spikemold_enable, spikemold_reset;
+    rtl_nid_t spike_in_neuron_id;
     ap_int<8> spike_in_weight;
     ap_uint<16> threshold_out, leak_rate_out;
     
     ap_uint<1> spike_in_ready = 1;
     ap_uint<1> spike_out_valid = 0;
-    neuron_id_t spike_out_neuron_id = 0;
+    rtl_nid_t spike_out_neuron_id = 0;
     ap_int<8> spike_out_weight = 0;
-    ap_uint<1> snn_ready = 1;
-    ap_uint<1> snn_busy = 0;
+    ap_uint<1> spikemold_ready = 1;
+    ap_uint<1> spikemold_busy = 0;
     ap_uint<1> learn_weight_valid = 0;
     group_id_t learn_weight_group = 0;
     local_id_t learn_weight_src = 0;
@@ -522,7 +543,7 @@ void test_rstdp_learning() {
     
     // Reset
     ctrl_reg = 0x02;
-    snn_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
+    spikemold_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
                 status_reg, spike_count_reg,
                 weight_sum_reg, version_reg, s_axis_spikes, s_axis_data, s_axis_weights,
                 m_axis_spikes,
@@ -532,25 +553,25 @@ void test_rstdp_learning() {
                 learn_weight_valid, learn_weight_group, learn_weight_src, learn_weight_dst,
                 learn_weight_data, learn_weight_exc, learn_weight_is_inter,
                 learn_weight_dst_group, learn_weight_fanout_idx, learn_weight_ready,
-                snn_enable, snn_reset, threshold_out, leak_rate_out,
-                snn_ready, snn_busy);
+                spikemold_enable, spikemold_reset, threshold_out, leak_rate_out,
+                spikemold_ready, spikemold_busy);
     
     // Run with R-STDP
     ctrl_reg = 0x29;  // Enable + Learning + Apply reward (bits 0, 3, 5)
     
-    // Generate spike activity: pre-spike from input neuron 0, post from hidden 784
-    s_axis_spikes.write(create_spike(0, 10, 0));
+    // Generate spike activity on connection 0.
+    s_axis_spikes.write(create_spike(TEST_FIRST_PRE_ID, 10, 0));
     
     for (int t = 0; t < 20; t++) {
         if (t == 5) {
             spike_out_valid = 1;
-            spike_out_neuron_id = 784;  // First neuron in hidden group
+            spike_out_neuron_id = TEST_POST_RTL_ID;
             spike_out_weight = 20;
         } else {
             spike_out_valid = 0;
         }
         
-        snn_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
+        spikemold_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
                 status_reg, spike_count_reg,
                 weight_sum_reg, version_reg, s_axis_spikes, s_axis_data, s_axis_weights,
                 m_axis_spikes,
@@ -560,14 +581,16 @@ void test_rstdp_learning() {
                 learn_weight_valid, learn_weight_group, learn_weight_src, learn_weight_dst,
                 learn_weight_data, learn_weight_exc, learn_weight_is_inter,
                 learn_weight_dst_group, learn_weight_fanout_idx, learn_weight_ready,
-                snn_enable, snn_reset, threshold_out, leak_rate_out,
-                    snn_ready, snn_busy);
+                spikemold_enable, spikemold_reset, threshold_out, leak_rate_out,
+                    spikemold_ready, spikemold_busy);
     }
     
     bool rstdp_enabled = status_reg[4];
     print_result("R-STDP enabled in status", rstdp_enabled);
     
     std::cout << "  Weight sum after R-STDP: " << weight_sum_reg << std::endl;
+    drain_spike_stream(m_axis_spikes);
+    drain_weight_stream(m_axis_weights);
 }
 
 //=============================================================================
@@ -591,17 +614,17 @@ void test_checkpoint_stream_payload() {
     ap_uint<32> status_reg = 0, spike_count_reg = 0, weight_sum_reg = 0, version_reg = 0;
     ap_int<8> reward_signal = 0;
 
-    ap_uint<1> spike_in_valid, spike_out_ready, snn_enable, snn_reset;
-    neuron_id_t spike_in_neuron_id;
+    ap_uint<1> spike_in_valid, spike_out_ready, spikemold_enable, spikemold_reset;
+    rtl_nid_t spike_in_neuron_id;
     ap_int<8> spike_in_weight;
     ap_uint<16> threshold_out, leak_rate_out;
 
     ap_uint<1> spike_in_ready = 1;
     ap_uint<1> spike_out_valid = 0;
-    neuron_id_t spike_out_neuron_id = 0;
+    rtl_nid_t spike_out_neuron_id = 0;
     ap_int<8> spike_out_weight = 0;
-    ap_uint<1> snn_ready = 1;
-    ap_uint<1> snn_busy = 0;
+    ap_uint<1> spikemold_ready = 1;
+    ap_uint<1> spikemold_busy = 0;
     ap_uint<1> learn_weight_valid = 0;
     group_id_t learn_weight_group = 0;
     local_id_t learn_weight_src = 0;
@@ -615,7 +638,7 @@ void test_checkpoint_stream_payload() {
 
     // Hard reset
     ctrl_reg = 0x02;
-    snn_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
+    spikemold_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
                 status_reg, spike_count_reg,
                 weight_sum_reg, version_reg, s_axis_spikes, s_axis_data, s_axis_weights,
                 m_axis_spikes, m_axis_weights, reward_signal,
@@ -624,18 +647,18 @@ void test_checkpoint_stream_payload() {
                 learn_weight_valid, learn_weight_group, learn_weight_src, learn_weight_dst,
                 learn_weight_data, learn_weight_exc, learn_weight_is_inter,
                 learn_weight_dst_group, learn_weight_fanout_idx, learn_weight_ready,
-                snn_enable, snn_reset, threshold_out, leak_rate_out,
-                snn_ready, snn_busy);
+                spikemold_enable, spikemold_reset, threshold_out, leak_rate_out,
+                spikemold_ready, spikemold_busy);
 
-    // Load two known weights:
-    //   idx=0      : pre=0, post=784 -> +3
-    //   idx=1024   : pre=1, post=784 -> -3
+    // Load two known weights from the generated connection 0:
+    //   first index  : first source neuron -> first destination neuron, +3
+    //   second index : third source neuron -> first destination neuron, -3
     ctrl_reg = 0x41;  // enable + weight_load_mode
     mode_reg = MODE_INFERENCE;
-    s_axis_weights.write(create_weight_packet(0, 784, 3));
-    s_axis_weights.write(create_weight_packet(1, 784, -3));
+    s_axis_weights.write(create_weight_packet(TEST_FIRST_PRE_ID, TEST_POST_ID, 3));
+    s_axis_weights.write(create_weight_packet(TEST_SECOND_PRE_ID, TEST_POST_ID, -3));
     for (int i = 0; i < 4; i++) {
-        snn_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
+        spikemold_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
                     status_reg, spike_count_reg,
                     weight_sum_reg, version_reg, s_axis_spikes, s_axis_data, s_axis_weights,
                     m_axis_spikes, m_axis_weights, reward_signal,
@@ -644,23 +667,23 @@ void test_checkpoint_stream_payload() {
                     learn_weight_valid, learn_weight_group, learn_weight_src, learn_weight_dst,
                     learn_weight_data, learn_weight_exc, learn_weight_is_inter,
                     learn_weight_dst_group, learn_weight_fanout_idx, learn_weight_ready,
-                    snn_enable, snn_reset, threshold_out, leak_rate_out,
-                    snn_ready, snn_busy);
+                    spikemold_enable, spikemold_reset, threshold_out, leak_rate_out,
+                    spikemold_ready, spikemold_busy);
     }
 
     // Enter checkpoint mode and read back stream.
     ctrl_reg = 0x11;  // enable + weight_read_mode
     mode_reg = MODE_CHECKPOINT;
 
-    bool found_idx0 = false;
-    bool found_idx1024 = false;
-    int8_t idx0_weight = 0;
-    int8_t idx1024_weight = 0;
+    bool found_first_weight = false;
+    bool found_second_weight = false;
+    int8_t first_weight_value = 0;
+    int8_t second_weight_value = 0;
     int nonzero_payload_words = 0;
     int packets_seen = 0;
 
     for (int cyc = 0; cyc < 1200; cyc++) {
-        snn_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
+        spikemold_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
                     status_reg, spike_count_reg,
                     weight_sum_reg, version_reg, s_axis_spikes, s_axis_data, s_axis_weights,
                     m_axis_spikes, m_axis_weights, reward_signal,
@@ -669,8 +692,8 @@ void test_checkpoint_stream_payload() {
                     learn_weight_valid, learn_weight_group, learn_weight_src, learn_weight_dst,
                     learn_weight_data, learn_weight_exc, learn_weight_is_inter,
                     learn_weight_dst_group, learn_weight_fanout_idx, learn_weight_ready,
-                    snn_enable, snn_reset, threshold_out, leak_rate_out,
-                    snn_ready, snn_busy);
+                    spikemold_enable, spikemold_reset, threshold_out, leak_rate_out,
+                    spikemold_ready, spikemold_busy);
 
         if (!m_axis_weights.empty()) {
             axis_weight_t pkt = m_axis_weights.read();
@@ -679,22 +702,22 @@ void test_checkpoint_stream_payload() {
             int8_t w = (int8_t)(ap_uint<8>)pkt.data(27, 20);
             if (w != 0) nonzero_payload_words++;
 
-            if (idx == 0) {
-                found_idx0 = true;
-                idx0_weight = w;
-            } else if (idx == 1024) {
-                found_idx1024 = true;
-                idx1024_weight = w;
+            if (idx == TEST_FIRST_WEIGHT_INDEX) {
+                found_first_weight = true;
+                first_weight_value = w;
+            } else if (idx == TEST_SECOND_WEIGHT_INDEX) {
+                found_second_weight = true;
+                second_weight_value = w;
             }
         }
     }
 
     print_result("Checkpoint stream produced packets", packets_seen > 0);
     print_result("Checkpoint payload has non-zero words", nonzero_payload_words > 0);
-    print_result("Checkpoint idx=0 present", found_idx0);
-    print_result("Checkpoint idx=0 weight matches loaded value", found_idx0 && idx0_weight == 3);
-    print_result("Checkpoint idx=1024 present", found_idx1024);
-    print_result("Checkpoint idx=1024 weight matches loaded value", found_idx1024 && idx1024_weight == -3);
+    print_result("Checkpoint first loaded weight present", found_first_weight);
+    print_result("Checkpoint first loaded weight matches", found_first_weight && first_weight_value == 3);
+    print_result("Checkpoint second loaded weight present", found_second_weight);
+    print_result("Checkpoint second loaded weight matches", found_second_weight && second_weight_value == -3);
 }
 
 //=============================================================================
@@ -721,17 +744,17 @@ void test_stdp_checkpoint_visibility() {
     ap_uint<32> status_reg = 0, spike_count_reg = 0, weight_sum_reg = 0, version_reg = 0;
     ap_int<8> reward_signal = 0;
 
-    ap_uint<1> spike_in_valid, spike_out_ready, snn_enable, snn_reset;
-    neuron_id_t spike_in_neuron_id;
+    ap_uint<1> spike_in_valid, spike_out_ready, spikemold_enable, spikemold_reset;
+    rtl_nid_t spike_in_neuron_id;
     ap_int<8> spike_in_weight;
     ap_uint<16> threshold_out, leak_rate_out;
 
     ap_uint<1> spike_in_ready = 1;
     ap_uint<1> spike_out_valid = 0;
-    neuron_id_t spike_out_neuron_id = 0;
+    rtl_nid_t spike_out_neuron_id = 0;
     ap_int<8> spike_out_weight = 0;
-    ap_uint<1> snn_ready = 1;
-    ap_uint<1> snn_busy = 0;
+    ap_uint<1> spikemold_ready = 1;
+    ap_uint<1> spikemold_busy = 0;
     ap_uint<1> learn_weight_valid = 0;
     group_id_t learn_weight_group = 0;
     local_id_t learn_weight_src = 0;
@@ -745,7 +768,7 @@ void test_stdp_checkpoint_visibility() {
 
     // Hard reset
     ctrl_reg = 0x02;
-    snn_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
+    spikemold_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
                 status_reg, spike_count_reg,
                 weight_sum_reg, version_reg, s_axis_spikes, s_axis_data, s_axis_weights,
                 m_axis_spikes, m_axis_weights, reward_signal,
@@ -754,15 +777,15 @@ void test_stdp_checkpoint_visibility() {
                 learn_weight_valid, learn_weight_group, learn_weight_src, learn_weight_dst,
                 learn_weight_data, learn_weight_exc, learn_weight_is_inter,
                 learn_weight_dst_group, learn_weight_fanout_idx, learn_weight_ready,
-                snn_enable, snn_reset, threshold_out, leak_rate_out,
-                snn_ready, snn_busy);
+                spikemold_enable, spikemold_reset, threshold_out, leak_rate_out,
+                spikemold_ready, spikemold_busy);
 
-    // STDP mode: one pre spike + one post spike on (0 -> 784)
+    // STDP mode: one pre spike + one post spike on generated connection 0.
     ctrl_reg = 0x09;  // enable + learning_enable
     mode_reg = MODE_TRAIN_STDP;
-    s_axis_spikes.write(create_spike(0, 10, 0));
+    s_axis_spikes.write(create_spike(TEST_FIRST_PRE_ID, 10, 0));
     spike_out_valid = 0;
-    snn_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
+    spikemold_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
                 status_reg, spike_count_reg,
                 weight_sum_reg, version_reg, s_axis_spikes, s_axis_data, s_axis_weights,
                 m_axis_spikes, m_axis_weights, reward_signal,
@@ -771,13 +794,13 @@ void test_stdp_checkpoint_visibility() {
                 learn_weight_valid, learn_weight_group, learn_weight_src, learn_weight_dst,
                 learn_weight_data, learn_weight_exc, learn_weight_is_inter,
                 learn_weight_dst_group, learn_weight_fanout_idx, learn_weight_ready,
-                snn_enable, snn_reset, threshold_out, leak_rate_out,
-                snn_ready, snn_busy);
+                spikemold_enable, spikemold_reset, threshold_out, leak_rate_out,
+                spikemold_ready, spikemold_busy);
 
     spike_out_valid = 1;
-    spike_out_neuron_id = 784;
+    spike_out_neuron_id = TEST_POST_RTL_ID;
     spike_out_weight = 20;
-    snn_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
+    spikemold_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
                 status_reg, spike_count_reg,
                 weight_sum_reg, version_reg, s_axis_spikes, s_axis_data, s_axis_weights,
                 m_axis_spikes, m_axis_weights, reward_signal,
@@ -786,12 +809,12 @@ void test_stdp_checkpoint_visibility() {
                 learn_weight_valid, learn_weight_group, learn_weight_src, learn_weight_dst,
                 learn_weight_data, learn_weight_exc, learn_weight_is_inter,
                 learn_weight_dst_group, learn_weight_fanout_idx, learn_weight_ready,
-                snn_enable, snn_reset, threshold_out, leak_rate_out,
-                snn_ready, snn_busy);
+                spikemold_enable, spikemold_reset, threshold_out, leak_rate_out,
+                spikemold_ready, spikemold_busy);
 
     // Drain one extra cycle
     spike_out_valid = 0;
-    snn_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
+    spikemold_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
                 status_reg, spike_count_reg,
                 weight_sum_reg, version_reg, s_axis_spikes, s_axis_data, s_axis_weights,
                 m_axis_spikes, m_axis_weights, reward_signal,
@@ -800,21 +823,21 @@ void test_stdp_checkpoint_visibility() {
                 learn_weight_valid, learn_weight_group, learn_weight_src, learn_weight_dst,
                 learn_weight_data, learn_weight_exc, learn_weight_is_inter,
                 learn_weight_dst_group, learn_weight_fanout_idx, learn_weight_ready,
-                snn_enable, snn_reset, threshold_out, leak_rate_out,
-                snn_ready, snn_busy);
+                spikemold_enable, spikemold_reset, threshold_out, leak_rate_out,
+                spikemold_ready, spikemold_busy);
 
     bool stdp_weight_sum_nonzero = ((int)weight_sum_reg != 0);
 
     // Checkpoint capture
     ctrl_reg = 0x11;  // enable + weight_read_mode
     mode_reg = MODE_CHECKPOINT;
-    bool found_idx0 = false;
-    int8_t idx0_weight = 0;
+    bool found_first_weight = false;
+    int8_t first_weight_value = 0;
     int nonzero_payload_words = 0;
     int packets_seen = 0;
 
     for (int cyc = 0; cyc < 2048; cyc++) {
-        snn_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
+        spikemold_top_hls(ctrl_reg, config_reg, mode_reg, time_steps_reg, params, encoder_cfg,
                     status_reg, spike_count_reg,
                     weight_sum_reg, version_reg, s_axis_spikes, s_axis_data, s_axis_weights,
                     m_axis_spikes, m_axis_weights, reward_signal,
@@ -823,8 +846,8 @@ void test_stdp_checkpoint_visibility() {
                     learn_weight_valid, learn_weight_group, learn_weight_src, learn_weight_dst,
                     learn_weight_data, learn_weight_exc, learn_weight_is_inter,
                     learn_weight_dst_group, learn_weight_fanout_idx, learn_weight_ready,
-                    snn_enable, snn_reset, threshold_out, leak_rate_out,
-                    snn_ready, snn_busy);
+                    spikemold_enable, spikemold_reset, threshold_out, leak_rate_out,
+                    spikemold_ready, spikemold_busy);
 
         if (!m_axis_weights.empty()) {
             axis_weight_t pkt = m_axis_weights.read();
@@ -832,9 +855,9 @@ void test_stdp_checkpoint_visibility() {
             int idx = (int)pkt.data(19, 0);
             int8_t w = (int8_t)(ap_uint<8>)pkt.data(27, 20);
             if (w != 0) nonzero_payload_words++;
-            if (idx == 0) {
-                found_idx0 = true;
-                idx0_weight = w;
+            if (idx == TEST_FIRST_WEIGHT_INDEX) {
+                found_first_weight = true;
+                first_weight_value = w;
             }
         }
     }
@@ -842,8 +865,11 @@ void test_stdp_checkpoint_visibility() {
     print_result("STDP run changed sampled weight sum", stdp_weight_sum_nonzero);
     print_result("Checkpoint stream produced packets after STDP", packets_seen > 0);
     print_result("Checkpoint payload has non-zero words after STDP", nonzero_payload_words > 0);
-    print_result("Checkpoint idx=0 seen after STDP", found_idx0);
-    print_result("Checkpoint idx=0 carries non-zero weight after STDP", found_idx0 && idx0_weight != 0);
+    print_result("Checkpoint learned weight seen after STDP", found_first_weight);
+    print_result("Checkpoint learned weight is non-zero after STDP",
+                 found_first_weight && first_weight_value != 0);
+    drain_spike_stream(m_axis_spikes);
+    drain_weight_stream(m_axis_weights);
 }
 
 //=============================================================================
@@ -851,7 +877,7 @@ void test_stdp_checkpoint_visibility() {
 //=============================================================================
 int main() {
     std::cout << "========================================" << std::endl;
-    std::cout << "SNN Top-Level HLS Testbench" << std::endl;
+    std::cout << "SpikeMold Top-Level HLS Testbench" << std::endl;
     std::cout << "On-Chip Learning Test Suite" << std::endl;
     std::cout << "========================================" << std::endl;
     

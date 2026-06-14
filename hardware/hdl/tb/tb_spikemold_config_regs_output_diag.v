@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module tb_snn_config_regs_output_diag;
+module tb_spikemold_config_regs_output_diag;
     reg clk = 1'b0;
     always #6.25 clk = ~clk;
 
@@ -52,7 +52,7 @@ module tb_snn_config_regs_output_diag;
     integer fail_count = 0;
     reg [31:0] read_value;
 
-    snn_config_regs dut (
+    spikemold_config_regs dut (
         .s_axi_aclk(clk),
         .s_axi_aresetn(rst_n),
         .s_axi_awaddr(awaddr),

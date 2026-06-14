@@ -176,7 +176,7 @@ class TestFromConfig:
         try:
             network = SpikePressNetwork.from_config()
         except RuntimeError:
-            pytest.skip("config.generated.snn_params not available")
+            pytest.skip("config.generated.spikemold_params not available")
         compiled = network.compile()
         errors = compiled.validate_against_hardware()
         assert errors == [], f"Mismatch: {errors}"

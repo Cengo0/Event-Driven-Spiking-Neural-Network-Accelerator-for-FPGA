@@ -24,7 +24,7 @@ fi
 
 echo "--- Starting XPA Power Analysis ---"
 # We need to specify the -strip_path in the TCL or here.
-# In the sim, the top was 'tb_snn_power_sweep'. The DUTs were 'router_inst' and 'neuron_array_inst'.
+# In the sim, the top was 'tb_spikemold_power_sweep'. The DUTs were 'router_inst' and 'neuron_array_inst'.
 # In the integrated design, 'spike_router' is usually at 'spike_router_inst' or similar.
 # However, for a quick check, we can just read the VCD and let Vivado match by name.
 

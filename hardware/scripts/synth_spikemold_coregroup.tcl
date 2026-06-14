@@ -1,4 +1,4 @@
-# Vivado Synthesis Script for Core Group Architecture
+# Vivado Synthesis Script for SpikeMold Coregroup Architecture
 # Checks resource utilization without full implementation
 
 # Set part
@@ -14,15 +14,15 @@ set rtl_dir    "${repo_root}/hardware/hdl/rtl"
 set output_dir "${repo_root}/outputs"
 
 # Core group modules
-read_verilog "$rtl_dir/core/core_group.v"
+read_verilog "$rtl_dir/core/spikemold_coregroup.v"
 read_verilog "$rtl_dir/core/synaptic_connectivity_table.v"
 read_verilog "$rtl_dir/core/event_router_ng.v"
 
-# Synthesize core_group standalone first to check per-group resource usage
-puts "===== Synthesizing core_group (single instance) ====="
-synth_design -top core_group -part $part -mode out_of_context
+# Synthesize spikemold_coregroup standalone first to check per-group resource usage
+puts "===== Synthesizing spikemold_coregroup (single instance) ====="
+synth_design -top spikemold_coregroup -part $part -mode out_of_context
 report_utilization -file "${output_dir}/core_group_utilization.rpt"
-puts "===== core_group synthesis complete ====="
+puts "===== spikemold_coregroup synthesis complete ====="
 
 # Close and reopen for connectivity table
 close_design

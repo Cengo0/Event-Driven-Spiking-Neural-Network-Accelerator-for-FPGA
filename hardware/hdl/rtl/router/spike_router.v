@@ -44,7 +44,7 @@ module spike_router #(
     
     // Configuration interface (from AXI)
     // Read path: config_addr -> config_readdata
-    // Write path: either legacy config_we/config_addr/config_data OR
+    // Write path: either direct config_we/config_addr/config_data OR
     //             queued config_cmd_valid/config_cmd_addr/config_cmd_data.
     input  wire                         config_we,
     input  wire [31:0]                  config_addr,
@@ -65,7 +65,7 @@ module spike_router #(
     wire unused_addr_bits_valid = |config_addr[23:12];  // Will be optimized away
     wire unused_data_bits_valid = |config_data[31:24];  // Will be optimized away
 
-    // Queued command path has priority over legacy direct write path.
+    // Queued command path has priority over direct write path.
     wire        cfg_wr_en   = config_cmd_valid | config_we;
     wire [31:0] cfg_wr_addr = config_cmd_valid ? config_cmd_addr : config_addr;
     wire [31:0] cfg_wr_data = config_cmd_valid ? config_cmd_data : config_data;

@@ -1,11 +1,11 @@
 // =============================================================================
-// SpikeMold Fabric Parameters - AUTO-GENERATED from snn_params.yaml
-// Generated deterministically from config/snn_params.yaml
-// DO NOT EDIT — modify config/snn_params.yaml and run generate_params.py
+// SpikeMold Fabric Parameters - AUTO-GENERATED from spikemold_params.yaml
+// Generated deterministically from config/spikemold_params.yaml
+// DO NOT EDIT — modify config/spikemold_params.yaml and run generate_params.py
 // =============================================================================
 
-#ifndef SNN_PARAMS_H
-#define SNN_PARAMS_H
+#ifndef SPIKEMOLD_PARAMS_H
+#define SPIKEMOLD_PARAMS_H
 
 // ─── Core Architecture ────────────────────────────────────────────
 const int SNN_NUM_GROUPS            = 16;
@@ -49,15 +49,6 @@ const int SNN_WEIGHT_FLAG_WIDTH   = 9;
 const int SNN_HLS_NEURON_ID_WIDTH = 13;
 const int SNN_HLS_MAX_NEURONS     = 2048;
 const int SNN_HLS_WEIGHT_WIDTH    = 8;
-// Inference-only mode: learning disabled by default for resource savings
-#ifndef SNN_EVENT_ROUTER_LEARNING_ENABLE
-#define SNN_EVENT_ROUTER_LEARNING_ENABLE 0
-#endif
-
-#ifndef SNN_CORE_GROUP_LEARNING_ENABLE
-#define SNN_CORE_GROUP_LEARNING_ENABLE 0
-#endif
-
 #ifndef SNN_HLS_LEARNING_ENABLE
 #define SNN_HLS_LEARNING_ENABLE 0
 #endif
@@ -84,7 +75,7 @@ const int SNN_TOTAL_LOGICAL_NEURONS   = 4890;
 // Per-population sizes
 const int SNN_NG_SIZE_0 = 512;  // visible_output
 const int SNN_NG_SIZE_1 = 512;  // input
-const int SNN_NG_SIZE_2 = 3866;  // dummy_pad
+const int SNN_NG_SIZE_2 = 3866;  // capacity_reserve
 
 // Population ID start offsets (cumulative)
 const int SNN_NG_ID_START_0 = 0;
@@ -105,7 +96,7 @@ const int SNN_CONN_0_NUM_WEIGHTS    = 262144;
 const int SNN_CONN_0_SRC_ID_START   = 512;
 const int SNN_CONN_0_DST_ID_START   = 0;
 
-// ─── Weight Memory Optimization (Loihi/TrueNorth/KIST) ───────────
+// ─── Resource-Aware Weight Memory ───────────
 #define SNN_WEIGHT_BITS           8
 #define SNN_TIME_EMBEDDING        1
 #define SNN_AUXILIARY_LUTRAM      1
@@ -128,4 +119,4 @@ const int SNN_PACKED_BUFFER_BYTES = 262144;
 const int SNN_FIXED_POINT_FRAC_BITS = 8;
 const int SNN_FIXED_POINT_SCALE     = (1 << SNN_FIXED_POINT_FRAC_BITS);
 
-#endif // SNN_PARAMS_H
+#endif // SPIKEMOLD_PARAMS_H

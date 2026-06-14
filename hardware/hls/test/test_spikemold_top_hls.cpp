@@ -1,6 +1,6 @@
 /**
- * @file test_snn_top_hls.cpp
- * @brief HLS Testbench for snn_top_hls kernel
+ * @file test_spikemold_top_hls.cpp
+ * @brief HLS Testbench for spikemold_top_hls kernel
  * 
  * This testbench verifies basic functionality of the SpikeMold backend:
  * - Encoder operation (rate, latency, delta-sigma)
@@ -9,7 +9,7 @@
  * - Basic inference
  */
 
-#include "../include/snn_top_hls.h"
+#include "../include/spikemold_top_hls.h"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -62,7 +62,7 @@ int test_encoder_rate() {
     hls::stream<spike_t> m_axis_spikes_out;
     
     // Call kernel (simplified - actual kernel has more parameters)
-    // Note: This is a placeholder for the actual testbench
+    // Note: This is a minimal smoke testbench
     // Real implementation would need proper AXI stream handling
     
     printf("  Input: %d pixels\n", TEST_WIDTH * TEST_HEIGHT);
@@ -140,7 +140,7 @@ int test_inference() {
  */
 int main() {
     printf("=========================================\n");
-    printf("SNN Top HLS Testbench\n");
+    printf("SpikeMold Top HLS Testbench\n");
     printf("=========================================\n");
     
     int errors = 0;

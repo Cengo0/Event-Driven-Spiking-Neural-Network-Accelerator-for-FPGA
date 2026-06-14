@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // Title         : SpikeMold-EDNP HLS Module with On-Chip Learning
 // Project       : SpikeMold-EDNP
-// File          : snn_top_hls.cpp
+// File          : spikemold_top_hls.cpp
 // Author        : Jiwoon Lee (@metr0jw)
 // Organization  : Kwangwoon University, Seoul, South Korea
 // Contact       : jwlee@linux.com
@@ -15,7 +15,7 @@
 //                 - Direct interface to Verilog SNN core
 //-----------------------------------------------------------------------------
 
-#include "../include/snn_top_hls.h"
+#include "../include/spikemold_top_hls.h"
 
 //=============================================================================
 // Delta-Sigma Spike Encoder (only HW encoder retained for area savings)
@@ -105,16 +105,16 @@ static void run_encoder_once(
 
 //=============================================================================
 // Weight Memory (On-Chip BRAM) — population-aware flat buffer
-// Loihi/TrueNorth-inspired: ALL weights on-chip, no DDR in datapath.
+// SpikeMold datapath: weights stay on-chip; no DDR in datapath.
 // Configurable precision via SNN_WEIGHT_BITS (2/4/8 bit per synapse).
 //   8-bit: [-128, 127],  ~794 BRAM18K for 1.6M synapses
-//   4-bit: [-8,    7],   ~353 BRAM18K  (Loihi default precision)
-//   2-bit: [-2,    1],   ~177 BRAM18K  (TrueNorth ternary-like)
+//   4-bit: [-8,    7],   ~353 BRAM18K  (reduced precision)
+//   2-bit: [-2,    1],   ~177 BRAM18K  (ultra-low precision)
 //=============================================================================
 static packed_weight_t weight_memory[MAX_WEIGHT_BUFFER_SIZE];
 
 //=============================================================================
-// Per-Neuron Trace Storage — KIST Time-Embedding
+// Per-Neuron Trace Storage - Global Decay
 // Instead of storing (trace + 16-bit timestamp) per neuron and computing
 // lazy decay on access, we store only the 8-bit trace value and apply
 // a global shift-based decay every timestep.  This saves 16 bits × N × 2
@@ -164,7 +164,7 @@ static inline void enqueue_learn_weight_update(
         return;
     }
 
-    // Bridge only the subset representable by RTL core-group global IDs.
+    // Bridge only the subset representable by RTL coregroup global IDs.
     if ((ap_uint<16>)pre_id >= (ap_uint<16>)SNN_TOTAL_NEURONS ||
         (ap_uint<16>)post_id >= (ap_uint<16>)SNN_TOTAL_NEURONS) {
         return;
@@ -194,7 +194,7 @@ static inline void enqueue_learn_weight_update(
 }
 
 //=============================================================================
-// Global Trace Decay (KIST Time-Embedding)
+// Global Trace Decay
 // Applied once per timestep in the main TIME_LOOP.
 // Uses trace_decay parameter (ap_fixed<16,8>): fraction of trace removed per step.
 //   trace_decay = 0.125 → 12.5% removed → 87.5% retention (≈ τ=8)
@@ -241,7 +241,7 @@ static void process_pre_spike_aer(
 ) {
     #pragma HLS INLINE off
     
-    // Step 1: Add new spike to pre-trace (KIST: no lazy decay, already done globally)
+    // Step 1: Add new spike to pre-trace (global decay already applied)
     ap_uint<9> new_trace = (ap_uint<9>)pre_traces[pre_id] + 128;
     pre_traces[pre_id] = (new_trace > 255) ? (ap_uint<8>)255 : (ap_uint<8>)new_trace;
     
@@ -268,7 +268,7 @@ static void process_pre_spike_aer(
             
             int global_post = conn.dst_id_start + jj;
             
-            // KIST: trace already decayed globally, just read current value
+            // Trace already decayed globally; read current value
             ap_uint<8> post_trace_val = post_traces[global_post];
             
             // Skip compute/update when there is no post activity, but keep
@@ -328,7 +328,7 @@ static void process_post_spike_aer(
 ) {
     #pragma HLS INLINE off
     
-    // Step 1: Add new spike to post-trace (KIST: no lazy decay, already done globally)
+    // Step 1: Add new spike to post-trace (global decay already applied)
     ap_uint<9> new_trace = (ap_uint<9>)post_traces[post_id] + 128;
     post_traces[post_id] = (new_trace > 255) ? (ap_uint<8>)255 : (ap_uint<8>)new_trace;
     
@@ -355,7 +355,7 @@ static void process_post_spike_aer(
             
             int global_pre = conn.src_id_start + ii;
             
-            // KIST: trace already decayed globally, just read current value
+            // Trace already decayed globally; read current value
             ap_uint<8> pre_trace_val = pre_traces[global_pre];
             
             // Skip compute/update when there is no pre activity, but keep
@@ -543,7 +543,7 @@ static void update_eligibility_on_post_spike(neuron_id_t post_id) {
 //=============================================================================
 // Main Top-Level Function
 //=============================================================================
-void snn_top_hls(
+void spikemold_top_hls(
     // AXI4-Lite Control Interface
     ap_uint<32> ctrl_reg,
     ap_uint<32> config_reg,
@@ -599,14 +599,14 @@ void snn_top_hls(
     ap_uint<1> learn_weight_ready,
     
     // Verilog Interface - Control signals
-    ap_uint<1> &snn_enable,
-    ap_uint<1> &snn_reset,
+    ap_uint<1> &spikemold_enable,
+    ap_uint<1> &spikemold_reset,
     ap_uint<16> &threshold_out,
     ap_uint<16> &leak_rate_out,
     
     // Verilog Interface - Status signals
-    ap_uint<1> snn_ready,
-    ap_uint<1> snn_busy
+    ap_uint<1> spikemold_ready,
+    ap_uint<1> spikemold_busy
 ) {
     //=========================================================================
     // HLS Interface Pragmas
@@ -651,16 +651,16 @@ void snn_top_hls(
     #pragma HLS INTERFACE ap_none port=learn_weight_dst_group
     #pragma HLS INTERFACE ap_none port=learn_weight_fanout_idx
     #pragma HLS INTERFACE ap_none port=learn_weight_ready
-    #pragma HLS INTERFACE ap_none port=snn_enable
-    #pragma HLS INTERFACE ap_none port=snn_reset
+    #pragma HLS INTERFACE ap_none port=spikemold_enable
+    #pragma HLS INTERFACE ap_none port=spikemold_reset
     #pragma HLS INTERFACE ap_none port=threshold_out
     #pragma HLS INTERFACE ap_none port=leak_rate_out
-    #pragma HLS INTERFACE ap_none port=snn_ready
-    #pragma HLS INTERFACE ap_none port=snn_busy
+    #pragma HLS INTERFACE ap_none port=spikemold_ready
+    #pragma HLS INTERFACE ap_none port=spikemold_busy
     
     //=========================================================================
     // Static Array Storage Bindings — Neuromorphic On-Chip Architecture
-    // Loihi/TrueNorth-inspired: ALL data on-chip SRAM, no DDR in datapath.
+    // SpikeMold datapath: data stays on-chip; no DDR in datapath.
     //=========================================================================
     // Weight Memory — BRAM, packed at SNN_WEIGHT_BITS precision
     // No ARRAY_PARTITION: reduces BRAM addressing overhead and allows
@@ -680,7 +680,7 @@ void snn_top_hls(
     #pragma HLS BIND_STORAGE variable=post_eligibility type=RAM_2P impl=BRAM
 #endif
     
-    // Per-Neuron Traces — LUTRAM (KIST time-embedding: only 8-bit, no timestamp)
+    // Per-Neuron Traces - LUTRAM (8-bit value, no timestamp)
     // After time-embedding: 2,842 × 8 bits each = ~355 LUTs per array.
 #if SNN_AUXILIARY_LUTRAM
     #pragma HLS BIND_STORAGE variable=pre_traces type=RAM_2P impl=LUTRAM
@@ -729,7 +729,7 @@ void snn_top_hls(
     bool first_spike_only = ctrl_reg[7];
     ap_uint<2> op_mode = mode_reg(1, 0);
     // mode_reg[31:16]: optional checkpoint chunk size in words.
-    // 0 => legacy behavior (single frame, TLAST only at MAX_WEIGHT_BUFFER_SIZE-1).
+    // 0 => single-frame behavior (TLAST only at MAX_WEIGHT_BUFFER_SIZE-1).
     ap_uint<16> checkpoint_chunk_words = mode_reg(31, 16);
     bool encoder_enable = mode_reg[8];
     bool checkpoint_mode = (op_mode == MODE_CHECKPOINT);
@@ -814,15 +814,16 @@ void snn_top_hls(
     // Weight Loading Mode: Stream weights from s_axis_weights to weight_memory
     // population-aware: uses connection table to compute flat buffer index
     // Host should set ctrl_reg[6] = 1, then stream weights
-    // Format: axis_weight_t.data[NEURON_ID_WIDTH-1:0] = pre_id,
-    //         [2*NEURON_ID_WIDTH-1:NEURON_ID_WIDTH] = post_id,
-    //         [2*NEURON_ID_WIDTH+7:2*NEURON_ID_WIDTH] = weight
+    // Format:
+    //   [WEIGHT_LOAD_PKT_PRE_HI:WEIGHT_LOAD_PKT_PRE_LO]   = pre_id
+    //   [WEIGHT_LOAD_PKT_POST_HI:WEIGHT_LOAD_PKT_POST_LO] = post_id
+    //   [WEIGHT_LOAD_PKT_WGT_HI:WEIGHT_LOAD_PKT_WGT_LO]   = weight
     // AXI weight is 8-bit; clip to packed_weight_t range on store.
     if (weight_load_mode && !s_axis_weights.empty()) {
         axis_weight_t w_pkt = s_axis_weights.read();
-        neuron_id_t row = w_pkt.data(NEURON_ID_WIDTH - 1, 0);
-        neuron_id_t col = w_pkt.data(2 * NEURON_ID_WIDTH - 1, NEURON_ID_WIDTH);
-        weight_t weight_val = w_pkt.data(2 * NEURON_ID_WIDTH + 7, 2 * NEURON_ID_WIDTH);
+        neuron_id_t row = w_pkt.data(WEIGHT_LOAD_PKT_PRE_HI, WEIGHT_LOAD_PKT_PRE_LO);
+        neuron_id_t col = w_pkt.data(WEIGHT_LOAD_PKT_POST_HI, WEIGHT_LOAD_PKT_POST_LO);
+        weight_t weight_val = w_pkt.data(WEIGHT_LOAD_PKT_WGT_HI, WEIGHT_LOAD_PKT_WGT_LO);
         
         int widx = weight_index(row, col);
         if (widx >= 0) {
@@ -848,8 +849,8 @@ void snn_top_hls(
     //=========================================================================
     // Route Control to Verilog Core
     //=========================================================================
-    snn_enable = enable;
-    snn_reset = reset;
+    spikemold_enable = enable;
+    spikemold_reset = reset;
     threshold_out = threshold;
     leak_rate_out = leak_rate;
     
@@ -889,7 +890,7 @@ void snn_top_hls(
             learn_bridge.valid = 0;
         }
 
-        // KIST Time-Embedding: apply global trace decay every timestep
+        // Apply global trace decay every timestep
         // Replaces lazy per-access compute_decayed_trace()
 #if SNN_TIME_EMBEDDING
         if (stdp_active) {
@@ -1112,8 +1113,8 @@ void snn_top_hls(
     // Status Register Assembly
     //=========================================================================
     ap_uint<32> status = 0;
-    status[0] = snn_ready;
-    status[1] = snn_busy;
+    status[0] = spikemold_ready;
+    status[1] = spikemold_busy;
     status[2] = stdp_active;
     status[3] = first_spike_only;
     status[4] = learning_params.rstdp_enable;
@@ -1186,9 +1187,9 @@ void load_weights_from_stream(
         if (weight_stream.empty()) break;
         
         axis_weight_t pkt = weight_stream.read();
-        neuron_id_t pre_id = pkt.data(7, 0);
-        neuron_id_t post_id = pkt.data(15, 8);
-        weight_t raw_weight = pkt.data(23, 16);
+        neuron_id_t pre_id = pkt.data(WEIGHT_LOAD_PKT_PRE_HI, WEIGHT_LOAD_PKT_PRE_LO);
+        neuron_id_t post_id = pkt.data(WEIGHT_LOAD_PKT_POST_HI, WEIGHT_LOAD_PKT_POST_LO);
+        weight_t raw_weight = pkt.data(WEIGHT_LOAD_PKT_WGT_HI, WEIGHT_LOAD_PKT_WGT_LO);
         
         int idx = weight_index(pre_id, post_id);
         if (idx >= 0) {

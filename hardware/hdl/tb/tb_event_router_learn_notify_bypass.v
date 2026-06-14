@@ -3,7 +3,7 @@
 //=============================================================================
 
 `timescale 1ns / 1ps
-`include "snn_params.vh"
+`include "spikemold_params.vh"
 
 module tb_event_router_learn_notify_bypass;
 

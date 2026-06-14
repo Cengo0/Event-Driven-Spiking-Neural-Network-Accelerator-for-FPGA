@@ -187,7 +187,7 @@ module tb_saliency_tile_skip_mapper_chain;
         @(posedge clk);
         #1;
         check("second saliency chain update reaches threshold", saliency_activity_count == 8'd2 && saliency_skip == 1'b0);
-        check("non-skip saliency event maps to core group", mapper_event_valid == 1'b1 && mapper_group_id == 4'd14);
+        check("non-skip saliency event maps to coregroup", mapper_event_valid == 1'b1 && mapper_group_id == 4'd14);
         check("non-skip saliency event derives local/global ID", mapper_local_id == 7'd117 && mapper_global_id == 11'd1909);
         check("non-skip saliency event preserves payload sign sideband", mapper_weight == 8'd3 && mapper_exc == 1'b1 && mapper_event_word[4:0] == 5'd14);
         check("saliency and mapper counters record one mapped event", saliency_update_count == 32'd2 && mapper_mapped_event_count == 32'd1);

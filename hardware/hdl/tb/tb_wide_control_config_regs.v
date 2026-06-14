@@ -47,7 +47,7 @@ module tb_wide_control_config_regs;
     integer pass_count = 0;
     integer fail_count = 0;
 
-    snn_config_regs u_regs (
+    spikemold_config_regs u_regs (
         .s_axi_aclk(clk),
         .s_axi_aresetn(rst_n),
         .s_axi_awaddr(awaddr),

@@ -1,11 +1,11 @@
 // =============================================================================
-// SpikeMold Fabric Parameters - AUTO-GENERATED from snn_params.yaml
-// Generated deterministically from config/snn_params.yaml
-// DO NOT EDIT — modify config/snn_params.yaml and run generate_params.py
+// SpikeMold Fabric Parameters - AUTO-GENERATED from spikemold_params.yaml
+// Generated deterministically from config/spikemold_params.yaml
+// DO NOT EDIT — modify config/spikemold_params.yaml and run generate_params.py
 // =============================================================================
 
-`ifndef SNN_PARAMS_VH
-`define SNN_PARAMS_VH
+`ifndef SPIKEMOLD_PARAMS_VH
+`define SPIKEMOLD_PARAMS_VH
 
 // ─── Core Architecture ────────────────────────────────────────────
 `define SNN_NUM_GROUPS          16
@@ -78,7 +78,7 @@
 `define SNN_NUM_CONNECTIONS       1
 `define SNN_NUM_NEURON_GROUPS     3
 
-// ─── Weight Memory Optimization (Loihi/TrueNorth/KIST) ──────────
+// ─── Resource-Aware Weight Memory ──────────
 `define SNN_WEIGHT_BITS           8
 `define SNN_TIME_EMBEDDING        1
 `define SNN_AUXILIARY_LUTRAM      1
@@ -97,4 +97,4 @@
 `define SNN_WEIGHT_TILING_ACTIVE_TILE_WEIGHTS 25088
 `define SNN_WEIGHT_TILING_ACTIVE_TILE_BYTES 25088
 
-`endif // SNN_PARAMS_VH
+`endif // SPIKEMOLD_PARAMS_VH

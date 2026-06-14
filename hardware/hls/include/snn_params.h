@@ -1,1 +1,0 @@
-../../../config/generated/snn_params.h

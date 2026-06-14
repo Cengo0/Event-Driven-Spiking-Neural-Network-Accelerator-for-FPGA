@@ -20,14 +20,14 @@ SRC_FILES=(
     "$RTL_DIR/router/spike_router.v"
     "$RTL_DIR/neurons/lif_neuron_array.v"
     "$RTL_DIR/common/fifo.v"
-    "$SIM_DIR/tb_snn_power_sweep.v"
+    "$SIM_DIR/tb_spikemold_power_sweep.v"
 )
 
 echo "--- Compiling Power Sweep Testbench ---"
 xvlog "${SRC_FILES[@]}"
 
 echo "--- Elaborating ---"
-xelab -debug typical tb_snn_power_sweep -s power_sim
+xelab -debug typical tb_spikemold_power_sweep -s power_sim
 
 echo "--- Running Simulation (SAIF generation) ---"
 xsim power_sim -tclbatch "$SCRIPT_DIR/gen_saif.tcl"

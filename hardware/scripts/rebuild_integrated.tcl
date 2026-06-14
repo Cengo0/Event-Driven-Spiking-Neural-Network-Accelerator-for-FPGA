@@ -30,7 +30,7 @@ set_property target_language Verilog [current_project]
 set_property source_mgmt_mode All [current_project]
 # Keep latest config-reg RTL in project so BD can fall back to module reference
 # when a stale packaged IP is present in ip_repo.
-add_files -norecurse "${rtl_dir}/common/snn_config_regs.v"
+add_files -norecurse "${rtl_dir}/common/spikemold_config_regs.v"
 update_compile_order -fileset sources_1
 # Add IP repositories (packaged HLS and local RTL-as-IP cores)
 # Prefer freshly synthesized HLS output; fall back to cached ip_repo copies.
@@ -115,13 +115,13 @@ set_property -dict [list \
 ] [get_bd_cells axi_dma_1]
 
 # --- HLS SNN IP ---
-create_bd_cell -type ip -vlnv xilinx.com:hls:snn_top_hls:1.0 snn_top_hls_0
+create_bd_cell -type ip -vlnv xilinx.com:hls:spikemold_top_hls:1.0 spikemold_top_hls_0
 
 # --- Config Regs ---
 # Always instantiate from latest RTL source to avoid stale packaged-IP drift.
-create_bd_cell -type module -reference snn_config_regs snn_config_regs_0
-if {[llength [get_bd_pins -quiet snn_config_regs_0/service_cycles_counter]] == 0} {
-    error "snn_config_regs_0/service_cycles_counter pin missing. Check hardware/hdl/rtl/common/snn_config_regs.v"
+create_bd_cell -type module -reference spikemold_config_regs spikemold_config_regs_0
+if {[llength [get_bd_pins -quiet spikemold_config_regs_0/service_cycles_counter]] == 0} {
+    error "spikemold_config_regs_0/service_cycles_counter pin missing. Check hardware/hdl/rtl/common/spikemold_config_regs.v"
 }
 
 # --- AXI Interconnect for GP0 (4 slaves: HLS, Config, spike DMA, weight DMA) ---
@@ -153,8 +153,8 @@ connect_bd_net [get_bd_pins processing_system7_0/FCLK_CLK0] \
     [get_bd_pins axi_dma_1/s_axi_lite_aclk] \
     [get_bd_pins axi_dma_1/m_axi_mm2s_aclk] \
     [get_bd_pins axi_dma_1/m_axi_s2mm_aclk] \
-    [get_bd_pins snn_top_hls_0/ap_clk] \
-    [get_bd_pins snn_config_regs_0/s_axi_aclk] \
+    [get_bd_pins spikemold_top_hls_0/ap_clk] \
+    [get_bd_pins spikemold_config_regs_0/s_axi_aclk] \
     [get_bd_pins axi_interconnect_0/ACLK] \
     [get_bd_pins axi_interconnect_0/S00_ACLK] \
     [get_bd_pins axi_interconnect_0/M00_ACLK] \
@@ -174,8 +174,8 @@ connect_bd_net [get_bd_pins processing_system7_0/FCLK_RESET0_N] \
     [get_bd_pins proc_sys_reset_0/ext_reset_in]
 
 connect_bd_net [get_bd_pins proc_sys_reset_0/peripheral_aresetn] \
-    [get_bd_pins snn_top_hls_0/ap_rst_n] \
-    [get_bd_pins snn_config_regs_0/s_axi_aresetn] \
+    [get_bd_pins spikemold_top_hls_0/ap_rst_n] \
+    [get_bd_pins spikemold_config_regs_0/s_axi_aresetn] \
     [get_bd_pins axi_dma_0/axi_resetn] \
     [get_bd_pins axi_dma_1/axi_resetn] \
     [get_bd_pins axi_interconnect_0/ARESETN] \
@@ -197,13 +197,13 @@ connect_bd_net [get_bd_pins proc_sys_reset_0/peripheral_aresetn] \
 connect_bd_intf_net [get_bd_intf_pins processing_system7_0/M_AXI_GP0] \
     [get_bd_intf_pins axi_interconnect_0/S00_AXI]
 
-# M00 → snn_top_hls_0/s_axi_ctrl
+# M00 → spikemold_top_hls_0/s_axi_ctrl
 connect_bd_intf_net [get_bd_intf_pins axi_interconnect_0/M00_AXI] \
-    [get_bd_intf_pins snn_top_hls_0/s_axi_ctrl]
+    [get_bd_intf_pins spikemold_top_hls_0/s_axi_ctrl]
 
-# M01 → snn_config_regs_0/S_AXI
+# M01 → spikemold_config_regs_0/S_AXI
 connect_bd_intf_net [get_bd_intf_pins axi_interconnect_0/M01_AXI] \
-    [get_bd_intf_pins snn_config_regs_0/s_axi]
+    [get_bd_intf_pins spikemold_config_regs_0/s_axi]
 
 # M02 → axi_dma_0/S_AXI_LITE
 connect_bd_intf_net [get_bd_intf_pins axi_interconnect_0/M02_AXI] \
@@ -232,31 +232,31 @@ connect_bd_intf_net [get_bd_intf_pins axi_interconnect_hp0/M00_AXI] \
 # =============================================================================
 # MM2S → HLS s_axis_spikes
 connect_bd_intf_net [get_bd_intf_pins axi_dma_0/M_AXIS_MM2S] \
-    [get_bd_intf_pins snn_top_hls_0/s_axis_spikes]
+    [get_bd_intf_pins spikemold_top_hls_0/s_axis_spikes]
 
 # HLS m_axis_spikes → S2MM
-connect_bd_intf_net [get_bd_intf_pins snn_top_hls_0/m_axis_spikes] \
+connect_bd_intf_net [get_bd_intf_pins spikemold_top_hls_0/m_axis_spikes] \
     [get_bd_intf_pins axi_dma_0/S_AXIS_S2MM]
 
 # Weight DMA paths:
 #   MM2S -> HLS s_axis_weights   (weight load mode)
 #   HLS  -> S2MM                 (checkpoint / weight read mode)
 connect_bd_intf_net [get_bd_intf_pins axi_dma_1/M_AXIS_MM2S] \
-    [get_bd_intf_pins snn_top_hls_0/s_axis_weights]
-connect_bd_intf_net [get_bd_intf_pins snn_top_hls_0/m_axis_weights] \
+    [get_bd_intf_pins spikemold_top_hls_0/s_axis_weights]
+connect_bd_intf_net [get_bd_intf_pins spikemold_top_hls_0/m_axis_weights] \
     [get_bd_intf_pins axi_dma_1/S_AXIS_S2MM]
 
 # Tie off unused AXI-Stream port (s_axis_data)
 # This input needs TVALID=0 when not used.
 # s_axis_data
-connect_bd_net [get_bd_pins const_zero_32bit/dout] [get_bd_pins snn_top_hls_0/s_axis_data_TDATA]
-connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins snn_top_hls_0/s_axis_data_TVALID]
-connect_bd_net [get_bd_pins const_zero_4bit/dout]  [get_bd_pins snn_top_hls_0/s_axis_data_TKEEP]
-connect_bd_net [get_bd_pins const_zero_4bit/dout]  [get_bd_pins snn_top_hls_0/s_axis_data_TSTRB]
-connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins snn_top_hls_0/s_axis_data_TLAST]
-connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins snn_top_hls_0/s_axis_data_TID]
-connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins snn_top_hls_0/s_axis_data_TDEST]
-connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins snn_top_hls_0/s_axis_data_TUSER]
+connect_bd_net [get_bd_pins const_zero_32bit/dout] [get_bd_pins spikemold_top_hls_0/s_axis_data_TDATA]
+connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins spikemold_top_hls_0/s_axis_data_TVALID]
+connect_bd_net [get_bd_pins const_zero_4bit/dout]  [get_bd_pins spikemold_top_hls_0/s_axis_data_TKEEP]
+connect_bd_net [get_bd_pins const_zero_4bit/dout]  [get_bd_pins spikemold_top_hls_0/s_axis_data_TSTRB]
+connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins spikemold_top_hls_0/s_axis_data_TLAST]
+connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins spikemold_top_hls_0/s_axis_data_TID]
+connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins spikemold_top_hls_0/s_axis_data_TDEST]
+connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins spikemold_top_hls_0/s_axis_data_TUSER]
 
 # Reward signal is s_axilite register (not standalone port), no tie-off needed
 
@@ -266,8 +266,8 @@ connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins snn_top_hls_0/s_
 # Make these external so the top wrapper can connect them
 
 # Derive neuron-id bus widths from HLS IP pins to avoid stale hardcoded widths.
-set spike_in_id_pin  [get_bd_pins snn_top_hls_0/spike_in_neuron_id]
-set spike_out_id_pin [get_bd_pins snn_top_hls_0/spike_out_neuron_id]
+set spike_in_id_pin  [get_bd_pins spikemold_top_hls_0/spike_in_neuron_id]
+set spike_out_id_pin [get_bd_pins spikemold_top_hls_0/spike_out_neuron_id]
 set spike_in_id_left   [get_property LEFT  $spike_in_id_pin]
 set spike_in_id_right  [get_property RIGHT $spike_in_id_pin]
 set spike_out_id_left  [get_property LEFT  $spike_out_id_pin]
@@ -281,10 +281,10 @@ create_bd_port -dir O -from $spike_in_id_left -to $spike_in_id_right spike_in_ne
 create_bd_port -dir O -from 7 -to 0 spike_in_weight -type data
 create_bd_port -dir I spike_in_ready -type data
 
-connect_bd_net [get_bd_pins snn_top_hls_0/spike_in_valid]       [get_bd_ports spike_in_valid]
-connect_bd_net [get_bd_pins snn_top_hls_0/spike_in_neuron_id]   [get_bd_ports spike_in_neuron_id]
-connect_bd_net [get_bd_pins snn_top_hls_0/spike_in_weight]      [get_bd_ports spike_in_weight]
-connect_bd_net [get_bd_ports spike_in_ready]                     [get_bd_pins snn_top_hls_0/spike_in_ready]
+connect_bd_net [get_bd_pins spikemold_top_hls_0/spike_in_valid]       [get_bd_ports spike_in_valid]
+connect_bd_net [get_bd_pins spikemold_top_hls_0/spike_in_neuron_id]   [get_bd_ports spike_in_neuron_id]
+connect_bd_net [get_bd_pins spikemold_top_hls_0/spike_in_weight]      [get_bd_ports spike_in_weight]
+connect_bd_net [get_bd_ports spike_in_ready]                     [get_bd_pins spikemold_top_hls_0/spike_in_ready]
 
 # RTL → HLS: spike from neurons
 create_bd_port -dir I spike_out_valid -type data
@@ -292,10 +292,10 @@ create_bd_port -dir I -from $spike_out_id_left -to $spike_out_id_right spike_out
 create_bd_port -dir I -from 7 -to 0 spike_out_weight -type data
 create_bd_port -dir O spike_out_ready -type data
 
-connect_bd_net [get_bd_ports spike_out_valid]                    [get_bd_pins snn_top_hls_0/spike_out_valid]
-connect_bd_net [get_bd_ports spike_out_neuron_id]               [get_bd_pins snn_top_hls_0/spike_out_neuron_id]
-connect_bd_net [get_bd_ports spike_out_weight]                   [get_bd_pins snn_top_hls_0/spike_out_weight]
-connect_bd_net [get_bd_pins snn_top_hls_0/spike_out_ready]      [get_bd_ports spike_out_ready]
+connect_bd_net [get_bd_ports spike_out_valid]                    [get_bd_pins spikemold_top_hls_0/spike_out_valid]
+connect_bd_net [get_bd_ports spike_out_neuron_id]               [get_bd_pins spikemold_top_hls_0/spike_out_neuron_id]
+connect_bd_net [get_bd_ports spike_out_weight]                   [get_bd_pins spikemold_top_hls_0/spike_out_weight]
+connect_bd_net [get_bd_pins spikemold_top_hls_0/spike_out_ready]      [get_bd_ports spike_out_ready]
 
 # HLS -> RTL: learned weight update channel
 create_bd_port -dir O learn_weight_valid -type data
@@ -309,31 +309,31 @@ create_bd_port -dir O -from 3 -to 0 learn_weight_dst_group -type data
 create_bd_port -dir O -from 3 -to 0 learn_weight_fanout_idx -type data
 create_bd_port -dir I learn_weight_ready -type data
 
-connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_valid]      [get_bd_ports learn_weight_valid]
-connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_group]      [get_bd_ports learn_weight_group]
-connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_src]        [get_bd_ports learn_weight_src]
-connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_dst]        [get_bd_ports learn_weight_dst]
-connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_data]       [get_bd_ports learn_weight_data]
-connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_exc]        [get_bd_ports learn_weight_exc]
-connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_is_inter]   [get_bd_ports learn_weight_is_inter]
-connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_dst_group]  [get_bd_ports learn_weight_dst_group]
-connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_fanout_idx] [get_bd_ports learn_weight_fanout_idx]
-connect_bd_net [get_bd_ports learn_weight_ready]                    [get_bd_pins snn_top_hls_0/learn_weight_ready]
+connect_bd_net [get_bd_pins spikemold_top_hls_0/learn_weight_valid]      [get_bd_ports learn_weight_valid]
+connect_bd_net [get_bd_pins spikemold_top_hls_0/learn_weight_group]      [get_bd_ports learn_weight_group]
+connect_bd_net [get_bd_pins spikemold_top_hls_0/learn_weight_src]        [get_bd_ports learn_weight_src]
+connect_bd_net [get_bd_pins spikemold_top_hls_0/learn_weight_dst]        [get_bd_ports learn_weight_dst]
+connect_bd_net [get_bd_pins spikemold_top_hls_0/learn_weight_data]       [get_bd_ports learn_weight_data]
+connect_bd_net [get_bd_pins spikemold_top_hls_0/learn_weight_exc]        [get_bd_ports learn_weight_exc]
+connect_bd_net [get_bd_pins spikemold_top_hls_0/learn_weight_is_inter]   [get_bd_ports learn_weight_is_inter]
+connect_bd_net [get_bd_pins spikemold_top_hls_0/learn_weight_dst_group]  [get_bd_ports learn_weight_dst_group]
+connect_bd_net [get_bd_pins spikemold_top_hls_0/learn_weight_fanout_idx] [get_bd_ports learn_weight_fanout_idx]
+connect_bd_net [get_bd_ports learn_weight_ready]                    [get_bd_pins spikemold_top_hls_0/learn_weight_ready]
 
-# SNN Control
-create_bd_port -dir O snn_enable -type data
-create_bd_port -dir O snn_reset -type data
-create_bd_port -dir I snn_ready -type data
-create_bd_port -dir I snn_busy -type data
+# SpikeMold Control
+create_bd_port -dir O spikemold_enable -type data
+create_bd_port -dir O spikemold_reset -type data
+create_bd_port -dir I spikemold_ready -type data
+create_bd_port -dir I spikemold_busy -type data
 create_bd_port -dir O -from 15 -to 0 threshold_out -type data
 create_bd_port -dir O -from 15 -to 0 leak_rate_out -type data
 
-connect_bd_net [get_bd_pins snn_top_hls_0/snn_enable]           [get_bd_ports snn_enable]
-connect_bd_net [get_bd_pins snn_top_hls_0/snn_reset]            [get_bd_ports snn_reset]
-connect_bd_net [get_bd_ports snn_ready]                          [get_bd_pins snn_top_hls_0/snn_ready]
-connect_bd_net [get_bd_ports snn_busy]                           [get_bd_pins snn_top_hls_0/snn_busy]
-connect_bd_net [get_bd_pins snn_top_hls_0/threshold_out]        [get_bd_ports threshold_out]
-connect_bd_net [get_bd_pins snn_top_hls_0/leak_rate_out]        [get_bd_ports leak_rate_out]
+connect_bd_net [get_bd_pins spikemold_top_hls_0/spikemold_enable]           [get_bd_ports spikemold_enable]
+connect_bd_net [get_bd_pins spikemold_top_hls_0/spikemold_reset]            [get_bd_ports spikemold_reset]
+connect_bd_net [get_bd_ports spikemold_ready]                          [get_bd_pins spikemold_top_hls_0/spikemold_ready]
+connect_bd_net [get_bd_ports spikemold_busy]                           [get_bd_pins spikemold_top_hls_0/spikemold_busy]
+connect_bd_net [get_bd_pins spikemold_top_hls_0/threshold_out]        [get_bd_ports threshold_out]
+connect_bd_net [get_bd_pins spikemold_top_hls_0/leak_rate_out]        [get_bd_ports leak_rate_out]
 
 # Config regs ↔ External ports for router/neuron config
 create_bd_port -dir O cfg_router_config_we -type data
@@ -354,22 +354,22 @@ create_bd_port -dir I -from 31 -to 0 cfg_throughput_counter -type data
 create_bd_port -dir I -from 31 -to 0 cfg_service_cycles_counter -type data
 
 # Connect config regs to external ports
-connect_bd_net [get_bd_pins snn_config_regs_0/router_config_we]     [get_bd_ports cfg_router_config_we]
-connect_bd_net [get_bd_pins snn_config_regs_0/router_config_addr]   [get_bd_ports cfg_router_config_addr]
-connect_bd_net [get_bd_pins snn_config_regs_0/router_config_wdata]  [get_bd_ports cfg_router_config_wdata]
-connect_bd_net [get_bd_ports cfg_router_config_rdata]                [get_bd_pins snn_config_regs_0/router_config_rdata]
-connect_bd_net [get_bd_pins snn_config_regs_0/neuron_config_we]     [get_bd_ports cfg_neuron_config_we]
-connect_bd_net [get_bd_pins snn_config_regs_0/neuron_config_addr]   [get_bd_ports cfg_neuron_config_addr]
-connect_bd_net [get_bd_pins snn_config_regs_0/neuron_config_wdata]  [get_bd_ports cfg_neuron_config_wdata]
-connect_bd_net [get_bd_pins snn_config_regs_0/global_threshold]     [get_bd_ports cfg_global_threshold]
-connect_bd_net [get_bd_pins snn_config_regs_0/global_leak_rate]     [get_bd_ports cfg_global_leak_rate]
-connect_bd_net [get_bd_pins snn_config_regs_0/global_refrac_period] [get_bd_ports cfg_global_refrac_period]
-connect_bd_net [get_bd_ports cfg_router_spike_count]                 [get_bd_pins snn_config_regs_0/router_spike_count]
-connect_bd_net [get_bd_ports cfg_neuron_spike_count]                 [get_bd_pins snn_config_regs_0/neuron_spike_count]
-connect_bd_net [get_bd_ports cfg_fifo_overflow]                      [get_bd_pins snn_config_regs_0/fifo_overflow]
-connect_bd_net [get_bd_ports cfg_active_neurons]                     [get_bd_pins snn_config_regs_0/active_neurons]
-connect_bd_net [get_bd_ports cfg_throughput_counter]                  [get_bd_pins snn_config_regs_0/throughput_counter]
-connect_bd_net [get_bd_ports cfg_service_cycles_counter]              [get_bd_pins snn_config_regs_0/service_cycles_counter]
+connect_bd_net [get_bd_pins spikemold_config_regs_0/router_config_we]     [get_bd_ports cfg_router_config_we]
+connect_bd_net [get_bd_pins spikemold_config_regs_0/router_config_addr]   [get_bd_ports cfg_router_config_addr]
+connect_bd_net [get_bd_pins spikemold_config_regs_0/router_config_wdata]  [get_bd_ports cfg_router_config_wdata]
+connect_bd_net [get_bd_ports cfg_router_config_rdata]                [get_bd_pins spikemold_config_regs_0/router_config_rdata]
+connect_bd_net [get_bd_pins spikemold_config_regs_0/neuron_config_we]     [get_bd_ports cfg_neuron_config_we]
+connect_bd_net [get_bd_pins spikemold_config_regs_0/neuron_config_addr]   [get_bd_ports cfg_neuron_config_addr]
+connect_bd_net [get_bd_pins spikemold_config_regs_0/neuron_config_wdata]  [get_bd_ports cfg_neuron_config_wdata]
+connect_bd_net [get_bd_pins spikemold_config_regs_0/global_threshold]     [get_bd_ports cfg_global_threshold]
+connect_bd_net [get_bd_pins spikemold_config_regs_0/global_leak_rate]     [get_bd_ports cfg_global_leak_rate]
+connect_bd_net [get_bd_pins spikemold_config_regs_0/global_refrac_period] [get_bd_ports cfg_global_refrac_period]
+connect_bd_net [get_bd_ports cfg_router_spike_count]                 [get_bd_pins spikemold_config_regs_0/router_spike_count]
+connect_bd_net [get_bd_ports cfg_neuron_spike_count]                 [get_bd_pins spikemold_config_regs_0/neuron_spike_count]
+connect_bd_net [get_bd_ports cfg_fifo_overflow]                      [get_bd_pins spikemold_config_regs_0/fifo_overflow]
+connect_bd_net [get_bd_ports cfg_active_neurons]                     [get_bd_pins spikemold_config_regs_0/active_neurons]
+connect_bd_net [get_bd_ports cfg_throughput_counter]                  [get_bd_pins spikemold_config_regs_0/throughput_counter]
+connect_bd_net [get_bd_ports cfg_service_cycles_counter]              [get_bd_pins spikemold_config_regs_0/service_cycles_counter]
 
 # Clock/reset external ports
 # NOTE: Port name is kept as clk_100mhz for backward compatibility with
@@ -383,7 +383,7 @@ connect_bd_net [get_bd_pins proc_sys_reset_0/peripheral_aresetn] [get_bd_ports r
 connect_bd_net [get_bd_pins const_zero_1bit/dout] [get_bd_ports debug_learning_active]
 
 # HLS threshold/leak connected via spikemold_integrated_top.v wrapper, not via config_regs
-# (config_regs doesn't have hls_snn_enable/hls_threshold/hls_leak_rate ports)
+# (config_regs doesn't have hls_spikemold_enable/hls_threshold/hls_leak_rate ports)
 
 # Interrupt
 connect_bd_net [get_bd_pins axi_dma_0/mm2s_introut] [get_bd_pins processing_system7_0/IRQ_F2P]
@@ -399,7 +399,7 @@ foreach seg [get_bd_addr_segs -of_objects [get_bd_addr_spaces processing_system7
     set seg_name [get_property NAME $seg]
     puts "Found address segment: $seg_name"
     
-    if {[string match "*snn_top_hls*" $seg_name]} {
+    if {[string match "*spikemold_top_hls*" $seg_name]} {
         set_property offset 0x43C00000 $seg
         # Expose full HLS AXI-Lite register map (up to 0x9C in current IP).
         # Keeping this at 128B hides version/reward registers above 0x7F and

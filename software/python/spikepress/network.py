@@ -29,7 +29,7 @@ from typing import Dict, List, Optional
 
 # Import generated constants for validation
 try:
-    from config.generated.snn_params import (
+    from config.generated.spikemold_params import (
         MAX_WEIGHT_BUFFER_SIZE,
         NUM_CONNECTIONS,
         NUM_NEURON_GROUPS,
@@ -217,7 +217,7 @@ class CompiledSpikePressTopology:
         Returns list of error messages (empty = all good).
         """
         if not _HW_PARAMS_AVAILABLE:
-            return ["Cannot validate: config.generated.snn_params not importable"]
+            return ["Cannot validate: config.generated.spikemold_params not importable"]
 
         errors = []
         if self.max_weight_buffer_size != MAX_WEIGHT_BUFFER_SIZE:
@@ -342,16 +342,16 @@ class SpikePressNetwork:
     def from_config() -> "SpikePressNetwork":
         """Create a network from the hardware-generated configuration.
 
-        Uses config/generated/snn_params.py constants to rebuild
+        Uses config/generated/spikemold_params.py constants to rebuild
         the exact topology that matches the HLS flat buffer layout.
         """
         if not _HW_PARAMS_AVAILABLE:
             raise RuntimeError(
-                "Cannot load HW config: config.generated.snn_params not importable. "
+                "Cannot load HW config: config.generated.spikemold_params not importable. "
                 "Run config/generate_params.py first."
             )
 
-        from config.generated.snn_params import (
+        from config.generated.spikemold_params import (
             NEURON_GROUP_NAMES,
             NEURON_GROUP_SIZES,
             CONNECTIONS as HW_CONNS,

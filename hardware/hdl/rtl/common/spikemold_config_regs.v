@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
-// Title         : SNN Configuration Register File (AXI4-Lite Slave)
+// Title         : SpikeMold Configuration Register File (AXI4-Lite Slave)
 // Project       : SpikeMold (HW) + SpikePress (SW)
-// File          : snn_config_regs.v
+// File          : spikemold_config_regs.v
 // Author        : Jiwoon Lee (@metr0jw)
 // Organization  : Kwangwoon University, Seoul, South Korea
 // Contact       : jwlee@linux.com
@@ -35,7 +35,7 @@
 
 `timescale 1ns / 1ps
 
-module snn_config_regs #(
+module spikemold_config_regs #(
     parameter C_S_AXI_ADDR_WIDTH = 7,
     parameter C_S_AXI_DATA_WIDTH = 32
 )(

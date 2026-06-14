@@ -1,6 +1,6 @@
 #!/bin/bash
 #=============================================================================
-# Run SpikeMold core-group testbenches using Vivado xsim
+# Run SpikeMold coregroup testbenches using Vivado xsim
 # Usage: bash run_testbenches.sh
 #=============================================================================
 set -o pipefail
@@ -125,11 +125,11 @@ run_test "spike_conv_commit_backpressure" \
     "$RTL_DIR/core/spike_conv_active_commit.v"
 
 #-----------------------------------------------------------------------------
-# Test 1: Core Group
+# Test 1: SpikeMold Coregroup
 #-----------------------------------------------------------------------------
-run_test "core_group" \
-    "$TB_DIR/tb_core_group.v" \
-    "$RTL_DIR/core/core_group.v"
+run_test "spikemold_coregroup" \
+    "$TB_DIR/tb_spikemold_coregroup.v" \
+    "$RTL_DIR/core/spikemold_coregroup.v"
 
 #-----------------------------------------------------------------------------
 # Test 2: Router + Connectivity Table
@@ -144,7 +144,7 @@ run_test "router_ct" \
 #-----------------------------------------------------------------------------
 run_test "integration" \
     "$TB_DIR/tb_integration.v" \
-    "$RTL_DIR/core/core_group.v" \
+    "$RTL_DIR/core/spikemold_coregroup.v" \
     "$RTL_DIR/core/event_router_ng.v" \
     "$RTL_DIR/core/synaptic_connectivity_table.v"
 

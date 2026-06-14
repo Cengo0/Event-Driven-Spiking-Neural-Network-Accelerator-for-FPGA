@@ -7,7 +7,7 @@
 ## Organization  : Kwangwoon University, Seoul, South Korea
 ## Contact       : jwlee@linux.com
 ## Description   : Modern v++ compiler based HLS build script
-##                 Replaces deprecated vitis_hls -f script.tcl workflow
+##                 Supersedes vitis_hls -f script.tcl workflow
 ##-----------------------------------------------------------------------------
 
 set -e
@@ -22,8 +22,8 @@ NC='\033[0m'
 # Default configuration
 PART="xc7z020clg400-1"
 CLOCK="10ns"
-TOP_FUNCTION="snn_top_hls"
-SRC_FILE="src/snn_top_hls.cpp"
+TOP_FUNCTION="spikemold_top_hls"
+SRC_FILE="src/spikemold_top_hls.cpp"
 WORK_DIR="./hls_output"
 
 # Script location
@@ -65,7 +65,7 @@ while [[ $# -gt 0 ]]; do
             echo "  --verbose, -v  Verbose output"
             echo "  --part PART    Target FPGA part (default: xc7z020clg400-1)"
             echo "  --clock PERIOD Clock period (default: 10ns)"
-            echo "  --top NAME     Top function name (default: snn_top_hls)"
+            echo "  --top NAME     Top function name (default: spikemold_top_hls)"
             echo "  --help, -h     Show this message"
             echo ""
             echo "Example:"

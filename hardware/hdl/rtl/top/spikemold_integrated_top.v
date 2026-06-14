@@ -91,11 +91,11 @@ module spikemold_integrated_top #(
     wire [7:0]  bd_spike_out_weight;
     wire [0:0]  bd_spike_out_ready;
 
-    // SNN Control
-    wire [0:0]  bd_snn_enable;
-    wire [0:0]  bd_snn_reset;
-    wire        bd_snn_ready;
-    wire        bd_snn_busy;
+    // SpikeMold Control
+    wire [0:0]  bd_spikemold_enable;
+    wire [0:0]  bd_spikemold_reset;
+    wire        bd_spikemold_ready;
+    wire        bd_spikemold_busy;
     wire        bd_learn_weight_valid;
     wire [3:0]  bd_learn_weight_group;
     wire [6:0]  bd_learn_weight_src;
@@ -223,11 +223,11 @@ module spikemold_integrated_top #(
         .learn_weight_fanout_idx (bd_learn_weight_fanout_idx),
         .learn_weight_ready      (bd_learn_weight_ready),
 
-        // SNN Control
-        .snn_enable              (bd_snn_enable),
-        .snn_reset               (bd_snn_reset),
-        .snn_ready               (bd_snn_ready),
-        .snn_busy                (bd_snn_busy),
+        // SpikeMold Control
+        .spikemold_enable              (bd_spikemold_enable),
+        .spikemold_reset               (bd_spikemold_reset),
+        .spikemold_ready               (bd_spikemold_ready),
+        .spikemold_busy                (bd_spikemold_busy),
 
         // Monitoring
         .threshold_out           (threshold_out),
@@ -270,7 +270,7 @@ module spikemold_integrated_top #(
     wire                             hls_spike_event;
 
     always @(posedge clk) begin
-        if (!rst_n || bd_snn_reset[0] || !bd_snn_enable[0]) begin
+        if (!rst_n || bd_spikemold_reset[0] || !bd_spikemold_enable[0]) begin
             hls_spike_valid_d <= 1'b0;
             hls_spike_nid_d   <= {HLS_NEURON_ID_WIDTH{1'b0}};
             hls_spike_wt_d    <= {WEIGHT_WIDTH{1'b0}};
@@ -346,7 +346,7 @@ module spikemold_integrated_top #(
         (spike_out_fifo_rd_ptr == SPIKE_OUT_FIFO_LAST) ? {SPIKE_OUT_FIFO_AW{1'b0}} : (spike_out_fifo_rd_ptr + 1'b1);
 
     always @(posedge clk) begin
-        if (!rst_n || bd_snn_reset[0] || !bd_snn_enable[0]) begin
+        if (!rst_n || bd_spikemold_reset[0] || !bd_spikemold_enable[0]) begin
             spike_out_fifo_wr_ptr <= {SPIKE_OUT_FIFO_AW{1'b0}};
             spike_out_fifo_rd_ptr <= {SPIKE_OUT_FIFO_AW{1'b0}};
             spike_out_fifo_count  <= {(SPIKE_OUT_FIFO_AW+1){1'b0}};
@@ -400,7 +400,7 @@ module spikemold_integrated_top #(
     wire hls_input_accept_event = hls_spike_event & router_input_ready;
 
     always @(posedge clk) begin
-        if (!rst_n || bd_snn_reset[0]) begin
+        if (!rst_n || bd_spikemold_reset[0]) begin
             pl_latency_cycles_cur    <= 32'd0;
             pl_latency_cycles_latched<= 32'd0;
             pl_latency_active        <= 1'b0;
@@ -410,7 +410,7 @@ module spikemold_integrated_top #(
             pl_service_active        <= 1'b0;
             pl_service_done          <= 1'b0;
             pl_service_seen_busy     <= 1'b0;
-        end else if (!bd_snn_enable[0]) begin
+        end else if (!bd_spikemold_enable[0]) begin
             // Inter-image idle window: keep last latched value readable.
             pl_latency_cycles_cur <= 32'd0;
             pl_latency_active     <= 1'b0;
@@ -442,14 +442,14 @@ module spikemold_integrated_top #(
                     pl_service_cycles_cur     <= 32'd0;
                     pl_service_cycles_latched <= 32'd0;
                     pl_service_active         <= 1'b1;
-                    pl_service_seen_busy      <= bd_snn_busy;
+                    pl_service_seen_busy      <= bd_spikemold_busy;
                 end
             end else if (pl_service_active) begin
                 pl_service_cycles_cur <= pl_service_cycles_cur + 1'b1;
-                if (bd_snn_busy) begin
+                if (bd_spikemold_busy) begin
                     pl_service_seen_busy <= 1'b1;
                 end
-                if ((pl_service_seen_busy || bd_snn_busy) && !bd_snn_busy) begin
+                if ((pl_service_seen_busy || bd_spikemold_busy) && !bd_spikemold_busy) begin
                     pl_service_cycles_latched <= pl_service_cycles_cur + 1'b1;
                     pl_service_active         <= 1'b0;
                     pl_service_done           <= 1'b1;
@@ -464,11 +464,11 @@ module spikemold_integrated_top #(
     //=========================================================================
     // SNN Status
     //=========================================================================
-    assign bd_snn_ready = ~router_busy & ~neuron_array_busy;
-    assign bd_snn_busy  = router_busy | neuron_array_busy;
+    assign bd_spikemold_ready = ~router_busy & ~neuron_array_busy;
+    assign bd_spikemold_busy  = router_busy | neuron_array_busy;
 
     //=========================================================================
-    // Router Config Queue (Loihi-style decoupled control path)
+    // Router Config Queue (decoupled control path)
     // Decouple AXI register fanout from router BRAM write path.
     //=========================================================================
     fifo #(
@@ -476,7 +476,7 @@ module spikemold_integrated_top #(
         .DEPTH(ROUTER_CFG_CMD_FIFO_DEPTH)
     ) u_router_cfg_cmd_fifo (
         .clk          (clk),
-        .rst_n        (rst_n & ~bd_snn_reset[0]),
+        .rst_n        (rst_n & ~bd_spikemold_reset[0]),
         .wr_en        (cfg_router_config_we),
         .wr_data      ({cfg_router_config_addr, cfg_router_config_wdata}),
         .full         (router_cfg_cmd_fifo_full),
@@ -493,7 +493,7 @@ module spikemold_integrated_top #(
     assign router_cfg_cmd_fifo_rd_en = !router_cfg_cmd_pop_pending && !router_cfg_cmd_fifo_empty;
 
     always @(posedge clk) begin
-        if (!rst_n || bd_snn_reset[0]) begin
+        if (!rst_n || bd_spikemold_reset[0]) begin
             router_cfg_cmd_pop_pending <= 1'b0;
             router_cfg_cmd_valid       <= 1'b0;
             router_cfg_cmd_addr        <= 32'd0;
@@ -524,7 +524,7 @@ module spikemold_integrated_top #(
         .FIFO_DEPTH      (ROUTER_BUFFER_DEPTH)
     ) u_spike_router (
         .clk             (clk),
-        .rst_n           (rst_n & ~bd_snn_reset[0]),
+        .rst_n           (rst_n & ~bd_spikemold_reset[0]),
         .s_spike_valid   (router_input_valid),
         .s_spike_neuron_id(router_input_neuron_id),
         .s_spike_ready   (router_input_ready),
@@ -562,8 +562,8 @@ module spikemold_integrated_top #(
         .USE_DSP            (1)
     ) u_neuron_array (
         .clk                    (clk),
-        .rst_n                  (rst_n & ~bd_snn_reset[0]),
-        .enable                 (bd_snn_enable[0]),
+        .rst_n                  (rst_n & ~bd_spikemold_reset[0]),
+        .enable                 (bd_spikemold_enable[0]),
         .s_axis_spike_valid     (router_spike_valid),
         .s_axis_spike_dest_id   (router_spike_dest_id),
         .s_axis_spike_weight    (router_spike_weight),

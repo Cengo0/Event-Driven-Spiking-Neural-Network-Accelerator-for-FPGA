@@ -6,8 +6,8 @@ This repository now uses SpikePress and SpikeMold names only.
 
 - Software package/API: `spikepress`
 - Hardware/backend name: `spikemold` or `SpikeMold`
-- Do not add references to removed pre-EDNP package names.
-- Do not reintroduce removed pre-EDNP experiment paths into the EDNP mainline.
+- Do not add references to removed package names.
+- Do not reintroduce removed experiment paths into the EDNP mainline.
 
 ## Environment
 

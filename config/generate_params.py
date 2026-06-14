@@ -2,17 +2,17 @@
 """
 Parameter Generator: YAML → Verilog / Python / HLS headers.
 
-Reads config/snn_params.yaml (single source of truth) and generates:
-  - config/generated/snn_params.vh   Verilog `include header
-  - config/generated/snn_params.py   Python constants module
-  - config/generated/snn_params.h    HLS/C++ header
+Reads config/spikemold_params.yaml (single source of truth) and generates:
+  - config/generated/spikemold_params.vh   Verilog `include header
+  - config/generated/spikemold_params.py   Python constants module
+  - config/generated/spikemold_params.h    HLS/C++ header
 
 Derived widths ($clog2 equivalents) are computed here so RTL doesn't
 need to use $clog2 on parameters (which isn't portable across all tools).
 
 Usage:
     python config/generate_params.py
-    python config/generate_params.py --config path/to/snn_params.yaml
+    python config/generate_params.py --config path/to/spikemold_params.yaml
 
 Author: Jiwoon Lee (@metr0jw)
 """
@@ -25,7 +25,7 @@ from pathlib import Path
 import yaml
 
 
-GENERATED_NOTICE = "Generated deterministically from config/snn_params.yaml"
+GENERATED_NOTICE = "Generated deterministically from config/spikemold_params.yaml"
 
 
 def clog2(n: int) -> int:
@@ -195,7 +195,7 @@ def compute_derived(cfg: dict) -> dict:
     #   [v_mem(DATA_WIDTH)] [refrac(REFRAC_WIDTH)]
     d['neuron_state_width'] = widths['data_width'] + widths['refrac_width']
 
-    # --- Weight Memory Optimization (Loihi/TrueNorth/KIST-inspired) -----------
+    # --- Resource-Aware Weight Memory -----------
     wm = cfg.get('weight_memory', {})
     d['weight_bits'] = wm.get('weight_bits', 8)  # 2, 4, or 8
     d['time_embedding'] = 1 if wm.get('time_embedding', False) else 0
@@ -293,13 +293,13 @@ def generate_verilog(cfg: dict, derived: dict) -> str:
 
     lines = [
         f'// =============================================================================',
-        f'// SpikeMold Fabric Parameters - AUTO-GENERATED from snn_params.yaml',
+        f'// SpikeMold Fabric Parameters - AUTO-GENERATED from spikemold_params.yaml',
         f'// {GENERATED_NOTICE}',
-        f'// DO NOT EDIT — modify config/snn_params.yaml and run generate_params.py',
+        f'// DO NOT EDIT — modify config/spikemold_params.yaml and run generate_params.py',
         f'// =============================================================================',
         f'',
-        f'`ifndef SNN_PARAMS_VH',
-        f'`define SNN_PARAMS_VH',
+        f'`ifndef SPIKEMOLD_PARAMS_VH',
+        f'`define SPIKEMOLD_PARAMS_VH',
         f'',
         f'// ─── Core Architecture ────────────────────────────────────────────',
         f'`define SNN_NUM_GROUPS          {num_groups}',
@@ -316,7 +316,7 @@ def generate_verilog(cfg: dict, derived: dict) -> str:
     ]
 
     # Per-group size defines — always emit exactly 16 entries so the
-    # ternary chain in snn_core_group_top.v compiles for any NUM_GROUPS ≤ 16.
+    # ternary chain in spikemold_coregroup_top.v compiles for any NUM_GROUPS ≤ 16.
     # Unused indices get the fallback value (never instantiated in RTL).
     fallback_npg = arch.get('neurons_per_group', max_npg)
     lines.append('')
@@ -367,7 +367,7 @@ def generate_verilog(cfg: dict, derived: dict) -> str:
         f'`define SNN_NUM_CONNECTIONS       {derived["num_connections"]}',
         f'`define SNN_NUM_NEURON_GROUPS     {derived["num_neuron_groups"]}',
         f'',
-        f'// ─── Weight Memory Optimization (Loihi/TrueNorth/KIST) ──────────',
+        f'// ─── Resource-Aware Weight Memory ──────────',
         f'`define SNN_WEIGHT_BITS           {derived["weight_bits"]}',
         f'`define SNN_TIME_EMBEDDING        {derived["time_embedding"]}',
         f'`define SNN_AUXILIARY_LUTRAM      {derived["auxiliary_lutram"]}',
@@ -386,7 +386,7 @@ def generate_verilog(cfg: dict, derived: dict) -> str:
         f'`define SNN_WEIGHT_TILING_ACTIVE_TILE_WEIGHTS {derived["weight_tiling_active_tile_weights"]}',
         f'`define SNN_WEIGHT_TILING_ACTIVE_TILE_BYTES {derived["weight_tiling_active_tile_bytes"]}',
         f'',
-        f'`endif // SNN_PARAMS_VH',
+        f'`endif // SPIKEMOLD_PARAMS_VH',
     ]
     return '\n'.join(lines) + '\n'
 
@@ -408,10 +408,10 @@ def generate_python(cfg: dict, derived: dict) -> str:
 
     lines = [
         f'"""',
-        f'SpikeMold Fabric Parameters - AUTO-GENERATED from snn_params.yaml',
+        f'SpikeMold Fabric Parameters - AUTO-GENERATED from spikemold_params.yaml',
         f'',
         GENERATED_NOTICE,
-        f'DO NOT EDIT — modify config/snn_params.yaml and run generate_params.py',
+        f'DO NOT EDIT — modify config/spikemold_params.yaml and run generate_params.py',
         f'"""',
         f'',
         f'# ─── Core Architecture ─────────────────────────────────────────────',
@@ -532,7 +532,7 @@ def generate_python(cfg: dict, derived: dict) -> str:
         f'REFERENCE_WEIGHT_SCALE = 128',
         f'WEIGHT_SCALE        = {1 << widths["weight_width"]}',
         f'',
-        f'# ─── Weight Memory Optimization (Loihi/TrueNorth/KIST) ──────────',
+        f'# ─── Resource-Aware Weight Memory ──────────',
         f'WEIGHT_BITS             = {derived["weight_bits"]}',
         f'PACKED_MAX_WEIGHT       = {(1 << (derived["weight_bits"] - 1)) - 1}',
         f'PACKED_MIN_WEIGHT       = {-(1 << (derived["weight_bits"] - 1))}',
@@ -582,13 +582,13 @@ def generate_hls(cfg: dict, derived: dict) -> str:
 
     lines = [
         f'// =============================================================================',
-        f'// SpikeMold Fabric Parameters - AUTO-GENERATED from snn_params.yaml',
+        f'// SpikeMold Fabric Parameters - AUTO-GENERATED from spikemold_params.yaml',
         f'// {GENERATED_NOTICE}',
-        f'// DO NOT EDIT — modify config/snn_params.yaml and run generate_params.py',
+        f'// DO NOT EDIT — modify config/spikemold_params.yaml and run generate_params.py',
         f'// =============================================================================',
         f'',
-        f'#ifndef SNN_PARAMS_H',
-        f'#define SNN_PARAMS_H',
+        f'#ifndef SPIKEMOLD_PARAMS_H',
+        f'#define SPIKEMOLD_PARAMS_H',
         f'',
         f'// ─── Core Architecture ────────────────────────────────────────────',
         f'const int SNN_NUM_GROUPS            = {num_groups};',
@@ -702,7 +702,7 @@ def generate_hls(cfg: dict, derived: dict) -> str:
         ]
 
     lines += [
-        f'// ─── Weight Memory Optimization (Loihi/TrueNorth/KIST) ───────────',
+        f'// ─── Resource-Aware Weight Memory ───────────',
         f'#define SNN_WEIGHT_BITS           {derived["weight_bits"]}',
         f'#define SNN_TIME_EMBEDDING        {derived["time_embedding"]}',
         f'#define SNN_AUXILIARY_LUTRAM      {derived["auxiliary_lutram"]}',
@@ -725,7 +725,7 @@ def generate_hls(cfg: dict, derived: dict) -> str:
         f'const int SNN_FIXED_POINT_FRAC_BITS = {hls["fixed_point_frac_bits"]};',
         f'const int SNN_FIXED_POINT_SCALE     = (1 << SNN_FIXED_POINT_FRAC_BITS);',
         f'',
-        f'#endif // SNN_PARAMS_H',
+        f'#endif // SPIKEMOLD_PARAMS_H',
     ]
     return '\n'.join(lines) + '\n'
 
@@ -736,9 +736,9 @@ def generate_hls(cfg: dict, derived: dict) -> str:
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Generate RTL/Python/HLS parameter files from snn_params.yaml')
+        description='Generate RTL/Python/HLS parameter files from spikemold_params.yaml')
     parser.add_argument('--config', default=None,
-                        help='Path to snn_params.yaml (auto-detected if not given)')
+                        help='Path to spikemold_params.yaml (auto-detected if not given)')
     parser.add_argument('--output-dir', default=None,
                         help='Output directory (default: config/generated/)')
     args = parser.parse_args()
@@ -751,7 +751,7 @@ def main():
     if args.config:
         config_path = Path(args.config)
     else:
-        config_path = project_root / 'config' / 'snn_params.yaml'
+        config_path = project_root / 'config' / 'spikemold_params.yaml'
 
     if not config_path.exists():
         print(f"ERROR: Config file not found: {config_path}", file=sys.stderr)
@@ -791,9 +791,9 @@ def main():
 
     # Generate files
     files = {
-        'snn_params.vh': generate_verilog(cfg, derived),
-        'snn_params.py': generate_python(cfg, derived),
-        'snn_params.h':  generate_hls(cfg, derived),
+        'spikemold_params.vh': generate_verilog(cfg, derived),
+        'spikemold_params.py': generate_python(cfg, derived),
+        'spikemold_params.h':  generate_hls(cfg, derived),
     }
 
     for filename, content in files.items():

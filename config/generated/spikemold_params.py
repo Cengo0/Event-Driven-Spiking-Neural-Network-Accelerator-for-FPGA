@@ -1,8 +1,8 @@
 """
-SpikeMold Fabric Parameters - AUTO-GENERATED from snn_params.yaml
+SpikeMold Fabric Parameters - AUTO-GENERATED from spikemold_params.yaml
 
-Generated deterministically from config/snn_params.yaml
-DO NOT EDIT — modify config/snn_params.yaml and run generate_params.py
+Generated deterministically from config/spikemold_params.yaml
+DO NOT EDIT — modify config/spikemold_params.yaml and run generate_params.py
 """
 
 # ─── Core Architecture ─────────────────────────────────────────────
@@ -67,7 +67,7 @@ MAX_SRC_NEURONS         = 512
 MAX_DST_NEURONS         = 512
 TOTAL_LOGICAL_NEURONS   = 4890
 
-NEURON_GROUP_NAMES  = ['visible_output', 'input', 'dummy_pad']
+NEURON_GROUP_NAMES  = ['visible_output', 'input', 'capacity_reserve']
 NEURON_GROUP_SIZES  = [512, 512, 3866]
 NEURON_GROUP_ID_START = [0, 512, 1024, 4890]
 
@@ -86,7 +86,7 @@ REFERENCE_MIN_WEIGHT = -128
 REFERENCE_WEIGHT_SCALE = 128
 WEIGHT_SCALE        = 256
 
-# ─── Weight Memory Optimization (Loihi/TrueNorth/KIST) ──────────
+# ─── Resource-Aware Weight Memory ──────────
 WEIGHT_BITS             = 8
 PACKED_MAX_WEIGHT       = 127
 PACKED_MIN_WEIGHT       = -128

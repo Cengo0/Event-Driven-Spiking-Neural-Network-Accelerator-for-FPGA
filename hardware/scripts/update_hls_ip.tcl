@@ -86,13 +86,13 @@ if {[llength $ip_to_upgrade] > 0} {
     puts "No IP upgrades available."
 }
 
-# Find snn_top_hls instance in BD
-set snn_hls_cell [get_bd_cells -quiet -filter {VLNV =~ "*snn_top_hls*"}]
-if {$snn_hls_cell != ""} {
-    puts "\n=== Found HLS IP instance: $snn_hls_cell ==="
+# Find spikemold_top_hls instance in BD
+set spikemold_hls_cell [get_bd_cells -quiet -filter {VLNV =~ "*spikemold_top_hls*"}]
+if {$spikemold_hls_cell != ""} {
+    puts "\n=== Found HLS IP instance: $spikemold_hls_cell ==="
     
     # Check for unconnected pins (new ports added in HLS)
-    set unconnected_pins [get_bd_pins -quiet -of_objects $snn_hls_cell -filter {TYPE == slave && DIR == I} -filter {CONNECTED == false}]
+    set unconnected_pins [get_bd_pins -quiet -of_objects $spikemold_hls_cell -filter {TYPE == slave && DIR == I} -filter {CONNECTED == false}]
     if {[llength $unconnected_pins] > 0} {
         puts "WARNING: Unconnected input pins detected:"
         foreach pin $unconnected_pins {
@@ -103,15 +103,15 @@ if {$snn_hls_cell != ""} {
     
     # Example: Tie off s_axis_data if not used yet
     # Uncomment and adjust if you want to auto-tie-off:
-    # set s_axis_data_pin [get_bd_pins -quiet ${snn_hls_cell}/s_axis_data_TVALID]
+    # set s_axis_data_pin [get_bd_pins -quiet ${spikemold_hls_cell}/s_axis_data_TVALID]
     # if {$s_axis_data_pin != ""} {
     #     create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 const_s_axis_data_tvalid
     #     set_property -dict [list CONFIG.CONST_VAL {0}] [get_bd_cells const_s_axis_data_tvalid]
-    #     connect_bd_net [get_bd_pins const_s_axis_data_tvalid/dout] [get_bd_pins ${snn_hls_cell}/s_axis_data_TVALID]
+    #     connect_bd_net [get_bd_pins const_s_axis_data_tvalid/dout] [get_bd_pins ${spikemold_hls_cell}/s_axis_data_TVALID]
     # }
     
 } else {
-    puts "WARNING: No snn_top_hls IP found in block design. You may need to manually add it."
+    puts "WARNING: No spikemold_top_hls IP found in block design. You may need to manually add it."
 }
 
 # Regenerate layout and validate

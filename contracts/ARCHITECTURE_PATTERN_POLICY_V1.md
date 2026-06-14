@@ -42,11 +42,11 @@ An allowed pattern must prove:
 - unbounded fanout with no compiler gate
 - full-neuron scan every timestep as the primary mode
 - silent semantic changes
-- legacy code reuse without trace compliance
+- prior implementation reuse without trace compliance
 
-## Legacy Reuse
+## Prior Implementation Reuse
 
-Legacy code may be reused only when:
+Prior implementation may be reused only when:
 
 - it is wrapped behind the V1 trace contract
 - it passes the same tests as new code

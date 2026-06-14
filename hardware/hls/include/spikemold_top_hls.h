@@ -1,26 +1,26 @@
 //-----------------------------------------------------------------------------
-// Title         : SNN Top-Level HLS Header
+// Title         : SpikeMold Top-Level HLS Header
 // Project       : PYNQ-Z2 SpikeMold
-// File          : snn_top_hls.h
+// File          : spikemold_top_hls.h
 // Author        : Jiwoon Lee (@metr0jw)
 // Organization  : Kwangwoon University, Seoul, South Korea
 // Contact       : jwlee@linux.com
 // Description   : Header for unified HLS top-level with on-chip learning
 //-----------------------------------------------------------------------------
 
-#ifndef SNN_TOP_HLS_H
-#define SNN_TOP_HLS_H
+#ifndef SPIKEMOLD_TOP_HLS_H
+#define SPIKEMOLD_TOP_HLS_H
 
 #include <ap_int.h>
 #include <ap_fixed.h>
 #include <ap_axi_sdata.h>
 #include <hls_stream.h>
 
-// Centralized parameters (source of truth: config/snn_params.yaml)
-#include "snn_params.h"
+// Centralized parameters (source of truth: config/spikemold_params.yaml)
+#include "spikemold_params.h"
 
 //=============================================================================
-// Configuration (derived from snn_params.h)
+// Configuration (derived from spikemold_params.h)
 //=============================================================================
 const int MAX_NEURONS    = SNN_MAX_NEURONS;                  // 16×128 = 2048
 
@@ -130,7 +130,7 @@ static const int NG_ID_START[NUM_NEURON_GROUPS + 1] = {
 };
 
 const int WEIGHT_WIDTH   = SNN_WEIGHT_WIDTH;                 // 8
-const int RTL_NEURON_ID_WIDTH = SNN_NEURON_ID_WIDTH;         // 11 (RTL Core Group global ID)
+const int RTL_NEURON_ID_WIDTH = SNN_NEURON_ID_WIDTH;         // 11 (RTL SpikeMold Coregroup global ID)
 const int NEURON_ID_WIDTH = SNN_HLS_NEURON_ID_WIDTH;         // 13 (HLS logical neuron space, K=1024)
 const int TIMESTAMP_WIDTH = 32;
 
@@ -146,18 +146,18 @@ const int SPIKE_PKT_TS_LO  = NEURON_ID_WIDTH + 8;
 const int SPIKE_PKT_TS_HI  = 31;
 
 //=============================================================================
-// Loihi/TrueNorth/KIST-Inspired Weight Memory Optimization
+// Resource-Aware Weight Memory Optimization
 //=============================================================================
-// WEIGHT_BITS: Configurable synapse precision (Loihi supports 1-9 bit).
+// WEIGHT_BITS: Configurable synapse precision (configurable per-backend limits).
 //   8-bit: full precision (original), ~794 BRAM18K for N=2048
-//   4-bit: Loihi default,            ~353 BRAM18K (halved)
-//   2-bit: TrueNorth ternary,        ~177 BRAM18K (quartered)
+//   4-bit: reduced precision,            ~353 BRAM18K (halved)
+//   2-bit: ultra-low precision,        ~177 BRAM18K (quartered)
 //
 // PACKED_BUFFER_BYTES: ceil(MAX_WEIGHT_BUFFER_SIZE * WEIGHT_BITS / 8)
 //   The storage array is declared as ap_int<WEIGHT_BITS> flat entries,
 //   letting HLS map to the most efficient BRAM configuration.
 //
-// TIME_EMBEDDING (KIST-style): Remove per-neuron 16-bit timestamps.
+// TIME_EMBEDDING: remove per-neuron 16-bit timestamps.
 //   Traces decay globally each timestep instead of lazily per-access.
 //   Saves 16 bits × TOTAL_LOGICAL_NEURONS × 2 in BRAM.
 //
@@ -192,14 +192,14 @@ const int VERSION_ID     = 0x20260221;
 #define MODE_TRAIN_STDP 1      // On-chip STDP learning
 #define MODE_CHECKPOINT 2      // Stream weights to DDR/PS
 // mode_reg[31:16] can optionally hold checkpoint chunk size (words):
-//   0 -> legacy single-frame checkpoint (TLAST at final word only)
+//   0 -> single-frame checkpoint (TLAST at final word only)
 //   N -> emit TLAST every N words while streaming checkpoint packets
 
 //=============================================================================
 // Basic Data Types
 //=============================================================================
 typedef ap_uint<NEURON_ID_WIDTH> neuron_id_t;      // HLS logical neuron ID (13b, K=1024)
-typedef ap_uint<RTL_NEURON_ID_WIDTH> rtl_nid_t;    // RTL core group ID (11b)
+typedef ap_uint<RTL_NEURON_ID_WIDTH> rtl_nid_t;    // RTL coregroup ID (11b)
 typedef ap_uint<SNN_GROUP_ID_WIDTH> group_id_t;
 typedef ap_uint<SNN_LOCAL_ID_WIDTH> local_id_t;
 typedef ap_uint<SNN_FANOUT_IDX_WIDTH> fanout_idx_t;
@@ -209,7 +209,7 @@ typedef ap_uint<TIMESTAMP_WIDTH> spike_time_t;
 
 // NOTE: HLS STDP engine uses packed_weight_t (configurable SNN_WEIGHT_BITS).
 // AXI-Stream packets still use 8-bit weight_t for interface compatibility.
-// RTL core_group.v uses unsigned 8-bit magnitude [0, 255] + 1-bit exc/inh flag.
+// RTL spikemold_coregroup.v uses unsigned 8-bit magnitude [0, 255] + 1-bit exc/inh flag.
 const packed_weight_t MAX_WEIGHT = PACKED_MAX_WEIGHT;
 const packed_weight_t MIN_WEIGHT = PACKED_MIN_WEIGHT;
 
@@ -222,7 +222,19 @@ const packed_weight_t MIN_WEIGHT = PACKED_MIN_WEIGHT;
 //   [SPIKE_PKT_TS_HI : SPIKE_PKT_TS_LO]   timestamp  (remaining bits)
 typedef ap_axiu<32, 1, 1, 1> axis_spike_t;
 
-// Weight packet: [31:24] reserved, [23:16] weight, [15:8] post_id, [7:0] pre_id
+// Weight-load packet (AXIS32):
+//   [11:0]  pre_id
+//   [23:12] post_id
+//   [31:24] signed 8-bit weight
+// The 12-bit ID fields match the compact AXIS32 loader path. Full logical IDs
+// above 4095 must use table/bulk artifact loading instead of this stream.
+const int WEIGHT_LOAD_PKT_ID_WIDTH = 12;
+const int WEIGHT_LOAD_PKT_PRE_LO = 0;
+const int WEIGHT_LOAD_PKT_PRE_HI = 11;
+const int WEIGHT_LOAD_PKT_POST_LO = 12;
+const int WEIGHT_LOAD_PKT_POST_HI = 23;
+const int WEIGHT_LOAD_PKT_WGT_LO = 24;
+const int WEIGHT_LOAD_PKT_WGT_HI = 31;
 typedef ap_axiu<32, 1, 1, 1> axis_weight_t;
 
 // Data packet (for encoder input frames) - 32-bit wide (4 pixels per beat)
@@ -237,7 +249,7 @@ struct learning_params_t {
     ap_fixed<16,8> a_minus;         // LTD amplitude — scales Δw in LTD (used)
     ap_uint<16> tau_plus;           // Pre-trace time constant (host-side, for computing trace_decay)
     ap_uint<16> tau_minus;          // Post-trace time constant (host-side, for computing trace_decay)
-    ap_uint<16> stdp_window;        // Reserved (KIST global decay makes window implicit)
+    ap_uint<16> stdp_window;        // Reserved (global decay makes window implicit)
     ap_fixed<16,8> learning_rate;   // Global learning rate — final scale on all weight updates (used)
     
     // R-STDP parameters
@@ -284,7 +296,7 @@ struct encoder_config_t {
 //=============================================================================
 // Main Function Declaration
 //=============================================================================
-void snn_top_hls(
+void spikemold_top_hls(
     // AXI4-Lite Control Interface
     ap_uint<32> ctrl_reg,
     ap_uint<32> config_reg,
@@ -340,14 +352,14 @@ void snn_top_hls(
     ap_uint<1> learn_weight_ready,
     
     // Verilog Interface - Control signals
-    ap_uint<1> &snn_enable,
-    ap_uint<1> &snn_reset,
+    ap_uint<1> &spikemold_enable,
+    ap_uint<1> &spikemold_reset,
     ap_uint<16> &threshold_out,
     ap_uint<16> &leak_rate_out,
     
     // Verilog Interface - Status signals
-    ap_uint<1> snn_ready,
-    ap_uint<1> snn_busy
+    ap_uint<1> spikemold_ready,
+    ap_uint<1> spikemold_busy
 );
 
 //=============================================================================
@@ -406,4 +418,4 @@ static inline int weight_index(neuron_id_t pre_id, neuron_id_t post_id) {
     return conn.weight_offset + local_src * conn.dst_size + local_dst;
 }
 
-#endif // SNN_TOP_HLS_H
+#endif // SPIKEMOLD_TOP_HLS_H

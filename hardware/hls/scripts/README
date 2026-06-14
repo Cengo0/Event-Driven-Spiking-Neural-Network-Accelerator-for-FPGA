@@ -2,7 +2,7 @@
 
 ## Modern v++ Workflow (Vitis 2025.2+)
 
-The legacy `vitis_hls -f script.tcl` workflow is deprecated.
+The `vitis_hls -f script.tcl` workflow is superseded.
 Use the `v++` compiler instead.
 
 ### Quick Build
@@ -16,8 +16,8 @@ v++ -c --mode hls \
     --part xc7z020clg400-1 \
     --work_dir ./hls_output \
     --hls.clock 10ns \
-    --hls.syn.top snn_top_hls \
-    --hls.syn.file "src/snn_top_hls.cpp" \
+    --hls.syn.top spikemold_top_hls \
+    --hls.syn.file "src/spikemold_top_hls.cpp" \
     --hls.flow_target vivado
 ```
 
@@ -25,7 +25,7 @@ v++ -c --mode hls \
 
 - `build_hls.sh` - Main build script using v++ CLI
 - `hls_config.cfg` - HLS configuration (optional)
-- `snn_top_hls_vpp.cfg` - v++ configuration file
+- `spikemold_top_hls_vpp.cfg` - v++ configuration file
 - `vpp_hls_config.cfg` - Alternative v++ config
 
 ### Build Options
@@ -45,7 +45,7 @@ Options:
 After successful synthesis:
 - IP Package: `hls_output/hls/impl/ip/`
 - Reports: `hls_output/hls/syn/report/csynth.rpt`
-- ZIP: `hls_output/snn_top_hls.zip`
+- ZIP: `hls_output/spikemold_top_hls.zip`
 
 ### Integration with Vivado
 

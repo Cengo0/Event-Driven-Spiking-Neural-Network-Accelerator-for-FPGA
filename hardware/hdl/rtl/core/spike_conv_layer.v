@@ -1,21 +1,21 @@
 //-----------------------------------------------------------------------------
-// Title       : Spike Convolution Layer - Loihi-style Implementation
+// Title       : Spike Convolution Layer - shared-kernel EventConv Implementation
 // Description : Complete convolution layer with shared weights and AGU.
 //
-// This module implements Intel Loihi's approach to convolution:
+// This module implements shared-kernel EventConv:
 // - Shared kernel weights stored in small BRAM (3x3 or 5x5)
 // - Event-driven address generation for receptive field
 // - Add-only accumulation (no DSP blocks needed)
 // - Sparsity-aware: only processes active spikes
 //
 // Architecture:
-//   Input Spike → AGU → Connectivity Table → Core Group Accumulation
+//   Input Spike → AGU → Connectivity Table → SpikeMold Coregroup Accumulation
 //                    ↓
 //              BRAM Kernel Weights (K×K)
 //-----------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
-`include "snn_params.vh"
+`include "spikemold_params.vh"
 
 module spike_conv_layer #(
     parameter KERNEL_SIZE         = 3,          // Kernel size: 3 or 5
@@ -106,7 +106,7 @@ module spike_conv_layer #(
     end
 
     //=========================================================================
-    // Connectivity Table Lookup (for Loihi-style mapping)
+    // Connectivity Table Lookup (for shared-kernel mapping)
     //=========================================================================
     wire lookup_en;
     assign lookup_en = enable && s_axis_spike_tvalid;

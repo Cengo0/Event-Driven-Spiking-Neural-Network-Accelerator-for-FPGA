@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
-`include "snn_params.vh"
+`include "spikemold_params.vh"
 
-module tb_core_group;
+module tb_spikemold_coregroup;
     parameter NEURONS_PER_GROUP  = `SNN_NEURONS_PER_GROUP;
     parameter DATA_WIDTH         = `SNN_DATA_WIDTH;
     parameter WEIGHT_WIDTH       = `SNN_WEIGHT_WIDTH;
@@ -41,7 +41,7 @@ module tb_core_group;
     wire [15:0] spike_count;
     wire group_busy;
 
-    core_group #(
+    spikemold_coregroup #(
         .GROUP_ID(0), .NEURONS_PER_GROUP(NEURONS_PER_GROUP),
         .DATA_WIDTH(DATA_WIDTH), .WEIGHT_WIDTH(WEIGHT_WIDTH),
         .THRESHOLD_WIDTH(THRESHOLD_WIDTH), .LEAK_WIDTH(LEAK_WIDTH),
@@ -199,7 +199,7 @@ module tb_core_group;
 
     initial begin
         $display("=========================================================");
-        $display("  Core Group Testbench - 128 LIF Neurons");
+        $display("  SpikeMold Coregroup Testbench - 128 LIF Neurons");
         $display("=========================================================");
         do_reset;
 
@@ -580,7 +580,7 @@ module tb_core_group;
         end
 
         $display("\n=========================================================");
-        $display("  Core Group TB: %0d PASS, %0d FAIL (of %0d)",
+        $display("  SpikeMold Coregroup TB: %0d PASS, %0d FAIL (of %0d)",
                  pass_count, fail_count, pass_count + fail_count);
         $display("=========================================================");
         if (fail_count > 0) $finish(1);

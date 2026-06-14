@@ -1,9 +1,9 @@
-# Active core-group fabric sources.
-# snn_core_group_top.v implements the fabric and snn_fabric_top.v is the
+# Active coregroup fabric sources.
+# spikemold_coregroup_top.v implements the fabric and spikemold_integrated_top.v is the
 # board-visible wrapper.
 
 # Core modules
-hardware/hdl/rtl/core/core_group.v
+hardware/hdl/rtl/core/spikemold_coregroup.v
 hardware/hdl/rtl/core/event_router_ng.v
 hardware/hdl/rtl/core/synaptic_connectivity_table.v
 
@@ -27,5 +27,5 @@ hardware/hdl/rtl/common/wide_control_decode.v
 # hardware/hdl/rtl/event_frontend/event_to_tile_mapper.v
 
 # Top-level modules
-hardware/hdl/rtl/top/snn_core_group_top.v
-hardware/hdl/rtl/top/snn_fabric_top.v
+hardware/hdl/rtl/top/spikemold_coregroup_top.v
+hardware/hdl/rtl/top/spikemold_integrated_top.v
