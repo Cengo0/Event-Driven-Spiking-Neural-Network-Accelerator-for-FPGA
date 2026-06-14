@@ -1,6 +1,6 @@
 // =============================================================================
-// SNN Accelerator Parameters — AUTO-GENERATED from snn_params.yaml
-// Generated: 2026-02-22 16:30:32
+// SpikeMold Fabric Parameters - AUTO-GENERATED from snn_params.yaml
+// Generated deterministically from config/snn_params.yaml
 // DO NOT EDIT — modify config/snn_params.yaml and run generate_params.py
 // =============================================================================
 
@@ -12,6 +12,12 @@ const int SNN_NUM_GROUPS            = 16;
 const int SNN_NEURONS_PER_GROUP     = 128;  // max(group_sizes)
 const int SNN_MAX_NEURONS_PER_GROUP = 128;
 const int SNN_MAX_FANOUT_INTER      = 16;
+const int SNN_ROUTER_MAX_FANOUT     = 32;
+const int SNN_ROUTER_DELAY_WIDTH    = 8;
+const int SNN_ROUTER_USE_DIRECT_OFFSET_MAP = 0;
+const int SNN_ROUTER_USE_TABLE_FALLBACK = 0;
+const int SNN_ROUTER_DIRECT_MAP_WINDOWS = 4;
+const int SNN_ROUTER_CONN_RAM_STYLE_DIST = 0;
 const int SNN_SPIKE_BUFFER_DEPTH    = 64;
 const int SNN_TOTAL_NEURONS         = 2048;
 
@@ -43,126 +49,80 @@ const int SNN_WEIGHT_FLAG_WIDTH   = 9;
 const int SNN_HLS_NEURON_ID_WIDTH = 13;
 const int SNN_HLS_MAX_NEURONS     = 2048;
 const int SNN_HLS_WEIGHT_WIDTH    = 8;
+// Inference-only mode: learning disabled by default for resource savings
+#ifndef SNN_EVENT_ROUTER_LEARNING_ENABLE
+#define SNN_EVENT_ROUTER_LEARNING_ENABLE 0
+#endif
+
+#ifndef SNN_CORE_GROUP_LEARNING_ENABLE
+#define SNN_CORE_GROUP_LEARNING_ENABLE 0
+#endif
+
+#ifndef SNN_HLS_LEARNING_ENABLE
+#define SNN_HLS_LEARNING_ENABLE 0
+#endif
+#ifndef SNN_HLS_SMOKE_COMMANDS_ENABLE
+#define SNN_HLS_SMOKE_COMMANDS_ENABLE 0
+#endif
+#ifndef SNN_HLS_CNN_DESCRIPTOR_PAGE_ENABLE
+#define SNN_HLS_CNN_DESCRIPTOR_PAGE_ENABLE 1
+#endif
 
 // ─── NeuronGroup Connection Topology (Brian2-style) ─────────────
-const int SNN_NUM_NEURON_GROUPS      = 9;
-const int SNN_NUM_CONNECTIONS         = 8;
-#define SNN_NUM_NEURON_GROUPS_PP      9
-#define SNN_NUM_CONNECTIONS_PP         8
-const int SNN_MAX_WEIGHT_BUFFER_SIZE  = 843776;
-const int SNN_MAX_SRC_NEURONS         = 1024;
-const int SNN_MAX_DST_NEURONS         = 1024;
+const int SNN_NUM_NEURON_GROUPS      = 3;
+const int SNN_NUM_CONNECTIONS         = 1;
+#define SNN_NUM_NEURON_GROUPS_PP      3
+#define SNN_NUM_CONNECTIONS_PP         1
+const int SNN_MAX_WEIGHT_BUFFER_SIZE  = 262144;
+const int SNN_RESIDENT_WEIGHT_BUFFER_SIZE = 1;
+const int SNN_RESIDENT_WEIGHT_LOGICAL_ENTRIES = 0;
+const int SNN_TILED_WEIGHT_ENTRIES    = 262144;
+const int SNN_MAX_SRC_NEURONS         = 512;
+const int SNN_MAX_DST_NEURONS         = 512;
 const int SNN_TOTAL_LOGICAL_NEURONS   = 4890;
 
 // Per-NeuronGroup sizes
-const int SNN_NG_SIZE_0 = 196;  // input_0
-const int SNN_NG_SIZE_1 = 196;  // input_1
-const int SNN_NG_SIZE_2 = 196;  // input_2
-const int SNN_NG_SIZE_3 = 196;  // input_3
-const int SNN_NG_SIZE_4 = 1024;  // hidden_0
-const int SNN_NG_SIZE_5 = 1024;  // hidden_1
-const int SNN_NG_SIZE_6 = 1024;  // hidden_2
-const int SNN_NG_SIZE_7 = 1024;  // hidden_3
-const int SNN_NG_SIZE_8 = 10;  // output
+const int SNN_NG_SIZE_0 = 512;  // visible_output
+const int SNN_NG_SIZE_1 = 512;  // input
+const int SNN_NG_SIZE_2 = 3866;  // dummy_pad
 
 // NeuronGroup ID start offsets (cumulative)
 const int SNN_NG_ID_START_0 = 0;
-const int SNN_NG_ID_START_1 = 196;
-const int SNN_NG_ID_START_2 = 392;
-const int SNN_NG_ID_START_3 = 588;
-const int SNN_NG_ID_START_4 = 784;
-const int SNN_NG_ID_START_5 = 1808;
-const int SNN_NG_ID_START_6 = 2832;
-const int SNN_NG_ID_START_7 = 3856;
-const int SNN_NG_ID_START_8 = 4880;
-const int SNN_NG_ID_START_9 = 4890;
+const int SNN_NG_ID_START_1 = 512;
+const int SNN_NG_ID_START_2 = 1024;
+const int SNN_NG_ID_START_3 = 4890;
 
 // Per-Connection parameters
-// Connection 0: in0_to_hid0 (group 0 -> group 4)
-const int SNN_CONN_0_SRC_GROUP      = 0;
-const int SNN_CONN_0_DST_GROUP      = 4;
-const int SNN_CONN_0_SRC_SIZE       = 196;
-const int SNN_CONN_0_DST_SIZE       = 1024;
+// Connection 0: input_to_visible_output (group 1 -> group 0)
+const int SNN_CONN_0_SRC_GROUP      = 1;
+const int SNN_CONN_0_DST_GROUP      = 0;
+const int SNN_CONN_0_SRC_SIZE       = 512;
+const int SNN_CONN_0_DST_SIZE       = 512;
 const int SNN_CONN_0_WEIGHT_OFFSET  = 0;
-const int SNN_CONN_0_NUM_WEIGHTS    = 200704;
-const int SNN_CONN_0_SRC_ID_START   = 0;
-const int SNN_CONN_0_DST_ID_START   = 784;
-
-// Connection 1: in1_to_hid1 (group 1 -> group 5)
-const int SNN_CONN_1_SRC_GROUP      = 1;
-const int SNN_CONN_1_DST_GROUP      = 5;
-const int SNN_CONN_1_SRC_SIZE       = 196;
-const int SNN_CONN_1_DST_SIZE       = 1024;
-const int SNN_CONN_1_WEIGHT_OFFSET  = 200704;
-const int SNN_CONN_1_NUM_WEIGHTS    = 200704;
-const int SNN_CONN_1_SRC_ID_START   = 196;
-const int SNN_CONN_1_DST_ID_START   = 1808;
-
-// Connection 2: in2_to_hid2 (group 2 -> group 6)
-const int SNN_CONN_2_SRC_GROUP      = 2;
-const int SNN_CONN_2_DST_GROUP      = 6;
-const int SNN_CONN_2_SRC_SIZE       = 196;
-const int SNN_CONN_2_DST_SIZE       = 1024;
-const int SNN_CONN_2_WEIGHT_OFFSET  = 401408;
-const int SNN_CONN_2_NUM_WEIGHTS    = 200704;
-const int SNN_CONN_2_SRC_ID_START   = 392;
-const int SNN_CONN_2_DST_ID_START   = 2832;
-
-// Connection 3: in3_to_hid3 (group 3 -> group 7)
-const int SNN_CONN_3_SRC_GROUP      = 3;
-const int SNN_CONN_3_DST_GROUP      = 7;
-const int SNN_CONN_3_SRC_SIZE       = 196;
-const int SNN_CONN_3_DST_SIZE       = 1024;
-const int SNN_CONN_3_WEIGHT_OFFSET  = 602112;
-const int SNN_CONN_3_NUM_WEIGHTS    = 200704;
-const int SNN_CONN_3_SRC_ID_START   = 588;
-const int SNN_CONN_3_DST_ID_START   = 3856;
-
-// Connection 4: hid0_to_output (group 4 -> group 8)
-const int SNN_CONN_4_SRC_GROUP      = 4;
-const int SNN_CONN_4_DST_GROUP      = 8;
-const int SNN_CONN_4_SRC_SIZE       = 1024;
-const int SNN_CONN_4_DST_SIZE       = 10;
-const int SNN_CONN_4_WEIGHT_OFFSET  = 802816;
-const int SNN_CONN_4_NUM_WEIGHTS    = 10240;
-const int SNN_CONN_4_SRC_ID_START   = 784;
-const int SNN_CONN_4_DST_ID_START   = 4880;
-
-// Connection 5: hid1_to_output (group 5 -> group 8)
-const int SNN_CONN_5_SRC_GROUP      = 5;
-const int SNN_CONN_5_DST_GROUP      = 8;
-const int SNN_CONN_5_SRC_SIZE       = 1024;
-const int SNN_CONN_5_DST_SIZE       = 10;
-const int SNN_CONN_5_WEIGHT_OFFSET  = 813056;
-const int SNN_CONN_5_NUM_WEIGHTS    = 10240;
-const int SNN_CONN_5_SRC_ID_START   = 1808;
-const int SNN_CONN_5_DST_ID_START   = 4880;
-
-// Connection 6: hid2_to_output (group 6 -> group 8)
-const int SNN_CONN_6_SRC_GROUP      = 6;
-const int SNN_CONN_6_DST_GROUP      = 8;
-const int SNN_CONN_6_SRC_SIZE       = 1024;
-const int SNN_CONN_6_DST_SIZE       = 10;
-const int SNN_CONN_6_WEIGHT_OFFSET  = 823296;
-const int SNN_CONN_6_NUM_WEIGHTS    = 10240;
-const int SNN_CONN_6_SRC_ID_START   = 2832;
-const int SNN_CONN_6_DST_ID_START   = 4880;
-
-// Connection 7: hid3_to_output (group 7 -> group 8)
-const int SNN_CONN_7_SRC_GROUP      = 7;
-const int SNN_CONN_7_DST_GROUP      = 8;
-const int SNN_CONN_7_SRC_SIZE       = 1024;
-const int SNN_CONN_7_DST_SIZE       = 10;
-const int SNN_CONN_7_WEIGHT_OFFSET  = 833536;
-const int SNN_CONN_7_NUM_WEIGHTS    = 10240;
-const int SNN_CONN_7_SRC_ID_START   = 3856;
-const int SNN_CONN_7_DST_ID_START   = 4880;
+const int SNN_CONN_0_RESIDENT_WEIGHT_OFFSET = -1;
+const int SNN_CONN_0_TILED          = 1;
+const int SNN_CONN_0_NUM_WEIGHTS    = 262144;
+const int SNN_CONN_0_SRC_ID_START   = 512;
+const int SNN_CONN_0_DST_ID_START   = 0;
 
 // ─── Weight Memory Optimization (Loihi/TrueNorth/KIST) ───────────
-#define SNN_WEIGHT_BITS           4
+#define SNN_WEIGHT_BITS           8
 #define SNN_TIME_EMBEDDING        1
 #define SNN_AUXILIARY_LUTRAM      1
-const int SNN_PACKED_BUFFER_BYTES = 421888;
+#define SNN_TRACE_MAINTENANCE_ACTIVE_SET 0
+#define SNN_TRACE_ACTIVE_CLEAR_THRESHOLD 0
+const int SNN_PACKED_BUFFER_BYTES = 262144;
+
+// ─── Weight Tiling (future large-network path) ───────────────────
+#define SNN_WEIGHT_TILING_ENABLE 1
+#define SNN_WEIGHT_TILING_LARGE_ONLY 1
+#define SNN_WEIGHT_TILING_LARGE_CONN_MIN_WEIGHTS 65536
+#define SNN_WEIGHT_TILING_SRC_CHUNK 196
+#define SNN_WEIGHT_TILING_DST_CHUNK 128
+#define SNN_WEIGHT_TILING_DOUBLE_BUFFER 0
+#define SNN_WEIGHT_TILING_ACTIVE_BUFFERS 1
+#define SNN_WEIGHT_TILING_ACTIVE_TILE_WEIGHTS 25088
+#define SNN_WEIGHT_TILING_ACTIVE_TILE_BYTES 25088
 
 // ─── Fixed-Point (ap_fixed<16,8>) ─────────────────────────────────
 const int SNN_FIXED_POINT_FRAC_BITS = 8;
