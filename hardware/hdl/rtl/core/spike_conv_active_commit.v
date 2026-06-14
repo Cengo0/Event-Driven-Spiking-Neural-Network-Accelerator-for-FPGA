@@ -33,7 +33,8 @@ module spike_conv_active_commit #(
     output reg  [31:0]                  active_commit_read_count,
     output reg  [31:0]                  commit_emit_count,
     output reg  [31:0]                  full_scan_count,
-    output reg signed [31:0]            readout_checksum
+    output reg signed [31:0]            readout_checksum,
+    output reg  [31:0]                  output_backpressure_cycle_count
 );
 
     localparam STATE_IDLE = 2'd0;
@@ -45,6 +46,8 @@ module spike_conv_active_commit #(
     reg [31:0] active_count_latched;
     reg [DEST_ID_WIDTH-1:0] held_dest_id;
     reg signed [STATE_WIDTH-1:0] held_state_value;
+    reg commit_channel_done;
+    reg reset_channel_done;
 
     wire active_index_in_range =
         (active_index < active_count_latched) && (active_index < STATE_COUNT);
@@ -55,9 +58,13 @@ module spike_conv_active_commit #(
         state_flat[current_dest_id*STATE_WIDTH +: STATE_WIDTH];
     wire current_should_emit =
         current_dest_valid && (current_state_value >= commit_threshold);
-    wire commit_output_fire =
-        m_axis_commit_tvalid && m_axis_commit_tready &&
-        m_axis_reset_tvalid && m_axis_reset_tready;
+    wire commit_output_fire = m_axis_commit_tvalid && m_axis_commit_tready;
+    wire reset_output_fire = m_axis_reset_tvalid && m_axis_reset_tready;
+    wire emit_complete =
+        (commit_channel_done || commit_output_fire) &&
+        (reset_channel_done || reset_output_fire);
+    wire emit_backpressured =
+        (m_axis_commit_tvalid || m_axis_reset_tvalid) && !emit_complete;
 
     always @(posedge clk) begin
         if (!rst_n || clear) begin
@@ -76,6 +83,9 @@ module spike_conv_active_commit #(
             commit_emit_count <= 32'd0;
             full_scan_count <= 32'd0;
             readout_checksum <= 32'sd0;
+            output_backpressure_cycle_count <= 32'd0;
+            commit_channel_done <= 1'b0;
+            reset_channel_done <= 1'b0;
         end else if (!enable) begin
             state <= STATE_IDLE;
             active_index <= 32'd0;
@@ -83,6 +93,8 @@ module spike_conv_active_commit #(
             commit_done <= 1'b0;
             m_axis_commit_tvalid <= 1'b0;
             m_axis_reset_tvalid <= 1'b0;
+            commit_channel_done <= 1'b0;
+            reset_channel_done <= 1'b0;
         end else begin
             commit_done <= 1'b0;
 
@@ -90,6 +102,8 @@ module spike_conv_active_commit #(
                 STATE_IDLE: begin
                     m_axis_commit_tvalid <= 1'b0;
                     m_axis_reset_tvalid <= 1'b0;
+                    commit_channel_done <= 1'b0;
+                    reset_channel_done <= 1'b0;
                     if (commit_start) begin
                         active_index <= 32'd0;
                         active_count_latched <= active_neuron_count;
@@ -120,6 +134,8 @@ module spike_conv_active_commit #(
                             m_axis_commit_tvalid <= 1'b1;
                             m_axis_reset_tdest <= current_dest_id;
                             m_axis_reset_tvalid <= 1'b1;
+                            commit_channel_done <= 1'b0;
+                            reset_channel_done <= 1'b0;
                             state <= STATE_EMIT;
                         end else begin
                             active_index <= active_index + 32'd1;
@@ -128,9 +144,22 @@ module spike_conv_active_commit #(
                 end
 
                 STATE_EMIT: begin
+                    if (emit_backpressured) begin
+                        output_backpressure_cycle_count <= output_backpressure_cycle_count + 32'd1;
+                    end
                     if (commit_output_fire) begin
                         m_axis_commit_tvalid <= 1'b0;
+                        commit_channel_done <= 1'b1;
+                    end
+                    if (reset_output_fire) begin
                         m_axis_reset_tvalid <= 1'b0;
+                        reset_channel_done <= 1'b1;
+                    end
+                    if (emit_complete) begin
+                        m_axis_commit_tvalid <= 1'b0;
+                        m_axis_reset_tvalid <= 1'b0;
+                        commit_channel_done <= 1'b0;
+                        reset_channel_done <= 1'b0;
                         commit_emit_count <= commit_emit_count + 32'd1;
                         readout_checksum <= readout_checksum + held_state_value;
                         active_index <= active_index + 32'd1;
@@ -143,6 +172,8 @@ module spike_conv_active_commit #(
                     commit_busy <= 1'b0;
                     m_axis_commit_tvalid <= 1'b0;
                     m_axis_reset_tvalid <= 1'b0;
+                    commit_channel_done <= 1'b0;
+                    reset_channel_done <= 1'b0;
                 end
             endcase
         end

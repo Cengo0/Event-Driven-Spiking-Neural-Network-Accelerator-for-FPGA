@@ -120,6 +120,10 @@ run_test "spike_conv_c4_scaleup" \
     "$RTL_DIR/core/spike_conv_state_update.v" \
     "$RTL_DIR/core/spike_conv_active_commit.v"
 
+run_test "spike_conv_commit_backpressure" \
+    "$TB_DIR/tb_spike_conv_commit_backpressure.v" \
+    "$RTL_DIR/core/spike_conv_active_commit.v"
+
 #-----------------------------------------------------------------------------
 # Test 1: Core Group
 #-----------------------------------------------------------------------------

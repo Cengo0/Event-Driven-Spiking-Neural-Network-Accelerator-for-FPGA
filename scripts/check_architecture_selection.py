@@ -86,6 +86,8 @@ def main() -> int:
             "coregroup_2x64",
             "page_block_256_updates",
             "tile_microbatch_4x4",
+            "C5 backpressure",
+            "output_backpressure_cycle_count > 0",
             "Probation And Failure-Mode Checks",
             "python_inner_loop_steps = 0",
             "ddr_bytes_inner_loop = 0",

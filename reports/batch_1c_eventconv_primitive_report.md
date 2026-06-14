@@ -1,6 +1,6 @@
 # Batch 1C EventConv Primitive Report
 
-Status: C0/C1/C2/C3/C4 board-free gate passed
+Status: C0/C1/C2/C3/C4/C5 board-free gate passed
 
 ## Evidence Level
 
@@ -20,6 +20,7 @@ latency, throughput, or energy.
 - `hardware/hdl/tb/tb_spike_conv_state_update.v`
 - `hardware/hdl/tb/tb_spike_conv_active_commit.v`
 - `hardware/hdl/tb/tb_spike_conv_c4_scaleup.v`
+- `hardware/hdl/tb/tb_spike_conv_commit_backpressure.v`
 
 ## Gate Results
 
@@ -30,6 +31,7 @@ latency, throughput, or energy.
 | C2 AGU + state update | PASS | Vivado xsim `tb_spike_conv_state_update`: 19 PASS, 0 FAIL |
 | C3 AGU + active-set commit | PASS | Vivado xsim `tb_spike_conv_active_commit`: 36 PASS, 0 FAIL |
 | C4 scale-up | PASS | Vivado xsim `tb_spike_conv_c4_scaleup`: 46 PASS, 0 FAIL |
+| C5 readout backpressure | PASS | Vivado xsim `tb_spike_conv_commit_backpressure`: 31 PASS, 0 FAIL |
 
 ## C0 Trace Contract
 
@@ -105,12 +107,26 @@ The RTL testbench checks all 12 update destinations, signed positive/negative
 state values, active-id ordering, active-mask bits, high-threshold active commit,
 and no reset when the trace has no commits.
 
+## C5 Readout Backpressure Contract
+
+The C5 gate stalls `m_axis_commit_tready` and `m_axis_reset_tready`
+independently. It proves the active commit stage does not duplicate the commit
+stream when reset is stalled, does not duplicate the reset stream when commit is
+stalled, and records output backpressure cycles.
+
+Expected C5 counters:
+
+- active commit read count: `4`
+- commit output count: `2`
+- reset output count observed by testbench: `2`
+- readout checksum: `7`
+- full-neuron scan count: `0`
+- output backpressure cycles: `> 0`
+
 ## Residual Risks
 
 - C4 uses centered input spikes; boundary padding invalid-coordinate behavior is
   still a follow-up gate.
-- C4 uses always-ready commit output; readout backpressure remains a follow-up
-  gate.
 - C4 state space is 64 destinations; wider output maps still need resource and
   destination-width gates before board claims.
 
@@ -123,6 +139,6 @@ and no reset when the trace has no commits.
 
 ## Next Gate
 
-Batch 1C board-free primitive gates are complete. Next gate is architecture
-selection reporting and then board/runtime integration without changing the
-trace contract.
+Batch 1C board-free primitive gates cover centered EventConv scale-up and
+readout backpressure. Next EventConv gate is boundary/invalid-coordinate and
+wider-destination evidence before board/runtime integration.

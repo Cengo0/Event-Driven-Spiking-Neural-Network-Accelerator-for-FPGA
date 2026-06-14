@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check Batch 1C EventConv C0/C1/C2/C3/C4 artifacts."""
+"""Check Batch 1C EventConv C0/C1/C2/C3/C4/C5 artifacts."""
 
 from __future__ import annotations
 
@@ -26,6 +26,7 @@ STATE_TB_PATH = ROOT / "hardware" / "hdl" / "tb" / "tb_spike_conv_state_update.v
 COMMIT_RTL_PATH = ROOT / "hardware" / "hdl" / "rtl" / "core" / "spike_conv_active_commit.v"
 COMMIT_TB_PATH = ROOT / "hardware" / "hdl" / "tb" / "tb_spike_conv_active_commit.v"
 SCALE_TB_PATH = ROOT / "hardware" / "hdl" / "tb" / "tb_spike_conv_c4_scaleup.v"
+BACKPRESSURE_TB_PATH = ROOT / "hardware" / "hdl" / "tb" / "tb_spike_conv_commit_backpressure.v"
 
 
 def fail(message: str) -> None:
@@ -68,6 +69,7 @@ def main() -> int:
         COMMIT_RTL_PATH,
         COMMIT_TB_PATH,
         SCALE_TB_PATH,
+        BACKPRESSURE_TB_PATH,
     ]:
         if not path.exists():
             fail(f"missing artifact: {path}")
@@ -167,6 +169,7 @@ def main() -> int:
         "commit_emit_count",
         "full_scan_count",
         "readout_checksum",
+        "output_backpressure_cycle_count",
     ]:
         if token not in commit_rtl:
             fail(f"commit RTL missing token: {token}")
@@ -191,12 +194,14 @@ def main() -> int:
         "C1 AGU-only",
         "C2 AGU + state update",
         "C3 AGU + active-set commit",
+        "C5 readout backpressure",
         "state checksum",
         "active commit readout",
         "reset-to-zero",
         "No board execution was run",
         "19 PASS, 0 FAIL",
         "36 PASS, 0 FAIL",
+        "31 PASS, 0 FAIL",
     ]:
         if phrase not in report:
             fail(f"report missing phrase: {phrase}")
@@ -281,18 +286,33 @@ def main() -> int:
         if phrase not in scale_tb:
             fail(f"scale testbench missing phrase: {phrase}")
 
+    backpressure_tb = BACKPRESSURE_TB_PATH.read_text(encoding="utf-8")
+    for phrase in [
+        "C5 backpressure holds first commit valid",
+        "C5 one-sided commit ready does not duplicate commit",
+        "C5 one-sided reset ready does not duplicate reset",
+        "C5 commit output count remains exact",
+        "C5 reset output count remains exact",
+        "C5 records output backpressure cycles",
+        "*** ALL TESTS PASSED ***",
+    ]:
+        if phrase not in backpressure_tb:
+            fail(f"backpressure testbench missing phrase: {phrase}")
+
     report = REPORT_PATH.read_text(encoding="utf-8")
     for phrase in [
         "C4 scale-up",
         "eventconv_8x8_tiny_v1",
         "46 PASS, 0 FAIL",
+        "C5 readout backpressure",
+        "31 PASS, 0 FAIL",
         "signed 3x3 kernel",
     ]:
         if phrase not in report:
             fail(f"report missing C4 phrase: {phrase}")
 
     check_trace_hashes(scale_trace)
-    print("PASS: Batch 1C EventConv C0/C1/C2/C3/C4 artifacts valid")
+    print("PASS: Batch 1C EventConv C0/C1/C2/C3/C4/C5 artifacts valid")
     return 0
 
 

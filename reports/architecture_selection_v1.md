@@ -16,7 +16,7 @@ replace them.
 | Candidate | Pattern | Evidence | Gate |
 |---|---|---|---:|
 | A flat EDNP-mini event pipeline | flat event/update/state/readout | Batch 1B software transport smoke | PASS |
-| D shared-kernel EventConv AGU | AGU plus state plus active-set commit | Batch 1C C0-C4 RTL xsim | PASS |
+| D shared-kernel EventConv AGU | AGU plus state plus active-set commit | Batch 1C C0-C5 RTL xsim | PASS |
 | B coregroup partition | local state plus router | Batch 1X board-free trace replay sandbox | DEFER |
 | C page/block sparse execution | page/block sparse descriptor path | Batch 1X board-free trace replay sandbox | DEFER |
 | E hybrid backend | flat FC plus EventConv, later coregroup/page as needed | selected staging composition | WINNER |
@@ -36,6 +36,7 @@ replace them.
 | EDNP-mini FC-LIF | 3 | 5 | 2 | 1 | `outputs/transport/batch_1b_transport_ednp_mini_smoke.json` |
 | EventConv C0 tiny | 1 | 4 | 4 | 0 | `scripts/check_batch1c_eventconv.py` |
 | EventConv C4 scale | 2 | 12 | 12 | 0 | `tb_spike_conv_c4_scaleup`: 46 PASS, 0 FAIL |
+| EventConv C5 backpressure | 0 new inputs | 0 new updates | 4 read | 2 emitted | `tb_spike_conv_commit_backpressure`: 31 PASS, 0 FAIL |
 
 ## Correctness Table
 
@@ -68,7 +69,7 @@ testbench waits, not measured PL performance.
 | Candidate | cycles per input event | cycles per generated update | cycles per active commit | maximum supported event count | stall count |
 |---|---:|---:|---:|---:|---:|
 | A flat EDNP-mini event pipeline | 8 model cycles / 3 inputs | 8 model cycles / 5 updates | 8 model cycles / 1 output | 1024 by current budget | 0 in smoke |
-| D shared-kernel EventConv AGU C4 | <= 256 cycles / 2 inputs in TB | <= 256 cycles / 12 updates in TB | <= 128 cycles / 12 active in TB | 1024 by current budget, 64-state TB | 0 observed in always-ready TB |
+| D shared-kernel EventConv AGU C4/C5 | <= 256 cycles / 2 inputs in TB | <= 256 cycles / 12 updates in TB | <= 128 cycles / 12 active in TB plus C5 held-output stalls | 1024 by current budget, 64-state TB | C5 records `output_backpressure_cycle_count > 0` |
 | B coregroup partition | 128 cycles / 5 inputs in sandbox | 128 cycles / 17 updates in sandbox | active-set only in sandbox | 256 by local FIFO estimate | 0 estimated |
 | C page/block sparse execution | 177 cycles / 5 inputs in sandbox | 177 cycles / 17 updates in sandbox | active-set only in sandbox | 256 updates per page | 0 estimated |
 | E hybrid backend | component-dependent | component-dependent | active-set only for selected primitives | compiler budget constrained | must be measured before board claim |
