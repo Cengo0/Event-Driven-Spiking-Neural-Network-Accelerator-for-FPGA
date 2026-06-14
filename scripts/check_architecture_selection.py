@@ -12,6 +12,7 @@ REPORT_PATH = ROOT / "reports" / "architecture_selection_v1.md"
 BUDGET_PATH = ROOT / "outputs" / "event_budget" / "recommended_ednp_mini_config.json"
 TRANSPORT_PATH = ROOT / "outputs" / "transport" / "batch_1b_transport_ednp_mini_smoke.json"
 C4_TRACE_PATH = ROOT / "golden_traces" / "v1" / "eventconv_8x8_tiny_v1.json"
+SANDBOX_PATH = ROOT / "outputs" / "architecture_sandbox" / "batch_1x_architecture_sandbox.json"
 
 
 def fail(message: str) -> None:
@@ -32,7 +33,7 @@ def require_text(text: str, phrases: list[str]) -> None:
 
 
 def main() -> int:
-    for path in [REPORT_PATH, BUDGET_PATH, TRANSPORT_PATH, C4_TRACE_PATH]:
+    for path in [REPORT_PATH, BUDGET_PATH, TRANSPORT_PATH, C4_TRACE_PATH, SANDBOX_PATH]:
         if not path.exists():
             fail(f"missing artifact: {path}")
 
@@ -51,6 +52,7 @@ def main() -> int:
             "## 7. Winner",
             "## 8. Rejected Candidates And Why",
             "## 9. Recommended Next Implementation Stage",
+            "Batch 1X Sandbox Update",
             "trace_match_rate",
             "readout_match",
             "state_checksum_match",
@@ -81,9 +83,13 @@ def main() -> int:
             "AXI-Lite commands per inference",
             "Python calls per inference",
             "E hybrid backend",
+            "coregroup_2x64",
+            "page_block_256_updates",
+            "tile_microbatch_4x4",
             "Probation And Failure-Mode Checks",
             "python_inner_loop_steps = 0",
             "ddr_bytes_inner_loop = 0",
+            "mainline_switch_recommended = False",
             "If `trace_match_rate < 1.0`, reject candidate.",
             "No board execution was run",
         ],
@@ -139,6 +145,35 @@ def main() -> int:
     for key, value in expected.items():
         if c4_counters.get(key) != value:
             fail(f"C4 counter mismatch for {key}: got {c4_counters.get(key)} want {value}")
+
+    sandbox = load_json(SANDBOX_PATH)
+    if sandbox.get("schema") != "spikemold.batch_1x_architecture_sandbox.v1":
+        fail("Batch 1X sandbox schema mismatch")
+    if sandbox.get("board_executed") is not False:
+        fail("Batch 1X sandbox must not claim board execution")
+    if sandbox.get("all_ok") is not True:
+        fail("Batch 1X sandbox all_ok is not true")
+    if sandbox.get("mainline_switch_recommended") is not False:
+        fail("Batch 1X sandbox must not switch mainline")
+    candidates = sandbox.get("candidates", {})
+    for candidate_id in ["coregroup_2x64", "page_block_256_updates", "tile_microbatch_4x4"]:
+        candidate = candidates.get(candidate_id, {})
+        for correctness in candidate.get("correctness", []):
+            if correctness.get("trace_match_rate") != 1.0:
+                fail(f"{candidate_id} sandbox trace_match_rate mismatch")
+            if correctness.get("readout_match") is not True:
+                fail(f"{candidate_id} sandbox readout mismatch")
+            if correctness.get("state_checksum_match") is not True:
+                fail(f"{candidate_id} sandbox state checksum mismatch")
+        memory = candidate.get("memory_estimate", {})
+        runtime = candidate.get("runtime_estimate", {})
+        probation = candidate.get("probation", {})
+        if memory.get("ddr_bytes_inner_loop") != 0:
+            fail(f"{candidate_id} sandbox inner-loop DDR mismatch")
+        if runtime.get("python_calls_per_inference") != 0:
+            fail(f"{candidate_id} sandbox Python call mismatch")
+        if probation.get("full_neuron_scan_primary") is not False:
+            fail(f"{candidate_id} sandbox full-neuron scan mismatch")
 
     print("PASS: Architecture selection V1 report valid")
     return 0

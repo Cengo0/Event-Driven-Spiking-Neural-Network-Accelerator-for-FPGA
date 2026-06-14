@@ -15,6 +15,10 @@ from .architecture_trace_generator import (
     generate_fc_lif_trace,
     pack_spikemold_event_word64,
 )
+from .architecture_sandbox import (
+    ARCHITECTURE_SANDBOX_SCHEMA,
+    build_batch_1x_architecture_sandbox,
+)
 from .spikemold_ednp_artifact import (
     SpikeMoldEDNPArtifact,
     build_spikemold_ednp_artifact,
@@ -59,6 +63,7 @@ from .transport import (
 __all__ = [
     "SpikeMoldContractTrace",
     "ActiveSetCommit",
+    "ARCHITECTURE_SANDBOX_SCHEMA",
     "DEFAULT_EDNP_MINI_LIMITS",
     "EventBudgetLimits",
     "EventBudgetResult",
@@ -80,6 +85,7 @@ __all__ = [
     "SynapticUpdate",
     "build_spikemold_ednp_artifact",
     "build_batch_1b_transport_smoke",
+    "build_batch_1x_architecture_sandbox",
     "build_spikemold_runtime_contract",
     "build_spikemold_runtime_resource_report",
     "event_word_type",
