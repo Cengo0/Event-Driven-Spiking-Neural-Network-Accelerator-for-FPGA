@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // Title         : Synchronous FIFO
-// Project       : PYNQ-Z2 SNN Accelerator
+// Project       : SpikeMold (HW) + SpikePress (SW)
 // File          : fifo.v
 // Author        : Jiwoon Lee (@metr0jw)
 // Organization  : Kwangwoon University, Seoul, South Korea

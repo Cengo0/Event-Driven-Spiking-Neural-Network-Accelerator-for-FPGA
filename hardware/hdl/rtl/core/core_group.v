@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // Title         : Core Group - Hierarchical Neuron Core with Local Synapses
-// Project       : PYNQ-Z2 SNN Accelerator
+// Project       : SpikeMold (HW) + SpikePress (SW)
 // File          : core_group.v
 // Author        : Jiwoon Lee (@metr0jw)
 // Organization  : Kwangwoon University, Seoul, South Korea
@@ -41,6 +41,7 @@ module core_group #(
     parameter LEAK_WIDTH            = `SNN_LEAK_WIDTH,
     parameter REFRAC_WIDTH          = `SNN_REFRAC_WIDTH,
     parameter SPIKE_BUFFER_DEPTH    = `SNN_SPIKE_BUFFER_DEPTH,
+    parameter ENABLE_INTRA_RECURRENCE = 1,
     parameter LOCAL_ID_WIDTH        = $clog2(NEURONS_PER_GROUP)
 )(
     input  wire                         clk,
@@ -52,17 +53,28 @@ module core_group #(
     input  wire [LOCAL_ID_WIDTH-1:0]    ext_spike_dest_id,
     input  wire [WEIGHT_WIDTH-1:0]      ext_spike_weight,
     input  wire                         ext_spike_exc_inh,  // 1=excitatory
+    input  wire [THRESHOLD_WIDTH-1:0]   ext_spike_threshold,
     output wire                         ext_spike_ready,
 
     // --- Output Spike (to Event Router for inter-group routing) ---
-    output reg                          out_spike_valid,
-    output reg  [LOCAL_ID_WIDTH-1:0]    out_spike_neuron_id,
+    output wire                         out_spike_valid,
+    output wire [LOCAL_ID_WIDTH-1:0]    out_spike_neuron_id,
     input  wire                         out_spike_ready,
 
     // --- Global Neuron Parameters ---
     input  wire [THRESHOLD_WIDTH-1:0]   global_threshold,
     input  wire [LEAK_WIDTH-1:0]        global_leak_rate,
     input  wire [REFRAC_WIDTH-1:0]      global_refrac_period,
+
+    // --- Wide-layer Commit Control ---
+    input  wire                         accumulate_only,
+    input  wire                         commit_start,
+    input  wire [THRESHOLD_WIDTH-1:0]   commit_threshold,
+    output wire                         commit_busy,
+    output reg                          commit_done,
+    input  wire                         clear_start,
+    output wire                         clear_busy,
+    output reg                          clear_done,
 
     // --- Weight Load Interface (from Host/HLS) ---
     input  wire                         weight_we,
@@ -83,7 +95,7 @@ module core_group #(
     localparam WEIGHT_DEPTH = NEURONS_PER_GROUP * NEURONS_PER_GROUP;
     localparam WEIGHT_ADDR_WIDTH = $clog2(WEIGHT_DEPTH);
     localparam FIFO_IDX_WIDTH = $clog2(SPIKE_BUFFER_DEPTH);
-    localparam FIFO_ENTRY_WIDTH = LOCAL_ID_WIDTH + WEIGHT_WIDTH + 1; // dest + weight + exc
+    localparam FIFO_ENTRY_WIDTH = LOCAL_ID_WIDTH + WEIGHT_WIDTH + 1 + THRESHOLD_WIDTH; // dest + weight + exc + threshold
 
     //=========================================================================
     // 1. Neuron State Memory (SDP BRAM)
@@ -147,13 +159,16 @@ module core_group #(
     reg [FIFO_IDX_WIDTH-1:0]   fifo_wr_ptr, fifo_rd_ptr;
     reg [FIFO_IDX_WIDTH:0]     fifo_count;
 
-    wire fifo_empty = (fifo_count == 0);
-    wire fifo_full  = (fifo_count >= SPIKE_BUFFER_DEPTH - 2);  // Leave room for recurrent
+    wire fifo_empty       = (fifo_count == 0);
+    wire fifo_full        = (fifo_count >= SPIKE_BUFFER_DEPTH - 2);  // External backpressure margin
+    wire fifo_at_capacity = (fifo_count >= SPIKE_BUFFER_DEPTH);
 
     // FIFO async read head
     wire [LOCAL_ID_WIDTH-1:0]  fifo_dest   = spike_fifo[fifo_rd_ptr][LOCAL_ID_WIDTH-1:0];
     wire [WEIGHT_WIDTH-1:0]    fifo_weight = spike_fifo[fifo_rd_ptr][LOCAL_ID_WIDTH+WEIGHT_WIDTH-1:LOCAL_ID_WIDTH];
-    wire                       fifo_exc    = spike_fifo[fifo_rd_ptr][FIFO_ENTRY_WIDTH-1];
+    wire                       fifo_exc    = spike_fifo[fifo_rd_ptr][LOCAL_ID_WIDTH+WEIGHT_WIDTH];
+    wire [THRESHOLD_WIDTH-1:0] fifo_threshold =
+        spike_fifo[fifo_rd_ptr][FIFO_ENTRY_WIDTH-1:LOCAL_ID_WIDTH+WEIGHT_WIDTH+1];
 
     //=========================================================================
     // 4. Spike Flag Bitmap (for output scan)
@@ -169,9 +184,14 @@ module core_group #(
     reg                   sf_clear_pending;
     reg [SF_ADDR_W-1:0]   sf_clear_addr;
     reg [7:0]             sf_clear_mask;
+    reg                   tile_clear_flush;
 
     always @(posedge clk) begin
         if (!rst_n) begin : sf_rst
+            integer j;
+            for (j = 0; j < SF_DEPTH; j = j + 1)
+                spike_flag_mem[j] <= 8'd0;
+        end else if (tile_clear_flush) begin : sf_clear_all
             integer j;
             for (j = 0; j < SF_DEPTH; j = j + 1)
                 spike_flag_mem[j] <= 8'd0;
@@ -201,10 +221,17 @@ module core_group #(
     reg [WEIGHT_WIDTH-1:0] sp_weight;
     reg                    sp_exc;
     reg [LOCAL_ID_WIDTH-1:0] sp_addr;
+    reg [THRESHOLD_WIDTH-1:0] sp_threshold;
 
-    wire [DATA_WIDTH:0] synaptic_sum    = {1'b0, mem_rd} + {{(DATA_WIDTH-WEIGHT_WIDTH+1){1'b0}}, sp_weight};
-    wire [DATA_WIDTH:0] threshold_diff  = synaptic_sum - {1'b0, global_threshold};
+    wire [DATA_WIDTH-1:0] weight_ext = {{(DATA_WIDTH-WEIGHT_WIDTH){1'b0}}, sp_weight};
+    wire [DATA_WIDTH-1:0] inhibitory_sum =
+        (mem_rd >= weight_ext) ? (mem_rd - weight_ext) : {DATA_WIDTH{1'b0}};
+    wire [DATA_WIDTH:0] synaptic_sum    = {1'b0, mem_rd} + {1'b0, weight_ext};
+    wire [DATA_WIDTH:0] threshold_diff  = synaptic_sum - {1'b0, sp_threshold};
     wire                threshold_hit   = sp_exc && ~threshold_diff[DATA_WIDTH];
+    wire [DATA_WIDTH:0] commit_threshold_diff =
+        {1'b0, mem_rd} - {1'b0, commit_threshold};
+    wire                commit_threshold_hit = ~commit_threshold_diff[DATA_WIDTH];
 
     //=========================================================================
     // 6. Main Processing FSM
@@ -218,31 +245,75 @@ module core_group #(
         ST_SPIKE_CMP    = 4'd5,
         ST_SPIKE_WR     = 4'd6,
         ST_INTRA_ROUTE  = 4'd7,   // Scan local weight matrix for fired neuron
-        ST_INTRA_READ   = 4'd8;   // Wait for weight memory read
+        ST_INTRA_READ   = 4'd8,   // Wait for weight memory read
+        ST_RESET_CLEAR  = 4'd9,   // Scrub neuron state BRAM after reset
+        ST_COMMIT_RD    = 4'd10,  // Read neuron state during commit scan
+        ST_COMMIT_CMP   = 4'd11,  // Compare membrane against commit threshold
+        ST_COMMIT_WR    = 4'd12,  // Fire/reset thresholded commit neuron
+        ST_CLEAR_STATE  = 4'd13;  // Clear selected destination group state
 
     reg [3:0] state;
     reg [LOCAL_ID_WIDTH-1:0] leak_idx;
     reg                      leak_cycle_done;
     reg                      sp_fired;
+    reg                      neuron_fire_pulse;
+    reg [LOCAL_ID_WIDTH-1:0] neuron_fire_id;
     reg [LOCAL_ID_WIDTH-1:0] fired_neuron_id;
     reg [LOCAL_ID_WIDTH-1:0] intra_scan_idx;
     reg [LOCAL_ID_WIDTH-1:0] leak_addr_hold;
+    reg [LOCAL_ID_WIDTH-1:0] commit_idx;
+    reg [LOCAL_ID_WIDTH-1:0] commit_addr_hold;
+    reg                      commit_fired;
+    reg                      commit_pending;
+    reg [LOCAL_ID_WIDTH-1:0] clear_idx;
+    reg                      clear_pending;
     reg [15:0]               total_spikes;
 
     // FIFO write signals (external or recurrent)
     reg                      fifo_push;
     reg [FIFO_ENTRY_WIDTH-1:0] fifo_push_data;
     reg                      fifo_pop;
+    reg                      fifo_push_now;
+    reg                      fifo_pop_now;
 
-    // Block external writes during intra-group routing to prevent FIFO write collision
+    // Block external writes during intra-group routing to prevent FIFO write collision.
+    // Keep group_busy scoped to event processing only; the background leak sweep
+    // can run whenever the group is idle and must not hold the host drain fence.
     wire intra_routing = (state == ST_INTRA_ROUTE || state == ST_INTRA_READ);
-    assign ext_spike_ready = !fifo_full && !intra_routing;
-    assign group_busy  = (state != ST_IDLE) || !fifo_empty;
+    wire commit_scanning = (state == ST_COMMIT_RD) ||
+                           (state == ST_COMMIT_CMP) ||
+                           (state == ST_COMMIT_WR);
+    wire commit_active = commit_pending || commit_scanning;
+    wire clear_scanning = (state == ST_CLEAR_STATE);
+    wire clear_active = clear_pending || clear_scanning;
+    wire event_pipeline_busy = (state == ST_SPIKE_RD) ||
+                               (state == ST_SPIKE_CMP) ||
+                               (state == ST_SPIKE_WR) ||
+                               (state == ST_INTRA_ROUTE) ||
+                               (state == ST_INTRA_READ) ||
+                               (state == ST_COMMIT_RD) ||
+                               (state == ST_COMMIT_CMP) ||
+                               (state == ST_COMMIT_WR) ||
+                               (state == ST_CLEAR_STATE) ||
+                               (state == ST_RESET_CLEAR);
+    wire spike_fire_commit =
+        (state == ST_SPIKE_WR) && (ref_rd == 0) && sp_fired && !accumulate_only;
+    wire commit_fire_commit = (state == ST_COMMIT_WR) && commit_fired;
+    wire neuron_fire_commit = spike_fire_commit || commit_fire_commit;
+    wire [LOCAL_ID_WIDTH-1:0] neuron_fire_commit_id =
+        commit_fire_commit ? commit_addr_hold : sp_addr;
+    wire output_pending_busy;
+    assign ext_spike_ready =
+        !fifo_full && !intra_routing && !commit_active && !clear_active && (state != ST_RESET_CLEAR);
+    assign group_busy  = event_pipeline_busy || commit_pending || clear_pending ||
+                         !fifo_empty || output_pending_busy;
+    assign commit_busy = commit_active;
+    assign clear_busy  = clear_active;
     assign spike_count = total_spikes;
 
     always @(posedge clk) begin
         if (!rst_n) begin
-            state           <= ST_IDLE;
+            state           <= ST_RESET_CLEAR;
             leak_idx        <= 0;
             leak_cycle_done <= 0;
             ns_we           <= 0;
@@ -255,31 +326,60 @@ module core_group #(
             sp_weight       <= 0;
             sp_exc          <= 0;
             sp_fired        <= 0;
+            neuron_fire_pulse <= 0;
+            neuron_fire_id  <= 0;
+            sp_threshold    <= 0;
             fired_neuron_id <= 0;
             intra_scan_idx  <= 0;
             leak_addr_hold  <= 0;
+            commit_idx      <= 0;
+            commit_addr_hold <= 0;
+            commit_fired    <= 0;
+            commit_pending   <= 0;
+            commit_done     <= 0;
+            clear_idx       <= 0;
+            clear_pending   <= 0;
+            clear_done      <= 0;
             total_spikes    <= 0;
             sf_set_pending  <= 0;
             sf_set_addr     <= 0;
             sf_set_bit      <= 0;
+            tile_clear_flush <= 0;
             fifo_wr_ptr     <= 0;
             fifo_rd_ptr     <= 0;
             fifo_count      <= 0;
             fifo_push       <= 0;
             fifo_pop        <= 0;
+            fifo_push_now   <= 0;
+            fifo_pop_now    <= 0;
         end else begin
             // Defaults
             ns_we          <= 0;
             sf_set_pending <= 0;
-            fifo_push      <= 0;
-            fifo_pop       <= 0;
+            neuron_fire_pulse <= 0;
+            commit_done    <= 0;
+            clear_done     <= 0;
+            tile_clear_flush <= 0;
+            if (clear_start) begin
+                clear_pending <= 1;
+                commit_pending <= 0;
+            end else if (commit_start && !clear_active) begin
+                commit_pending <= 1;
+            end
+            fifo_push_now  = 1'b0;
+            fifo_pop_now   = 1'b0;
             wm_we          <= 0;
 
-            //--- External FIFO write (blocked during intra-group routing) ---
-            if (ext_spike_valid && !fifo_full && !intra_routing) begin
-                spike_fifo[fifo_wr_ptr] <= {ext_spike_exc_inh, ext_spike_weight, ext_spike_dest_id};
+            //--- External FIFO write (exactly follows ready/valid acceptance) ---
+            if (ext_spike_valid && ext_spike_ready) begin
+                spike_fifo[fifo_wr_ptr] <= {
+                    ext_spike_threshold,
+                    ext_spike_exc_inh,
+                    ext_spike_weight,
+                    ext_spike_dest_id
+                };
                 fifo_wr_ptr <= fifo_wr_ptr + 1;
-                fifo_push   <= 1;
+                fifo_push_now = 1'b1;
             end
 
             //--- Weight load (config) ---
@@ -292,16 +392,47 @@ module core_group #(
             if (enable || state != ST_IDLE) begin
                 case (state)
                     //------------------------------------------------------
+                    // Reset scrub: inferred BRAM contents are not cleared by
+                    // a one-cycle reset, so clear one neuron state per clock.
+                    //------------------------------------------------------
+                    ST_RESET_CLEAR: begin
+                        ns_we      <= 1;
+                        ns_wr_addr <= leak_idx;
+                        ns_din     <= {STATE_WIDTH{1'b0}};
+                        if (leak_idx + 1 >= NEURONS_PER_GROUP) begin
+                            leak_idx        <= 0;
+                            leak_cycle_done <= 0;
+                            state           <= ST_IDLE;
+                        end else begin
+                            leak_idx <= leak_idx + 1'b1;
+                        end
+                    end
+
+                    //------------------------------------------------------
                     ST_IDLE: begin
                         sp_fired <= 0;
-                        if (!fifo_empty) begin
+                        if ((clear_start || clear_pending) && fifo_empty) begin
+                            clear_idx <= 0;
+                            clear_pending <= 0;
+                            commit_pending <= 0;
+                            tile_clear_flush <= 1;
+                            state <= ST_CLEAR_STATE;
+                        end else if ((commit_start || commit_pending) && fifo_empty) begin
+                            commit_idx       <= 0;
+                            commit_addr_hold <= 0;
+                            commit_fired     <= 0;
+                            commit_pending   <= 0;
+                            ns_rd_addr       <= 0;
+                            state            <= ST_COMMIT_RD;
+                        end else if (!fifo_empty) begin
                             // Pop spike from FIFO
                             sp_addr      <= fifo_dest;
                             sp_weight    <= fifo_weight;
                             sp_exc       <= fifo_exc;
+                            sp_threshold <= fifo_threshold;
                             ns_rd_addr   <= fifo_dest;
                             fifo_rd_ptr  <= fifo_rd_ptr + 1;
-                            fifo_pop     <= 1;
+                            fifo_pop_now = 1'b1;
                             state        <= ST_SPIKE_RD;
                         end else if (!leak_cycle_done) begin
                             ns_rd_addr   <= leak_idx;
@@ -319,9 +450,10 @@ module core_group #(
                             sp_addr      <= fifo_dest;
                             sp_weight    <= fifo_weight;
                             sp_exc       <= fifo_exc;
+                            sp_threshold <= fifo_threshold;
                             ns_rd_addr   <= fifo_dest;
                             fifo_rd_ptr  <= fifo_rd_ptr + 1;
-                            fifo_pop     <= 1;
+                            fifo_pop_now = 1'b1;
                             state        <= ST_SPIKE_RD;
                         end else begin
                             state <= ST_LEAK_CMP;
@@ -362,10 +494,8 @@ module core_group #(
 
                     ST_SPIKE_CMP: begin
                         sp_fired <= 0;
-                        if (ref_rd == 0 && sp_exc) begin
-                            if (~threshold_diff[DATA_WIDTH])
-                                sp_fired <= 1;
-                        end
+                        if (ref_rd == 0 && threshold_hit && !accumulate_only)
+                            sp_fired <= 1;
                         state <= ST_SPIKE_WR;
                     end
 
@@ -383,13 +513,19 @@ module core_group #(
                             sf_set_addr    <= sp_addr[LOCAL_ID_WIDTH-1:3];
                             sf_set_bit     <= sp_addr[2:0];
                             total_spikes   <= total_spikes + 1;
+                            neuron_fire_pulse <= 1;
+                            neuron_fire_id <= sp_addr;
 
-                            // Start intra-group recurrent routing
-                            fired_neuron_id <= sp_addr;
-                            intra_scan_idx  <= 0;
-                            // Issue first weight memory read
-                            wm_rd_addr <= sp_addr * NEURONS_PER_GROUP;  // weight[fired][0]
-                            state      <= ST_INTRA_READ;
+                            if (ENABLE_INTRA_RECURRENCE != 0) begin
+                                // Start intra-group recurrent routing.
+                                fired_neuron_id <= sp_addr;
+                                intra_scan_idx  <= 0;
+                                // Issue first weight memory read.
+                                wm_rd_addr <= sp_addr * NEURONS_PER_GROUP;  // weight[fired][0]
+                                state      <= ST_INTRA_READ;
+                            end else begin
+                                state <= ST_IDLE;
+                            end
                         end else begin
                             // Not fired: update membrane
                             if (sp_exc) begin
@@ -398,10 +534,7 @@ module core_group #(
                                 else
                                     ns_din <= {synaptic_sum[DATA_WIDTH-1:0], ref_rd};
                             end else begin
-                                if (mem_rd >= {{(DATA_WIDTH-WEIGHT_WIDTH){1'b0}}, sp_weight})
-                                    ns_din <= {mem_rd - {{(DATA_WIDTH-WEIGHT_WIDTH){1'b0}}, sp_weight}, ref_rd};
-                                else
-                                    ns_din <= {{DATA_WIDTH{1'b0}}, ref_rd};
+                                ns_din <= {inhibitory_sum, ref_rd};
                             end
                             state <= ST_IDLE;
                         end
@@ -416,21 +549,94 @@ module core_group #(
                     end
 
                     ST_INTRA_ROUTE: begin
-                        // Process weight readout: if non-zero, push to FIFO
-                        if (wm_weight != 0 && !fifo_full) begin
-                            spike_fifo[fifo_wr_ptr] <= {wm_exc, wm_weight, intra_scan_idx};
-                            fifo_wr_ptr <= fifo_wr_ptr + 1;
-                            fifo_push   <= 1;
+                        if (wm_weight != 0 && fifo_at_capacity) begin
+                            // Hold the current non-zero recurrent event until
+                            // a FIFO slot is available; never advance past it.
+                            state <= ST_INTRA_ROUTE;
+                        end else begin
+                            // Process weight readout: if non-zero, push to FIFO.
+                            if (wm_weight != 0) begin
+                                spike_fifo[fifo_wr_ptr] <= {
+                                    global_threshold,
+                                    wm_exc,
+                                    wm_weight,
+                                    intra_scan_idx
+                                };
+                                fifo_wr_ptr <= fifo_wr_ptr + 1;
+                                fifo_push_now = 1'b1;
+                            end
+
+                            // Advance scan only after a zero weight or a
+                            // successfully queued recurrent event.
+                            if (intra_scan_idx + 1 >= NEURONS_PER_GROUP) begin
+                                // Done scanning all local connections
+                                state <= ST_IDLE;
+                            end else begin
+                                intra_scan_idx <= intra_scan_idx + 1;
+                                wm_rd_addr <= fired_neuron_id * NEURONS_PER_GROUP + intra_scan_idx + 1;
+                                state      <= ST_INTRA_READ;
+                            end
+                        end
+                    end
+
+                    //------------------------------------------------------
+                    // Commit scan: threshold accumulated membrane state
+                    // without relying on a dummy input spike.
+                    //------------------------------------------------------
+                    ST_COMMIT_RD: begin
+                        commit_addr_hold <= ns_rd_addr;
+                        state <= ST_COMMIT_CMP;
+                    end
+
+                    ST_COMMIT_CMP: begin
+                        commit_fired <= 0;
+                        if (ref_rd == 0 && commit_threshold_hit) begin
+                            commit_fired <= 1;
+                        end
+                        state <= ST_COMMIT_WR;
+                    end
+
+                    ST_COMMIT_WR: begin
+                        if (commit_fired) begin
+                            ns_we      <= 1;
+                            ns_wr_addr <= commit_addr_hold;
+                            ns_din     <= {{DATA_WIDTH{1'b0}}, global_refrac_period};
+                            sf_set_pending <= 1;
+                            sf_set_addr    <= commit_addr_hold[LOCAL_ID_WIDTH-1:3];
+                            sf_set_bit     <= commit_addr_hold[2:0];
+                            total_spikes   <= total_spikes + 1;
+                            neuron_fire_pulse <= 1;
+                            neuron_fire_id <= commit_addr_hold;
                         end
 
-                        // Advance scan
-                        if (intra_scan_idx + 1 >= NEURONS_PER_GROUP) begin
-                            // Done scanning all local connections
-                            state <= ST_IDLE;
+                        if (commit_addr_hold + 1 >= NEURONS_PER_GROUP) begin
+                            commit_idx  <= 0;
+                            commit_done <= 1;
+                            state       <= ST_IDLE;
                         end else begin
-                            intra_scan_idx <= intra_scan_idx + 1;
-                            wm_rd_addr <= fired_neuron_id * NEURONS_PER_GROUP + intra_scan_idx + 1;
-                            state      <= ST_INTRA_READ;
+                            commit_idx <= commit_addr_hold + 1'b1;
+                            ns_rd_addr <= commit_addr_hold + 1'b1;
+                            state      <= ST_COMMIT_RD;
+                        end
+                    end
+
+                    //------------------------------------------------------
+                    // Selected destination tile/group clear.  The host-level
+                    // mask selects which core groups receive clear_start.
+                    //------------------------------------------------------
+                    ST_CLEAR_STATE: begin
+                        ns_we      <= 1;
+                        ns_wr_addr <= clear_idx;
+                        ns_din     <= {STATE_WIDTH{1'b0}};
+
+                        if (clear_idx + 1 >= NEURONS_PER_GROUP) begin
+                            clear_idx       <= 0;
+                            leak_idx        <= 0;
+                            leak_cycle_done <= 1;
+                            clear_done      <= 1;
+                            state           <= ST_IDLE;
+                        end else begin
+                            clear_idx <= clear_idx + 1'b1;
                         end
                     end
 
@@ -443,7 +649,9 @@ module core_group #(
             end
 
             //--- FIFO count management ---
-            case ({fifo_push, fifo_pop})
+            fifo_push <= fifo_push_now;
+            fifo_pop  <= fifo_pop_now;
+            case ({fifo_push_now, fifo_pop_now})
                 2'b10: fifo_count <= fifo_count + 1;
                 2'b01: fifo_count <= fifo_count - 1;
                 default: fifo_count <= fifo_count;  // 00 or 11 (push+pop)
@@ -452,55 +660,64 @@ module core_group #(
     end
 
     //=========================================================================
-    // 7. Output Spike Scan (bitmap → event router)
-    //    Scans spike_flag_mem, outputs one spike per cycle when ready
+    // 7. Output Spike FIFO
+    //    Preserve fire order for the host-visible frame contract. The bitmap is
+    //    still maintained for debug visibility, but output does not depend on a
+    //    slow asynchronous scan.
     //=========================================================================
-    reg [LOCAL_ID_WIDTH-1:0] scan_idx;
-    reg [7:0]                scan_byte;
-    reg [2:0]                scan_bit_pos;
-    reg                      scan_active;
+    localparam OUT_FIFO_DEPTH = NEURONS_PER_GROUP;
+    localparam OUT_FIFO_PTR_W = (OUT_FIFO_DEPTH <= 1) ? 1 : $clog2(OUT_FIFO_DEPTH);
+
+    reg [LOCAL_ID_WIDTH-1:0] out_spike_fifo [0:OUT_FIFO_DEPTH-1];
+    reg [OUT_FIFO_PTR_W-1:0] out_fifo_wr_ptr;
+    reg [OUT_FIFO_PTR_W-1:0] out_fifo_rd_ptr;
+    reg [OUT_FIFO_PTR_W:0]   out_fifo_count;
+    reg [31:0]               out_fifo_drop_count;
+
+    wire out_fifo_empty = (out_fifo_count == 0);
+    wire out_fifo_full  = (out_fifo_count == OUT_FIFO_DEPTH);
+    wire out_fifo_pop   = (!out_fifo_empty && out_spike_ready);
+    wire out_fifo_push  = neuron_fire_commit && (!out_fifo_full || out_fifo_pop);
+
+    assign output_pending_busy = !out_fifo_empty || neuron_fire_commit;
+    assign out_spike_valid = !out_fifo_empty;
+    assign out_spike_neuron_id = out_spike_fifo[out_fifo_rd_ptr];
 
     always @(posedge clk) begin
-        if (!rst_n) begin
-            out_spike_valid     <= 0;
-            out_spike_neuron_id <= 0;
-            scan_idx            <= 0;
-            scan_byte           <= 0;
-            scan_bit_pos        <= 0;
-            scan_active         <= 0;
+        if (!rst_n || tile_clear_flush) begin
+            out_fifo_wr_ptr     <= 0;
+            out_fifo_rd_ptr     <= 0;
+            out_fifo_count      <= 0;
+            out_fifo_drop_count <= 0;
             sf_clear_pending    <= 0;
             sf_clear_addr       <= 0;
             sf_clear_mask       <= 8'hFF;
         end else begin
             sf_clear_pending <= 0;
 
-            if (out_spike_ready || !out_spike_valid) begin
-                out_spike_valid <= 0;
-
-                if (!scan_active) begin
-                    scan_byte    <= spike_flag_mem[scan_idx[LOCAL_ID_WIDTH-1:3]];
-                    scan_bit_pos <= 0;
-                    scan_active  <= 1;
-                end else begin
-                    if (scan_byte[scan_bit_pos]) begin
-                        out_spike_valid     <= 1;
-                        out_spike_neuron_id <= {scan_idx[LOCAL_ID_WIDTH-1:3], scan_bit_pos};
-                        sf_clear_pending    <= 1;
-                        sf_clear_addr       <= scan_idx[LOCAL_ID_WIDTH-1:3];
-                        sf_clear_mask       <= ~(8'd1 << scan_bit_pos);
-                    end
-
-                    if (scan_bit_pos == 3'd7) begin
-                        scan_active <= 0;
-                        if (scan_idx + 8 >= NEURONS_PER_GROUP)
-                            scan_idx <= 0;
-                        else
-                            scan_idx <= scan_idx + 8;
-                    end else begin
-                        scan_bit_pos <= scan_bit_pos + 1;
-                    end
-                end
+            if (out_fifo_push) begin
+                out_spike_fifo[out_fifo_wr_ptr] <= neuron_fire_commit_id;
+                if (out_fifo_wr_ptr == OUT_FIFO_DEPTH - 1)
+                    out_fifo_wr_ptr <= 0;
+                else
+                    out_fifo_wr_ptr <= out_fifo_wr_ptr + 1'b1;
+            end else if (neuron_fire_commit) begin
+                out_fifo_drop_count <= out_fifo_drop_count + 1'b1;
             end
+
+            if (out_fifo_pop) begin
+                if (out_fifo_rd_ptr == OUT_FIFO_DEPTH - 1)
+                    out_fifo_rd_ptr <= 0;
+                else
+                    out_fifo_rd_ptr <= out_fifo_rd_ptr + 1'b1;
+            end
+
+            case ({out_fifo_push, out_fifo_pop})
+                2'b10: out_fifo_count <= out_fifo_count + 1'b1;
+                2'b01: out_fifo_count <= out_fifo_count - 1'b1;
+                default: out_fifo_count <= out_fifo_count;
+            endcase
+
         end
     end
 
@@ -517,6 +734,8 @@ module core_group #(
             spike_flag_mem[init_i] = 8'd0;
         for (init_i = 0; init_i < SPIKE_BUFFER_DEPTH; init_i = init_i + 1)
             spike_fifo[init_i] = {FIFO_ENTRY_WIDTH{1'b0}};
+        for (init_i = 0; init_i < OUT_FIFO_DEPTH; init_i = init_i + 1)
+            out_spike_fifo[init_i] = {LOCAL_ID_WIDTH{1'b0}};
     end
 
 endmodule
