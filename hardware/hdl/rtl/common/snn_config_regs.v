@@ -6,7 +6,7 @@
 // Organization  : Kwangwoon University, Seoul, South Korea
 // Contact       : jwlee@linux.com
 // Description   : AXI4-Lite slave register file for runtime configuration
-//                 of the SNN accelerator's RTL modules (event routing and
+//                 of the SpikeMold backend's RTL modules (event routing and
 //                 LIF neuron array). Provides PS-accessible registers for:
 //                 - Fabric/neuron connectivity programming
 //                 - Global neuron parameter tuning

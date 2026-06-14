@@ -20,11 +20,9 @@
 set hls_ip_repo "../hls/hls_output/hls/impl/ip"
 set bd_name "design_1"
 
-# Prefer legacy path, then current build outputs.
+# Current SpikeMold-EDNP build output.
 set project_candidates [list \
-    "../vivado/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA.xpr" \
-    "../build/snn_accelerator/snn_accelerator.xpr" \
-    "../build/snn_integrated_v2/snn_integrated_v2.xpr" \
+    "../build/spikemold_ednp_pynq_z2/spikemold_ednp_pynq_z2.xpr" \
 ]
 
 set proj_xpr ""

@@ -110,7 +110,7 @@ def compute_derived(cfg: dict) -> dict:
     # HLS compatibility aliases (hls_neuron_id_width computed after topology)
     d['hls_max_neurons'] = total_neurons
 
-    # --- NeuronGroup Connection Topology (Brian2-style) -------------------------
+    # --- SpikePress Projection Topology -------------------------
     neuron_groups = cfg.get('neuron_groups', [])
     connections = cfg.get('connections', [])
 
@@ -183,7 +183,7 @@ def compute_derived(cfg: dict) -> dict:
 
     # HLS neuron ID width: must accommodate ALL logical neuron IDs.
     # RTL core groups use global_id_width (GROUP_ID + LOCAL_ID = 11 bits for 2048).
-    # HLS logical neuron space (NeuronGroups) may be larger (e.g., 4890 → 13 bits).
+    # HLS logical neuron space (SpikePress populations) may be larger (e.g., 4890 → 13 bits).
     logical_bits = clog2(d['total_logical_neurons']) if d['total_logical_neurons'] > 0 else 0
     d['hls_neuron_id_width'] = max(d['global_id_width'], logical_bits)
     hls_cfg = cfg.get('hls', {})
@@ -359,7 +359,7 @@ def generate_verilog(cfg: dict, derived: dict) -> str:
         f'`define SNN_HLS_SMOKE_COMMANDS_ENABLE {derived["hls_smoke_commands_enable"]}',
         f'`define SNN_HLS_CNN_DESCRIPTOR_PAGE_ENABLE {derived["hls_cnn_descriptor_page_enable"]}',
         f'',
-        f'// ─── NeuronGroup Weight Buffer ─────────────────────────────────────',
+        f'// ─── SpikePress Weight Buffer ─────────────────────────────────────',
         f'`define SNN_MAX_WEIGHT_BUFFER_SIZE {derived["max_weight_buffer_size"]}',
         f'`define SNN_RESIDENT_WEIGHT_BUFFER_SIZE {derived["resident_weight_buffer_size"]}',
         f'`define SNN_RESIDENT_WEIGHT_LOGICAL_ENTRIES {derived["resident_weight_logical_entries"]}',
@@ -467,14 +467,14 @@ def generate_python(cfg: dict, derived: dict) -> str:
         f'',
     ]
 
-    # --- NeuronGroup Connection Topology (Brian2-style) -------------------------
+    # --- SpikePress Projection Topology -------------------------
     if derived['num_neuron_groups'] > 0:
         ng_sizes = derived['neuron_group_sizes']
         ng_id_start = derived['neuron_group_id_start']
         conns = derived['connections']
 
         lines += [
-            f'# ─── NeuronGroup Connection Topology (Brian2-style) ────────────────',
+            f'# ─── SpikePress Projection Topology ────────────────',
             f'NUM_NEURON_GROUPS       = {derived["num_neuron_groups"]}',
             f'NUM_CONNECTIONS         = {derived["num_connections"]}',
             f'MAX_WEIGHT_BUFFER_SIZE  = {derived["max_weight_buffer_size"]}',
@@ -644,14 +644,14 @@ def generate_hls(cfg: dict, derived: dict) -> str:
         f'',
     ]
 
-    # --- NeuronGroup Connection Topology (Brian2-style) -------------------------
+    # --- SpikePress Projection Topology -------------------------
     if derived['num_neuron_groups'] > 0:
         ng_sizes = derived['neuron_group_sizes']
         ng_id_start = derived['neuron_group_id_start']
         conns = derived['connections']
 
         lines += [
-            f'// ─── NeuronGroup Connection Topology (Brian2-style) ─────────────',
+            f'// ─── SpikePress Projection Topology ─────────────',
             f'const int SNN_NUM_NEURON_GROUPS      = {derived["num_neuron_groups"]};',
             f'const int SNN_NUM_CONNECTIONS         = {derived["num_connections"]};',
             f'#define SNN_NUM_NEURON_GROUPS_PP      {derived["num_neuron_groups"]}',
@@ -664,12 +664,12 @@ def generate_hls(cfg: dict, derived: dict) -> str:
             f'const int SNN_MAX_DST_NEURONS         = {derived["max_dst_neurons"]};',
             f'const int SNN_TOTAL_LOGICAL_NEURONS   = {derived["total_logical_neurons"]};',
             f'',
-            f'// Per-NeuronGroup sizes',
+            f'// Per-population sizes',
         ]
         for i, ng in enumerate(derived['neuron_groups']):
             lines.append(f'const int SNN_NG_SIZE_{i} = {ng["size"]};  // {ng["name"]}')
         lines.append(f'')
-        lines.append(f'// NeuronGroup ID start offsets (cumulative)')
+        lines.append(f'// Population ID start offsets (cumulative)')
         for i, start in enumerate(ng_id_start):
             lines.append(f'const int SNN_NG_ID_START_{i} = {start};')
         lines.append(f'')

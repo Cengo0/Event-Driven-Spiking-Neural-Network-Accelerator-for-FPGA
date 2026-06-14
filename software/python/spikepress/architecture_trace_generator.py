@@ -1,4 +1,4 @@
-"""Architecture-neutral EDNP trace generation.
+"""Architecture-neutral SpikeMold-EDNP trace generation.
 
 The objects in this module are small deterministic golden builders for the
 SpikePress + SpikeMold-EDNP contract. They do not model a full training stack.
@@ -17,7 +17,7 @@ from typing import Dict, Iterable, List, Mapping, MutableMapping, Optional, Sequ
 
 INT32_MIN = -(1 << 31)
 INT32_MAX = (1 << 31) - 1
-TRACE_SCHEMA = "ednp.trace.v1"
+TRACE_SCHEMA = "spikemold.ednp_trace.v1"
 
 
 def _clamp_i32(value: int) -> int:
@@ -85,7 +85,7 @@ class SynapticUpdate:
 
 
 @dataclass(frozen=True)
-class CommitEvent:
+class ActiveSetCommit:
     tick: int
     dst_id: int
     value: int
@@ -112,13 +112,13 @@ class TraceCounters:
 
 
 @dataclass(frozen=True)
-class ArchitectureTrace:
+class SpikeMoldContractTrace:
     trace_id: str
     target: str
     metadata: Mapping[str, object]
     inputs: Sequence[InputSpike]
     updates: Sequence[SynapticUpdate]
-    commits: Sequence[CommitEvent]
+    commits: Sequence[ActiveSetCommit]
     final_state: Mapping[int, int]
     counters: TraceCounters
 
@@ -153,7 +153,7 @@ class ArchitectureTrace:
         path.write_text(json.dumps(self.to_dict(), indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
-def pack_event_word64(
+def pack_spikemold_event_word64(
     event_type: int,
     tick: int,
     src_y_or_hi: int = 0,
@@ -187,14 +187,14 @@ def generate_fc_lif_trace(
     reset_values: Optional[Mapping[int, int]] = None,
     initial_state: Optional[Mapping[int, int]] = None,
     trace_id: str = "fc_lif_tiny",
-) -> ArchitectureTrace:
+) -> SpikeMoldContractTrace:
     """Generate deterministic FC-LIF updates and active-set commits."""
 
     ordered_inputs = sorted(list(input_spikes), key=lambda event: (event.tick, event.src_id))
     state: MutableMapping[int, int] = {int(k): int(v) for k, v in (initial_state or {}).items()}
     reset_values = reset_values or {}
     updates: List[SynapticUpdate] = []
-    commits: List[CommitEvent] = []
+    commits: List[ActiveSetCommit] = []
     active = set()
 
     fanout = sorted(((src, dst, weight) for (src, dst), weight in weights.items()), key=lambda item: item[:2])
@@ -206,7 +206,7 @@ def generate_fc_lif_trace(
             active.add(dst)
             state[dst] = _clamp_i32(state.get(dst, 0) + int(weight))
             if state[dst] >= int(thresholds.get(dst, INT32_MAX)):
-                commits.append(CommitEvent(spike.tick, dst, state[dst]))
+                commits.append(ActiveSetCommit(spike.tick, dst, state[dst]))
                 state[dst] = int(reset_values.get(dst, 0))
 
     counters = TraceCounters(
@@ -219,7 +219,7 @@ def generate_fc_lif_trace(
         ddr_bytes_inner_loop=0,
         python_inner_loop_steps=0,
     )
-    return ArchitectureTrace(
+    return SpikeMoldContractTrace(
         trace_id=trace_id,
         target="architecture-neutral",
         metadata={
@@ -243,7 +243,7 @@ def generate_eventconv_trace(
     padding: int = 0,
     thresholds: Optional[Mapping[int, int]] = None,
     trace_id: str = "eventconv_tiny",
-) -> ArchitectureTrace:
+) -> SpikeMoldContractTrace:
     """Generate shared-kernel EventConv AGU trace.
 
     Kernel layout is `[cout][cin][ky][kx]`.
@@ -265,7 +265,7 @@ def generate_eventconv_trace(
     thresholds = thresholds or {}
     state: MutableMapping[int, int] = {}
     updates: List[SynapticUpdate] = []
-    commits: List[CommitEvent] = []
+    commits: List[ActiveSetCommit] = []
     active = set()
 
     for spike in ordered_inputs:
@@ -306,7 +306,7 @@ def generate_eventconv_trace(
                     active.add(dst)
                     state[dst] = _clamp_i32(state.get(dst, 0) + weight)
                     if state[dst] >= int(thresholds.get(dst, INT32_MAX)):
-                        commits.append(CommitEvent(spike.tick, dst, state[dst]))
+                        commits.append(ActiveSetCommit(spike.tick, dst, state[dst]))
                         state[dst] = 0
 
     counters = TraceCounters(
@@ -319,7 +319,7 @@ def generate_eventconv_trace(
         ddr_bytes_inner_loop=0,
         python_inner_loop_steps=0,
     )
-    return ArchitectureTrace(
+    return SpikeMoldContractTrace(
         trace_id=trace_id,
         target="architecture-neutral",
         metadata={
@@ -337,4 +337,3 @@ def generate_eventconv_trace(
         final_state=dict(state),
         counters=counters,
     )
-

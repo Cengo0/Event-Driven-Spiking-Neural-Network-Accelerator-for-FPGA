@@ -8,7 +8,7 @@
 ## Description   : Additional constraints for SNN-specific pins
 ##-----------------------------------------------------------------------------
 
-## This file only contains constraints for pins actually used by the SNN accelerator
+## This file only contains constraints for pins actually used by the SpikeMold backend
 ## The base PYNQ-Z2 v1.0.xdc file contains all available pin definitions
 
 

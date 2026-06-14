@@ -56,7 +56,7 @@ HLS_SMOKE_COMMANDS_ENABLE = 0
 HLS_CNN_DESCRIPTOR_PAGE_ENABLE = 1
 NEURON_ID_WIDTH     = GLOBAL_ID_WIDTH  # Alias
 
-# ─── NeuronGroup Connection Topology (Brian2-style) ────────────────
+# ─── SpikePress Projection Topology ────────────────
 NUM_NEURON_GROUPS       = 3
 NUM_CONNECTIONS         = 1
 MAX_WEIGHT_BUFFER_SIZE  = 262144

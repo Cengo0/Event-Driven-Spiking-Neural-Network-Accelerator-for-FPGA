@@ -1,4 +1,4 @@
-"""Minimal SpikePress native API for EDNP Batch 1A.
+"""Minimal SpikePress API for SpikeMold-EDNP Batch 1A.
 
 This module is inference-only. It intentionally exposes only compile and trace
 generation objects.
@@ -11,10 +11,10 @@ from typing import Dict, Iterable, Mapping, Optional, Sequence
 
 import numpy as np
 
-from .architecture_trace_generator import ArchitectureTrace, InputSpike, generate_fc_lif_trace
-from .ednp_artifact import EDNPArtifact, build_ednp_artifact
+from .architecture_trace_generator import InputSpike, SpikeMoldContractTrace, generate_fc_lif_trace
+from .spikemold_ednp_artifact import SpikeMoldEDNPArtifact, build_spikemold_ednp_artifact
 from .event_budget import EventBudgetResult, evaluate_trace_budget
-from .network import NeuronGroup, SpikePressNetwork, Synapses
+from .network import SpikePressNeuronPopulation, SpikePressProjection, SpikePressNetwork
 
 
 @dataclass(frozen=True)
@@ -51,14 +51,14 @@ class SpikePressFCLIFLayer:
 
 
 @dataclass(frozen=True)
-class SpikePressCompiledEDNP:
+class SpikePressCompileResult:
     model_name: str
-    artifact: EDNPArtifact
+    artifact: SpikeMoldEDNPArtifact
     resource_report: Mapping[str, object]
 
 
 class SpikePressModel:
-    """Small inference-only model authoring surface for EDNP-mini."""
+    """Small inference-only model authoring surface for SpikeMold-EDNP mini."""
 
     def __init__(self, name: str):
         self.name = name
@@ -75,43 +75,45 @@ class SpikePressModel:
         thresholds: Optional[Sequence[int]] = None,
     ) -> SpikePressFCLIFLayer:
         if self._layers:
-            raise ValueError("Batch 1A EDNP-mini supports one FC-LIF layer")
+            raise ValueError("Batch 1A SpikeMold-EDNP mini supports one FC-LIF layer")
         layer = SpikePressFCLIFLayer.create(name, weights, thresholds)
         self._layers.append(layer)
         return layer
 
-    def compile_ednp(self, *, target: str = "pynq-z2") -> SpikePressCompiledEDNP:
+    def compile_spikemold_ednp(self, *, target: str = "pynq-z2") -> SpikePressCompileResult:
         layer = self._single_layer()
-        net = SpikePressNetwork()
-        src = net.add_group(NeuronGroup(layer.input_size, "input"))
-        dst = net.add_group(NeuronGroup(layer.output_size, layer.name))
-        net.add_synapses(Synapses(src, dst, name=f"input_to_{layer.name}"))
-        compiled = net.compile()
-        artifact = build_ednp_artifact(
-            compiled,
+        network = SpikePressNetwork()
+        input_population = network.add_population(SpikePressNeuronPopulation(layer.input_size, "input"))
+        output_population = network.add_population(SpikePressNeuronPopulation(layer.output_size, layer.name))
+        network.add_projection(
+            SpikePressProjection(input_population, output_population, name=f"input_to_{layer.name}")
+        )
+        compiled_network = network.compile()
+        artifact = build_spikemold_ednp_artifact(
+            compiled_network,
             {f"input_to_{layer.name}": layer.weights},
             target=target,
             artifact_id=self.name,
         )
         report = {
-            "schema": "ednp.resource_report.v1",
+            "schema": "spikemold.resource_report.v1",
             "target": target,
             "model_name": self.name,
             "layers": 1,
-            "total_logical_neurons": compiled.total_logical_neurons,
-            "max_weight_buffer_size": compiled.max_weight_buffer_size,
+            "total_logical_neurons": compiled_network.total_logical_neurons,
+            "max_weight_buffer_size": compiled_network.max_weight_buffer_size,
             "weight_bytes": int(artifact.flat_weights.nbytes),
             "state_bytes_i32": int(layer.output_size * 4),
-            "connection_count": len(compiled.connections),
+            "projection_count": len(compiled_network.projections),
             "python_inner_loop_required": False,
         }
-        return SpikePressCompiledEDNP(
+        return SpikePressCompileResult(
             model_name=self.name,
             artifact=artifact,
             resource_report=report,
         )
 
-    def golden_trace(self, input_spikes: Iterable[InputSpike]) -> ArchitectureTrace:
+    def golden_trace(self, input_spikes: Iterable[InputSpike]) -> SpikeMoldContractTrace:
         layer = self._single_layer()
         weights: Dict[tuple[int, int], int] = {}
         for src in range(layer.input_size):
@@ -135,7 +137,7 @@ class SpikePressModel:
 
     def _single_layer(self) -> SpikePressFCLIFLayer:
         if len(self._layers) != 1:
-            raise ValueError("SpikePressModel requires exactly one FC-LIF layer for EDNP-mini")
+            raise ValueError("SpikePressModel requires exactly one FC-LIF layer for SpikeMold-EDNP mini")
         return self._layers[0]
 
 

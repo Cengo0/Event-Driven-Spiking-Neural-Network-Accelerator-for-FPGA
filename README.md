@@ -16,12 +16,12 @@ Active path:
 - inference-only SpikePress API
 - integer FC-LIF and EventConv trace generation
 - event/update budget checks
-- EDNP artifact JSON roundtrip
+- SpikeMold-EDNP artifact JSON roundtrip
 - Batch 0/1A contract verification
 
 Out of scope for the current EDNP mainline:
 
-- legacy accelerator API
+- legacy HW/SW API
 - Python-controlled inner loops as runtime architecture
 
 ## Quick Check
@@ -40,7 +40,7 @@ rtk pytest software/python/tests
 from spikepress import InputSpike, fc_lif_model
 
 model = fc_lif_model("tiny", weights=[[3, 1], [2, 0]], thresholds=[5, 9])
-compiled = model.compile_ednp(target="pynq-z2")
+compiled = model.compile_spikemold_ednp(target="pynq-z2")
 trace = model.golden_trace([
     InputSpike(tick=0, src_id=0),
     InputSpike(tick=1, src_id=1),

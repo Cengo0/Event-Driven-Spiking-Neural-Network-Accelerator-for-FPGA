@@ -26,7 +26,7 @@ Owns:
 Produces:
 
 - `golden_traces/v1/`
-- `outputs/event_budget/recommended_m3_config.json`
+- `outputs/event_budget/recommended_ednp_mini_config.json`
 - `reports/batch_1a_software_foundation_report.md`
 
 ## Subagent B: Transport + EDNP-mini

@@ -7,7 +7,7 @@ set -e
 source /tools/Xilinx/2025.2/Vivado/settings64.sh
 
 PROJ_ROOT="/mnt/workspace/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA"
-DCP="$PROJ_ROOT/hardware/build/snn_integrated_v2/snn_integrated_v2.runs/impl_1/snn_integrated_top_routed.dcp"
+DCP="$PROJ_ROOT/hardware/build/spikemold_ednp_pynq_z2/spikemold_ednp_pynq_z2.runs/impl_1/spikemold_integrated_top_routed.dcp"
 VCD="$PROJ_ROOT/hardware/sim_work_power/power_sweep.saif"
 XPA_TCL="$PROJ_ROOT/hardware/scripts/run_xpa.tcl"
 

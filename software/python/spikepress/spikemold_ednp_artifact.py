@@ -1,4 +1,4 @@
-"""Minimal EDNP compiler artifact helpers."""
+"""Minimal SpikeMold-EDNP compiler artifact helpers."""
 
 from __future__ import annotations
 
@@ -10,10 +10,10 @@ from typing import Dict, Mapping, Sequence
 
 import numpy as np
 
-from .network import CompiledSpikePressNetwork
+from .network import CompiledSpikePressTopology
 
 
-ARTIFACT_SCHEMA = "ednp.artifact.v1"
+ARTIFACT_SCHEMA = "spikemold.ednp_artifact.v1"
 
 
 def _sha256_bytes(data: bytes) -> str:
@@ -25,7 +25,7 @@ def _canonical_json(value: object) -> str:
 
 
 @dataclass(frozen=True)
-class EDNPArtifact:
+class SpikeMoldEDNPArtifact:
     manifest: Mapping[str, object]
     flat_weights: np.ndarray
 
@@ -34,38 +34,38 @@ class EDNPArtifact:
         return str(self.manifest["hashes"]["artifact_sha256"])  # type: ignore[index]
 
 
-def build_ednp_artifact(
-    compiled: CompiledSpikePressNetwork,
+def build_spikemold_ednp_artifact(
+    compiled: CompiledSpikePressTopology,
     weight_dict: Mapping[str, np.ndarray],
     *,
     target: str = "pynq-z2",
-    artifact_id: str = "ednp_artifact",
-) -> EDNPArtifact:
-    """Build a minimal hardware-deployable EDNP artifact manifest."""
+    artifact_id: str = "spikemold_ednp_artifact",
+) -> SpikeMoldEDNPArtifact:
+    """Build a minimal hardware-deployable SpikeMold-EDNP artifact manifest."""
 
     flat = compiled.pack_weights(dict(weight_dict)).astype(np.int8, copy=False)
     flat_bytes = flat.tobytes()
-    groups = [
+    populations = [
         {
-            "name": group.name,
-            "size": int(group.n),
-            "id_start": int(compiled.group_id_start[index]),
+            "name": population.name,
+            "size": int(population.size),
+            "id_start": int(compiled.population_id_start[index]),
         }
-        for index, group in enumerate(compiled.groups)
+        for index, population in enumerate(compiled.populations)
     ]
-    connections = [
+    projections = [
         {
-            "name": conn.name,
-            "src_group": int(conn.src_group),
-            "dst_group": int(conn.dst_group),
-            "src_size": int(conn.src_size),
-            "dst_size": int(conn.dst_size),
-            "weight_offset": int(conn.weight_offset),
-            "num_weights": int(conn.num_weights),
-            "src_id_start": int(conn.src_id_start),
-            "dst_id_start": int(conn.dst_id_start),
+            "name": projection.name,
+            "source_population": int(projection.source_population),
+            "target_population": int(projection.target_population),
+            "source_size": int(projection.source_size),
+            "target_size": int(projection.target_size),
+            "weight_offset": int(projection.weight_offset),
+            "num_weights": int(projection.num_weights),
+            "source_id_start": int(projection.source_id_start),
+            "target_id_start": int(projection.target_id_start),
         }
-        for conn in compiled.connections
+        for projection in compiled.projections
     ]
     manifest: Dict[str, object] = {
         "schema": ARTIFACT_SCHEMA,
@@ -78,9 +78,9 @@ def build_ednp_artifact(
             "resource_budget": "RESOURCE_BUDGET_V1",
         },
         "network": {
-            "groups": groups,
-            "group_id_start": [int(v) for v in compiled.group_id_start],
-            "connections": connections,
+            "populations": populations,
+            "population_id_start": [int(v) for v in compiled.population_id_start],
+            "projections": projections,
             "total_logical_neurons": int(compiled.total_logical_neurons),
             "max_weight_buffer_size": int(compiled.max_weight_buffer_size),
         },
@@ -97,15 +97,15 @@ def build_ednp_artifact(
     manifest["hashes"]["artifact_sha256"] = _sha256_bytes(  # type: ignore[index]
         _canonical_json(manifest).encode("utf-8")
     )
-    return EDNPArtifact(manifest=manifest, flat_weights=flat.copy())
+    return SpikeMoldEDNPArtifact(manifest=manifest, flat_weights=flat.copy())
 
 
-def write_ednp_artifact(path: Path, artifact: EDNPArtifact) -> None:
+def write_spikemold_ednp_artifact(path: Path, artifact: SpikeMoldEDNPArtifact) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(artifact.manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
-def read_ednp_artifact(path: Path) -> EDNPArtifact:
+def read_spikemold_ednp_artifact(path: Path) -> SpikeMoldEDNPArtifact:
     manifest = json.loads(path.read_text(encoding="utf-8"))
     if manifest.get("schema") != ARTIFACT_SCHEMA:
         raise ValueError(f"unsupported artifact schema: {manifest.get('schema')}")
@@ -124,4 +124,4 @@ def read_ednp_artifact(path: Path) -> EDNPArtifact:
     expected_artifact_hash = manifest_without_artifact_hash["hashes"].pop("artifact_sha256", None)
     if expected_artifact_hash != _sha256_bytes(_canonical_json(manifest_without_artifact_hash).encode("utf-8")):
         raise ValueError("artifact hash mismatch")
-    return EDNPArtifact(manifest=manifest, flat_weights=flat)
+    return SpikeMoldEDNPArtifact(manifest=manifest, flat_weights=flat)

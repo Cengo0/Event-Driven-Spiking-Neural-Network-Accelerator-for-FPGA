@@ -1,31 +1,31 @@
 """SpikePress network topology compiler.
 
 Provides a small API for defining EDNP-compatible SNN topologies with explicit
-NeuronGroup connections. The flat weight buffer layout is computed at compile
-time and maps to the SpikeMold hardware artifact contract.
+neuron populations and directed projections. The flat weight buffer layout is
+computed at compile time and maps to the SpikeMold hardware artifact contract.
 
 Example:
-    >>> from spikepress.network import NeuronGroup, Synapses, SpikePressNetwork
-    >>> inp = NeuronGroup(784, name='input')
-    >>> hid = NeuronGroup(2048, name='hidden')
-    >>> out = NeuronGroup(10, name='output')
-    >>> net = SpikePressNetwork()
-    >>> net.add_group(inp)
-    >>> net.add_group(hid)
-    >>> net.add_group(out)
-    >>> s1 = Synapses(inp, hid)
-    >>> s2 = Synapses(hid, out)
-    >>> net.add_synapses(s1)
-    >>> net.add_synapses(s2)
-    >>> cfg = net.compile()
-    >>> flat_weights = cfg.pack_weights({'input_to_hidden': w1, 'hidden_to_output': w2})
+    >>> from spikepress.network import SpikePressNeuronPopulation, SpikePressProjection, SpikePressNetwork
+    >>> input_pop = SpikePressNeuronPopulation(784, name="input")
+    >>> hidden_pop = SpikePressNeuronPopulation(2048, name="hidden")
+    >>> output_pop = SpikePressNeuronPopulation(10, name="output")
+    >>> network = SpikePressNetwork()
+    >>> network.add_population(input_pop)
+    >>> network.add_population(hidden_pop)
+    >>> network.add_population(output_pop)
+    >>> input_to_hidden = SpikePressProjection(input_pop, hidden_pop)
+    >>> hidden_to_output = SpikePressProjection(hidden_pop, output_pop)
+    >>> network.add_projection(input_to_hidden)
+    >>> network.add_projection(hidden_to_output)
+    >>> compiled = network.compile()
+    >>> flat_weights = compiled.pack_weights({"input_to_hidden": w1, "hidden_to_output": w2})
 """
 
 from __future__ import annotations
 
 import numpy as np
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
+from dataclasses import dataclass
+from typing import Dict, List, Optional
 
 # Import generated constants for validation
 try:
@@ -49,98 +49,99 @@ except ImportError:
 
 
 # =============================================================================
-# NeuronGroup
+# SpikePressNeuronPopulation
 # =============================================================================
-class NeuronGroup:
+class SpikePressNeuronPopulation:
     """A population of logical neurons."""
 
-    def __init__(self, n: int, name: str = ""):
-        if n <= 0:
-            raise ValueError(f"NeuronGroup size must be positive, got {n}")
-        self.n = n
+    def __init__(self, size: int, name: str = ""):
+        if size <= 0:
+            raise ValueError(f"SpikePressNeuronPopulation size must be positive, got {size}")
+        self.size = size
         self.name = name
-        self._group_index: Optional[int] = None  # set by SpikePressNetwork.add_group
+        self._population_index: Optional[int] = None  # set by SpikePressNetwork.add_population
         self._id_start: Optional[int] = None      # set by SpikePressNetwork.compile
 
     def __repr__(self):
-        return f"NeuronGroup(n={self.n}, name='{self.name}')"
+        return f"SpikePressNeuronPopulation(size={self.size}, name='{self.name}')"
 
 
 # =============================================================================
-# Synapses
-# =============================================================================
-class Synapses:
-    """A synaptic connection from src NeuronGroup to dst NeuronGroup.
+class SpikePressProjection:
+    """A directed synaptic projection between two neuron populations.
 
-    Weights are stored as a (src.n, dst.n) matrix.
+    Weights are stored as a `(source.size, target.size)` matrix.
     """
 
-    def __init__(self, src: NeuronGroup, dst: NeuronGroup, name: str = ""):
-        self.src = src
-        self.dst = dst
-        self.name = name or f"{src.name}_to_{dst.name}"
-        self._weights: Optional[np.ndarray] = None  # (src.n, dst.n), int8
-        self._conn_index: Optional[int] = None       # set by SpikePressNetwork
+    def __init__(self, source: SpikePressNeuronPopulation, target: SpikePressNeuronPopulation, name: str = ""):
+        self.source = source
+        self.target = target
+        self.name = name or f"{source.name}_to_{target.name}"
+        self._weights: Optional[np.ndarray] = None
+        self._projection_index: Optional[int] = None       # set by SpikePressNetwork
         self._weight_offset: Optional[int] = None     # set by SpikePressNetwork.compile
 
     @property
-    def w(self) -> np.ndarray:
-        """Weight matrix, shape (src.n, dst.n)."""
+    def weights(self) -> np.ndarray:
+        """Weight matrix, shape `(source.size, target.size)`."""
         if self._weights is None:
-            self._weights = np.zeros((self.src.n, self.dst.n), dtype=np.int8)
+            self._weights = np.zeros((self.source.size, self.target.size), dtype=np.int8)
         return self._weights
 
-    @w.setter
-    def w(self, value: np.ndarray):
+    @weights.setter
+    def weights(self, value: np.ndarray):
         value = np.asarray(value, dtype=np.int8)
-        if value.shape != (self.src.n, self.dst.n):
+        if value.shape != (self.source.size, self.target.size):
             raise ValueError(
                 f"Weight shape {value.shape} doesn't match "
-                f"({self.src.n}, {self.dst.n})"
+                f"({self.source.size}, {self.target.size})"
             )
         self._weights = value
 
     @property
     def num_weights(self) -> int:
-        return self.src.n * self.dst.n
+        return self.source.size * self.target.size
 
     def __repr__(self):
-        return (f"Synapses('{self.name}': {self.src.name}[{self.src.n}] → "
-                f"{self.dst.name}[{self.dst.n}], "
-                f"weights={self.num_weights})")
+        return (
+            f"SpikePressProjection('{self.name}': "
+            f"{self.source.name}[{self.source.size}] -> "
+            f"{self.target.name}[{self.target.size}], "
+            f"weights={self.num_weights})"
+        )
 
 
 # =============================================================================
-# CompiledNetwork — immutable snapshot of the compiled network topology
+# CompiledSpikePressTopology
 # =============================================================================
 @dataclass
-class ConnectionInfo:
-    """Metadata for one synaptic connection in the compiled network."""
+class SpikePressProjectionInfo:
+    """Metadata for one synaptic projection in the compiled topology."""
     name: str
-    src_group: int
-    dst_group: int
-    src_size: int
-    dst_size: int
+    source_population: int
+    target_population: int
+    source_size: int
+    target_size: int
     weight_offset: int
     num_weights: int
-    src_id_start: int
-    dst_id_start: int
+    source_id_start: int
+    target_id_start: int
 
 
 @dataclass
-class CompiledSpikePressNetwork:
+class CompiledSpikePressTopology:
     """Compiled network topology with flat weight buffer layout."""
-    groups: List[NeuronGroup]
-    connections: List[ConnectionInfo]
-    group_id_start: List[int]
+    populations: List[SpikePressNeuronPopulation]
+    projections: List[SpikePressProjectionInfo]
+    population_id_start: List[int]
     total_logical_neurons: int
     max_weight_buffer_size: int
 
     def pack_weights(self, weight_dict: Dict[str, np.ndarray]) -> np.ndarray:
-        """Pack per-connection weight matrices into a single flat buffer.
+        """Pack per-projection weight matrices into a single flat buffer.
 
         Args:
-            weight_dict: {connection_name: np.ndarray of shape (src_size, dst_size)}
+            weight_dict: {projection_name: np.ndarray of shape (source_size, target_size)}
 
         Returns:
             Flat int8 array of length max_weight_buffer_size.
@@ -148,34 +149,36 @@ class CompiledSpikePressNetwork:
             matching the HLS packed_weight_t range (default 4-bit: [-8, 7]).
         """
         flat = np.zeros(self.max_weight_buffer_size, dtype=np.int8)
-        for conn in self.connections:
-            if conn.name in weight_dict:
+        for projection in self.projections:
+            if projection.name in weight_dict:
                 # Clip to packed weight range before storing
-                w = np.clip(
-                    np.asarray(weight_dict[conn.name]),
+                weights = np.clip(
+                    np.asarray(weight_dict[projection.name]),
                     PACKED_MIN_WEIGHT, PACKED_MAX_WEIGHT
                 ).astype(np.int8)
-                if w.shape != (conn.src_size, conn.dst_size):
+                if weights.shape != (projection.source_size, projection.target_size):
                     raise ValueError(
-                        f"Weight '{conn.name}' shape {w.shape} doesn't match "
-                        f"({conn.src_size}, {conn.dst_size})"
+                        f"Weight '{projection.name}' shape {weights.shape} doesn't match "
+                        f"({projection.source_size}, {projection.target_size})"
                     )
-                flat[conn.weight_offset:conn.weight_offset + conn.num_weights] = w.ravel()
+                flat[
+                    projection.weight_offset:projection.weight_offset + projection.num_weights
+                ] = weights.ravel()
         return flat
 
     def unpack_weights(self, flat: np.ndarray) -> Dict[str, np.ndarray]:
-        """Unpack a flat weight buffer into per-connection matrices.
+        """Unpack a flat weight buffer into per-projection matrices.
 
         Args:
             flat: int8 array of length max_weight_buffer_size
 
         Returns:
-            Dict of {connection_name: np.ndarray of shape (src_size, dst_size)}
+            Dict of {projection_name: np.ndarray of shape (source_size, target_size)}
         """
         result = {}
-        for conn in self.connections:
-            w_flat = flat[conn.weight_offset:conn.weight_offset + conn.num_weights]
-            result[conn.name] = w_flat.reshape(conn.src_size, conn.dst_size)
+        for projection in self.projections:
+            flat_slice = flat[projection.weight_offset:projection.weight_offset + projection.num_weights]
+            result[projection.name] = flat_slice.reshape(projection.source_size, projection.target_size)
         return result
 
     def weight_index(self, pre_id: int, post_id: int) -> int:
@@ -184,25 +187,28 @@ class CompiledSpikePressNetwork:
         Matches HLS weight_index() function exactly.
 
         Returns:
-            Flat buffer offset, or -1 if not connected.
+            Flat buffer offset, or -1 if no projection exists.
         """
-        src_g = self._find_group(pre_id)
-        dst_g = self._find_group(post_id)
-        if src_g < 0 or dst_g < 0:
+        source_population = self._find_population(pre_id)
+        target_population = self._find_population(post_id)
+        if source_population < 0 or target_population < 0:
             return -1
 
-        for conn in self.connections:
-            if conn.src_group == src_g and conn.dst_group == dst_g:
-                local_src = pre_id - conn.src_id_start
-                local_dst = post_id - conn.dst_id_start
-                return conn.weight_offset + local_src * conn.dst_size + local_dst
+        for projection in self.projections:
+            if (
+                projection.source_population == source_population
+                and projection.target_population == target_population
+            ):
+                local_source = pre_id - projection.source_id_start
+                local_target = post_id - projection.target_id_start
+                return projection.weight_offset + local_source * projection.target_size + local_target
         return -1
 
-    def _find_group(self, nid: int) -> int:
-        """Find which group a neuron ID belongs to. Returns -1 if not found."""
-        for g in range(len(self.groups)):
-            if self.group_id_start[g] <= nid < self.group_id_start[g + 1]:
-                return g
+    def _find_population(self, neuron_id: int) -> int:
+        """Find which population a neuron ID belongs to. Returns -1 if not found."""
+        for index in range(len(self.populations)):
+            if self.population_id_start[index] <= neuron_id < self.population_id_start[index + 1]:
+                return index
         return -1
 
     def validate_against_hardware(self) -> List[str]:
@@ -219,9 +225,9 @@ class CompiledSpikePressNetwork:
                 f"max_weight_buffer_size mismatch: compiled={self.max_weight_buffer_size} "
                 f"vs HW={MAX_WEIGHT_BUFFER_SIZE}"
             )
-        if len(self.connections) != NUM_CONNECTIONS:
+        if len(self.projections) != NUM_CONNECTIONS:
             errors.append(
-                f"num_connections mismatch: compiled={len(self.connections)} "
+                f"projection_count mismatch: compiled={len(self.projections)} "
                 f"vs HW={NUM_CONNECTIONS}"
             )
         if self.total_logical_neurons != sum(NEURON_GROUP_SIZES):
@@ -229,13 +235,13 @@ class CompiledSpikePressNetwork:
                 f"total_logical_neurons mismatch: compiled={self.total_logical_neurons} "
                 f"vs HW={sum(NEURON_GROUP_SIZES)}"
             )
-        for i, conn in enumerate(self.connections):
+        for i, projection in enumerate(self.projections):
             if i < len(HW_CONNECTIONS):
                 hw = HW_CONNECTIONS[i]
-                if conn.weight_offset != hw['weight_offset']:
+                if projection.weight_offset != hw['weight_offset']:
                     errors.append(
-                        f"connection '{conn.name}' weight_offset: "
-                        f"compiled={conn.weight_offset} vs HW={hw['weight_offset']}"
+                        f"projection '{projection.name}' weight_offset: "
+                        f"compiled={projection.weight_offset} vs HW={hw['weight_offset']}"
                     )
         return errors
 
@@ -247,84 +253,86 @@ class SpikePressNetwork:
     """Network definition that compiles to a flat weight buffer layout.
 
     Usage:
-        net = SpikePressNetwork()
-        net.add_group(NeuronGroup(784, 'input'))
-        net.add_group(NeuronGroup(2048, 'hidden'))
-        net.add_group(NeuronGroup(10, 'output'))
-        net.add_synapses(Synapses(input_group, hidden_group))
-        net.add_synapses(Synapses(hidden_group, output_group))
-        compiled = net.compile()
+        network = SpikePressNetwork()
+        network.add_population(SpikePressNeuronPopulation(784, "input"))
+        network.add_population(SpikePressNeuronPopulation(2048, "hidden"))
+        network.add_population(SpikePressNeuronPopulation(10, "output"))
+        network.add_projection(SpikePressProjection(input_population, hidden_population))
+        network.add_projection(SpikePressProjection(hidden_population, output_population))
+        compiled = network.compile()
     """
 
     def __init__(self):
-        self._groups: List[NeuronGroup] = []
-        self._synapses: List[Synapses] = []
-        self._compiled: Optional[CompiledSpikePressNetwork] = None
+        self._populations: List[SpikePressNeuronPopulation] = []
+        self._projections: List[SpikePressProjection] = []
+        self._compiled: Optional[CompiledSpikePressTopology] = None
 
-    def add_group(self, group: NeuronGroup) -> NeuronGroup:
-        """Add a NeuronGroup to the network. Returns the group for chaining."""
+    def add_population(self, population: SpikePressNeuronPopulation) -> SpikePressNeuronPopulation:
+        """Add a neuron population to the network. Returns the population."""
         if self._compiled is not None:
             raise RuntimeError("Cannot modify network after compile()")
-        group._group_index = len(self._groups)
-        self._groups.append(group)
-        return group
+        population._population_index = len(self._populations)
+        self._populations.append(population)
+        return population
 
-    def add_synapses(self, syn: Synapses) -> Synapses:
-        """Add a Synapses connection. Returns the synapses for chaining."""
+    def add_projection(self, projection: SpikePressProjection) -> SpikePressProjection:
+        """Add a directed projection. Returns the projection."""
         if self._compiled is not None:
             raise RuntimeError("Cannot modify network after compile()")
-        if syn.src not in self._groups:
-            raise ValueError(f"Source group '{syn.src.name}' not added to network")
-        if syn.dst not in self._groups:
-            raise ValueError(f"Destination group '{syn.dst.name}' not added to network")
-        syn._conn_index = len(self._synapses)
-        self._synapses.append(syn)
-        return syn
+        if projection.source not in self._populations:
+            raise ValueError(f"Source population '{projection.source.name}' not added to network")
+        if projection.target not in self._populations:
+            raise ValueError(f"Target population '{projection.target.name}' not added to network")
+        projection._projection_index = len(self._projections)
+        self._projections.append(projection)
+        return projection
 
-    def compile(self) -> CompiledSpikePressNetwork:
+    def compile(self) -> CompiledSpikePressTopology:
         """Compile the network topology into a flat weight buffer layout.
 
-        Computes group ID start offsets and connection weight offsets.
+        Computes population ID start offsets and projection weight offsets.
         """
         if self._compiled is not None:
             return self._compiled
 
-        # Compute group_id_start
-        group_id_start = [0]
-        for g in self._groups:
-            group_id_start.append(group_id_start[-1] + g.n)
-        total_logical_neurons = group_id_start[-1]
+        # Compute population ID starts.
+        population_id_start = [0]
+        for population in self._populations:
+            population_id_start.append(population_id_start[-1] + population.size)
+        total_logical_neurons = population_id_start[-1]
 
-        # Assign group IDs
-        for i, g in enumerate(self._groups):
-            g._id_start = group_id_start[i]
+        # Assign population IDs.
+        for index, population in enumerate(self._populations):
+            population._id_start = population_id_start[index]
 
-        # Compute connection offsets
+        # Compute projection offsets.
         weight_offset = 0
-        conn_infos = []
-        for syn in self._synapses:
-            src_idx = syn.src._group_index
-            dst_idx = syn.dst._group_index
-            num_w = syn.src.n * syn.dst.n
-            syn._weight_offset = weight_offset
+        projection_infos = []
+        for projection in self._projections:
+            source_index = projection.source._population_index
+            target_index = projection.target._population_index
+            if source_index is None or target_index is None:
+                raise RuntimeError("projection population index missing")
+            weight_count = projection.source.size * projection.target.size
+            projection._weight_offset = weight_offset
 
-            conn_infos.append(ConnectionInfo(
-                name=syn.name,
-                src_group=src_idx,
-                dst_group=dst_idx,
-                src_size=syn.src.n,
-                dst_size=syn.dst.n,
+            projection_infos.append(SpikePressProjectionInfo(
+                name=projection.name,
+                source_population=source_index,
+                target_population=target_index,
+                source_size=projection.source.size,
+                target_size=projection.target.size,
                 weight_offset=weight_offset,
-                num_weights=num_w,
-                src_id_start=group_id_start[src_idx],
-                dst_id_start=group_id_start[dst_idx],
+                num_weights=weight_count,
+                source_id_start=population_id_start[source_index],
+                target_id_start=population_id_start[target_index],
             ))
-            weight_offset += num_w
+            weight_offset += weight_count
 
-        self._compiled = CompiledSpikePressNetwork(
-            groups=self._groups,
-            connections=conn_infos,
-            group_id_start=group_id_start,
+        self._compiled = CompiledSpikePressTopology(
+            populations=self._populations,
+            projections=projection_infos,
+            population_id_start=population_id_start,
             total_logical_neurons=total_logical_neurons,
             max_weight_buffer_size=weight_offset,
         )
@@ -349,55 +357,55 @@ class SpikePressNetwork:
             CONNECTIONS as HW_CONNS,
         )
 
-        net = SpikePressNetwork()
-        groups = []
+        network = SpikePressNetwork()
+        populations = []
         for name, size in zip(NEURON_GROUP_NAMES, NEURON_GROUP_SIZES):
-            g = NeuronGroup(size, name=name)
-            net.add_group(g)
-            groups.append(g)
+            population = SpikePressNeuronPopulation(size, name=name)
+            network.add_population(population)
+            populations.append(population)
 
         for conn in HW_CONNS:
-            syn = Synapses(
-                groups[conn['src_group']],
-                groups[conn['dst_group']],
+            projection = SpikePressProjection(
+                populations[conn['src_group']],
+                populations[conn['dst_group']],
                 name=conn['name'],
             )
-            net.add_synapses(syn)
+            network.add_projection(projection)
 
-        return net
-
-    @property
-    def groups(self) -> List[NeuronGroup]:
-        return list(self._groups)
+        return network
 
     @property
-    def synapses(self) -> List[Synapses]:
-        return list(self._synapses)
+    def populations(self) -> List[SpikePressNeuronPopulation]:
+        return list(self._populations)
+
+    @property
+    def projections(self) -> List[SpikePressProjection]:
+        return list(self._projections)
 
     def summary(self) -> str:
         """Human-readable summary of the network topology."""
         lines = ["SpikePress Network Summary", "=" * 40]
 
-        lines.append(f"\nNeuronGroups ({len(self._groups)}):")
-        for i, g in enumerate(self._groups):
-            lines.append(f"  [{i}] {g.name}: {g.n} neurons")
+        lines.append(f"\nNeuron populations ({len(self._populations)}):")
+        for index, population in enumerate(self._populations):
+            lines.append(f"  [{index}] {population.name}: {population.size} neurons")
 
-        lines.append(f"\nSynapses ({len(self._synapses)}):")
+        lines.append(f"\nProjections ({len(self._projections)}):")
         total_weights = 0
-        for syn in self._synapses:
+        for projection in self._projections:
             lines.append(
-                f"  {syn.name}: {syn.src.name}[{syn.src.n}] → "
-                f"{syn.dst.name}[{syn.dst.n}] = {syn.num_weights:,} weights"
+                f"  {projection.name}: {projection.source.name}[{projection.source.size}] -> "
+                f"{projection.target.name}[{projection.target.size}] = {projection.num_weights:,} weights"
             )
-            total_weights += syn.num_weights
+            total_weights += projection.num_weights
 
         lines.append(f"\nTotal weights: {total_weights:,}")
         lines.append(f"Buffer size (int8): {total_weights:,} bytes = {total_weights/1024:.1f} KB")
 
-        old_size = sum(g.n for g in self._groups) ** 2
-        if old_size > 0:
-            reduction = (1 - total_weights / old_size) * 100
-            lines.append(f"vs N×N dense: {old_size:,} → {reduction:.1f}% reduction")
+        dense_weight_count = sum(population.size for population in self._populations) ** 2
+        if dense_weight_count > 0:
+            reduction = (1 - total_weights / dense_weight_count) * 100
+            lines.append(f"vs all-to-all dense: {dense_weight_count:,} -> {reduction:.1f}% reduction")
 
         return "\n".join(lines)
 
@@ -405,11 +413,11 @@ class SpikePressNetwork:
 # =============================================================================
 # Convenience: create the default MNIST network topology
 # =============================================================================
-def create_mnist_network(n_hidden: int = 2048) -> SpikePressNetwork:
+def create_mnist_network(hidden_size: int = 2048) -> SpikePressNetwork:
     """Create the standard MNIST 3-layer SNN network (fully-connected).
 
     Args:
-        n_hidden: Number of hidden layer neurons (default: 2048)
+        hidden_size: Number of hidden layer neurons (default: 2048)
 
     Returns:
         SpikePressNetwork ready to compile.
@@ -418,13 +426,13 @@ def create_mnist_network(n_hidden: int = 2048) -> SpikePressNetwork:
         This creates a fully-connected topology.  For the BRAM-optimised
         block-sparse version, use :func:`create_mnist_block_sparse_network`.
     """
-    net = SpikePressNetwork()
-    inp = net.add_group(NeuronGroup(784, name='input'))
-    hid = net.add_group(NeuronGroup(n_hidden, name='hidden'))
-    out = net.add_group(NeuronGroup(10, name='output'))
-    net.add_synapses(Synapses(inp, hid))
-    net.add_synapses(Synapses(hid, out))
-    return net
+    network = SpikePressNetwork()
+    input_population = network.add_population(SpikePressNeuronPopulation(784, name="input"))
+    hidden_population = network.add_population(SpikePressNeuronPopulation(hidden_size, name="hidden"))
+    output_population = network.add_population(SpikePressNeuronPopulation(10, name="output"))
+    network.add_projection(SpikePressProjection(input_population, hidden_population))
+    network.add_projection(SpikePressProjection(hidden_population, output_population))
+    return network
 
 
 def create_mnist_block_sparse_network(
@@ -438,10 +446,10 @@ def create_mnist_block_sparse_network(
     All hidden blocks converge fully-connected to the 10-class output layer.
 
     With the default (n_blocks=4, hidden_per_block=1024):
-      - 4 input groups of 196 pixels (7 MNIST rows each)
-      - 4 hidden groups of 1024 neurons each (4096 total)
-      - 1 output group of 10 neurons
-      - Total synapses: 843,776  (48% less than fully-connected)
+      - 4 input populations of 196 pixels (7 MNIST rows each)
+      - 4 hidden populations of 1024 neurons each (4096 total)
+      - 1 output population of 10 neurons
+      - Total projection weights: 843,776  (48% less than fully-connected)
       - At 4-bit: 263 BRAM18K  (93.9% of xc7z020)
 
     Args:
@@ -454,29 +462,29 @@ def create_mnist_block_sparse_network(
     assert 784 % n_blocks == 0, f"784 must be divisible by n_blocks={n_blocks}"
     pixels_per_block = 784 // n_blocks
 
-    net = SpikePressNetwork()
+    network = SpikePressNetwork()
 
-    # Input groups (image stripe partitions)
-    inp_groups = []
-    for i in range(n_blocks):
-        g = net.add_group(NeuronGroup(pixels_per_block, name=f'input_{i}'))
-        inp_groups.append(g)
+    # Input populations (image stripe partitions)
+    input_populations = []
+    for index in range(n_blocks):
+        population = network.add_population(SpikePressNeuronPopulation(pixels_per_block, name=f"input_{index}"))
+        input_populations.append(population)
 
-    # Hidden groups (one per block)
-    hid_groups = []
-    for i in range(n_blocks):
-        g = net.add_group(NeuronGroup(hidden_per_block, name=f'hidden_{i}'))
-        hid_groups.append(g)
+    # Hidden populations (one per block)
+    hidden_populations = []
+    for index in range(n_blocks):
+        population = network.add_population(SpikePressNeuronPopulation(hidden_per_block, name=f"hidden_{index}"))
+        hidden_populations.append(population)
 
-    # Output group
-    out = net.add_group(NeuronGroup(10, name='output'))
+    # Output population
+    output_population = network.add_population(SpikePressNeuronPopulation(10, name="output"))
 
-    # Block-sparse input→hidden connections
-    for i in range(n_blocks):
-        net.add_synapses(Synapses(inp_groups[i], hid_groups[i]))
+    # Block-sparse input→hidden projections
+    for index in range(n_blocks):
+        network.add_projection(SpikePressProjection(input_populations[index], hidden_populations[index]))
 
-    # Fully-connected hidden→output connections
-    for i in range(n_blocks):
-        net.add_synapses(Synapses(hid_groups[i], out))
+    # Fully-connected hidden→output projections
+    for hidden_population in hidden_populations:
+        network.add_projection(SpikePressProjection(hidden_population, output_population))
 
-    return net
+    return network

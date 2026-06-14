@@ -104,7 +104,7 @@ static void run_encoder_once(
 }
 
 //=============================================================================
-// Weight Memory (On-Chip BRAM) — NeuronGroup-aware flat buffer
+// Weight Memory (On-Chip BRAM) — population-aware flat buffer
 // Loihi/TrueNorth-inspired: ALL weights on-chip, no DDR in datapath.
 // Configurable precision via SNN_WEIGHT_BITS (2/4/8 bit per synapse).
 //   8-bit: [-128, 127],  ~794 BRAM18K for 1.6M synapses
@@ -432,7 +432,7 @@ static void apply_rstdp_reward(
     ap_int<16> rs_raw = params.reward_scale.range(15, 0);
     
     // Apply reward modulated by eligibility traces
-    // NeuronGroup-aware: only iterate over defined connections
+    // population-aware: only iterate over defined connections
     RSTDP_CONN_LOOP: for (int c = 0; c < NUM_CONNECTIONS; c++) {
         #pragma HLS LOOP_FLATTEN off
         const SynapticConnection &conn = CONNECTION_TABLE[c];
@@ -812,7 +812,7 @@ void snn_top_hls(
     }
     
     // Weight Loading Mode: Stream weights from s_axis_weights to weight_memory
-    // NeuronGroup-aware: uses connection table to compute flat buffer index
+    // population-aware: uses connection table to compute flat buffer index
     // Host should set ctrl_reg[6] = 1, then stream weights
     // Format: axis_weight_t.data[NEURON_ID_WIDTH-1:0] = pre_id,
     //         [2*NEURON_ID_WIDTH-1:NEURON_ID_WIDTH] = post_id,
@@ -1143,7 +1143,7 @@ void snn_top_hls(
 
 //=============================================================================
 // Weight Memory Access Functions (for external use)
-// Uses NeuronGroup connection table for global_id → flat buffer lookup
+// Uses SpikePress population connection table for global_id → flat buffer lookup
 // Returns/accepts packed_weight_t (SNN_WEIGHT_BITS precision)
 //=============================================================================
 void write_weight(
@@ -1172,7 +1172,7 @@ packed_weight_t read_weight(
 
 //=============================================================================
 // Batch Weight Load (via AXI-Stream)
-// NeuronGroup-aware: uses weight_index() for flat buffer lookup
+// population-aware: uses weight_index() for flat buffer lookup
 //=============================================================================
 void load_weights_from_stream(
     hls::stream<axis_weight_t> &weight_stream,

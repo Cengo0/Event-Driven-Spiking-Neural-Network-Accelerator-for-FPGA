@@ -1,69 +1,69 @@
 """SpikePress software API for SpikeMold-EDNP artifacts."""
 
 from .api import (
-    SpikePressCompiledEDNP,
     SpikePressFCLIFLayer,
     SpikePressModel,
     fc_lif_model,
+    SpikePressCompileResult,
 )
 from .architecture_trace_generator import (
-    ArchitectureTrace,
-    CommitEvent,
+    ActiveSetCommit,
     InputSpike,
+    SpikeMoldContractTrace,
     SynapticUpdate,
     generate_eventconv_trace,
     generate_fc_lif_trace,
-    pack_event_word64,
+    pack_spikemold_event_word64,
 )
-from .ednp_artifact import (
-    EDNPArtifact,
-    build_ednp_artifact,
-    read_ednp_artifact,
-    write_ednp_artifact,
+from .spikemold_ednp_artifact import (
+    SpikeMoldEDNPArtifact,
+    build_spikemold_ednp_artifact,
+    read_spikemold_ednp_artifact,
+    write_spikemold_ednp_artifact,
 )
 from .event_budget import (
-    DEFAULT_M3_LIMITS,
     EventBudgetLimits,
     EventBudgetResult,
+    DEFAULT_EDNP_MINI_LIMITS,
     evaluate_trace_budget,
-    recommended_m3_config,
+    recommended_ednp_mini_config,
     summarize_trace_budgets,
 )
 from .network import (
-    CompiledSpikePressNetwork,
-    ConnectionInfo,
-    NeuronGroup,
+    CompiledSpikePressTopology,
+    SpikePressNeuronPopulation,
+    SpikePressProjectionInfo,
     SpikePressNetwork,
-    Synapses,
+    SpikePressProjection,
 )
 
 __all__ = [
-    "ArchitectureTrace",
-    "CommitEvent",
-    "CompiledSpikePressNetwork",
-    "ConnectionInfo",
-    "DEFAULT_M3_LIMITS",
-    "EDNPArtifact",
+    "SpikeMoldContractTrace",
+    "ActiveSetCommit",
+    "DEFAULT_EDNP_MINI_LIMITS",
     "EventBudgetLimits",
     "EventBudgetResult",
     "InputSpike",
-    "NeuronGroup",
+    "CompiledSpikePressTopology",
     "SpikePressNetwork",
-    "SpikePressCompiledEDNP",
+    "SpikePressNeuronPopulation",
+    "SpikePressProjection",
+    "SpikePressProjectionInfo",
+    "SpikeMoldEDNPArtifact",
+    "SpikePressCompileResult",
     "SpikePressFCLIFLayer",
     "SpikePressModel",
-    "Synapses",
     "SynapticUpdate",
-    "build_ednp_artifact",
+    "build_spikemold_ednp_artifact",
     "evaluate_trace_budget",
     "fc_lif_model",
     "generate_eventconv_trace",
     "generate_fc_lif_trace",
-    "pack_event_word64",
-    "read_ednp_artifact",
-    "recommended_m3_config",
+    "pack_spikemold_event_word64",
+    "read_spikemold_ednp_artifact",
+    "recommended_ednp_mini_config",
     "summarize_trace_budgets",
-    "write_ednp_artifact",
+    "write_spikemold_ednp_artifact",
 ]
 
 __version__ = "0.1.0"

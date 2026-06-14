@@ -2,7 +2,7 @@
  * @file test_snn_top_hls.cpp
  * @brief HLS Testbench for snn_top_hls kernel
  * 
- * This testbench verifies basic functionality of the SNN accelerator:
+ * This testbench verifies basic functionality of the SpikeMold backend:
  * - Encoder operation (rate, latency, delta-sigma)
  * - Two-neuron encoding
  * - Weight loading

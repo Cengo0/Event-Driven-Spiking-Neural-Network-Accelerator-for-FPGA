@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // Title         : SNN Top-Level HLS Testbench
-// Project       : PYNQ-Z2 SNN Accelerator
+// Project       : PYNQ-Z2 SpikeMold
 // File          : tb_snn_top_hls.cpp
 // Author        : Jiwoon Lee (@metr0jw)
 // Organization  : Kwangwoon University, Seoul, South Korea

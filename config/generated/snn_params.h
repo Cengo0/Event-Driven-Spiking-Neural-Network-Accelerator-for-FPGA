@@ -68,7 +68,7 @@ const int SNN_HLS_WEIGHT_WIDTH    = 8;
 #define SNN_HLS_CNN_DESCRIPTOR_PAGE_ENABLE 1
 #endif
 
-// ─── NeuronGroup Connection Topology (Brian2-style) ─────────────
+// ─── SpikePress Projection Topology ─────────────
 const int SNN_NUM_NEURON_GROUPS      = 3;
 const int SNN_NUM_CONNECTIONS         = 1;
 #define SNN_NUM_NEURON_GROUPS_PP      3
@@ -81,12 +81,12 @@ const int SNN_MAX_SRC_NEURONS         = 512;
 const int SNN_MAX_DST_NEURONS         = 512;
 const int SNN_TOTAL_LOGICAL_NEURONS   = 4890;
 
-// Per-NeuronGroup sizes
+// Per-population sizes
 const int SNN_NG_SIZE_0 = 512;  // visible_output
 const int SNN_NG_SIZE_1 = 512;  // input
 const int SNN_NG_SIZE_2 = 3866;  // dummy_pad
 
-// NeuronGroup ID start offsets (cumulative)
+// Population ID start offsets (cumulative)
 const int SNN_NG_ID_START_0 = 0;
 const int SNN_NG_ID_START_1 = 512;
 const int SNN_NG_ID_START_2 = 1024;

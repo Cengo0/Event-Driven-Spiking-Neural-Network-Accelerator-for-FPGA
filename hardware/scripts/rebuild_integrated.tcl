@@ -1,12 +1,12 @@
 #-----------------------------------------------------------------------------
-# Rebuild snn_integrated bitstream with RTL fixes
+# Rebuild SpikeMold-EDNP bitstream with RTL fixes
 # Edge detector on spike_in_valid + hold register on spike_out
 #
 # Usage: vivado -mode batch -source hardware/scripts/rebuild_integrated.tcl
 #-----------------------------------------------------------------------------
 
 set project_dir "/mnt/workspace/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA"
-set build_dir   "${project_dir}/hardware/build/snn_integrated_v2"
+set build_dir   "${project_dir}/hardware/build/spikemold_ednp_pynq_z2"
 set rtl_dir     "${project_dir}/hardware/hdl/rtl"
 set ip_repo     "${project_dir}/hardware/ip_repo"
 set output_dir  "${project_dir}/outputs"
@@ -23,7 +23,7 @@ puts "Using processing_system7_0/FCLK_CLK0 frequency: ${pl_clk_mhz} MHz"
 file delete -force $build_dir
 
 # Create project
-create_project snn_integrated_v2 $build_dir -part $part -force
+create_project spikemold_ednp_pynq_z2 $build_dir -part $part -force
 set_property target_language Verilog [current_project]
 # Use automatic source management so module-reference BD cells resolve correctly.
 set_property source_mgmt_mode All [current_project]
@@ -264,7 +264,7 @@ connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins snn_top_hls_0/s_
 # Reward signal is s_axilite register (not standalone port), no tie-off needed
 
 # =============================================================================
-# HLS ↔ RTL External Ports  (connected in snn_integrated_top.v wrapper)
+# HLS ↔ RTL External Ports  (connected in spikemold_integrated_top.v wrapper)
 # =============================================================================
 # Make these external so the top wrapper can connect them
 
@@ -385,7 +385,7 @@ connect_bd_net [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_ports clk_10
 connect_bd_net [get_bd_pins proc_sys_reset_0/peripheral_aresetn] [get_bd_ports rst_n_sync]
 connect_bd_net [get_bd_pins const_zero_1bit/dout] [get_bd_ports debug_learning_active]
 
-# HLS threshold/leak connected via snn_integrated_top.v wrapper, not via config_regs
+# HLS threshold/leak connected via spikemold_integrated_top.v wrapper, not via config_regs
 # (config_regs doesn't have hls_snn_enable/hls_threshold/hls_leak_rate ports)
 
 # Interrupt
@@ -431,19 +431,19 @@ validate_bd_design
 save_bd_design
 
 # Generate BD wrapper
-make_wrapper -files [get_files ${build_dir}/snn_integrated_v2.srcs/sources_1/bd/design_1/design_1.bd] -top
-add_files -norecurse ${build_dir}/snn_integrated_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v
+make_wrapper -files [get_files ${build_dir}/spikemold_ednp_pynq_z2.srcs/sources_1/bd/design_1/design_1.bd] -top
+add_files -norecurse ${build_dir}/spikemold_ednp_pynq_z2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v
 
 # =============================================================================
-# Add RTL Sources (spike_router, lif_neuron_array, snn_integrated_top with fixes)
+# Add RTL Sources (spike_router, lif_neuron_array, spikemold_integrated_top with fixes)
 # =============================================================================
 add_files -norecurse ${rtl_dir}/router/spike_router.v
 add_files -norecurse ${rtl_dir}/neurons/lif_neuron_array.v
 add_files -norecurse ${rtl_dir}/common/fifo.v
-add_files -norecurse ${rtl_dir}/top/snn_integrated_top.v
+add_files -norecurse ${rtl_dir}/top/spikemold_integrated_top.v
 
-# Set snn_integrated_top as the real top module
-set_property top snn_integrated_top [get_filesets sources_1]
+# Set spikemold_integrated_top as the real top module
+set_property top spikemold_integrated_top [get_filesets sources_1]
 update_compile_order -fileset sources_1
 
 # Add PYNQ-Z2 constraints
@@ -480,25 +480,25 @@ puts "===== Implementation Complete ====="
 # =============================================================================
 # Copy Outputs
 # =============================================================================
-set bit_file [glob -nocomplain ${build_dir}/snn_integrated_v2.runs/impl_1/*.bit]
-set hwh_file [glob -nocomplain ${build_dir}/snn_integrated_v2.gen/sources_1/bd/design_1/hw_handoff/*.hwh]
+set bit_file [glob -nocomplain ${build_dir}/spikemold_ednp_pynq_z2.runs/impl_1/*.bit]
+set hwh_file [glob -nocomplain ${build_dir}/spikemold_ednp_pynq_z2.gen/sources_1/bd/design_1/hw_handoff/*.hwh]
 
 if {$bit_file ne ""} {
-    file copy -force $bit_file ${output_dir}/snn_integrated_v2.bit
-    puts "Bitstream: ${output_dir}/snn_integrated_v2.bit"
+    file copy -force $bit_file ${output_dir}/spikemold_ednp_pynq_z2.bit
+    puts "Bitstream: ${output_dir}/spikemold_ednp_pynq_z2.bit"
 }
 if {$hwh_file ne ""} {
-    file copy -force $hwh_file ${output_dir}/snn_integrated_v2.hwh
-    puts "HWH: ${output_dir}/snn_integrated_v2.hwh"
+    file copy -force $hwh_file ${output_dir}/spikemold_ednp_pynq_z2.hwh
+    puts "HWH: ${output_dir}/spikemold_ednp_pynq_z2.hwh"
 }
 
 # Reports
 if {[catch {open_run impl_1} open_err]} {
     puts "WARNING: Could not open impl_1 for report generation: $open_err"
 } else {
-    report_utilization -file ${output_dir}/snn_integrated_v2_utilization.rpt
-    report_timing_summary -file ${output_dir}/snn_integrated_v2_timing.rpt
-    report_power -file ${output_dir}/snn_integrated_v2_power.rpt
+    report_utilization -file ${output_dir}/spikemold_ednp_pynq_z2_utilization.rpt
+    report_timing_summary -file ${output_dir}/spikemold_ednp_pynq_z2_timing.rpt
+    report_power -file ${output_dir}/spikemold_ednp_pynq_z2_power.rpt
 }
 
 puts "===== ALL DONE ====="

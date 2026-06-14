@@ -5,10 +5,10 @@ Target: PYNQ-Z2 / Zynq-7020
 
 ## Purpose
 
-This contract defines the execution boundary for the first EDNP backend. It is
-architecture-neutral. Flat pipelines, coregroups, pages, tiles, block-sparse
-layouts, and shared-kernel EventConv AGUs are allowed only when they preserve
-the trace semantics and pass the same evidence gates.
+This contract defines the execution boundary for the first SpikeMold-EDNP
+backend. It is architecture-neutral. Flat pipelines, coregroups, pages, tiles,
+block-sparse layouts, and shared-kernel EventConv AGUs are allowed only when
+they preserve the trace semantics and pass the same evidence gates.
 
 ## Required Execution Semantics
 
@@ -23,7 +23,7 @@ the trace semantics and pass the same evidence gates.
 
 ## Backend Boundary
 
-The EDNP backend consumes:
+The SpikeMold-EDNP backend consumes:
 
 - target specification
 - integer model artifact
@@ -64,4 +64,3 @@ Keep these evidence levels separate:
 - PYNQ-Z2 PL execution with board-captured output
 
 Only the last item supports board execution claims.
-

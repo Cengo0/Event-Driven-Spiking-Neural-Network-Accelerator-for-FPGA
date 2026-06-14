@@ -1,4 +1,4 @@
-"""Event/update budget checks for EDNP traces."""
+"""Event/update budget checks for SpikeMold-EDNP traces."""
 
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ class EventBudgetResult:
         }
 
 
-DEFAULT_M3_LIMITS = EventBudgetLimits(
+DEFAULT_EDNP_MINI_LIMITS = EventBudgetLimits(
     max_input_events=1024,
     max_generated_updates=8192,
     max_active_neurons=512,
@@ -44,21 +44,21 @@ DEFAULT_M3_LIMITS = EventBudgetLimits(
 )
 
 
-def recommended_m3_config() -> Dict[str, object]:
+def recommended_ednp_mini_config() -> Dict[str, object]:
     return {
         "target": "pynq-z2",
         "primitive": "ednp-mini-fc-lif",
         "state_width_bits": 32,
         "weight_width_bits": 16,
-        "ddr_bytes_inner_loop": DEFAULT_M3_LIMITS.max_ddr_bytes_inner_loop,
-        "python_inner_loop_steps": DEFAULT_M3_LIMITS.max_python_inner_loop_steps,
-        **asdict(DEFAULT_M3_LIMITS),
+        "ddr_bytes_inner_loop": DEFAULT_EDNP_MINI_LIMITS.max_ddr_bytes_inner_loop,
+        "python_inner_loop_steps": DEFAULT_EDNP_MINI_LIMITS.max_python_inner_loop_steps,
+        **asdict(DEFAULT_EDNP_MINI_LIMITS),
     }
 
 
 def evaluate_trace_budget(
     trace: Mapping[str, object],
-    limits: EventBudgetLimits = DEFAULT_M3_LIMITS,
+    limits: EventBudgetLimits = DEFAULT_EDNP_MINI_LIMITS,
 ) -> EventBudgetResult:
     counters_obj = trace.get("counters", {})
     if not isinstance(counters_obj, Mapping):
@@ -92,12 +92,12 @@ def evaluate_trace_budget(
 
 def summarize_trace_budgets(
     traces: Mapping[str, Mapping[str, object]],
-    limits: EventBudgetLimits = DEFAULT_M3_LIMITS,
+    limits: EventBudgetLimits = DEFAULT_EDNP_MINI_LIMITS,
 ) -> Dict[str, object]:
     results = {name: evaluate_trace_budget(trace, limits).to_dict() for name, trace in traces.items()}
     return {
-        "schema": "ednp.event_budget.v1",
-        "recommended_m3_config": recommended_m3_config(),
+        "schema": "spikemold.ednp_event_budget.v1",
+        "recommended_ednp_mini_config": recommended_ednp_mini_config(),
         "all_ok": all(result["ok"] for result in results.values()),
         "counter_histogram": build_counter_histogram(trace.get("counters", {}) for trace in traces.values()),
         "trace_results": results,

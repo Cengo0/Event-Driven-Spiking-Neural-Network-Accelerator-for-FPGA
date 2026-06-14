@@ -5,7 +5,7 @@
 SpikePress produces deterministic integer artifacts and traces. SpikeMold
 consumes those artifacts through a bounded hardware runtime.
 
-## Default EDNP Path
+## Default SpikeMold-EDNP Path
 
 ```text
 input events

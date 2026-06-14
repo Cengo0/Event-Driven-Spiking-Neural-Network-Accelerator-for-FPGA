@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // Title         : SNN Top-Level HLS Header
-// Project       : PYNQ-Z2 SNN Accelerator
+// Project       : PYNQ-Z2 SpikeMold
 // File          : snn_top_hls.h
 // Author        : Jiwoon Lee (@metr0jw)
 // Organization  : Kwangwoon University, Seoul, South Korea
@@ -24,7 +24,7 @@
 //=============================================================================
 const int MAX_NEURONS    = SNN_MAX_NEURONS;                  // 16×128 = 2048
 
-// --- NeuronGroup-aware weight buffer (Brian2-style) ---
+// --- population-aware weight buffer (Brian2-style) ---
 // Replaces the old O(N²) dense weight_memory[MAX_NEURONS][MAX_NEURONS].
 // Weight memory is now a flat buffer: Σ(src_size × dst_size) per connection.
 const int MAX_WEIGHT_BUFFER_SIZE = SNN_MAX_WEIGHT_BUFFER_SIZE;
@@ -35,8 +35,8 @@ const int TOTAL_LOGICAL_NEURONS  = SNN_TOTAL_LOGICAL_NEURONS;
 // Connection descriptor: defines one src_group→dst_group synaptic projection.
 // Used by HLS to index into the flat weight_memory[] buffer.
 struct SynapticConnection {
-    int src_group;        // source NeuronGroup index
-    int dst_group;        // destination NeuronGroup index
+    int src_group;        // source SpikePress population index
+    int dst_group;        // destination SpikePress population index
     int src_size;         // number of neurons in source group
     int dst_size;         // number of neurons in destination group
     int weight_offset;    // byte offset into flat weight_memory[]
@@ -98,7 +98,7 @@ static const SynapticConnection CONNECTION_TABLE[NUM_CONNECTIONS] = {
 #endif
 };
 
-// NeuronGroup ID start offsets (for global_id → local_id conversion)
+// Population ID start offsets (for global_id → local_id conversion)
 // Supports up to 9 groups + 1 sentinel for block-sparse topology
 static const int NG_ID_START[NUM_NEURON_GROUPS + 1] = {
     SNN_NG_ID_START_0,
@@ -358,11 +358,11 @@ packed_weight_t read_weight(neuron_id_t pre_id, neuron_id_t post_id);
 void load_weights_from_stream(hls::stream<axis_weight_t> &weight_stream, ap_uint<32> num_weights);
 
 //=============================================================================
-// NeuronGroup Weight Access Helpers
+// SpikePress population Weight Access Helpers
 // These convert global neuron IDs to flat buffer offsets via connection table.
 //=============================================================================
 
-// Find which NeuronGroup a global neuron ID belongs to.
+// Find which SpikePress population a global neuron ID belongs to.
 // Returns group index [0, NUM_NEURON_GROUPS), or -1 if not found.
 static inline int find_neuron_group(neuron_id_t nid) {
     #pragma HLS INLINE

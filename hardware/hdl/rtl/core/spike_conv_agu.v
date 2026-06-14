@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // Title       : Spike Convolution Address Generation Unit (AGU)
-// Description : Loihi-style convolutional connectivity for SNN accelerator
+// Description : Loihi-style convolutional connectivity for SpikeMold backend
 //
 // This module implements event-driven address generation for convolutional
 // layers, following Intel Loihi's approach:

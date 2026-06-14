@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate initial EDNP Batch 1A golden traces and event budget artifacts."""
+"""Generate initial SpikeMold-EDNP Batch 1A golden traces and budget artifacts."""
 
 from __future__ import annotations
 
@@ -61,7 +61,7 @@ def main() -> int:
             "eventconv_8x8_tiny_v1": eventconv_trace.to_dict(),
         }
     )
-    (event_budget_dir / "recommended_m3_config.json").write_text(
+    (event_budget_dir / "recommended_ednp_mini_config.json").write_text(
         json.dumps(budget, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
@@ -74,7 +74,7 @@ Status: initial artifacts generated
 
 - `golden_traces/v1/fc_lif_tiny_v1.json`
 - `golden_traces/v1/eventconv_8x8_tiny_v1.json`
-- `outputs/event_budget/recommended_m3_config.json`
+- `outputs/event_budget/recommended_ednp_mini_config.json`
 - `software/python/spikepress/`
 
 ## Evidence Level
@@ -86,9 +86,9 @@ Integer golden trace generation only. No HLS, RTL, or board claim.
 - FC-LIF tiny deterministic trace
 - shared-kernel EventConv AGU tiny deterministic trace
 - event/update/active/state counter budget
-- inference-only SpikePress API and compiler artifact path
+- inference-only SpikePress API and SpikeMold-EDNP artifact path
 - event counter histogram
-- compiler artifact JSON roundtrip
+- SpikeMold-EDNP artifact JSON roundtrip
 
 ## Remaining Batch 1A Work
 

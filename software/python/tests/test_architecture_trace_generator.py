@@ -5,12 +5,12 @@ from spikepress.architecture_trace_generator import (
     InputSpike,
     generate_eventconv_trace,
     generate_fc_lif_trace,
-    pack_event_word64,
+    pack_spikemold_event_word64,
 )
 from spikepress.event_budget import (
     EventBudgetLimits,
     evaluate_trace_budget,
-    recommended_m3_config,
+    recommended_ednp_mini_config,
 )
 
 
@@ -68,7 +68,7 @@ def test_trace_json_roundtrip(tmp_path):
 
 
 def test_eventword64_pack_matches_contract_fields():
-    word = pack_event_word64(
+    word = pack_spikemold_event_word64(
         event_type=1,
         tick=0x1234,
         src_y_or_hi=0x155,
@@ -111,8 +111,8 @@ def test_event_budget_accepts_tiny_trace_and_rejects_overflow():
     assert rejected.failures == ("limit_exceeded:input_event_count:1>0",)
 
 
-def test_recommended_m3_config_exposes_runtime_guards():
-    config = recommended_m3_config()
+def test_recommended_ednp_mini_config_exposes_runtime_guards():
+    config = recommended_ednp_mini_config()
 
     assert config["target"] == "pynq-z2"
     assert config["primitive"] == "ednp-mini-fc-lif"

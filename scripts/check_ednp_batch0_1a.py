@@ -17,9 +17,9 @@ from spikepress.architecture_trace_generator import TRACE_SCHEMA, sha256_json  #
 from spikepress.event_budget import evaluate_trace_budget  # noqa: E402
 
 
-EDNP_SOURCE_FILES = [
+SPIKEPRESS_SOURCE_FILES = [
     ROOT / "software" / "python" / "spikepress" / "architecture_trace_generator.py",
-    ROOT / "software" / "python" / "spikepress" / "ednp_artifact.py",
+    ROOT / "software" / "python" / "spikepress" / "spikemold_ednp_artifact.py",
     ROOT / "software" / "python" / "spikepress" / "event_budget.py",
     ROOT / "software" / "python" / "spikepress" / "api.py",
 ]
@@ -125,11 +125,11 @@ def check_batch1a() -> None:
             fail(f"missing trace: {path}")
         check_trace(path)
 
-    budget = ROOT / "outputs" / "event_budget" / "recommended_m3_config.json"
+    budget = ROOT / "outputs" / "event_budget" / "recommended_ednp_mini_config.json"
     if not budget.exists():
         fail(f"missing budget artifact: {budget}")
     budget_json = load_json(budget)
-    if budget_json.get("schema") != "ednp.event_budget.v1":
+    if budget_json.get("schema") != "spikemold.ednp_event_budget.v1":
         fail("event budget schema mismatch")
     if budget_json.get("all_ok") is not True:
         fail("event budget all_ok is not true")
@@ -147,10 +147,21 @@ def check_batch1a() -> None:
 def check_legacy_dependencies_excluded() -> None:
     banned = [
         "snn" + "_fpga" + "_accelerator",
+        "Neuron" + "Group",
+        "Syn" + "apses",
+        "SpikePress" + "Connection",
+        "compile_" + "ednp",
+        "class " + "EDNPArtifact",
+        "build_" + "ednp_artifact",
+        "read_" + "ednp_artifact",
+        "write_" + "ednp_artifact",
+        "SpikePress" + "CompiledEDNP",
+        "DEFAULT_" + "M3_LIMITS",
+        "recommended_" + "m3_config",
     ]
-    for path in EDNP_SOURCE_FILES:
+    for path in SPIKEPRESS_SOURCE_FILES:
         if not path.exists():
-            fail(f"missing EDNP source file: {path}")
+            fail(f"missing SpikePress source file: {path}")
         text = path.read_text(encoding="utf-8")
         for token in banned:
             if token in text:

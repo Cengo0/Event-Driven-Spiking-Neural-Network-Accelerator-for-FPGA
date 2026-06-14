@@ -28,7 +28,7 @@
     "commits_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "final_state_sha256": "4300b91052c5da9c0573152cc146938599a3220d849d2e82dfbdc813ad9e21f5",
     "input_sha256": "8d8b6d2b39c82c92de8e9fee6f3be229aee1662563665cb271811c1dc9b2baed",
-    "trace_sha256": "99be5a254a0240fa45255bbca1a41e6c8cb5b71feee33f083cada1a0b951d216",
+    "trace_sha256": "9c075ea97ee29501cb46f8dee79745c81c6a4102bdd5d18d60221e77af7fbedc",
     "updates_sha256": "cfba9465906016565d1c926cc228e1fd82bf3598db8dd3b4e257309947209172"
   },
   "inputs": [
@@ -73,7 +73,7 @@
     "stride": 1,
     "weight_storage": "shared_kernel"
   },
-  "schema": "ednp.trace.v1",
+  "schema": "spikemold.ednp_trace.v1",
   "target": "architecture-neutral",
   "trace_id": "eventconv_8x8_tiny_v1",
   "updates": [

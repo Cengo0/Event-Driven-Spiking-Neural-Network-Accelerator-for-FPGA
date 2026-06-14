@@ -8,7 +8,7 @@ Trace files are JSON objects:
 
 ```json
 {
-  "schema": "ednp.trace.v1",
+  "schema": "spikemold.ednp_trace.v1",
   "trace_id": "name",
   "target": "architecture-neutral",
   "metadata": {},
@@ -53,4 +53,3 @@ belongs under `metadata.candidate`, not in new top-level semantics.
 If a candidate cannot represent a trace without semantic changes, it must reject
 the trace and report the reason. It must not rewrite the trace into a different
 network.
-

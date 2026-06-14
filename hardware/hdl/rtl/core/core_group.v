@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Title         : Core Group - Hierarchical Neuron Core with Local Synapses
+// Title         : Core Group - Hierarchical Neuron Core with Local Projections
 // Project       : SpikeMold (HW) + SpikePress (SW)
 // File          : core_group.v
 // Author        : Jiwoon Lee (@metr0jw)

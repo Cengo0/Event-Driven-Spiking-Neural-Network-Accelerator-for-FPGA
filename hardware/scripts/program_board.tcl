@@ -1,6 +1,6 @@
 ##-----------------------------------------------------------------------------
 ## Title         : FPGA Programming Script
-## Project       : PYNQ-Z2 SNN Accelerator
+## Project       : PYNQ-Z2 SpikeMold
 ## File          : program_board.tcl
 ## Author        : Jiwoon Lee (@metr0jw)
 ## Organization  : Kwangwoon University, Seoul, South Korea
@@ -13,7 +13,7 @@ set script_dir [file dirname [file normalize [info script]]]
 set proj_root [file normalize "$script_dir/../.."]
 
 # Default bitstream location
-set default_bit "$proj_root/build/bitstreams/snn_accelerator.bit"
+set default_bit "$proj_root/build/bitstreams/spikemold_ednp_pynq_z2.bit"
 set default_ltx "$proj_root/build/bitstreams/debug_nets.ltx"
 
 # Parse command line arguments

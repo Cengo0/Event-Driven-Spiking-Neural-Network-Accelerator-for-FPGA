@@ -70,7 +70,7 @@
 `define SNN_HLS_SMOKE_COMMANDS_ENABLE 0
 `define SNN_HLS_CNN_DESCRIPTOR_PAGE_ENABLE 1
 
-// ─── NeuronGroup Weight Buffer ─────────────────────────────────────
+// ─── SpikePress Weight Buffer ─────────────────────────────────────
 `define SNN_MAX_WEIGHT_BUFFER_SIZE 262144
 `define SNN_RESIDENT_WEIGHT_BUFFER_SIZE 1
 `define SNN_RESIDENT_WEIGHT_LOGICAL_ENTRIES 0

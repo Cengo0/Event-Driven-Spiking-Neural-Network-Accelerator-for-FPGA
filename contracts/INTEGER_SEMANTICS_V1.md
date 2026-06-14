@@ -4,9 +4,9 @@ Status: active draft
 
 ## Numeric Rule
 
-The EDNP compiler and golden simulator use explicit integer arithmetic. Floating
-point may be used during training, calibration, and export, but not inside the
-locked hardware trace contract.
+The SpikePress compiler/golden simulator and SpikeMold-EDNP backend use explicit
+integer arithmetic. Floating point may be used during training, calibration, and
+export, but not inside the locked hardware trace contract.
 
 ## Default Widths
 
@@ -35,8 +35,9 @@ if state[dst] >= threshold[dst]:
     state[dst] = reset_value[dst]
 ```
 
-The first EDNP-mini contract uses reset-to-zero after fire. Later contracts may
-add subtract-threshold reset only if traces name that mode explicitly.
+The first SpikeMold-EDNP mini contract uses reset-to-zero after fire. Later
+contracts may add subtract-threshold reset only if traces name that mode
+explicitly.
 
 ## EventConv Update
 
@@ -57,4 +58,3 @@ update.
 Default golden semantics use signed 32-bit saturation for membrane state. Any
 hardware implementation with narrower state must prove the compiler rejects
 traces that can overflow the narrower state.
-

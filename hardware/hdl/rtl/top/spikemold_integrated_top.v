@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
-// Title         : Integrated SNN Accelerator Top (BD Wrapper + RTL)
-// Project       : PYNQ-Z2 SNN Accelerator
-// File          : snn_integrated_top.v
+// Title         : Integrated SpikeMold Top (BD Wrapper + RTL)
+// Project       : PYNQ-Z2 SpikeMold
+// File          : spikemold_integrated_top.v
 // Author        : Jiwoon Lee (@metr0jw)
 // Organization  : Kwangwoon University, Seoul, South Korea
 // Contact       : jwlee@linux.com
@@ -16,17 +16,17 @@
 //                 2. FIFO bridge on RTL->HLS neuron output so HLS ready
 //                    stalls do not drop post-spike bursts.
 //
-//                 NeuronGroup Note (Phase 6.5):
-//                 The NeuronGroup connection topology (Brian2-style) is handled
+//                 SpikePress population note (Phase 6.5):
+//                 The SpikePress projection topology is handled
 //                 entirely in HLS weight_memory (flat buffer) and Python host.
 //                 The RTL spike_router uses a generic config-based conn_memory
-//                 that is NeuronGroup-agnostic. The Python host generates the
-//                 routing table entries based on NeuronGroup connections.
+//                 that is population-agnostic. The Python host generates the
+//                 routing table entries from SpikePress projections.
 //-----------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
 
-module snn_integrated_top #(
+module spikemold_integrated_top #(
     parameter NUM_NEURONS           = 1024,
     parameter NUM_AXONS             = 1024,
     parameter NUM_PARALLEL_UNITS    = 4,
