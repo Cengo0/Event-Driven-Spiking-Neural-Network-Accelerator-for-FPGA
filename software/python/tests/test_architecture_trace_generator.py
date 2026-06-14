@@ -7,6 +7,11 @@ from snn_fpga_accelerator.architecture_trace_generator import (
     generate_fc_lif_trace,
     pack_event_word64,
 )
+from snn_fpga_accelerator.event_budget import (
+    EventBudgetLimits,
+    evaluate_trace_budget,
+    recommended_m3_config,
+)
 
 
 def test_fc_lif_trace_is_deterministic_and_hashes():
@@ -83,3 +88,33 @@ def test_eventword64_pack_matches_contract_fields():
     assert (word >> 11) & 0xFF == 7
     assert (word >> 5) & 0x3F == 0x2A
     assert word & 0x1F == 0x15
+
+
+def test_event_budget_accepts_tiny_trace_and_rejects_overflow():
+    trace = generate_fc_lif_trace(
+        input_spikes=[InputSpike(tick=0, src_id=0)],
+        weights={(0, 1): 7},
+        thresholds={1: 99},
+    ).to_dict()
+
+    assert evaluate_trace_budget(trace).ok is True
+
+    tiny_limits = EventBudgetLimits(
+        max_input_events=0,
+        max_generated_updates=8,
+        max_active_neurons=8,
+        max_state_reads=8,
+        max_state_writes=8,
+    )
+    rejected = evaluate_trace_budget(trace, tiny_limits)
+    assert rejected.ok is False
+    assert rejected.failures == ("limit_exceeded:input_event_count:1>0",)
+
+
+def test_recommended_m3_config_exposes_runtime_guards():
+    config = recommended_m3_config()
+
+    assert config["target"] == "pynq-z2"
+    assert config["primitive"] == "ednp-mini-fc-lif"
+    assert config["python_inner_loop_steps"] == 0
+    assert config["ddr_bytes_inner_loop"] == 0

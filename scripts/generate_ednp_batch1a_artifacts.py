@@ -18,6 +18,7 @@ from snn_fpga_accelerator.architecture_trace_generator import (  # noqa: E402
     generate_eventconv_trace,
     generate_fc_lif_trace,
 )
+from snn_fpga_accelerator.event_budget import summarize_trace_budgets  # noqa: E402
 
 
 def main() -> int:
@@ -54,24 +55,12 @@ def main() -> int:
     )
     eventconv_trace.write_json(golden_dir / "eventconv_8x8_tiny_v1.json")
 
-    budget = {
-        "schema": "ednp.event_budget.v1",
-        "recommended_m3_config": {
-            "target": "pynq-z2",
-            "primitive": "ednp-mini-fc-lif",
-            "max_input_events": 1024,
-            "max_generated_updates": 8192,
-            "max_active_neurons": 512,
-            "state_width_bits": 32,
-            "weight_width_bits": 16,
-            "python_inner_loop_steps": 0,
-            "ddr_bytes_inner_loop": 0,
-        },
-        "trace_summaries": {
-            "fc_lif_tiny_v1": fc_trace.to_dict()["counters"],
-            "eventconv_8x8_tiny_v1": eventconv_trace.to_dict()["counters"],
-        },
-    }
+    budget = summarize_trace_budgets(
+        {
+            "fc_lif_tiny_v1": fc_trace.to_dict(),
+            "eventconv_8x8_tiny_v1": eventconv_trace.to_dict(),
+        }
+    )
     (event_budget_dir / "recommended_m3_config.json").write_text(
         json.dumps(budget, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -110,4 +99,3 @@ Integer golden trace generation only. No HLS, RTL, or board claim.
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
