@@ -1,0 +1,55 @@
+# HLS Scripts Directory
+
+## Modern v++ Workflow (Vitis 2025.2+)
+
+The legacy `vitis_hls -f script.tcl` workflow is deprecated.
+Use the `v++` compiler instead.
+
+### Quick Build
+
+```bash
+# From hardware/hls directory:
+./scripts/build_hls.sh --clean
+
+# Or directly with v++:
+v++ -c --mode hls \
+    --part xc7z020clg400-1 \
+    --work_dir ./hls_output \
+    --hls.clock 10ns \
+    --hls.syn.top snn_top_hls \
+    --hls.syn.file "src/snn_top_hls.cpp" \
+    --hls.flow_target vivado
+```
+
+### Files
+
+- `build_hls.sh` - Main build script using v++ CLI
+- `hls_config.cfg` - HLS configuration (optional)
+- `snn_top_hls_vpp.cfg` - v++ configuration file
+- `vpp_hls_config.cfg` - Alternative v++ config
+
+### Build Options
+
+```bash
+./scripts/build_hls.sh --help
+```
+
+Options:
+- `--clean` - Remove previous build
+- `--clock 8ns` - Set clock period
+- `--part xc7z020clg400-1` - Target FPGA
+- `--verbose` - Show detailed output
+
+### Output
+
+After successful synthesis:
+- IP Package: `hls_output/hls/impl/ip/`
+- Reports: `hls_output/hls/syn/report/csynth.rpt`
+- ZIP: `hls_output/snn_top_hls.zip`
+
+### Integration with Vivado
+
+Copy the generated IP to your project:
+```bash
+cp -r hls_output/hls/impl/ip ../ip_repo/snn_top_hls
+```
