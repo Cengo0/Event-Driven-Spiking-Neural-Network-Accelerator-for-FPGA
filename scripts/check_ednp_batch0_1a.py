@@ -140,6 +140,7 @@ def check_batch1a() -> None:
     for report in [
         ROOT / "reports" / "batch_0_contract_freeze_report.md",
         ROOT / "reports" / "batch_1a_software_foundation_report.md",
+        ROOT / "reports" / "verifier_gate_review.md",
     ]:
         if not report.exists():
             fail(f"missing report: {report}")

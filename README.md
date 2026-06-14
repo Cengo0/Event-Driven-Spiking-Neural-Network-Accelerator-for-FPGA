@@ -20,11 +20,14 @@ Active path:
 - Batch 0/1A contract verification
 - Batch 1B software transport smoke
 - Batch 1C EventConv AGU/state/commit C0/C1/C2/C3/C4 RTL smoke
+- board-free verifier gate review
+- PYNQ one-shot runtime API and CLI entrypoint
 
 Out of scope for the current EDNP mainline:
 
 - removed HW/SW API
 - Python-controlled inner loops as runtime architecture
+- on-chip learning, STDP, and R-STDP engines
 
 ## Quick Check
 
@@ -42,6 +45,7 @@ rtk python scripts/check_batch1x_architecture_sandbox.py
 rtk python scripts/check_architecture_selection.py
 rtk python scripts/generate_spikemold_runtime_artifacts.py
 rtk python scripts/check_spikemold_runtime_artifacts.py
+rtk python scripts/check_verifier_gate.py
 rtk pytest software/python/tests
 ```
 
@@ -73,6 +77,8 @@ throughput, or energy from software artifacts.
 - `software/python/spikepress/`: SpikePress software package
 - `golden_traces/v1/`: deterministic architecture-neutral traces
 - `scripts/check_ednp_batch0_1a.py`: contract/artifact checker
+- `scripts/check_verifier_gate.py`: board-free verifier gate checker
+- `scripts/run_spikemold_pynq_one_shot.py`: PYNQ one-shot runtime CLI
 - `reports/`: current gate reports
 
 ## License

@@ -1,6 +1,6 @@
 # Batch 1A Software Foundation Report
 
-Status: initial artifacts generated
+Status: verifier gate complete
 
 ## Generated
 
@@ -24,4 +24,9 @@ Integer golden trace generation only. No HLS, RTL, or board claim.
 
 ## Remaining Batch 1A Work
 
-- verifier gate review
+- None for the current board-free Batch 1A slice.
+
+## Verifier
+
+- `reports/verifier_gate_review.md`
+- `scripts/check_verifier_gate.py`

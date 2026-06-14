@@ -8,6 +8,7 @@ This repository now uses SpikePress and SpikeMold names only.
 - Hardware/backend name: `spikemold` or `SpikeMold`
 - Do not add references to removed package names.
 - Do not reintroduce removed experiment paths into the EDNP mainline.
+- Do not add STDP/R-STDP or on-chip learning into the current EDNP mainline.
 
 ## Environment
 
@@ -43,5 +44,6 @@ For current Batch 0/1A work:
 ```bash
 rtk python scripts/generate_ednp_batch1a_artifacts.py
 rtk python scripts/check_ednp_batch0_1a.py
+rtk python scripts/check_verifier_gate.py
 rtk pytest software/python/tests
 ```

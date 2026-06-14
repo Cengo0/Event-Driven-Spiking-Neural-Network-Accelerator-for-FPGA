@@ -40,6 +40,12 @@ from .spikemold_runtime_contract import (
     build_spikemold_runtime_contract,
     build_spikemold_runtime_resource_report,
 )
+from .pynq_runtime import (
+    PYNQ_ONESHOT_SCHEMA,
+    SpikeMoldPynqRunConfig,
+    SpikeMoldPynqRunResult,
+    run_spikemold_pynq_one_shot,
+)
 from .network import (
     CompiledSpikePressTopology,
     SpikePressNeuronPopulation,
@@ -71,6 +77,7 @@ __all__ = [
     "SPIKEMOLD_RUNTIME_BACKEND_ID",
     "SPIKEMOLD_RUNTIME_CONTRACT_SCHEMA",
     "SPIKEMOLD_RUNTIME_RESOURCE_REPORT_SCHEMA",
+    "PYNQ_ONESHOT_SCHEMA",
     "CompiledSpikePressTopology",
     "SpikePressNetwork",
     "SpikePressNeuronPopulation",
@@ -78,6 +85,8 @@ __all__ = [
     "SpikePressProjectionInfo",
     "REGISTER_OFFSETS",
     "SpikeMoldEDNPArtifact",
+    "SpikeMoldPynqRunConfig",
+    "SpikeMoldPynqRunResult",
     "SpikeMoldRuntimeCounters",
     "SpikePressCompileResult",
     "SpikePressFCLIFLayer",
@@ -102,6 +111,7 @@ __all__ = [
     "run_dma_loopback",
     "run_ednp_mini_fc_lif_smoke",
     "run_eventword64_counter_smoke",
+    "run_spikemold_pynq_one_shot",
     "summarize_trace_budgets",
     "write_spikemold_ednp_artifact",
 ]
