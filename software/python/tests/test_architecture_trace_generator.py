@@ -1,0 +1,85 @@
+import json
+
+from snn_fpga_accelerator.architecture_trace_generator import (
+    TRACE_SCHEMA,
+    InputSpike,
+    generate_eventconv_trace,
+    generate_fc_lif_trace,
+    pack_event_word64,
+)
+
+
+def test_fc_lif_trace_is_deterministic_and_hashes():
+    trace = generate_fc_lif_trace(
+        input_spikes=[
+            InputSpike(tick=1, src_id=1),
+            InputSpike(tick=0, src_id=0),
+            InputSpike(tick=2, src_id=0),
+        ],
+        weights={(0, 10): 3, (1, 10): 2},
+        thresholds={10: 5},
+    ).to_dict()
+
+    assert trace["schema"] == TRACE_SCHEMA
+    assert trace["counters"]["input_event_count"] == 3
+    assert trace["counters"]["generated_update_count"] == 3
+    assert trace["counters"]["commit_count"] == 1
+    assert trace["counters"]["python_inner_loop_steps"] == 0
+    assert trace["counters"]["ddr_bytes_inner_loop"] == 0
+    assert trace["final_state"]["10"] == 3
+    assert len(trace["hashes"]["trace_sha256"]) == 64
+
+
+def test_eventconv_trace_uses_shared_kernel_agu_semantics():
+    trace = generate_eventconv_trace(
+        input_spikes=[InputSpike(tick=0, src_id=0, y=1, x=1, channel=0)],
+        kernel=[[[[1, 2], [3, 4]]]],
+        input_shape=(1, 3, 3),
+        stride=1,
+        padding=0,
+        thresholds={0: 1},
+    ).to_dict()
+
+    assert trace["metadata"]["primitive"] == "eventconv_agu"
+    assert trace["metadata"]["weight_storage"] == "shared_kernel"
+    assert trace["metadata"]["output_shape"] == [1, 2, 2]
+    assert trace["counters"]["generated_update_count"] == 4
+    assert trace["counters"]["active_neuron_count"] == 4
+    assert trace["counters"]["commit_count"] == 1
+
+
+def test_trace_json_roundtrip(tmp_path):
+    path = tmp_path / "trace.json"
+    trace = generate_fc_lif_trace(
+        input_spikes=[InputSpike(tick=0, src_id=0)],
+        weights={(0, 1): 7},
+        thresholds={1: 99},
+    )
+    trace.write_json(path)
+
+    loaded = json.loads(path.read_text(encoding="utf-8"))
+    assert loaded["schema"] == TRACE_SCHEMA
+    assert loaded["updates"][0]["weight"] == 7
+
+
+def test_eventword64_pack_matches_contract_fields():
+    word = pack_event_word64(
+        event_type=1,
+        tick=0x1234,
+        src_y_or_hi=0x155,
+        src_x_or_lo=0x2AA,
+        channel_or_dst_hi=0x5A,
+        signed_weight=-7,
+        flags=0x2A,
+        target=0x15,
+    )
+
+    assert (word >> 60) & 0xF == 1
+    assert (word >> 48) & 0xFFF == 0x234
+    assert (word >> 38) & 0x3FF == 0x155
+    assert (word >> 28) & 0x3FF == 0x2AA
+    assert (word >> 20) & 0xFF == 0x5A
+    assert (word >> 19) & 0x1 == 1
+    assert (word >> 11) & 0xFF == 7
+    assert (word >> 5) & 0x3F == 0x2A
+    assert word & 0x1F == 0x15

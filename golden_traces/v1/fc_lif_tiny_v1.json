@@ -1,0 +1,96 @@
+{
+  "commits": [
+    {
+      "dst_id": 10,
+      "kind": "commit",
+      "tick": 1,
+      "value": 5
+    }
+  ],
+  "counters": {
+    "active_neuron_count": 2,
+    "commit_count": 1,
+    "ddr_bytes_inner_loop": 0,
+    "generated_update_count": 5,
+    "input_event_count": 3,
+    "python_inner_loop_steps": 0,
+    "state_reads": 5,
+    "state_writes": 6
+  },
+  "final_state": {
+    "10": 3,
+    "11": 2
+  },
+  "hashes": {
+    "commits_sha256": "30de5eca3b8968a9d86fc09a48fb5e2ed5f1af122142338a69d7672c3aeb394a",
+    "final_state_sha256": "3157a79e6d8094094777ae6cd59e858b4c889327db95c7e3db410034490ba235",
+    "input_sha256": "4f53352986544abce855aaf7fa666337bce0ef50a3d344c70e9559d593a8e451",
+    "trace_sha256": "467d089ebbcafa7c874e3e0d30a5552dd1572fd89393b0418fc798143bb364ca",
+    "updates_sha256": "226ed8970a51f20b88ef0da96a30bec45b5cbd64190184670d22cdd3ee654028"
+  },
+  "inputs": [
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 0,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 1,
+      "tick": 1
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 0,
+      "tick": 2
+    }
+  ],
+  "metadata": {
+    "primitive": "fc_lif",
+    "reset_mode": "zero",
+    "weight_storage": "explicit_sparse"
+  },
+  "schema": "ednp.trace.v1",
+  "target": "architecture-neutral",
+  "trace_id": "fc_lif_tiny_v1",
+  "updates": [
+    {
+      "dst_id": 10,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 3
+    },
+    {
+      "dst_id": 11,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 10,
+      "kind": "synaptic_update",
+      "src_id": 1,
+      "tick": 1,
+      "weight": 2
+    },
+    {
+      "dst_id": 10,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 2,
+      "weight": 3
+    },
+    {
+      "dst_id": 11,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 2,
+      "weight": 1
+    }
+  ]
+}
