@@ -144,7 +144,7 @@ def check_batch1a() -> None:
             fail(f"missing report: {report}")
 
 
-def check_legacy_dependencies_excluded() -> None:
+def check_removed_api_dependencies_excluded() -> None:
     banned = [
         "snn" + "_fpga" + "_accelerator",
         "Neuron" + "Group",
@@ -165,13 +165,13 @@ def check_legacy_dependencies_excluded() -> None:
         text = path.read_text(encoding="utf-8")
         for token in banned:
             if token in text:
-                fail(f"legacy dependency found in {path}: {token}")
+                fail(f"removed API dependency found in {path}: {token}")
 
 
 def main() -> int:
     check_contracts()
     check_batch1a()
-    check_legacy_dependencies_excluded()
+    check_removed_api_dependencies_excluded()
     print("PASS: EDNP Batch 0 + initial Batch 1A artifacts valid")
     return 0
 

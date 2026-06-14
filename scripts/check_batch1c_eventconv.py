@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check Batch 1C EventConv C0/C1 artifacts."""
+"""Check Batch 1C EventConv C0/C1/C2 artifacts."""
 
 from __future__ import annotations
 
@@ -20,6 +20,8 @@ TRACE_PATH = ROOT / "golden_traces" / "v1" / "eventconv_agu_c0_tiny_v1.json"
 REPORT_PATH = ROOT / "reports" / "batch_1c_eventconv_primitive_report.md"
 RTL_PATH = ROOT / "hardware" / "hdl" / "rtl" / "core" / "spike_conv_agu.v"
 TB_PATH = ROOT / "hardware" / "hdl" / "tb" / "tb_spike_conv_agu.v"
+STATE_RTL_PATH = ROOT / "hardware" / "hdl" / "rtl" / "core" / "spike_conv_state_update.v"
+STATE_TB_PATH = ROOT / "hardware" / "hdl" / "tb" / "tb_spike_conv_state_update.v"
 
 
 def fail(message: str) -> None:
@@ -51,7 +53,7 @@ def check_trace_hashes(trace: dict) -> None:
 
 
 def main() -> int:
-    for path in [TRACE_PATH, REPORT_PATH, RTL_PATH, TB_PATH]:
+    for path in [TRACE_PATH, REPORT_PATH, RTL_PATH, TB_PATH, STATE_RTL_PATH, STATE_TB_PATH]:
         if not path.exists():
             fail(f"missing artifact: {path}")
 
@@ -114,19 +116,44 @@ def main() -> int:
         if phrase not in tb:
             fail(f"testbench missing phrase: {phrase}")
 
+    state_rtl = STATE_RTL_PATH.read_text(encoding="utf-8")
+    for token in [
+        "module spike_conv_state_update",
+        "state_checksum",
+        "active_mask",
+        "state_read_count",
+        "invalid_dest_count",
+    ]:
+        if token not in state_rtl:
+            fail(f"state RTL missing token: {token}")
+
+    state_tb = STATE_TB_PATH.read_text(encoding="utf-8")
+    for phrase in [
+        "C2 state update consumed four updates",
+        "C2 state[0] matches trace",
+        "C2 state checksum matches trace",
+        "C2 active mask matches trace",
+        "*** ALL TESTS PASSED ***",
+    ]:
+        if phrase not in state_tb:
+            fail(f"state testbench missing phrase: {phrase}")
+
     report = REPORT_PATH.read_text(encoding="utf-8")
     for phrase in [
         "Batch 1C EventConv Primitive Report",
         "C0 trace-locked tiny case",
         "C1 AGU-only",
+        "C2 AGU + state update",
+        "state checksum",
         "No board execution was run",
         "19 PASS, 0 FAIL",
+        "14 PASS, 0 FAIL",
     ]:
         if phrase not in report:
             fail(f"report missing phrase: {phrase}")
 
     check_trace_hashes(trace)
-    print("PASS: Batch 1C EventConv C0/C1 artifacts valid")
+    print("PASS: Batch 1C EventConv C0/C1/C2 artifacts valid")
     return 0
 
 

@@ -7,9 +7,10 @@ hardware/hdl/rtl/core/core_group.v
 hardware/hdl/rtl/core/event_router_ng.v
 hardware/hdl/rtl/core/synaptic_connectivity_table.v
 
-# Optional: Spike Convolution Layer (Loihi-style)
-# Uncomment to enable convolutional connectivity support with shared weights
+# Optional: EventConv primitive sources for shared-kernel AGU experiments.
+# Keep these board-free until the trace-locked C-gates promote them into fabric.
 # hardware/hdl/rtl/core/spike_conv_agu.v
+# hardware/hdl/rtl/core/spike_conv_state_update.v
 # hardware/hdl/rtl/core/spike_conv_connectivity_table.v
 # hardware/hdl/rtl/core/spike_conv_layer.v
 

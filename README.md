@@ -19,11 +19,11 @@ Active path:
 - SpikeMold-EDNP artifact JSON roundtrip
 - Batch 0/1A contract verification
 - Batch 1B software transport smoke
-- Batch 1C EventConv AGU C0/C1 RTL smoke
+- Batch 1C EventConv AGU/state C0/C1/C2 RTL smoke
 
 Out of scope for the current EDNP mainline:
 
-- legacy HW/SW API
+- removed pre-EDNP HW/SW API
 - Python-controlled inner loops as runtime architecture
 
 ## Quick Check

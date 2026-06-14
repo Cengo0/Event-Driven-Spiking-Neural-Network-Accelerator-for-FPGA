@@ -1,6 +1,6 @@
 #!/bin/bash
 #=============================================================================
-# Run all SNN Core Group testbenches using Vivado xsim
+# Run SpikeMold core-group testbenches using Vivado xsim
 # Usage: bash run_testbenches.sh
 #=============================================================================
 set -o pipefail
@@ -102,6 +102,11 @@ run_test "spike_out_bridge" \
 run_test "spike_conv_agu" \
     "$TB_DIR/tb_spike_conv_agu.v" \
     "$RTL_DIR/core/spike_conv_agu.v"
+
+run_test "spike_conv_state_update" \
+    "$TB_DIR/tb_spike_conv_state_update.v" \
+    "$RTL_DIR/core/spike_conv_agu.v" \
+    "$RTL_DIR/core/spike_conv_state_update.v"
 
 #-----------------------------------------------------------------------------
 # Test 1: Core Group

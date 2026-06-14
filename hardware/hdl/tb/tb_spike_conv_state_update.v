@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module tb_spike_conv_agu;
+module tb_spike_conv_state_update;
     localparam KERNEL_SIZE = 2;
     localparam INPUT_WIDTH = 3;
     localparam INPUT_HEIGHT = 3;
@@ -10,31 +10,39 @@ module tb_spike_conv_agu;
     localparam PADDING = 0;
     localparam KERNEL_WEIGHT_BITS = 8;
     localparam KERNEL_WORDS = OUTPUT_CHANNELS * NUM_CHANNELS * KERNEL_SIZE * KERNEL_SIZE;
+    localparam STATE_COUNT = 4;
+    localparam STATE_WIDTH = 16;
 
     reg clk = 1'b0;
     always #6.25 clk = ~clk;
 
     reg rst_n;
     reg enable;
+    reg clear;
     reg s_axis_spike_tvalid;
     reg [31:0] s_axis_spike_tdata;
     wire s_axis_spike_tready;
-    wire m_axis_spike_tvalid;
-    wire [31:0] m_axis_spike_tdata;
-    reg m_axis_spike_tready;
+    wire update_tvalid;
+    wire [31:0] update_tdata;
+    wire update_tready;
+    wire signed [KERNEL_WEIGHT_BITS-1:0] update_weight;
     wire [KERNEL_WEIGHT_BITS-1:0] kernel_weight_out;
     reg [(KERNEL_WORDS*KERNEL_WEIGHT_BITS)-1:0] kernel_weight_flat;
     wire [31:0] conv_spikes_processed;
     wire [31:0] conv_updates_generated;
     wire [31:0] conv_address_errors;
+    wire [(STATE_COUNT*STATE_WIDTH)-1:0] state_flat;
+    wire [STATE_COUNT-1:0] active_mask;
+    wire [31:0] active_neuron_count;
+    wire [31:0] state_read_count;
+    wire [31:0] state_write_count;
+    wire [31:0] update_count;
+    wire [31:0] invalid_dest_count;
+    wire signed [31:0] state_checksum;
 
     integer pass_count = 0;
     integer fail_count = 0;
-    integer outputs_seen;
     integer cycles;
-    reg [15:0] expected_dest [0:3];
-    reg [15:0] expected_weight_idx [0:3];
-    reg [7:0] expected_weight [0:3];
 
     spike_conv_agu #(
         .KERNEL_SIZE(KERNEL_SIZE),
@@ -45,21 +53,47 @@ module tb_spike_conv_agu;
         .STRIDE(STRIDE),
         .PADDING(PADDING),
         .KERNEL_WEIGHT_BITS(KERNEL_WEIGHT_BITS)
-    ) dut (
+    ) u_agu (
         .clk(clk),
         .rst_n(rst_n),
         .enable(enable),
         .s_axis_spike_tvalid(s_axis_spike_tvalid),
         .s_axis_spike_tdata(s_axis_spike_tdata),
         .s_axis_spike_tready(s_axis_spike_tready),
-        .m_axis_spike_tvalid(m_axis_spike_tvalid),
-        .m_axis_spike_tdata(m_axis_spike_tdata),
-        .m_axis_spike_tready(m_axis_spike_tready),
+        .m_axis_spike_tvalid(update_tvalid),
+        .m_axis_spike_tdata(update_tdata),
+        .m_axis_spike_tready(update_tready),
         .kernel_weight_out(kernel_weight_out),
         .kernel_weight_flat(kernel_weight_flat),
         .conv_spikes_processed(conv_spikes_processed),
         .conv_updates_generated(conv_updates_generated),
         .conv_address_errors(conv_address_errors)
+    );
+
+    assign update_weight = kernel_weight_out;
+
+    spike_conv_state_update #(
+        .STATE_COUNT(STATE_COUNT),
+        .DEST_ID_WIDTH(16),
+        .STATE_WIDTH(STATE_WIDTH),
+        .WEIGHT_WIDTH(KERNEL_WEIGHT_BITS)
+    ) u_state (
+        .clk(clk),
+        .rst_n(rst_n),
+        .enable(enable),
+        .clear(clear),
+        .s_axis_update_tvalid(update_tvalid),
+        .s_axis_update_tdata(update_tdata),
+        .update_weight(update_weight),
+        .s_axis_update_tready(update_tready),
+        .state_flat(state_flat),
+        .active_mask(active_mask),
+        .active_neuron_count(active_neuron_count),
+        .state_read_count(state_read_count),
+        .state_write_count(state_write_count),
+        .update_count(update_count),
+        .invalid_dest_count(invalid_dest_count),
+        .state_checksum(state_checksum)
     );
 
     task automatic check;
@@ -80,9 +114,9 @@ module tb_spike_conv_agu;
         begin
             rst_n = 1'b0;
             enable = 1'b0;
+            clear = 1'b0;
             s_axis_spike_tvalid = 1'b0;
             s_axis_spike_tdata = 32'd0;
-            m_axis_spike_tready = 1'b0;
             repeat (4) @(posedge clk);
             @(negedge clk);
             rst_n = 1'b1;
@@ -101,7 +135,7 @@ module tb_spike_conv_agu;
             s_axis_spike_tdata = {x, y, channel, 8'd0};
             s_axis_spike_tvalid = 1'b1;
             @(posedge clk);
-            check("input spike accepted in idle", s_axis_spike_tready == 1'b1);
+            check("input spike accepted by AGU", s_axis_spike_tready == 1'b1);
             @(negedge clk);
             s_axis_spike_tvalid = 1'b0;
         end
@@ -109,49 +143,30 @@ module tb_spike_conv_agu;
 
     initial begin
         kernel_weight_flat = {8'd4, 8'd3, 8'd2, 8'd1};
-        expected_dest[0] = 16'd3;
-        expected_dest[1] = 16'd2;
-        expected_dest[2] = 16'd1;
-        expected_dest[3] = 16'd0;
-        expected_weight_idx[0] = 16'd0;
-        expected_weight_idx[1] = 16'd1;
-        expected_weight_idx[2] = 16'd2;
-        expected_weight_idx[3] = 16'd3;
-        expected_weight[0] = 8'd1;
-        expected_weight[1] = 8'd2;
-        expected_weight[2] = 8'd3;
-        expected_weight[3] = 8'd4;
-
         reset_dut();
-
-        check("AGU starts idle-ready", s_axis_spike_tready == 1'b1);
         send_spike(8'd1, 8'd1, 8'd0);
 
-        m_axis_spike_tready = 1'b1;
-        outputs_seen = 0;
         cycles = 0;
-        while (outputs_seen < 4 && cycles < 40) begin
+        while (update_count < 4 && cycles < 64) begin
             @(posedge clk);
-            #1;
-            if (m_axis_spike_tvalid) begin
-                check("trace-locked destination id",
-                      m_axis_spike_tdata[31:16] == expected_dest[outputs_seen]);
-                check("trace-locked weight index",
-                      m_axis_spike_tdata[15:0] == expected_weight_idx[outputs_seen]);
-                check("selected shared-kernel weight",
-                      kernel_weight_out == expected_weight[outputs_seen]);
-                outputs_seen = outputs_seen + 1;
-            end
             cycles = cycles + 1;
         end
-
-        check("AGU emitted four trace updates", outputs_seen == 4);
-        repeat (4) @(posedge clk);
+        repeat (2) @(posedge clk);
         #1;
-        check("AGU returns to idle after scan", s_axis_spike_tready == 1'b1 && !m_axis_spike_tvalid);
-        check("input spike counter matches trace", conv_spikes_processed == 32'd1);
-        check("generated update counter matches trace", conv_updates_generated == 32'd4);
-        check("center tiny case has no address errors", conv_address_errors == 32'd0);
+
+        check("C2 AGU generated four updates", conv_updates_generated == 32'd4);
+        check("C2 state update consumed four updates", update_count == 32'd4);
+        check("C2 state reads match trace", state_read_count == 32'd4);
+        check("C2 state writes match trace", state_write_count == 32'd4);
+        check("C2 active count matches trace", active_neuron_count == 32'd4);
+        check("C2 no invalid destination", invalid_dest_count == 32'd0);
+        check("C2 no AGU address errors", conv_address_errors == 32'd0);
+        check("C2 state[0] matches trace", state_flat[0*STATE_WIDTH +: STATE_WIDTH] == 16'd4);
+        check("C2 state[1] matches trace", state_flat[1*STATE_WIDTH +: STATE_WIDTH] == 16'd3);
+        check("C2 state[2] matches trace", state_flat[2*STATE_WIDTH +: STATE_WIDTH] == 16'd2);
+        check("C2 state[3] matches trace", state_flat[3*STATE_WIDTH +: STATE_WIDTH] == 16'd1);
+        check("C2 state checksum matches trace", state_checksum == 32'sd10);
+        check("C2 active mask matches trace", active_mask == 4'b1111);
 
         $display("Results: %0d PASS, %0d FAIL", pass_count, fail_count);
         if (fail_count == 0) begin
