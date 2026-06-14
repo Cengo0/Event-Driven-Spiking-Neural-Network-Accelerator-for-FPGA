@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from typing import Dict, Mapping, Tuple
+from typing import Dict, Iterable, Mapping, Tuple
 
 
 @dataclass(frozen=True)
@@ -99,5 +99,19 @@ def summarize_trace_budgets(
         "schema": "ednp.event_budget.v1",
         "recommended_m3_config": recommended_m3_config(),
         "all_ok": all(result["ok"] for result in results.values()),
+        "counter_histogram": build_counter_histogram(trace.get("counters", {}) for trace in traces.values()),
         "trace_results": results,
     }
+
+
+def build_counter_histogram(counter_sets: Iterable[Mapping[str, object]]) -> Dict[str, Dict[str, int]]:
+    histogram: Dict[str, Dict[str, int]] = {}
+    for counters_obj in counter_sets:
+        counters = {str(k): int(v) for k, v in counters_obj.items()}
+        for key, value in counters.items():
+            if key not in histogram:
+                histogram[key] = {"min": value, "max": value, "total": 0}
+            histogram[key]["min"] = min(histogram[key]["min"], value)
+            histogram[key]["max"] = max(histogram[key]["max"], value)
+            histogram[key]["total"] += value
+    return histogram

@@ -7,8 +7,7 @@ Status: initial artifacts generated
 - `golden_traces/v1/fc_lif_tiny_v1.json`
 - `golden_traces/v1/eventconv_8x8_tiny_v1.json`
 - `outputs/event_budget/recommended_m3_config.json`
-- `software/python/snn_fpga_accelerator/event_budget.py`
-- `software/python/snn_fpga_accelerator/ednp_artifact.py`
+- `software/python/spikepress/`
 
 ## Evidence Level
 
@@ -19,11 +18,10 @@ Integer golden trace generation only. No HLS, RTL, or board claim.
 - FC-LIF tiny deterministic trace
 - shared-kernel EventConv AGU tiny deterministic trace
 - event/update/active/state counter budget
-- reusable event budget pass/reject validator
-- minimal EDNP compiler artifact JSON roundtrip
+- inference-only SpikePress API and compiler artifact path
+- event counter histogram
+- compiler artifact JSON roundtrip
 
 ## Remaining Batch 1A Work
 
-- minimal SpikePress native API contract test
-- broader event budget histogram
 - verifier gate review

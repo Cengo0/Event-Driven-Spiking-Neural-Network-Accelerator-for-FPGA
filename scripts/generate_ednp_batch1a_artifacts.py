@@ -13,12 +13,12 @@ PYTHON_ROOT = ROOT / "software" / "python"
 if str(PYTHON_ROOT) not in sys.path:
     sys.path.insert(0, str(PYTHON_ROOT))
 
-from snn_fpga_accelerator.architecture_trace_generator import (  # noqa: E402
+from spikepress.architecture_trace_generator import (  # noqa: E402
     InputSpike,
     generate_eventconv_trace,
     generate_fc_lif_trace,
 )
-from snn_fpga_accelerator.event_budget import summarize_trace_budgets  # noqa: E402
+from spikepress.event_budget import summarize_trace_budgets  # noqa: E402
 
 
 def main() -> int:
@@ -75,6 +75,7 @@ Status: initial artifacts generated
 - `golden_traces/v1/fc_lif_tiny_v1.json`
 - `golden_traces/v1/eventconv_8x8_tiny_v1.json`
 - `outputs/event_budget/recommended_m3_config.json`
+- `software/python/spikepress/`
 
 ## Evidence Level
 
@@ -85,12 +86,12 @@ Integer golden trace generation only. No HLS, RTL, or board claim.
 - FC-LIF tiny deterministic trace
 - shared-kernel EventConv AGU tiny deterministic trace
 - event/update/active/state counter budget
+- inference-only SpikePress API and compiler artifact path
+- event counter histogram
+- compiler artifact JSON roundtrip
 
 ## Remaining Batch 1A Work
 
-- minimal SpikePress native API contract test
-- compiler artifact roundtrip test
-- broader event budget histogram
 - verifier gate review
 """
     (report_dir / "batch_1a_software_foundation_report.md").write_text(report, encoding="utf-8")

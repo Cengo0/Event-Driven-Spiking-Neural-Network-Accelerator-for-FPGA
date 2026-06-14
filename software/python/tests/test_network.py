@@ -1,7 +1,7 @@
 """
-Tests for NeuronGroup-aware Network API (Phase 6.5)
+Tests for SpikePress network topology API.
 
-Validates the Brian2-style topology builder, flat weight buffer packing,
+Validates the SpikePress topology builder, flat weight buffer packing,
 and consistency with HLS weight_index().
 """
 
@@ -15,11 +15,11 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
-from software.python.snn_fpga_accelerator.network import (
+from spikepress.network import (
     NeuronGroup,
     Synapses,
-    SNNNetwork,
-    CompiledNetwork,
+    SpikePressNetwork,
+    CompiledSpikePressNetwork,
     create_mnist_network,
 )
 
@@ -66,9 +66,9 @@ class TestSynapses:
             syn.w = np.zeros((4, 2), dtype=np.int8)
 
 
-class TestSNNNetwork:
+class TestSpikePressNetwork:
     def test_compile_simple(self):
-        net = SNNNetwork()
+        net = SpikePressNetwork()
         inp = net.add_group(NeuronGroup(10, 'input'))
         hid = net.add_group(NeuronGroup(20, 'hidden'))
         out = net.add_group(NeuronGroup(5, 'output'))
@@ -82,7 +82,7 @@ class TestSNNNetwork:
         assert c.group_id_start == [0, 10, 30, 35]
 
     def test_connection_offsets(self):
-        net = SNNNetwork()
+        net = SpikePressNetwork()
         a = net.add_group(NeuronGroup(4, 'a'))
         b = net.add_group(NeuronGroup(3, 'b'))
         c = net.add_group(NeuronGroup(2, 'c'))
@@ -96,14 +96,14 @@ class TestSNNNetwork:
         assert compiled.connections[1].num_weights == 6   # 3*2
 
     def test_cannot_modify_after_compile(self):
-        net = SNNNetwork()
+        net = SpikePressNetwork()
         g = net.add_group(NeuronGroup(5, 'x'))
         net.compile()
         with pytest.raises(RuntimeError):
             net.add_group(NeuronGroup(3, 'y'))
 
     def test_unregistered_group_rejected(self):
-        net = SNNNetwork()
+        net = SpikePressNetwork()
         a = net.add_group(NeuronGroup(5, 'a'))
         orphan = NeuronGroup(3, 'orphan')
         with pytest.raises(ValueError):
@@ -113,7 +113,7 @@ class TestSNNNetwork:
 class TestPackUnpack:
     @pytest.fixture
     def compiled(self):
-        net = SNNNetwork()
+        net = SpikePressNetwork()
         a = net.add_group(NeuronGroup(3, 'a'))
         b = net.add_group(NeuronGroup(2, 'b'))
         c = net.add_group(NeuronGroup(2, 'c'))
@@ -175,7 +175,7 @@ class TestFromConfig:
     def test_from_config_matches_constants(self):
         """Network from HW config must produce identical buffer sizes."""
         try:
-            net = SNNNetwork.from_config()
+            net = SpikePressNetwork.from_config()
         except RuntimeError:
             pytest.skip("config.generated.snn_params not available")
         c = net.compile()

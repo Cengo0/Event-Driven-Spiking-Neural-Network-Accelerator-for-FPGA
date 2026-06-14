@@ -10,7 +10,7 @@ from typing import Dict, Mapping, Sequence
 
 import numpy as np
 
-from .network import CompiledNetwork
+from .network import CompiledSpikePressNetwork
 
 
 ARTIFACT_SCHEMA = "ednp.artifact.v1"
@@ -35,7 +35,7 @@ class EDNPArtifact:
 
 
 def build_ednp_artifact(
-    compiled: CompiledNetwork,
+    compiled: CompiledSpikePressNetwork,
     weight_dict: Mapping[str, np.ndarray],
     *,
     target: str = "pynq-z2",
@@ -125,4 +125,3 @@ def read_ednp_artifact(path: Path) -> EDNPArtifact:
     if expected_artifact_hash != _sha256_bytes(_canonical_json(manifest_without_artifact_hash).encode("utf-8")):
         raise ValueError("artifact hash mismatch")
     return EDNPArtifact(manifest=manifest, flat_weights=flat)
-

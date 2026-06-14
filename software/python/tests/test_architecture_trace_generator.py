@@ -1,13 +1,13 @@
 import json
 
-from snn_fpga_accelerator.architecture_trace_generator import (
+from spikepress.architecture_trace_generator import (
     TRACE_SCHEMA,
     InputSpike,
     generate_eventconv_trace,
     generate_fc_lif_trace,
     pack_event_word64,
 )
-from snn_fpga_accelerator.event_budget import (
+from spikepress.event_budget import (
     EventBudgetLimits,
     evaluate_trace_budget,
     recommended_m3_config,

@@ -13,9 +13,16 @@ PYTHON_ROOT = ROOT / "software" / "python"
 if str(PYTHON_ROOT) not in sys.path:
     sys.path.insert(0, str(PYTHON_ROOT))
 
-from snn_fpga_accelerator.architecture_trace_generator import TRACE_SCHEMA, sha256_json  # noqa: E402
-from snn_fpga_accelerator.event_budget import evaluate_trace_budget  # noqa: E402
+from spikepress.architecture_trace_generator import TRACE_SCHEMA, sha256_json  # noqa: E402
+from spikepress.event_budget import evaluate_trace_budget  # noqa: E402
 
+
+EDNP_SOURCE_FILES = [
+    ROOT / "software" / "python" / "spikepress" / "architecture_trace_generator.py",
+    ROOT / "software" / "python" / "spikepress" / "ednp_artifact.py",
+    ROOT / "software" / "python" / "spikepress" / "event_budget.py",
+    ROOT / "software" / "python" / "spikepress" / "api.py",
+]
 
 REQUIRED_CONTRACTS = [
     "ARCHITECTURE_CONTRACT_V1.md",
@@ -126,6 +133,8 @@ def check_batch1a() -> None:
         fail("event budget schema mismatch")
     if budget_json.get("all_ok") is not True:
         fail("event budget all_ok is not true")
+    if "counter_histogram" not in budget_json:
+        fail("event budget missing counter_histogram")
 
     for report in [
         ROOT / "reports" / "batch_0_contract_freeze_report.md",
@@ -135,13 +144,26 @@ def check_batch1a() -> None:
             fail(f"missing report: {report}")
 
 
+def check_legacy_dependencies_excluded() -> None:
+    banned = [
+        "snn" + "_fpga" + "_accelerator",
+    ]
+    for path in EDNP_SOURCE_FILES:
+        if not path.exists():
+            fail(f"missing EDNP source file: {path}")
+        text = path.read_text(encoding="utf-8")
+        for token in banned:
+            if token in text:
+                fail(f"legacy dependency found in {path}: {token}")
+
+
 def main() -> int:
     check_contracts()
     check_batch1a()
+    check_legacy_dependencies_excluded()
     print("PASS: EDNP Batch 0 + initial Batch 1A artifacts valid")
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

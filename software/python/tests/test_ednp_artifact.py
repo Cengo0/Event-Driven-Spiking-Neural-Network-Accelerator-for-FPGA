@@ -1,16 +1,16 @@
 import numpy as np
 
-from snn_fpga_accelerator.ednp_artifact import (
+from spikepress.ednp_artifact import (
     ARTIFACT_SCHEMA,
     build_ednp_artifact,
     read_ednp_artifact,
     write_ednp_artifact,
 )
-from snn_fpga_accelerator.network import NeuronGroup, SNNNetwork, Synapses
+from spikepress.network import NeuronGroup, SpikePressNetwork, Synapses
 
 
 def _tiny_compiled_network():
-    net = SNNNetwork()
+    net = SpikePressNetwork()
     src = net.add_group(NeuronGroup(2, "input"))
     dst = net.add_group(NeuronGroup(3, "output"))
     net.add_synapses(Synapses(src, dst, name="input_to_output"))

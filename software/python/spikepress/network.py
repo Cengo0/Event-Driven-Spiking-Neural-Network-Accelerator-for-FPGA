@@ -1,18 +1,15 @@
-"""
-NeuronGroup-aware Network API (Brian2-style)
+"""SpikePress network topology compiler.
 
-Provides a high-level API for defining SNN topologies with explicit
-NeuronGroup connections, matching the Brian2 programming model.
-
-The flat weight buffer layout is computed at compile time and maps
-directly to the HLS weight_memory[] flat buffer.
+Provides a small API for defining EDNP-compatible SNN topologies with explicit
+NeuronGroup connections. The flat weight buffer layout is computed at compile
+time and maps to the SpikeMold hardware artifact contract.
 
 Example:
-    >>> from snn_fpga_accelerator.network import NeuronGroup, Synapses, SNNNetwork
+    >>> from spikepress.network import NeuronGroup, Synapses, SpikePressNetwork
     >>> inp = NeuronGroup(784, name='input')
     >>> hid = NeuronGroup(2048, name='hidden')
     >>> out = NeuronGroup(10, name='output')
-    >>> net = SNNNetwork()
+    >>> net = SpikePressNetwork()
     >>> net.add_group(inp)
     >>> net.add_group(hid)
     >>> net.add_group(out)
@@ -52,25 +49,25 @@ except ImportError:
 
 
 # =============================================================================
-# NeuronGroup — Brian2-style neuron population
+# NeuronGroup
 # =============================================================================
 class NeuronGroup:
-    """A population of neurons, analogous to Brian2's NeuronGroup."""
+    """A population of logical neurons."""
 
     def __init__(self, n: int, name: str = ""):
         if n <= 0:
             raise ValueError(f"NeuronGroup size must be positive, got {n}")
         self.n = n
         self.name = name
-        self._group_index: Optional[int] = None  # set by SNNNetwork.add_group
-        self._id_start: Optional[int] = None      # set by SNNNetwork.compile
+        self._group_index: Optional[int] = None  # set by SpikePressNetwork.add_group
+        self._id_start: Optional[int] = None      # set by SpikePressNetwork.compile
 
     def __repr__(self):
         return f"NeuronGroup(n={self.n}, name='{self.name}')"
 
 
 # =============================================================================
-# Synapses — Brian2-style synaptic connection between two groups
+# Synapses
 # =============================================================================
 class Synapses:
     """A synaptic connection from src NeuronGroup to dst NeuronGroup.
@@ -83,8 +80,8 @@ class Synapses:
         self.dst = dst
         self.name = name or f"{src.name}_to_{dst.name}"
         self._weights: Optional[np.ndarray] = None  # (src.n, dst.n), int8
-        self._conn_index: Optional[int] = None       # set by SNNNetwork
-        self._weight_offset: Optional[int] = None     # set by SNNNetwork.compile
+        self._conn_index: Optional[int] = None       # set by SpikePressNetwork
+        self._weight_offset: Optional[int] = None     # set by SpikePressNetwork.compile
 
     @property
     def w(self) -> np.ndarray:
@@ -131,7 +128,7 @@ class ConnectionInfo:
 
 
 @dataclass
-class CompiledNetwork:
+class CompiledSpikePressNetwork:
     """Compiled network topology with flat weight buffer layout."""
     groups: List[NeuronGroup]
     connections: List[ConnectionInfo]
@@ -244,13 +241,13 @@ class CompiledNetwork:
 
 
 # =============================================================================
-# SNNNetwork — Brian2-style network builder
+# SpikePressNetwork
 # =============================================================================
-class SNNNetwork:
+class SpikePressNetwork:
     """Network definition that compiles to a flat weight buffer layout.
 
     Usage:
-        net = SNNNetwork()
+        net = SpikePressNetwork()
         net.add_group(NeuronGroup(784, 'input'))
         net.add_group(NeuronGroup(2048, 'hidden'))
         net.add_group(NeuronGroup(10, 'output'))
@@ -262,7 +259,7 @@ class SNNNetwork:
     def __init__(self):
         self._groups: List[NeuronGroup] = []
         self._synapses: List[Synapses] = []
-        self._compiled: Optional[CompiledNetwork] = None
+        self._compiled: Optional[CompiledSpikePressNetwork] = None
 
     def add_group(self, group: NeuronGroup) -> NeuronGroup:
         """Add a NeuronGroup to the network. Returns the group for chaining."""
@@ -284,7 +281,7 @@ class SNNNetwork:
         self._synapses.append(syn)
         return syn
 
-    def compile(self) -> CompiledNetwork:
+    def compile(self) -> CompiledSpikePressNetwork:
         """Compile the network topology into a flat weight buffer layout.
 
         Computes group ID start offsets and connection weight offsets.
@@ -324,7 +321,7 @@ class SNNNetwork:
             ))
             weight_offset += num_w
 
-        self._compiled = CompiledNetwork(
+        self._compiled = CompiledSpikePressNetwork(
             groups=self._groups,
             connections=conn_infos,
             group_id_start=group_id_start,
@@ -334,7 +331,7 @@ class SNNNetwork:
         return self._compiled
 
     @staticmethod
-    def from_config() -> 'SNNNetwork':
+    def from_config() -> "SpikePressNetwork":
         """Create a network from the hardware-generated configuration.
 
         Uses config/generated/snn_params.py constants to rebuild
@@ -352,7 +349,7 @@ class SNNNetwork:
             CONNECTIONS as HW_CONNS,
         )
 
-        net = SNNNetwork()
+        net = SpikePressNetwork()
         groups = []
         for name, size in zip(NEURON_GROUP_NAMES, NEURON_GROUP_SIZES):
             g = NeuronGroup(size, name=name)
@@ -379,7 +376,7 @@ class SNNNetwork:
 
     def summary(self) -> str:
         """Human-readable summary of the network topology."""
-        lines = ["SNN Network Summary", "=" * 40]
+        lines = ["SpikePress Network Summary", "=" * 40]
 
         lines.append(f"\nNeuronGroups ({len(self._groups)}):")
         for i, g in enumerate(self._groups):
@@ -408,20 +405,20 @@ class SNNNetwork:
 # =============================================================================
 # Convenience: create the default MNIST network topology
 # =============================================================================
-def create_mnist_network(n_hidden: int = 2048) -> SNNNetwork:
+def create_mnist_network(n_hidden: int = 2048) -> SpikePressNetwork:
     """Create the standard MNIST 3-layer SNN network (fully-connected).
 
     Args:
         n_hidden: Number of hidden layer neurons (default: 2048)
 
     Returns:
-        SNNNetwork ready to compile.
+        SpikePressNetwork ready to compile.
 
     Note:
         This creates a fully-connected topology.  For the BRAM-optimised
         block-sparse version, use :func:`create_mnist_block_sparse_network`.
     """
-    net = SNNNetwork()
+    net = SpikePressNetwork()
     inp = net.add_group(NeuronGroup(784, name='input'))
     hid = net.add_group(NeuronGroup(n_hidden, name='hidden'))
     out = net.add_group(NeuronGroup(10, name='output'))
@@ -433,8 +430,8 @@ def create_mnist_network(n_hidden: int = 2048) -> SNNNetwork:
 def create_mnist_block_sparse_network(
     n_blocks: int = 4,
     hidden_per_block: int = 1024,
-) -> SNNNetwork:
-    """Create a block-sparse MNIST SNN (Loihi-inspired local connectivity).
+) -> SpikePressNetwork:
+    """Create a block-sparse MNIST SNN with local input partitions.
 
     The 784 MNIST input pixels are split into ``n_blocks`` horizontal stripes,
     each connecting to a dedicated block of ``hidden_per_block`` hidden neurons.
@@ -452,12 +449,12 @@ def create_mnist_block_sparse_network(
         hidden_per_block: Hidden neurons per block.
 
     Returns:
-        SNNNetwork ready to compile.
+        SpikePressNetwork ready to compile.
     """
     assert 784 % n_blocks == 0, f"784 must be divisible by n_blocks={n_blocks}"
     pixels_per_block = 784 // n_blocks
 
-    net = SNNNetwork()
+    net = SpikePressNetwork()
 
     # Input groups (image stripe partitions)
     inp_groups = []

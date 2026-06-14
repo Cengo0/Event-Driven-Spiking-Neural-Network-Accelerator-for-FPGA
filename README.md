@@ -1,86 +1,69 @@
-# Event-Driven SNN Accelerator for FPGA
+# SpikePress + SpikeMold-EDNP
 
-Energy-efficient, spike-triggered SNN accelerator on PYNQ-Z2 with a native Python/PyTorch-style software stack.
+SpikePress + SpikeMold-EDNP is a fixed-bitstream FPGA SNN research stack.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+- **SpikePress**: software API, integer golden traces, resource-aware compiler artifacts
+- **SpikeMold**: PYNQ-Z2 / Zynq-7020 event-triggered hardware backend
 
-## Current Status
+The project goal is HW/SW co-design for accessible event-driven neuromorphic
+deployment: train or define models in software, compile explicit integer
+artifacts, run bounded jobs on SpikeMold, and verify against golden traces.
 
-- FPGA target: `Zynq-7020 (PYNQ-Z2)`
-- Canonical PL clock: `80 MHz`
-- Maintained workflow: native library-first
-- Supported scenarios:
-  1. GPU training -> FPGA inference
-  2. FPGA on-chip STDP train + inference
+## Current Scope
 
-## Quick Start
+Active path:
+
+- inference-only SpikePress API
+- integer FC-LIF and EventConv trace generation
+- event/update budget checks
+- EDNP artifact JSON roundtrip
+- Batch 0/1A contract verification
+
+Out of scope for the current EDNP mainline:
+
+- legacy accelerator API
+- Python-controlled inner loops as runtime architecture
+
+## Quick Check
 
 ```bash
-git clone https://github.com/metr0jw/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA.git
-cd Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA
-./setup.sh
+source /home/jwlee/miniconda3/etc/profile.d/conda.sh
+conda activate fpga
+rtk python scripts/generate_ednp_batch1a_artifacts.py
+rtk python scripts/check_ednp_batch0_1a.py
+rtk pytest software/python/tests
 ```
+
+## Minimal SpikePress Example
 
 ```python
-import numpy as np
-from snn_fpga_accelerator import SNNAccelerator
+from spikepress import InputSpike, fc_lif_model
 
-accel = SNNAccelerator(simulation_mode=True)
-output = accel.forward(np.array([[0, 0.0, 1.0]], dtype=np.float32))
+model = fc_lif_model("tiny", weights=[[3, 1], [2, 0]], thresholds=[5, 9])
+compiled = model.compile_ednp(target="pynq-z2")
+trace = model.golden_trace([
+    InputSpike(tick=0, src_id=0),
+    InputSpike(tick=1, src_id=1),
+])
+
+print(compiled.artifact.sha256)
+print(trace.to_dict()["counters"])
 ```
 
-## Project Direction
+## Evidence Boundary
 
-This repository uses a native workflow built around `snn_fpga_accelerator`.
+Current evidence is software contract/golden only unless a report explicitly says
+HLS, RTL, or PYNQ-Z2 board execution was run. Do not infer board latency,
+throughput, or energy from software artifacts.
 
-- Maintained path: native PyTorch-style training/export/runtime
-- Removed from supported path: `SpikingJelly auto-conversion`
+## Main Files
 
-## Features
-
-- Fixed-point LIF neuron and event-router hardware
-- On-chip STDP and R-STDP support
-- Native Python/PyTorch-style API
-- Host/runtime tooling for export, parity, and board execution
-- RTL + HLS co-design for inference and learning
-
-## Public Documentation
-
-- [Developer Guide](docs/developer_guide.md)
-- [API Reference](docs/api_reference.md)
-- [Architecture](docs/architecture.md)
-- [User Guide](docs/user_guide.md)
-
-## Examples
-
-```bash
-python examples/pytorch/mnist_training_example.py
-python examples/pytorch/r_stdp_learning_example.py
-python examples/pytorch/mozafari_rstdp_faithful.py
-```
-
-## Project Structure
-
-```
-hardware/
-software/python/
-examples/
-docs/
-scripts/
-tests/
-```
-
-## Citation
-
-```bibtex
-@misc{lee2025snnaccelerator,
-  title={Event-Driven Spiking Neural Network Accelerator for FPGA},
-  author={Lee, Jiwoon},
-  year={2025},
-  url={https://github.com/metr0jw/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA}
-}
-```
+- `contracts/`: architecture, trace, event, register, and resource contracts
+- `software/python/spikepress/`: SpikePress software package
+- `golden_traces/v1/`: deterministic architecture-neutral traces
+- `scripts/check_ednp_batch0_1a.py`: contract/artifact checker
+- `reports/`: current gate reports
 
 ## License
 
-MIT License - see [LICENSE](LICENSE)
+MIT License. See [LICENSE](LICENSE).
