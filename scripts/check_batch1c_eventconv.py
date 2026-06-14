@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check Batch 1C EventConv C0/C1/C2/C3 artifacts."""
+"""Check Batch 1C EventConv C0/C1/C2/C3/C4 artifacts."""
 
 from __future__ import annotations
 
@@ -17,6 +17,7 @@ from spikepress.architecture_trace_generator import TRACE_SCHEMA, sha256_json  #
 
 
 TRACE_PATH = ROOT / "golden_traces" / "v1" / "eventconv_agu_c0_tiny_v1.json"
+SCALE_TRACE_PATH = ROOT / "golden_traces" / "v1" / "eventconv_8x8_tiny_v1.json"
 REPORT_PATH = ROOT / "reports" / "batch_1c_eventconv_primitive_report.md"
 RTL_PATH = ROOT / "hardware" / "hdl" / "rtl" / "core" / "spike_conv_agu.v"
 TB_PATH = ROOT / "hardware" / "hdl" / "tb" / "tb_spike_conv_agu.v"
@@ -24,6 +25,7 @@ STATE_RTL_PATH = ROOT / "hardware" / "hdl" / "rtl" / "core" / "spike_conv_state_
 STATE_TB_PATH = ROOT / "hardware" / "hdl" / "tb" / "tb_spike_conv_state_update.v"
 COMMIT_RTL_PATH = ROOT / "hardware" / "hdl" / "rtl" / "core" / "spike_conv_active_commit.v"
 COMMIT_TB_PATH = ROOT / "hardware" / "hdl" / "tb" / "tb_spike_conv_active_commit.v"
+SCALE_TB_PATH = ROOT / "hardware" / "hdl" / "tb" / "tb_spike_conv_c4_scaleup.v"
 
 
 def fail(message: str) -> None:
@@ -57,6 +59,7 @@ def check_trace_hashes(trace: dict) -> None:
 def main() -> int:
     for path in [
         TRACE_PATH,
+        SCALE_TRACE_PATH,
         REPORT_PATH,
         RTL_PATH,
         TB_PATH,
@@ -64,6 +67,7 @@ def main() -> int:
         STATE_TB_PATH,
         COMMIT_RTL_PATH,
         COMMIT_TB_PATH,
+        SCALE_TB_PATH,
     ]:
         if not path.exists():
             fail(f"missing artifact: {path}")
@@ -198,7 +202,97 @@ def main() -> int:
             fail(f"report missing phrase: {phrase}")
 
     check_trace_hashes(trace)
-    print("PASS: Batch 1C EventConv C0/C1/C2/C3 artifacts valid")
+
+    scale_trace = load_json(SCALE_TRACE_PATH)
+    if scale_trace.get("schema") != TRACE_SCHEMA:
+        fail("scale trace schema mismatch")
+    if scale_trace.get("trace_id") != "eventconv_8x8_tiny_v1":
+        fail("scale trace_id mismatch")
+    if scale_trace.get("metadata", {}).get("input_shape") != [1, 8, 8]:
+        fail("scale input shape mismatch")
+    if scale_trace.get("metadata", {}).get("kernel_shape") != [1, 1, 3, 3]:
+        fail("scale kernel shape mismatch")
+    if scale_trace.get("metadata", {}).get("padding") != 1:
+        fail("scale padding mismatch")
+
+    scale_updates = scale_trace.get("updates", [])
+    expected_scale_updates = [
+        {"dst_id": 36, "weight": 1, "y": 4, "x": 4},
+        {"dst_id": 34, "weight": -1, "y": 4, "x": 2},
+        {"dst_id": 28, "weight": 2, "y": 3, "x": 4},
+        {"dst_id": 26, "weight": -2, "y": 3, "x": 2},
+        {"dst_id": 20, "weight": 1, "y": 2, "x": 4},
+        {"dst_id": 18, "weight": -1, "y": 2, "x": 2},
+        {"dst_id": 45, "weight": 1, "y": 5, "x": 5},
+        {"dst_id": 43, "weight": -1, "y": 5, "x": 3},
+        {"dst_id": 37, "weight": 2, "y": 4, "x": 5},
+        {"dst_id": 35, "weight": -2, "y": 4, "x": 3},
+        {"dst_id": 29, "weight": 1, "y": 3, "x": 5},
+        {"dst_id": 27, "weight": -1, "y": 3, "x": 3},
+    ]
+    if len(scale_updates) != len(expected_scale_updates):
+        fail(f"scale update count mismatch: {len(scale_updates)}")
+    for got, want in zip(scale_updates, expected_scale_updates):
+        for key, value in want.items():
+            if got.get(key) != value:
+                fail(f"scale update mismatch for {key}: got {got.get(key)} want {value}")
+
+    scale_final_state = {int(k): int(v) for k, v in scale_trace.get("final_state", {}).items()}
+    expected_scale_state = {
+        18: -1,
+        20: 1,
+        26: -2,
+        27: -1,
+        28: 2,
+        29: 1,
+        34: -1,
+        35: -2,
+        36: 1,
+        37: 2,
+        43: -1,
+        45: 1,
+    }
+    if scale_final_state != expected_scale_state:
+        fail(f"scale final state mismatch: {scale_final_state}")
+
+    scale_counters = scale_trace.get("counters", {})
+    expected_scale_counters = {
+        "input_event_count": 2,
+        "generated_update_count": 12,
+        "active_neuron_count": 12,
+        "commit_count": 0,
+        "state_reads": 12,
+        "state_writes": 12,
+        "ddr_bytes_inner_loop": 0,
+        "python_inner_loop_steps": 0,
+    }
+    for key, value in expected_scale_counters.items():
+        if scale_counters.get(key) != value:
+            fail(f"scale counter mismatch for {key}: got {scale_counters.get(key)} want {value}")
+
+    scale_tb = SCALE_TB_PATH.read_text(encoding="utf-8")
+    for phrase in [
+        "C4 generated twelve signed updates",
+        "C4 state[34] negative signed match",
+        "C4 high-threshold scans active set only",
+        "C4 high-threshold uses no full-neuron scan",
+        "*** ALL TESTS PASSED ***",
+    ]:
+        if phrase not in scale_tb:
+            fail(f"scale testbench missing phrase: {phrase}")
+
+    report = REPORT_PATH.read_text(encoding="utf-8")
+    for phrase in [
+        "C4 scale-up",
+        "eventconv_8x8_tiny_v1",
+        "46 PASS, 0 FAIL",
+        "signed 3x3 kernel",
+    ]:
+        if phrase not in report:
+            fail(f"report missing C4 phrase: {phrase}")
+
+    check_trace_hashes(scale_trace)
+    print("PASS: Batch 1C EventConv C0/C1/C2/C3/C4 artifacts valid")
     return 0
 
 

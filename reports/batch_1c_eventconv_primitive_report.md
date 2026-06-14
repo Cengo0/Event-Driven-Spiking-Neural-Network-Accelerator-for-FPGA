@@ -1,6 +1,6 @@
 # Batch 1C EventConv Primitive Report
 
-Status: C0/C1/C2/C3 board-free gate passed
+Status: C0/C1/C2/C3/C4 board-free gate passed
 
 ## Evidence Level
 
@@ -12,12 +12,14 @@ latency, throughput, or energy.
 ## Generated
 
 - `golden_traces/v1/eventconv_agu_c0_tiny_v1.json`
+- `golden_traces/v1/eventconv_8x8_tiny_v1.json`
 - `hardware/hdl/rtl/core/spike_conv_agu.v`
 - `hardware/hdl/rtl/core/spike_conv_state_update.v`
 - `hardware/hdl/rtl/core/spike_conv_active_commit.v`
 - `hardware/hdl/tb/tb_spike_conv_agu.v`
 - `hardware/hdl/tb/tb_spike_conv_state_update.v`
 - `hardware/hdl/tb/tb_spike_conv_active_commit.v`
+- `hardware/hdl/tb/tb_spike_conv_c4_scaleup.v`
 
 ## Gate Results
 
@@ -27,7 +29,7 @@ latency, throughput, or energy.
 | C1 AGU-only | PASS | Vivado xsim `tb_spike_conv_agu`: 19 PASS, 0 FAIL |
 | C2 AGU + state update | PASS | Vivado xsim `tb_spike_conv_state_update`: 19 PASS, 0 FAIL |
 | C3 AGU + active-set commit | PASS | Vivado xsim `tb_spike_conv_active_commit`: 36 PASS, 0 FAIL |
-| C4 scale-up | PENDING | waits for C3 |
+| C4 scale-up | PASS | Vivado xsim `tb_spike_conv_c4_scaleup`: 46 PASS, 0 FAIL |
 
 ## C0 Trace Contract
 
@@ -84,6 +86,34 @@ readout emission order and reset-to-zero semantics:
 After the positive-threshold readout, committed destinations `1` and `0` reset
 to zero, active count compacts from `4` to `2`, and state checksum becomes `3`.
 
+## C4 Scale-Up Contract
+
+The C4 gate uses `eventconv_8x8_tiny_v1`: two input spikes, a signed 3x3 kernel
+with zero-skipped taps, padding `1`, and an 8x8 output state space.
+
+Expected C4 counters:
+
+- input event count: `2`
+- generated update count: `12`
+- active neuron count: `12`
+- state reads: `12`
+- state writes: `12`
+- commit output count: `0`
+- full-neuron scan count: `0`
+
+The RTL testbench checks all 12 update destinations, signed positive/negative
+state values, active-id ordering, active-mask bits, high-threshold active commit,
+and no reset when the trace has no commits.
+
+## Residual Risks
+
+- C4 uses centered input spikes; boundary padding invalid-coordinate behavior is
+  still a follow-up gate.
+- C4 uses always-ready commit output; readout backpressure remains a follow-up
+  gate.
+- C4 state space is 64 destinations; wider output maps still need resource and
+  destination-width gates before board claims.
+
 ## Runtime Assumptions
 
 - Python inner loop required: `False`
@@ -93,5 +123,6 @@ to zero, active count compacts from `4` to `2`, and state checksum becomes `3`.
 
 ## Next Gate
 
-Implement C4 by scaling the EventConv primitive beyond the tiny 2x2 kernel case
-while preserving trace correctness and active-set commit counters.
+Batch 1C board-free primitive gates are complete. Next gate is architecture
+selection reporting and then board/runtime integration without changing the
+trace contract.

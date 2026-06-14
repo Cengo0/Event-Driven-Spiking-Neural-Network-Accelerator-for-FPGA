@@ -19,7 +19,7 @@ Active path:
 - SpikeMold-EDNP artifact JSON roundtrip
 - Batch 0/1A contract verification
 - Batch 1B software transport smoke
-- Batch 1C EventConv AGU/state/commit C0/C1/C2/C3 RTL smoke
+- Batch 1C EventConv AGU/state/commit C0/C1/C2/C3/C4 RTL smoke
 
 Out of scope for the current EDNP mainline:
 
