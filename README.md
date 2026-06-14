@@ -37,6 +37,7 @@ rtk python scripts/generate_batch1b_transport_artifacts.py
 rtk python scripts/check_batch1b_transport.py
 rtk python scripts/generate_batch1c_eventconv_artifacts.py
 rtk python scripts/check_batch1c_eventconv.py
+rtk python scripts/check_architecture_selection.py
 rtk pytest software/python/tests
 ```
 
