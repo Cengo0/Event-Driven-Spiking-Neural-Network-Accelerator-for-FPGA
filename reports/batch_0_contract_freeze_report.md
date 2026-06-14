@@ -12,7 +12,6 @@ Date: 2026-06-14
 - `contracts/REGISTER_MAP_MINIMAL_V1.md`
 - `contracts/RESOURCE_BUDGET_V1.md`
 - `contracts/ARCHITECTURE_PATTERN_POLICY_V1.md`
-- `contracts/AGENT_HANDOFF_PROTOCOL_V1.md`
 
 ## Policy Decision
 
@@ -35,4 +34,3 @@ HLS, RTL, or PYNQ-Z2 execution.
 Batch 1A must keep producing architecture-neutral traces under
 `golden_traces/v1/`, event budget artifacts under `outputs/event_budget/`, and
 software foundation evidence under `reports/`.
-

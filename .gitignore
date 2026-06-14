@@ -135,6 +135,7 @@ notes/
 CLAUDE.md
 AGENTS.md
 .claude/
+contracts/AGENT_HANDOFF_PROTOCOL_V1.md
 
 # Local non-release snapshots. These are operator-only references and must not
 # be committed as active sources.
