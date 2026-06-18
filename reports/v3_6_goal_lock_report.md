@@ -73,6 +73,19 @@ Board JSONs remain local generated artifacts under `outputs/board/`. Their hashe
 
 Generated build outputs stay ignored. The manifest records identity; source, tests, configs, curated traces, and reports are committed.
 
+## Release Bundle
+
+Local ignored bundle:
+
+| Artifact | SHA-256 | Size |
+|---|---|---:|
+| `outputs/release/spikemold_v3_6_lock_20260619.tar.gz` | `e6165ffff28e3ce37b7bee489e56c3529a2b146d3f8c980ecac17578b68aebc6` | `726555` bytes |
+
+Bundle contains curated reports, curated golden traces, PYNQ-Z2 bit/HWH,
+Vivado reports, board smoke JSON outputs, and HLS IP package/readback files.
+It excludes checkpoints, dataset downloads, profiler dumps, and large local
+training artifacts.
+
 ## Final Verifier Commands
 
 Run these from repo root:

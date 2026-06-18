@@ -106,6 +106,20 @@
       "tracked_by_git": false
     }
   ],
+  "release_bundle": {
+    "path": "outputs/release/spikemold_v3_6_lock_20260619.tar.gz",
+    "sha256": "e6165ffff28e3ce37b7bee489e56c3529a2b146d3f8c980ecac17578b68aebc6",
+    "bytes": 726555,
+    "tracked_by_git": false,
+    "contents": [
+      "curated reports",
+      "curated golden traces",
+      "PYNQ-Z2 bit/HWH",
+      "Vivado timing/utilization/power reports",
+      "board smoke JSON outputs",
+      "HLS component.xml and packaged IP zip"
+    ]
+  },
   "curated_reports": [
     "reports/v3_6_goal_lock_report.md",
     "reports/v3_6_goal_lock_manifest.json",
