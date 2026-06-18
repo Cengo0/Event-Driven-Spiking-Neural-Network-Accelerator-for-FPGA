@@ -17,12 +17,12 @@ architecture:
   - 128
   - 128
   - 128
-  max_fanout_inter: 16
-  spike_buffer_depth: 64
+  max_fanout_inter: 32      # increased from 16: allows higher fanout from active blocks without extra cycles
+  spike_buffer_depth: 128   # increased from 64: better handling of input_event_count bursts (rate conv → FC)
 router:
   mapping_mode: table
   direct_map_windows: 4
-  max_fanout: 32
+  max_fanout: 64            # increased from 32: supports higher activity per commit window in hybrid block case
   delay_width: 8
   conn_ram_style: block
 neuron_groups:
@@ -47,8 +47,8 @@ weight_tiling:
   enable: true
   large_only: true
   large_conn_min_weights: 65536
-  src_chunk: 196
-  dst_chunk: 128
+  src_chunk: 256        # increased from 196: larger active tile for feat→16k hidden (fewer tiles, lower commit/router pressure for ~3k–4k active cases)
+  dst_chunk: 192        # increased from 128: pairs with src for better coverage of 512→16384 logical block connections
   double_buffer: false
 widths:
   data_width: 16

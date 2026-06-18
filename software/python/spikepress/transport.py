@@ -23,8 +23,17 @@ TRANSPORT_SMOKE_SCHEMA = "spikemold.batch_1b_transport_smoke.v1"
 AXI_LITE_SMOKE_SCHEMA = "spikemold.axi_lite_smoke.v1"
 DMA_LOOPBACK_SCHEMA = "spikemold.dma_loopback_smoke.v1"
 EVENTWORD_COUNTER_SCHEMA = "spikemold.eventword64_counter_smoke.v1"
+EVENTWORD_TO_AXIS32_SCHEMA = "spikemold.eventword64_to_axis32_lowering.v1"
 FLAT_FC_LIF_SMOKE_SCHEMA = "spikemold.flat_fc_lif_smoke.v1"
 EVIDENCE_LEVEL = "software_transport_smoke_no_board"
+
+AER32_ID_BITS = 13
+AER32_WEIGHT_BITS = 8
+AER32_TIMESTAMP_BITS = 11
+AER32_ID_MASK = (1 << AER32_ID_BITS) - 1
+AER32_WEIGHT_LO = AER32_ID_BITS
+AER32_TIMESTAMP_LO = AER32_ID_BITS + AER32_WEIGHT_BITS
+DIRECT_RTL_PHYSICAL_NEURONS = 1024
 
 REGISTER_OFFSETS: Mapping[str, int] = {
     "CTRL": 0x00,
@@ -90,8 +99,68 @@ def _sha256_u64_words(words: Sequence[int]) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def _sha256_u32_words(words: Sequence[int]) -> str:
+    data = b"".join(int(word).to_bytes(4, "little") for word in words)
+    return hashlib.sha256(data).hexdigest()
+
+
 def event_word_type(word: int) -> int:
     return (_validate_word64(word) >> 60) & 0xF
+
+
+def decode_eventword64_input(word: int) -> Dict[str, int]:
+    word = _validate_word64(word)
+    event_type = event_word_type(word)
+    if event_type != 0:
+        raise ValueError(f"cannot lower non-input EventWord64 type: {event_type}")
+    weight_abs = (word >> 11) & 0xFF
+    sign = (word >> 19) & 0x1
+    signed_payload = -weight_abs if sign else weight_abs
+    src_hi = (word >> 38) & 0x3FF
+    src_lo = (word >> 28) & 0x3FF
+    return {
+        "event_type": event_type,
+        "tick": (word >> 48) & 0xFFF,
+        "src_y_or_hi": src_hi,
+        "src_x_or_lo": src_lo,
+        "src_id": (src_hi << 10) | src_lo,
+        "channel_or_dst_hi": (word >> 20) & 0xFF,
+        "signed_payload": signed_payload,
+        "flags": (word >> 5) & 0x3F,
+        "target": word & 0x1F,
+    }
+
+
+def lower_eventword64_input_to_axis32(word: int) -> int:
+    decoded = decode_eventword64_input(word)
+    src_id = decoded["src_id"]
+    tick = decoded["tick"]
+    payload = decoded["signed_payload"]
+    if src_id > AER32_ID_MASK:
+        raise ValueError(f"source id exceeds AER32 {AER32_ID_BITS}-bit field: {src_id}")
+    if src_id >= DIRECT_RTL_PHYSICAL_NEURONS:
+        raise ValueError(
+            f"source id exceeds current direct RTL physical neuron range 0..{DIRECT_RTL_PHYSICAL_NEURONS - 1}: {src_id}"
+        )
+    if tick >= (1 << AER32_TIMESTAMP_BITS):
+        raise ValueError(f"tick exceeds AER32 {AER32_TIMESTAMP_BITS}-bit timestamp field: {tick}")
+    if payload < -(1 << (AER32_WEIGHT_BITS - 1)) or payload >= (1 << (AER32_WEIGHT_BITS - 1)):
+        raise ValueError(f"payload exceeds signed AER32 {AER32_WEIGHT_BITS}-bit field: {payload}")
+    if decoded["channel_or_dst_hi"] != 0:
+        raise ValueError("flat AER32 lowering requires channel_or_dst_hi == 0")
+    if decoded["flags"] != 0:
+        raise ValueError("flat AER32 lowering requires flags == 0")
+    if decoded["target"] != 0:
+        raise ValueError("flat AER32 lowering requires target == 0")
+    return (
+        (src_id & AER32_ID_MASK)
+        | ((payload & 0xFF) << AER32_WEIGHT_LO)
+        | ((tick & ((1 << AER32_TIMESTAMP_BITS) - 1)) << AER32_TIMESTAMP_LO)
+    )
+
+
+def lower_eventword64_inputs_to_axis32(words: Sequence[int]) -> list[int]:
+    return [lower_eventword64_input_to_axis32(word) for word in words]
 
 
 def pack_input_spikes(input_spikes: Iterable[InputSpike]) -> list[int]:
@@ -213,6 +282,33 @@ def run_eventword64_counter_smoke(words: Sequence[int]) -> Dict[str, object]:
     }
 
 
+def run_eventword64_to_axis32_lowering_smoke(words: Sequence[int]) -> Dict[str, object]:
+    output_words = lower_eventword64_inputs_to_axis32(words)
+    return {
+        "schema": EVENTWORD_TO_AXIS32_SCHEMA,
+        "evidence_level": EVIDENCE_LEVEL,
+        "board_executed": False,
+        "ok": True,
+        "source_format": "EventWord64 input_spike",
+        "target_format": "AER32 direct RTL DMA0",
+        "word_count": len(output_words),
+        "input_eventword64_sha256": _sha256_u64_words(words),
+        "output_axis32_sha256": _sha256_u32_words(output_words),
+        "output_axis32_words": output_words,
+        "lossless_flat_input_semantics": True,
+        "rejected_semantics": [
+            "non-input event types",
+            "source id wider than 13 bits",
+            "source id outside current direct RTL physical range",
+            "tick wider than 11 bits",
+            "payload outside signed 8-bit range",
+            "nonzero channel_or_dst_hi",
+            "nonzero flags",
+            "nonzero target",
+        ],
+    }
+
+
 def run_flat_fc_lif_smoke(
     model: SpikePressModel,
     input_spikes: Iterable[InputSpike],
@@ -269,10 +365,11 @@ def build_batch_1b_transport_smoke(
     register_smoke = run_axi_lite_smoke()
     dma_loopback = run_dma_loopback(input_words)
     eventword_counter = run_eventword64_counter_smoke(input_words)
+    axis32_lowering = run_eventword64_to_axis32_lowering_smoke(input_words)
     flat_fc_lif = run_flat_fc_lif_smoke(model, spikes)
     all_ok = all(
         bool(section["ok"])
-        for section in [register_smoke, dma_loopback, eventword_counter, flat_fc_lif]
+        for section in [register_smoke, dma_loopback, eventword_counter, axis32_lowering, flat_fc_lif]
     )
     return {
         "schema": TRANSPORT_SMOKE_SCHEMA,
@@ -288,5 +385,6 @@ def build_batch_1b_transport_smoke(
         "register_smoke": register_smoke,
         "dma_loopback": dma_loopback,
         "eventword64_counter": eventword_counter,
+        "eventword64_to_axis32": axis32_lowering,
         "flat_fc_lif": flat_fc_lif,
     }

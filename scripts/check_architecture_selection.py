@@ -113,8 +113,8 @@ def main() -> int:
     transport = load_json(TRANSPORT_PATH)
     if transport.get("all_ok") is not True:
         fail("transport smoke all_ok is not true")
-    if transport.get("board_executed") is not False:
-        fail("architecture report must not rely on board execution")
+    if "Board Evidence" in report:
+        fail("architecture report must not include board evidence")
     flat_fc_lif = transport.get("flat_fc_lif", {})
     if flat_fc_lif.get("trace_match_rate") != 1.0:
         fail("SpikeMold flat FC-LIF trace_match_rate is not 1.0")

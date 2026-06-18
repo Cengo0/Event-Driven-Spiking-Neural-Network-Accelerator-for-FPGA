@@ -248,6 +248,7 @@ module tb_spike_conv_active_commit;
     initial begin
         kernel_weight_flat = {8'd4, 8'd3, 8'd2, 8'd1};
         reset_dut();
+        commit_seen = 0;
         send_spike(8'd1, 8'd1, 8'd0);
 
         cycles = 0;
@@ -315,6 +316,40 @@ module tb_spike_conv_active_commit;
               active_id_flat[1*16 +: 16] == 16'd2);
         check("C3 positive-threshold updates state checksum",
               state_checksum == 32'sd3);
+
+        reset_dut();
+        commit_seen = 0;
+        send_spike(8'd1, 8'd1, 8'd0);
+        cycles = 0;
+        while (update_count < 4 && cycles < 64) begin
+            @(posedge clk);
+            cycles = cycles + 1;
+        end
+        repeat (2) @(posedge clk);
+        #1;
+        start_commit(16'sd2);
+        wait_commit_done();
+
+        check("C3 threshold-2 active commit done", commit_done_seen == 1'b1);
+        check("C3 threshold-2 scans compacted active set once", active_commit_read_count == 32'd4);
+        check("C3 threshold-2 emits three commits", commit_emit_count == 32'd3);
+        check("C3 threshold-2 output count matches", commit_seen == 3);
+        check("C3 threshold-2 first commit is dest2 state2",
+              commit_words[0] == {16'd2, 16'd2});
+        check("C3 threshold-2 second commit is dest1 state3",
+              commit_words[1] == {16'd1, 16'd3});
+        check("C3 threshold-2 third commit is dest0 state4",
+              commit_words[2] == {16'd0, 16'd4});
+        check("C3 threshold-2 readout checksum matches",
+              readout_checksum == 32'sd9);
+        check("C3 threshold-2 resets three committed neurons",
+              commit_reset_count == 32'd3);
+        check("C3 threshold-2 preserves only state[3]",
+              state_checksum == 32'sd1);
+        check("C3 threshold-2 compacts active count",
+              active_neuron_count == 32'd1);
+        check("C3 threshold-2 compacts active id[0]",
+              active_id_flat[0*16 +: 16] == 16'd3);
 
         $display("Results: %0d PASS, %0d FAIL", pass_count, fail_count);
         if (fail_count == 0) begin

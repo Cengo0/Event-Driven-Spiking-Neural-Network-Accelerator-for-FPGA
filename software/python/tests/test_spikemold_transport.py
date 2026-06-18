@@ -1,11 +1,16 @@
-from spikepress import InputSpike, fc_lif_model
+import pytest
+
+from spikepress import InputSpike, fc_lif_model, pack_spikemold_event_word64
 from spikepress.transport import (
     REGISTER_OFFSETS,
     build_batch_1b_transport_smoke,
+    decode_eventword64_input,
     event_word_type,
+    lower_eventword64_input_to_axis32,
     pack_input_spikes,
     run_axi_lite_smoke,
     run_dma_loopback,
+    run_eventword64_to_axis32_lowering_smoke,
     run_flat_fc_lif_smoke,
     run_eventword64_counter_smoke,
 )
@@ -45,6 +50,43 @@ def test_eventword64_counter_counts_input_words():
     assert counter["event_type_counts"]["invalid"] == 0
 
 
+def test_eventword64_to_axis32_lowering_matches_direct_rtl_aer32():
+    word = pack_input_spikes([InputSpike(tick=3, src_id=17, payload=1)])[0]
+    decoded = decode_eventword64_input(word)
+    axis32 = lower_eventword64_input_to_axis32(word)
+    smoke = run_eventword64_to_axis32_lowering_smoke([word])
+
+    assert decoded["src_id"] == 17
+    assert decoded["tick"] == 3
+    assert decoded["signed_payload"] == 1
+    assert axis32 == 17 | (1 << 13) | (3 << 21)
+    assert smoke["ok"] is True
+    assert smoke["word_count"] == 1
+    assert smoke["output_axis32_words"] == [axis32]
+    assert smoke["lossless_flat_input_semantics"] is True
+
+
+def test_eventword64_to_axis32_lowering_rejects_semantic_loss():
+    commit = pack_spikemold_event_word64(event_type=2, tick=0)
+    too_wide_tick = pack_spikemold_event_word64(event_type=0, tick=2048)
+    too_wide_direct_rtl_src = pack_spikemold_event_word64(
+        event_type=0,
+        tick=0,
+        src_y_or_hi=1,
+        src_x_or_lo=0,
+    )
+    nonzero_channel = pack_spikemold_event_word64(
+        event_type=0,
+        tick=0,
+        src_x_or_lo=1,
+        channel_or_dst_hi=1,
+    )
+
+    for word in [commit, too_wide_tick, too_wide_direct_rtl_src, nonzero_channel]:
+        with pytest.raises(ValueError):
+            lower_eventword64_input_to_axis32(word)
+
+
 def test_flat_fc_lif_smoke_matches_golden_trace():
     model = fc_lif_model("tiny", weights=[[3, 1], [2, 0]], thresholds=[5, 9])
     smoke = run_flat_fc_lif_smoke(
@@ -77,3 +119,5 @@ def test_batch_1b_transport_smoke_rejects_forbidden_runtime_assumptions():
     assert smoke["runtime_assumptions"]["python_inner_loop_required"] is False
     assert smoke["runtime_assumptions"]["random_ddr_inner_loop"] is False
     assert smoke["runtime_assumptions"]["full_neuron_scan_primary"] is False
+    assert smoke["eventword64_to_axis32"]["ok"] is True
+    assert smoke["eventword64_to_axis32"]["word_count"] == 1

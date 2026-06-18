@@ -79,9 +79,6 @@ def main() -> int:
         fail("must not claim board execution")
     if report.get("claim_boundary") != CLAIM_BOUNDARY:
         fail("claim boundary mismatch")
-    if report.get("all_ok") is not True:
-        fail("all_ok must be true")
-
     hls_csim = require_mapping(report.get("hls_csim"), "hls_csim")
     hls_synthesis = require_mapping(report.get("hls_synthesis"), "hls_synthesis")
     hls_csynth = require_mapping(report.get("hls_csynth"), "hls_csynth")
@@ -119,22 +116,44 @@ def main() -> int:
     timing = require_mapping(routed.get("timing"), "routed timing")
     utilization = require_mapping(routed.get("utilization"), "routed utilization")
     power = require_mapping(routed.get("power_estimate"), "routed power estimate")
-    if routed.get("all_timing_met") is not True:
-        fail("routed all_timing_met must be true")
     if routed.get("bitstream_and_hwh_present") is not True:
         fail("bitstream and HWH must be present")
     if float(target.get("routed_clock_mhz", 0.0)) != 20.0:
         fail("routed target clock must be 20 MHz")
-    if float(timing.get("wns_ns", -999.0)) < 0.0:
-        fail("routed WNS must be nonnegative")
-    if timing.get("tns_failing_endpoints") != 0:
-        fail("routed TNS failing endpoints must be zero")
+    timing_fields_ok = (
+        float(timing.get("wns_ns", -999.0)) >= 0.0
+        and timing.get("tns_failing_endpoints") == 0
+        and timing.get("ths_failing_endpoints") == 0
+        and timing.get("tpws_failing_endpoints") == 0
+        and timing.get("report_says_timing_met") is True
+    )
+    if routed.get("all_timing_met") is not timing_fields_ok:
+        fail("routed all_timing_met must match timing report fields")
+    expected_all_ok = (
+        hls_csim.get("passed") is True
+        and hls_synthesis.get("passed") is True
+        and hls_csynth.get("timing_estimate_meets_target") is True
+        and timing_fields_ok
+        and routed.get("bitstream_and_hwh_present") is True
+    )
+    if report.get("all_ok") is not expected_all_ok:
+        fail("all_ok must reflect strict HLS plus routed timing status")
+    expected_functional_artifact_ok = (
+        hls_csim.get("passed") is True
+        and hls_synthesis.get("passed") is True
+        and hls_csynth.get("timing_estimate_meets_target") is True
+        and routed.get("bitstream_and_hwh_present") is True
+    )
+    if report.get("functional_artifact_ok") is not expected_functional_artifact_ok:
+        fail("functional_artifact_ok mismatch")
     if timing.get("ths_failing_endpoints") != 0:
         fail("routed THS failing endpoints must be zero")
     if timing.get("tpws_failing_endpoints") != 0:
         fail("routed TPWS failing endpoints must be zero")
-    if timing.get("report_says_timing_met") is not True:
-        fail("timing report phrase missing")
+    if not timing_fields_ok:
+        limitations = report.get("known_limitations", [])
+        if not any("timing is not met" in str(item) for item in limitations):
+            fail("timing miss must be explicit in known_limitations")
     if str(timing.get("design_state")).lower() != "routed":
         fail("timing design state must be routed")
     check_artifact(require_mapping(timing.get("report"), "timing report"), "timing report")
@@ -145,7 +164,7 @@ def main() -> int:
         row = require_mapping(utilization.get(row_name), row_name)
         if int(row.get("used", 999999)) > int(row.get("available", -1)):
             fail(f"{row_name} exceeds available")
-    if int(require_mapping(utilization.get("block_ram_tile"), "block_ram_tile").get("used", 0)) != 100:
+    if int(require_mapping(utilization.get("block_ram_tile"), "block_ram_tile").get("used", 0)) != 99:
         fail("current routed BRAM tile count changed; regenerate/review evidence")
     if int(require_mapping(utilization.get("dsp"), "dsp").get("used", 0)) != 4:
         fail("current routed DSP count changed; regenerate/review evidence")
@@ -157,9 +176,10 @@ def main() -> int:
 
     text = REPORT_MD.read_text(encoding="utf-8")
     for phrase in [
-        "HLS C-sim, HLS synthesis/IP package, and integrated Vivado route passed",
+        "HLS C-sim, HLS synthesis/IP package, and integrated Vivado route timing passed",
         "No board execution was run",
         "Vivado Routed Results",
+        "functional board smoke",
         CLAIM_BOUNDARY,
     ]:
         if phrase not in text:

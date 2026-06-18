@@ -150,6 +150,7 @@ void test_spike_input() {
     reset_hls(h);
 
     h.ctrl_reg = 0x01;
+    h.time_steps_reg = 2;
     h.s_axis_spikes.write(create_spike(TEST_FIRST_PRE_ID, 12, 3));
     h.call();
 

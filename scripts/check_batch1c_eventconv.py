@@ -18,6 +18,7 @@ from spikepress.architecture_trace_generator import TRACE_SCHEMA, sha256_json  #
 
 TRACE_PATH = ROOT / "golden_traces" / "v1" / "eventconv_agu_c0_tiny_v1.json"
 SCALE_TRACE_PATH = ROOT / "golden_traces" / "v1" / "eventconv_8x8_tiny_v1.json"
+BURST_TRACE_PATH = ROOT / "golden_traces" / "v1" / "eventconv_burst_boundary_v1.json"
 REPORT_PATH = ROOT / "reports" / "batch_1c_eventconv_primitive_report.md"
 RTL_PATH = ROOT / "hardware" / "hdl" / "rtl" / "core" / "spike_conv_agu.v"
 TB_PATH = ROOT / "hardware" / "hdl" / "tb" / "tb_spike_conv_agu.v"
@@ -61,6 +62,7 @@ def main() -> int:
     for path in [
         TRACE_PATH,
         SCALE_TRACE_PATH,
+        BURST_TRACE_PATH,
         REPORT_PATH,
         RTL_PATH,
         TB_PATH,
@@ -198,9 +200,9 @@ def main() -> int:
         "state checksum",
         "active commit readout",
         "reset-to-zero",
-        "No board execution was run",
+        "pynq_axi_dma0_direct_rtl_eventconv_burst_boundary_state_checksum_readback",
         "19 PASS, 0 FAIL",
-        "36 PASS, 0 FAIL",
+        "49 PASS, 0 FAIL",
         "31 PASS, 0 FAIL",
     ]:
         if phrase not in report:
@@ -303,16 +305,77 @@ def main() -> int:
     for phrase in [
         "C4 scale-up",
         "eventconv_8x8_tiny_v1",
+        "eventconv_burst_boundary_v1",
         "46 PASS, 0 FAIL",
         "C5 readout backpressure",
         "31 PASS, 0 FAIL",
         "signed 3x3 kernel",
+        "Burst-Boundary Active Readout Contract",
+        "Invalid boundary taps are skipped",
     ]:
         if phrase not in report:
             fail(f"report missing C4 phrase: {phrase}")
 
     check_trace_hashes(scale_trace)
-    print("PASS: Batch 1C EventConv C0/C1/C2/C3/C4/C5 artifacts valid")
+
+    burst_trace = load_json(BURST_TRACE_PATH)
+    if burst_trace.get("schema") != TRACE_SCHEMA:
+        fail("burst-boundary trace schema mismatch")
+    if burst_trace.get("trace_id") != "eventconv_burst_boundary_v1":
+        fail("burst-boundary trace_id mismatch")
+    burst_meta = burst_trace.get("metadata", {})
+    if burst_meta.get("commit_mode") != "packet_end_active_set":
+        fail("burst-boundary commit mode mismatch")
+    if burst_meta.get("active_neuron_count_after_commit") != 1:
+        fail("burst-boundary active count after commit mismatch")
+    if burst_meta.get("readout_scan_count") != 4:
+        fail("burst-boundary readout scan count mismatch")
+    burst_updates = burst_trace.get("updates", [])
+    expected_burst_updates = [
+        {"dst_id": 3, "weight": 1, "y": 1, "x": 1},
+        {"dst_id": 2, "weight": 2, "y": 1, "x": 0},
+        {"dst_id": 1, "weight": 3, "y": 0, "x": 1},
+        {"dst_id": 0, "weight": 4, "y": 0, "x": 0},
+        {"dst_id": 3, "weight": 4, "y": 1, "x": 1},
+        {"dst_id": 0, "weight": 1, "y": 0, "x": 0},
+    ]
+    if len(burst_updates) != len(expected_burst_updates):
+        fail(f"burst-boundary update count mismatch: {len(burst_updates)}")
+    for got, want in zip(burst_updates, expected_burst_updates):
+        for key, value in want.items():
+            if got.get(key) != value:
+                fail(f"burst-boundary update mismatch for {key}: got {got.get(key)} want {value}")
+    expected_burst_commits = [
+        {"dst_id": 3, "value": 5},
+        {"dst_id": 1, "value": 3},
+        {"dst_id": 0, "value": 5},
+    ]
+    burst_commits = burst_trace.get("commits", [])
+    if len(burst_commits) != len(expected_burst_commits):
+        fail(f"burst-boundary commit count mismatch: {len(burst_commits)}")
+    for got, want in zip(burst_commits, expected_burst_commits):
+        for key, value in want.items():
+            if got.get(key) != value:
+                fail(f"burst-boundary commit mismatch for {key}: got {got.get(key)} want {value}")
+    if burst_trace.get("final_state") != {"2": 2}:
+        fail("burst-boundary final state mismatch")
+    expected_burst_counters = {
+        "input_event_count": 3,
+        "generated_update_count": 6,
+        "active_neuron_count": 4,
+        "commit_count": 3,
+        "state_reads": 6,
+        "state_writes": 9,
+        "ddr_bytes_inner_loop": 0,
+        "python_inner_loop_steps": 0,
+    }
+    burst_counters = burst_trace.get("counters", {})
+    for key, value in expected_burst_counters.items():
+        if burst_counters.get(key) != value:
+            fail(f"burst-boundary counter mismatch for {key}: got {burst_counters.get(key)} want {value}")
+    check_trace_hashes(burst_trace)
+
+    print("PASS: Batch 1C EventConv C0/C1/C2/C3/C4/C5/burst-boundary artifacts valid")
     return 0
 
 

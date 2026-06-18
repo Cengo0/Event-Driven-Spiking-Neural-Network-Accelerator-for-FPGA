@@ -33,6 +33,7 @@ REQUIRED_CONTRACTS = [
     "REGISTER_MAP_MINIMAL_V1.md",
     "RESOURCE_BUDGET_V1.md",
     "ARCHITECTURE_PATTERN_POLICY_V1.md",
+    "AGENT_HANDOFF_PROTOCOL_V1.md",
 ]
 
 REQUIRED_TRACE_COUNTERS = [
@@ -77,6 +78,16 @@ def check_contracts() -> None:
     ]:
         if failure_mode not in policy:
             fail(f"policy missing forbidden failure mode: {failure_mode}")
+
+    handoff = (contracts / "AGENT_HANDOFF_PROTOCOL_V1.md").read_text(encoding="utf-8")
+    for phrase in [
+        "Status: active contract",
+        "ARCHITECTURE_PATTERN_POLICY_V1.md",
+        "architecture policy and forbidden failure mode check result",
+        "evidence level reached",
+    ]:
+        if phrase not in handoff:
+            fail(f"agent handoff protocol missing phrase: {phrase}")
 
 
 def check_trace(path: Path) -> None:

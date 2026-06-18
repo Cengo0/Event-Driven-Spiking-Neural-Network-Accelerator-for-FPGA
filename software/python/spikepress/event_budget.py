@@ -33,12 +33,33 @@ class EventBudgetResult:
         }
 
 
+# Conservative limits from the very first tiny flat-FC-LIF primitive experiments.
+# These are intentionally tight for "no tiling / no block-sparse / no heavy mux" cases.
+# For the current hybrid + 16-block reduced design (logical 16k hidden on 2k physical fabric)
+# the real constraints are weight_tiling chunks, per-block commit, and measured activity
+# (see train script hybrid-reduced annotations and post-training integer trace validation).
+# We keep the old numbers for backward compat on flat checks but also provide a relaxed
+# hybrid-aware set that the training deploy checker can prefer.
 DEFAULT_FLAT_FC_LIF_LIMITS = EventBudgetLimits(
     max_input_events=1024,
     max_generated_updates=8192,
     max_active_neurons=512,
     max_state_reads=8192,
     max_state_writes=9216,
+    max_ddr_bytes_inner_loop=0,
+    max_python_inner_loop_steps=0,
+)
+
+# More realistic limits for block-sparse hybrid designs on PYNQ-Z2.
+# These reflect the architecture's use of weight tiling + active-set commit + 16-block
+# multiplexing over the 16×128 physical fabric. Still conservative; final truth is always
+# the integer golden trace + board execution with the actual tiled weights.
+DEFAULT_HYBRID_BLOCK_LIMITS = EventBudgetLimits(
+    max_input_events=8192,        # rate-encoded images + conv output events into FC
+    max_generated_updates=65536,
+    max_active_neurons=8192,      # logical active across all blocks (physical fabric 2048; block-sparse + tiling + active commit is how we exceed it)
+    max_state_reads=32768,
+    max_state_writes=32768,
     max_ddr_bytes_inner_loop=0,
     max_python_inner_loop_steps=0,
 )

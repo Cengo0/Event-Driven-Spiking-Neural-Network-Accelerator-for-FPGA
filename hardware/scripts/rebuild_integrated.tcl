@@ -9,6 +9,7 @@ set script_dir  [file dirname [file normalize [info script]]]
 set project_dir [file normalize [file join $script_dir "../.."]]
 set build_dir   "${project_dir}/hardware/build/spikemold_pynq_z2"
 set rtl_dir     "${project_dir}/hardware/hdl/rtl"
+set include_dir "${project_dir}/config/generated"
 set ip_repo     "${project_dir}/hardware/ip_repo"
 set output_dir  "${project_dir}/outputs"
 set part        "xc7z020clg400-1"
@@ -28,6 +29,7 @@ create_project spikemold_pynq_z2 $build_dir -part $part -force
 set_property target_language Verilog [current_project]
 # Use automatic source management so module-reference BD cells resolve correctly.
 set_property source_mgmt_mode All [current_project]
+set_property include_dirs [list $include_dir] [current_fileset]
 # Keep latest config-reg RTL in project so BD can fall back to module reference
 # when a stale packaged IP is present in ip_repo.
 add_files -norecurse "${rtl_dir}/common/spikemold_config_regs.v"
@@ -36,7 +38,9 @@ update_compile_order -fileset sources_1
 # Prefer freshly synthesized HLS output; fall back to cached ip_repo copies.
 set hls_ip_repo_generated "${project_dir}/hardware/hls/hls_output/hls/impl/ip"
 set hls_ip_repo_new "${ip_repo}/spikemold_top_hls_1_0"
-if {[file exists $hls_ip_repo_generated]} {
+if {[info exists ::env(SPIKEMOLD_HLS_IP_REPO)] && $::env(SPIKEMOLD_HLS_IP_REPO) ne ""} {
+    set hls_ip_repo [file normalize $::env(SPIKEMOLD_HLS_IP_REPO)]
+} elseif {[file exists $hls_ip_repo_generated]} {
     set hls_ip_repo $hls_ip_repo_generated
 } elseif {[file exists $hls_ip_repo_new]} {
     set hls_ip_repo $hls_ip_repo_new
@@ -47,10 +51,20 @@ if {[file exists $hls_ip_repo_generated]} {
     exit 1
 }
 puts "Using HLS IP repository: $hls_ip_repo"
+if {![file exists $hls_ip_repo]} {
+    puts "ERROR: selected HLS IP repository does not exist: $hls_ip_repo"
+    exit 1
+}
 set_property ip_repo_paths [list \
     $hls_ip_repo \
 ] [current_project]
 update_ip_catalog
+
+set output_basename "spikemold_pynq_z2"
+if {[info exists ::env(SPIKEMOLD_OUTPUT_BASENAME)] && $::env(SPIKEMOLD_OUTPUT_BASENAME) ne ""} {
+    set output_basename $::env(SPIKEMOLD_OUTPUT_BASENAME)
+}
+puts "Using output basename: $output_basename"
 
 # =============================================================================
 # Create Block Design
@@ -123,6 +137,20 @@ create_bd_cell -type module -reference spikemold_config_regs spikemold_config_re
 if {[llength [get_bd_pins -quiet spikemold_config_regs_0/service_cycles_counter]] == 0} {
     error "spikemold_config_regs_0/service_cycles_counter pin missing. Check hardware/hdl/rtl/common/spikemold_config_regs.v"
 }
+foreach required_pin {
+    pl_busy_cycles_counter
+    output_drain_cycles_counter
+    output_bridge_status
+    output_bridge_drop_count
+    output_bridge_event_count
+    output_bridge_emit_count
+    state_checksum
+    backend_mode
+} {
+    if {[llength [get_bd_pins -quiet spikemold_config_regs_0/$required_pin]] == 0} {
+        error "spikemold_config_regs_0/$required_pin pin missing. Check hardware/hdl/rtl/common/spikemold_config_regs.v"
+    }
+}
 
 # --- AXI Interconnect for GP0 (4 slaves: HLS, Config, spike DMA, weight DMA) ---
 create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_0
@@ -135,6 +163,9 @@ set_property -dict [list CONFIG.NUM_SI {4} CONFIG.NUM_MI {1}] [get_bd_cells axi_
 # --- Constants ---
 create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 const_zero_1bit
 set_property CONFIG.CONST_VAL {0} [get_bd_cells const_zero_1bit]
+
+create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 const_one_1bit
+set_property CONFIG.CONST_VAL {1} [get_bd_cells const_one_1bit]
 
 create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 const_zero_32bit
 set_property -dict [list CONFIG.CONST_VAL {0} CONFIG.CONST_WIDTH {32}] [get_bd_cells const_zero_32bit]
@@ -228,15 +259,40 @@ connect_bd_intf_net [get_bd_intf_pins axi_interconnect_hp0/M00_AXI] \
     [get_bd_intf_pins processing_system7_0/S_AXI_HP0]
 
 # =============================================================================
-# DMA ↔ HLS AXI-Stream Connections
+# DMA0 direct spike AXI-Stream ports
 # =============================================================================
-# MM2S → HLS s_axis_spikes
-connect_bd_intf_net [get_bd_intf_pins axi_dma_0/M_AXIS_MM2S] \
-    [get_bd_intf_pins spikemold_top_hls_0/s_axis_spikes]
+# Keep the spike event datapath in RTL: MM2S -> integrated top -> router/neuron
+# -> integrated top -> S2MM. HLS remains on control/config plus weight DMA.
+create_bd_port -dir O -from 31 -to 0 dma_spike_in_tdata -type data
+create_bd_port -dir O -from 3 -to 0 dma_spike_in_tkeep -type data
+create_bd_port -dir O dma_spike_in_tlast -type data
+create_bd_port -dir O dma_spike_in_tvalid -type data
+create_bd_port -dir I dma_spike_in_tready -type data
 
-# HLS m_axis_spikes → S2MM
-connect_bd_intf_net [get_bd_intf_pins spikemold_top_hls_0/m_axis_spikes] \
-    [get_bd_intf_pins axi_dma_0/S_AXIS_S2MM]
+connect_bd_net [get_bd_pins axi_dma_0/m_axis_mm2s_tdata]  [get_bd_ports dma_spike_in_tdata]
+connect_bd_net [get_bd_pins axi_dma_0/m_axis_mm2s_tkeep]  [get_bd_ports dma_spike_in_tkeep]
+connect_bd_net [get_bd_pins axi_dma_0/m_axis_mm2s_tlast]  [get_bd_ports dma_spike_in_tlast]
+connect_bd_net [get_bd_pins axi_dma_0/m_axis_mm2s_tvalid] [get_bd_ports dma_spike_in_tvalid]
+connect_bd_net [get_bd_ports dma_spike_in_tready]         [get_bd_pins axi_dma_0/m_axis_mm2s_tready]
+
+create_bd_port -dir I -from 31 -to 0 dma_spike_out_tdata -type data
+create_bd_port -dir I -from 3 -to 0 dma_spike_out_tkeep -type data
+create_bd_port -dir I dma_spike_out_tlast -type data
+create_bd_port -dir I dma_spike_out_tvalid -type data
+create_bd_port -dir O dma_spike_out_tready -type data
+
+connect_bd_net [get_bd_ports dma_spike_out_tdata]  [get_bd_pins axi_dma_0/s_axis_s2mm_tdata]
+connect_bd_net [get_bd_ports dma_spike_out_tkeep]  [get_bd_pins axi_dma_0/s_axis_s2mm_tkeep]
+connect_bd_net [get_bd_ports dma_spike_out_tlast]  [get_bd_pins axi_dma_0/s_axis_s2mm_tlast]
+connect_bd_net [get_bd_ports dma_spike_out_tvalid] [get_bd_pins axi_dma_0/s_axis_s2mm_tvalid]
+connect_bd_net [get_bd_pins axi_dma_0/s_axis_s2mm_tready] [get_bd_ports dma_spike_out_tready]
+
+# HLS spike stream is unused in the direct RTL event path.
+connect_bd_net [get_bd_pins const_zero_32bit/dout] [get_bd_pins spikemold_top_hls_0/s_axis_spikes_TDATA]
+connect_bd_net [get_bd_pins const_zero_4bit/dout]  [get_bd_pins spikemold_top_hls_0/s_axis_spikes_TKEEP]
+connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins spikemold_top_hls_0/s_axis_spikes_TLAST]
+connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins spikemold_top_hls_0/s_axis_spikes_TVALID]
+connect_bd_net [get_bd_pins const_one_1bit/dout]   [get_bd_pins spikemold_top_hls_0/m_axis_spikes_TREADY]
 
 # Weight DMA paths:
 #   MM2S -> HLS s_axis_weights   (weight load mode)
@@ -321,12 +377,20 @@ create_bd_port -dir O -from 31 -to 0 cfg_neuron_config_wdata -type data
 create_bd_port -dir O -from 15 -to 0 cfg_global_threshold -type data
 create_bd_port -dir O -from 7 -to 0 cfg_global_leak_rate -type data
 create_bd_port -dir O -from 7 -to 0 cfg_global_refrac_period -type data
+create_bd_port -dir O -from 1 -to 0 cfg_backend_mode -type data
 create_bd_port -dir I -from 31 -to 0 cfg_router_spike_count -type data
 create_bd_port -dir I -from 31 -to 0 cfg_neuron_spike_count -type data
 create_bd_port -dir I cfg_fifo_overflow -type data
 create_bd_port -dir I -from 7 -to 0 cfg_active_neurons -type data
 create_bd_port -dir I -from 31 -to 0 cfg_throughput_counter -type data
 create_bd_port -dir I -from 31 -to 0 cfg_service_cycles_counter -type data
+create_bd_port -dir I -from 31 -to 0 cfg_pl_busy_cycles_counter -type data
+create_bd_port -dir I -from 31 -to 0 cfg_output_drain_cycles_counter -type data
+create_bd_port -dir I -from 31 -to 0 cfg_output_bridge_status -type data
+create_bd_port -dir I -from 31 -to 0 cfg_output_bridge_drop_count -type data
+create_bd_port -dir I -from 31 -to 0 cfg_output_bridge_event_count -type data
+create_bd_port -dir I -from 31 -to 0 cfg_output_bridge_emit_count -type data
+create_bd_port -dir I -from 31 -to 0 cfg_state_checksum -type data
 
 # Connect config regs to external ports
 connect_bd_net [get_bd_pins spikemold_config_regs_0/router_config_we]     [get_bd_ports cfg_router_config_we]
@@ -339,12 +403,20 @@ connect_bd_net [get_bd_pins spikemold_config_regs_0/neuron_config_wdata]  [get_b
 connect_bd_net [get_bd_pins spikemold_config_regs_0/global_threshold]     [get_bd_ports cfg_global_threshold]
 connect_bd_net [get_bd_pins spikemold_config_regs_0/global_leak_rate]     [get_bd_ports cfg_global_leak_rate]
 connect_bd_net [get_bd_pins spikemold_config_regs_0/global_refrac_period] [get_bd_ports cfg_global_refrac_period]
+connect_bd_net [get_bd_pins spikemold_config_regs_0/backend_mode]         [get_bd_ports cfg_backend_mode]
 connect_bd_net [get_bd_ports cfg_router_spike_count]                 [get_bd_pins spikemold_config_regs_0/router_spike_count]
 connect_bd_net [get_bd_ports cfg_neuron_spike_count]                 [get_bd_pins spikemold_config_regs_0/neuron_spike_count]
 connect_bd_net [get_bd_ports cfg_fifo_overflow]                      [get_bd_pins spikemold_config_regs_0/fifo_overflow]
 connect_bd_net [get_bd_ports cfg_active_neurons]                     [get_bd_pins spikemold_config_regs_0/active_neurons]
 connect_bd_net [get_bd_ports cfg_throughput_counter]                  [get_bd_pins spikemold_config_regs_0/throughput_counter]
 connect_bd_net [get_bd_ports cfg_service_cycles_counter]              [get_bd_pins spikemold_config_regs_0/service_cycles_counter]
+connect_bd_net [get_bd_ports cfg_pl_busy_cycles_counter]              [get_bd_pins spikemold_config_regs_0/pl_busy_cycles_counter]
+connect_bd_net [get_bd_ports cfg_output_drain_cycles_counter]         [get_bd_pins spikemold_config_regs_0/output_drain_cycles_counter]
+connect_bd_net [get_bd_ports cfg_output_bridge_status]                [get_bd_pins spikemold_config_regs_0/output_bridge_status]
+connect_bd_net [get_bd_ports cfg_output_bridge_drop_count]            [get_bd_pins spikemold_config_regs_0/output_bridge_drop_count]
+connect_bd_net [get_bd_ports cfg_output_bridge_event_count]           [get_bd_pins spikemold_config_regs_0/output_bridge_event_count]
+connect_bd_net [get_bd_ports cfg_output_bridge_emit_count]            [get_bd_pins spikemold_config_regs_0/output_bridge_emit_count]
+connect_bd_net [get_bd_ports cfg_state_checksum]                      [get_bd_pins spikemold_config_regs_0/state_checksum]
 
 # Clock/reset external ports
 # NOTE: Port name is kept as clk_100mhz for backward compatibility with
@@ -412,6 +484,9 @@ add_files -norecurse ${build_dir}/spikemold_pynq_z2.gen/sources_1/bd/design_1/hd
 add_files -norecurse ${rtl_dir}/router/spike_router.v
 add_files -norecurse ${rtl_dir}/neurons/lif_neuron_array.v
 add_files -norecurse ${rtl_dir}/common/fifo.v
+add_files -norecurse ${rtl_dir}/core/spike_conv_agu.v
+add_files -norecurse ${rtl_dir}/core/spike_conv_state_update.v
+add_files -norecurse ${rtl_dir}/core/spike_conv_active_commit.v
 add_files -norecurse ${rtl_dir}/top/spikemold_integrated_top.v
 
 # Set spikemold_integrated_top as the real top module
@@ -456,21 +531,21 @@ set bit_file [glob -nocomplain ${build_dir}/spikemold_pynq_z2.runs/impl_1/*.bit]
 set hwh_file [glob -nocomplain ${build_dir}/spikemold_pynq_z2.gen/sources_1/bd/design_1/hw_handoff/*.hwh]
 
 if {$bit_file ne ""} {
-    file copy -force $bit_file ${output_dir}/spikemold_pynq_z2.bit
-    puts "Bitstream: ${output_dir}/spikemold_pynq_z2.bit"
+    file copy -force $bit_file ${output_dir}/${output_basename}.bit
+    puts "Bitstream: ${output_dir}/${output_basename}.bit"
 }
 if {$hwh_file ne ""} {
-    file copy -force $hwh_file ${output_dir}/spikemold_pynq_z2.hwh
-    puts "HWH: ${output_dir}/spikemold_pynq_z2.hwh"
+    file copy -force $hwh_file ${output_dir}/${output_basename}.hwh
+    puts "HWH: ${output_dir}/${output_basename}.hwh"
 }
 
 # Reports
 if {[catch {open_run impl_1} open_err]} {
     puts "WARNING: Could not open impl_1 for report generation: $open_err"
 } else {
-    report_utilization -file ${output_dir}/spikemold_pynq_z2_utilization.rpt
-    report_timing_summary -file ${output_dir}/spikemold_pynq_z2_timing.rpt
-    report_power -file ${output_dir}/spikemold_pynq_z2_power.rpt
+    report_utilization -file ${output_dir}/${output_basename}_utilization.rpt
+    report_timing_summary -file ${output_dir}/${output_basename}_timing.rpt
+    report_power -file ${output_dir}/${output_basename}_power.rpt
 }
 
 puts "===== ALL DONE ====="

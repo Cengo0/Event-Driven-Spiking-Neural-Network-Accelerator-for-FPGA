@@ -37,6 +37,7 @@ module tb_spikemold_config_regs_output_diag;
     reg [31:0] output_bridge_drop_count;
     reg [31:0] output_bridge_event_count;
     reg [31:0] output_bridge_emit_count;
+    reg [31:0] state_checksum;
 
     wire router_config_we;
     wire [31:0] router_config_addr;
@@ -47,6 +48,7 @@ module tb_spikemold_config_regs_output_diag;
     wire [15:0] global_threshold;
     wire [7:0] global_leak_rate;
     wire [7:0] global_refrac_period;
+    wire [1:0] backend_mode;
 
     integer pass_count = 0;
     integer fail_count = 0;
@@ -84,6 +86,7 @@ module tb_spikemold_config_regs_output_diag;
         .global_threshold(global_threshold),
         .global_leak_rate(global_leak_rate),
         .global_refrac_period(global_refrac_period),
+        .backend_mode(backend_mode),
         .router_spike_count(router_spike_count),
         .neuron_spike_count(neuron_spike_count),
         .fifo_overflow(fifo_overflow),
@@ -95,7 +98,8 @@ module tb_spikemold_config_regs_output_diag;
         .output_bridge_status(output_bridge_status),
         .output_bridge_drop_count(output_bridge_drop_count),
         .output_bridge_event_count(output_bridge_event_count),
-        .output_bridge_emit_count(output_bridge_emit_count)
+        .output_bridge_emit_count(output_bridge_emit_count),
+        .state_checksum(state_checksum)
     );
 
     task automatic check;
@@ -161,6 +165,7 @@ module tb_spikemold_config_regs_output_diag;
         output_bridge_drop_count = 32'd7;
         output_bridge_event_count = 32'd19;
         output_bridge_emit_count = 32'd12;
+        state_checksum = 32'd5;
 
         repeat (3) @(posedge clk);
         @(negedge clk);
@@ -197,6 +202,13 @@ module tb_spikemold_config_regs_output_diag;
         axil_read(7'h44, read_value);
         check("OUTPUT_DRAIN_CYCLES returns output drain counter",
               read_value == output_drain_cycles_counter);
+
+        axil_read(7'h48, read_value);
+        check("STATE_CHECKSUM returns membrane checksum",
+              read_value == state_checksum);
+
+        axil_read(7'h4C, read_value);
+        check("BACKEND_MODE defaults to flat path", read_value == 32'd0);
 
         $display("Results: %0d PASS, %0d FAIL", pass_count, fail_count);
         if (fail_count == 0) begin

@@ -199,6 +199,9 @@ void spikemold_top_hls(
     static neuron_id_t first_spike_pending_id = 0;
     static weight_t first_spike_pending_weight = 0;
     static ap_uint<1> spike_out_ack_toggle = 0;
+    static bool spike_in_pending = false;
+    static neuron_id_t spike_in_pending_id = 0;
+    static weight_t spike_in_pending_weight = 0;
 
     bool enable = ctrl_reg[0];
     bool reset = ctrl_reg[1];
@@ -228,6 +231,9 @@ void spikemold_top_hls(
         first_spike_pending_id = 0;
         first_spike_pending_weight = 0;
         spike_out_ack_toggle = 0;
+        spike_in_pending = false;
+        spike_in_pending_id = 0;
+        spike_in_pending_weight = 0;
 
         RESET_ENCODER: for (int i = 0; i < MAX_INPUT_CHANNELS; i++) {
             #pragma HLS PIPELINE II=1
@@ -266,6 +272,9 @@ void spikemold_top_hls(
         first_spike_pending = false;
         first_spike_pending_id = 0;
         first_spike_pending_weight = 0;
+        spike_in_pending = false;
+        spike_in_pending_id = 0;
+        spike_in_pending_weight = 0;
     }
 
     spikemold_enable = enable;
@@ -303,11 +312,16 @@ void spikemold_top_hls(
             run_encoder_once(true, encoder_config, timestamp, encoder_spikes, encoder_spike_counter);
         }
 
-        spike_in_valid = 0;
-        spike_in_neuron_id = 0;
-        spike_in_weight = 0;
+        spike_in_valid = (enable && spike_in_pending) ? (ap_uint<1>)1 : (ap_uint<1>)0;
+        spike_in_neuron_id = (rtl_nid_t)spike_in_pending_id;
+        spike_in_weight = spike_in_pending_weight;
 
-        if (enable && spike_in_ready) {
+        if (enable && spike_in_pending && spike_in_ready) {
+            spike_counter++;
+            spike_in_pending = false;
+        }
+
+        if (enable && !spike_in_pending) {
             axis_spike_t in_pkt;
             bool have_pkt = false;
 
@@ -330,10 +344,9 @@ void spikemold_top_hls(
                 neuron_id_t pre_id = in_pkt.data(SPIKE_PKT_ID_HI, SPIKE_PKT_ID_LO);
                 weight_t weight = (weight_t)in_pkt.data(SPIKE_PKT_WGT_HI, SPIKE_PKT_WGT_LO);
 
-                spike_in_valid = 1;
-                spike_in_neuron_id = (rtl_nid_t)pre_id;
-                spike_in_weight = weight;
-                spike_counter++;
+                spike_in_pending = true;
+                spike_in_pending_id = pre_id;
+                spike_in_pending_weight = weight;
             }
         }
 
@@ -445,6 +458,7 @@ void spikemold_top_hls(
     status(7, 6) = op_mode;
     status(15, 8) = 0;
     status[16] = first_spike_pending;
+    status[17] = spike_in_pending;
 
     status_reg = status;
     spike_count_reg = spike_counter;

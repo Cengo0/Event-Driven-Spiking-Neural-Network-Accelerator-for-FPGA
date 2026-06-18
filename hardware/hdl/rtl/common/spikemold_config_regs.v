@@ -31,6 +31,8 @@
 //   0x3C  OUTPUT_BR_EMITS [R]  [31:0] output bridge emitted-word count
 //   0x40  PL_BUSY_CYCLES [R]  [31:0] PL/fabric busy-cycle counter
 //   0x44  OUTPUT_DRAIN_CYCLES[R] [31:0] output-drain busy-cycle counter
+//   0x48  STATE_CHECKSUM  [R]  [31:0] running membrane-state checksum
+//   0x4C  BACKEND_MODE    [RW] [1:0] 0=flat FC-LIF, 1=tiny EventConv smoke
 //-----------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
@@ -113,6 +115,7 @@ module spikemold_config_regs #(
     output wire [15:0]                       global_threshold,
     output wire [7:0]                        global_leak_rate,
     output wire [7:0]                        global_refrac_period,
+    output wire [1:0]                        backend_mode,
 
     //=========================================================================
     // Status Input Ports (from RTL modules)
@@ -128,7 +131,8 @@ module spikemold_config_regs #(
     input  wire [31:0]                       output_bridge_status,
     input  wire [31:0]                       output_bridge_drop_count,
     input  wire [31:0]                       output_bridge_event_count,
-    input  wire [31:0]                       output_bridge_emit_count
+    input  wire [31:0]                       output_bridge_emit_count,
+    input  wire [31:0]                       state_checksum
 );
 
     // AXI4-Lite interface parameters
@@ -155,6 +159,8 @@ module spikemold_config_regs #(
     localparam [4:0] ADDR_OUTPUT_BR_EMITS     = 5'h0F;  // 0x3C
     localparam [4:0] ADDR_PL_BUSY_CYCLES      = 5'h10;  // 0x40
     localparam [4:0] ADDR_OUTPUT_DRAIN_CYCLES = 5'h11;  // 0x44
+    localparam [4:0] ADDR_STATE_CHECKSUM      = 5'h12;  // 0x48
+    localparam [4:0] ADDR_BACKEND_MODE        = 5'h13;  // 0x4C
     localparam [31:0] SPIKEMOLD_CONFIG_VERSION = 32'h534D3031;  // "SM01"
 
     //=========================================================================
@@ -191,6 +197,7 @@ module spikemold_config_regs #(
     reg  [15:0] reg_threshold;
     reg  [7:0]  reg_leak_rate;
     reg  [7:0]  reg_refrac_period;
+    reg  [1:0]  reg_backend_mode;
 
     // Config write enable pulse (one-cycle pulse on CONFIG_WDATA write)
     reg         config_we_pulse;
@@ -210,6 +217,7 @@ module spikemold_config_regs #(
     assign global_threshold    = reg_threshold;
     assign global_leak_rate    = reg_leak_rate;
     assign global_refrac_period = reg_refrac_period;
+    assign backend_mode        = reg_backend_mode;
 
     //=========================================================================
     // AXI Write Address Channel
@@ -262,6 +270,7 @@ module spikemold_config_regs #(
             reg_threshold    <= 16'd100;        // Default: 100
             reg_leak_rate    <= 8'h03;          // Default: shift1=3 (tau≈0.875)
             reg_refrac_period <= 8'd10;         // Default: 10 cycles
+            reg_backend_mode  <= 2'd0;
             config_we_pulse  <= 1'b0;
             config_target    <= 2'd0;
         end else begin
@@ -301,6 +310,10 @@ module spikemold_config_regs #(
                     ADDR_NEURON_PARAMS: begin
                         if (s_axi_wstrb[0]) reg_leak_rate      <= s_axi_wdata[7:0];
                         if (s_axi_wstrb[1]) reg_refrac_period   <= s_axi_wdata[15:8];
+                    end
+
+                    ADDR_BACKEND_MODE: begin
+                        if (s_axi_wstrb[0]) reg_backend_mode <= s_axi_wdata[1:0];
                     end
 
                     default: ; // Read-only or reserved registers
@@ -376,6 +389,8 @@ module spikemold_config_regs #(
                     ADDR_OUTPUT_BR_EMITS:   r_data <= output_bridge_emit_count;
                     ADDR_PL_BUSY_CYCLES:    r_data <= pl_busy_cycles_counter;
                     ADDR_OUTPUT_DRAIN_CYCLES: r_data <= output_drain_cycles_counter;
+                    ADDR_STATE_CHECKSUM:     r_data <= state_checksum;
+                    ADDR_BACKEND_MODE:       r_data <= {30'd0, reg_backend_mode};
                     default:                r_data <= 32'hDEADBEEF;
                 endcase
             end else if (r_valid && s_axi_rready) begin

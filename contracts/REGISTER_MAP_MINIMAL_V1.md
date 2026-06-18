@@ -27,6 +27,7 @@ must preserve these addresses or provide an explicit compatibility shim.
 | `0x30` | `ACTIVE_COUNT` | RO | unique active neurons committed |
 | `0x34` | `STALL_COUNT` | RO | backpressure cycles |
 | `0x38` | `ERROR_CODE` | RO | zero on success |
+| `0x4C` | `BACKEND_MODE` | RW | backend selector: 0 flat FC-LIF, 1 tiny EventConv smoke |
 
 ## Required Smoke Behavior
 

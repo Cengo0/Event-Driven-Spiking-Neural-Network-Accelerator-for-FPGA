@@ -12,7 +12,7 @@ import hashlib
 import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Mapping, MutableMapping, Optional, Sequence, Tuple
+from typing import Dict, Iterable, List, Mapping, MutableMapping, Optional, Sequence, Tuple, Set
 
 
 INT32_MIN = -(1 << 31)
@@ -335,5 +335,221 @@ def generate_eventconv_trace(
         updates=updates,
         commits=commits,
         final_state=dict(state),
+        counters=counters,
+    )
+
+
+def generate_eventconv_active_readout_trace(
+    input_spikes: Iterable[InputSpike],
+    kernel: Sequence[Sequence[Sequence[Sequence[int]]]],
+    input_shape: Tuple[int, int, int],
+    stride: int = 1,
+    padding: int = 0,
+    commit_thresholds: Optional[Mapping[int, int]] = None,
+    trace_id: str = "eventconv_active_readout",
+) -> SpikeMoldContractTrace:
+    """Generate EventConv trace with packet-end active-set commit.
+
+    This matches the integrated board path: input spikes first generate
+    near-memory state updates, then active destinations are scanned once at
+    the packet boundary.
+    """
+
+    base = generate_eventconv_trace(
+        input_spikes=input_spikes,
+        kernel=kernel,
+        input_shape=input_shape,
+        stride=stride,
+        padding=padding,
+        thresholds={},
+        trace_id=trace_id,
+    )
+    thresholds = commit_thresholds or {}
+    state: MutableMapping[int, int] = {int(k): int(v) for k, v in base.final_state.items()}
+    active_order: List[int] = []
+    for update in base.updates:
+        if update.dst_id not in active_order:
+            active_order.append(update.dst_id)
+
+    commits: List[ActiveSetCommit] = []
+    commit_tick = max((event.tick for event in base.inputs), default=0)
+    scan_index = 0
+    while scan_index < len(active_order):
+        dst = active_order[scan_index]
+        value = int(state.get(dst, 0))
+        if value >= int(thresholds.get(dst, INT32_MAX)):
+            commits.append(ActiveSetCommit(commit_tick, dst, value))
+            state[dst] = 0
+            active_order.pop(scan_index)
+        else:
+            scan_index += 1
+
+    nonzero_state = {dst: value for dst, value in state.items() if value != 0}
+    counters = TraceCounters(
+        input_event_count=len(base.inputs),
+        generated_update_count=len(base.updates),
+        active_neuron_count=len({update.dst_id for update in base.updates}),
+        commit_count=len(commits),
+        state_reads=len(base.updates),
+        state_writes=len(base.updates) + len(commits),
+        ddr_bytes_inner_loop=0,
+        python_inner_loop_steps=0,
+    )
+    metadata = dict(base.metadata)
+    metadata.update(
+        {
+            "commit_mode": "packet_end_active_set",
+            "active_neuron_count_after_commit": len(active_order),
+            "readout_scan_count": counters.active_neuron_count,
+        }
+    )
+    return SpikeMoldContractTrace(
+        trace_id=trace_id,
+        target=base.target,
+        metadata=metadata,
+        inputs=base.inputs,
+        updates=base.updates,
+        commits=commits,
+        final_state=nonzero_state,
+        counters=counters,
+    )
+
+
+# =============================================================================
+# Multi-layer FC-LIF trace generation
+# =============================================================================
+
+def generate_fclif_layer_trace(
+    input_ids: Sequence[int],
+    weights: Mapping[Tuple[int, int], int],
+    thresholds: Mapping[int, int],
+    reset_values: Optional[Mapping[int, int]] = None,
+    initial_state: Optional[Mapping[int, int]] = None,
+    layer_name: str = "fc_lif_layer",
+) -> Tuple[Sequence[SynapticUpdate], Sequence[ActiveSetCommit], MutableMapping[int, int]]:
+    """Generate updates and commits for one FC-LIF layer.
+
+    Args:
+        input_ids: Source neuron IDs that fire (input spikes)
+        weights: {(src_id, dst_id): weight} mapping
+        thresholds: {dst_id: threshold} for firing
+        reset_values: {dst_id: value} after firing (default: 0)
+        initial_state: {dst_id: state} starting state
+        layer_name: Layer identifier for tracing
+
+    Returns:
+        (updates, commits, final_state)
+    """
+    reset_values = reset_values or {}
+    state: MutableMapping[int, int] = {int(k): int(v) for k, v in (initial_state or {}).items()}
+    updates: List[SynapticUpdate] = []
+    commits: List[ActiveSetCommit] = []
+
+    fanout = sorted(((src, dst, weight) for (src, dst), weight in weights.items()), key=lambda item: item[:2])
+
+    for src_id in input_ids:
+        for src, dst, weight in fanout:
+            if src != src_id:
+                continue
+            # Use tick 0 for all layer computations (trace-level timing handled externally)
+            updates.append(SynapticUpdate(0, src, dst, int(weight)))
+            state[dst] = _clamp_i32(state.get(dst, 0) + int(weight))
+            if state[dst] >= int(thresholds.get(dst, INT32_MAX)):
+                commits.append(ActiveSetCommit(0, dst, state[dst]))
+                state[dst] = int(reset_values.get(dst, 0))
+
+    return updates, commits, dict(state)
+
+
+def generate_multilayer_fc_lif_trace(
+    layer_configs: Sequence[Mapping[str, object]],
+    input_spikes: Iterable[InputSpike],
+    trace_id: str = "multilayer_fclif",
+    target: str = "architecture-neutral",
+) -> SpikeMoldContractTrace:
+    """Generate deterministic multi-layer FC-LIF trace.
+
+    Args:
+        layer_configs: List of layer configurations, each with:
+            - 'name': layer name
+            - 'input_ids': list of input neuron IDs for this layer
+            - 'weights': {(src_id, dst_id): weight}
+            - 'thresholds': {dst_id: threshold}
+            - 'reset_values': optional {dst_id: value}
+        input_spikes: Input spike events
+        trace_id: Trace identifier
+        target: Target platform
+
+    Returns:
+        SpikeMoldContractTrace with multi-layer computation results
+    """
+    ordered_inputs = sorted(list(input_spikes), key=lambda event: (event.tick, event.src_id))
+
+    # Track state across layers
+    layer_states: List[MutableMapping[int, int]] = []
+    all_updates: List[SynapticUpdate] = []
+    all_commits: List[ActiveSetCommit] = []
+    active_set: Set[int] = set()
+
+    current_input_ids = [spike.src_id for spike in ordered_inputs]
+
+    for layer_idx, config in enumerate(layer_configs):
+        layer_name = config.get('name', f'layer_{layer_idx}')
+        weights = config.get('weights', {})
+        thresholds = config.get('thresholds', {})
+        reset_values = config.get('reset_values', {})
+
+        updates, commits, final_state = generate_fclif_layer_trace(
+            input_ids=current_input_ids,
+            weights=weights,
+            thresholds=thresholds,
+            reset_values=reset_values,
+            initial_state=None,  # Each layer starts fresh
+            layer_name=layer_name,
+        )
+
+        layer_states.append(final_state)
+        all_updates.extend(updates)
+
+        for commit in commits:
+            all_commits.append(ActiveSetCommit(
+                tick=ordered_inputs[0].tick if ordered_inputs else 0,
+                dst_id=commit.dst_id,
+                value=commit.value,
+            ))
+            # Next layer input is the committed neurons
+            current_input_ids = [commit.dst_id for commit in commits]
+
+        active_set.update(update.dst_id for update in updates)
+
+    counters = TraceCounters(
+        input_event_count=len(ordered_inputs),
+        generated_update_count=len(all_updates),
+        active_neuron_count=len(active_set),
+        commit_count=len(all_commits),
+        state_reads=len(all_updates),
+        state_writes=len(all_updates) + len(all_commits),
+        ddr_bytes_inner_loop=0,
+        python_inner_loop_steps=0,
+    )
+
+    # Final state is the last layer's output (non-committed neurons)
+    final_state_output = layer_states[-1] if layer_states else {}
+    nonzero_state = {dst: value for dst, value in final_state_output.items() if value != 0}
+
+    return SpikeMoldContractTrace(
+        trace_id=trace_id,
+        target=target,
+        metadata={
+            "primitive": "multilayer_fc_lif",
+            "num_layers": len(layer_configs),
+            "layer_names": [c.get('name', f'layer_{i}') for i, c in enumerate(layer_configs)],
+            "reset_mode": "zero",
+            "weight_storage": "explicit_sparse",
+        },
+        inputs=ordered_inputs,
+        updates=all_updates,
+        commits=all_commits,
+        final_state=nonzero_state,
         counters=counters,
     )

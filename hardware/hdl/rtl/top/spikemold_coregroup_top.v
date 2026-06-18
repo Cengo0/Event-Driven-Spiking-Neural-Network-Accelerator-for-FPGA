@@ -291,6 +291,7 @@ module spikemold_coregroup_top #(
     wire [31:0]                   output_bridge_event_count;
     wire [31:0]                   output_bridge_emit_count;
     wire [31:0]                   output_bridge_drop_count;
+    wire [31:0]                   coregroup_state_checksum;
     reg [31:0]                    service_cycles_counter;
     reg [31:0]                    pl_busy_cycles_counter;
     reg [31:0]                    output_drain_cycles_counter;
@@ -648,8 +649,13 @@ module spikemold_coregroup_top #(
                                    output_bridge_overflow}),
         .cfg_output_bridge_event_count(output_bridge_event_count),
         .cfg_output_bridge_emit_count(output_bridge_emit_count),
-        .cfg_output_bridge_drop_count(output_bridge_drop_count)
+        .cfg_output_bridge_drop_count(output_bridge_drop_count),
+        .cfg_state_checksum     (coregroup_state_checksum)
     );
+
+    // Coregroup top does not yet aggregate per-core membrane checksums.
+    // Register 0x48 is supported only by the integrated flat LIF top today.
+    assign coregroup_state_checksum = 32'd0;
 
     //=========================================================================
     // HLS ↔ Event Router Bridge

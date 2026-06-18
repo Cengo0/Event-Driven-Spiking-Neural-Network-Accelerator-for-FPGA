@@ -36,6 +36,7 @@ module tb_wide_control_config_regs;
     wire [15:0] global_threshold;
     wire [7:0] global_leak_rate;
     wire [7:0] global_refrac_period;
+    wire [1:0] backend_mode;
 
     wire accumulate_only;
     wire [NUM_GROUPS-1:0] commit_group_mask;
@@ -79,6 +80,7 @@ module tb_wide_control_config_regs;
         .global_threshold(global_threshold),
         .global_leak_rate(global_leak_rate),
         .global_refrac_period(global_refrac_period),
+        .backend_mode(backend_mode),
         .router_spike_count(32'd0),
         .neuron_spike_count(32'd0),
         .fifo_overflow(1'b0),
@@ -90,7 +92,8 @@ module tb_wide_control_config_regs;
         .output_bridge_status(32'd0),
         .output_bridge_drop_count(32'd0),
         .output_bridge_event_count(32'd0),
-        .output_bridge_emit_count(32'd0)
+        .output_bridge_emit_count(32'd0),
+        .state_checksum(32'd0)
     );
 
     wide_control_decode #(

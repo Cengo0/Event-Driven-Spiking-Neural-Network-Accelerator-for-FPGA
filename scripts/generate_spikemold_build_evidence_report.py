@@ -24,11 +24,11 @@ CSYNTH_XML = ROOT / "hardware" / "hls" / "hls_output" / "hls" / "syn" / "report"
 CSYNTH_RPT = ROOT / "hardware" / "hls" / "hls_output" / "hls" / "syn" / "report" / "csynth.rpt"
 HLS_COMPONENT_XML = ROOT / "hardware" / "hls" / "hls_output" / "hls" / "impl" / "ip" / "component.xml"
 HLS_ZIP = ROOT / "hardware" / "hls" / "hls_output" / "spikemold_top_hls.zip"
-BITSTREAM = ROOT / "outputs" / "spikemold_pynq_z2.bit"
-HWH = ROOT / "outputs" / "spikemold_pynq_z2.hwh"
-TIMING_RPT = ROOT / "outputs" / "spikemold_pynq_z2_timing.rpt"
-UTIL_RPT = ROOT / "outputs" / "spikemold_pynq_z2_utilization.rpt"
-POWER_RPT = ROOT / "outputs" / "spikemold_pynq_z2_power.rpt"
+BITSTREAM = ROOT / "outputs" / "spikemold_pynq_z2_eventconv_20mhz.bit"
+HWH = ROOT / "outputs" / "spikemold_pynq_z2_eventconv_20mhz.hwh"
+TIMING_RPT = ROOT / "outputs" / "spikemold_pynq_z2_eventconv_20mhz_timing.rpt"
+UTIL_RPT = ROOT / "outputs" / "spikemold_pynq_z2_eventconv_20mhz_utilization.rpt"
+POWER_RPT = ROOT / "outputs" / "spikemold_pynq_z2_eventconv_20mhz_power.rpt"
 
 
 def sha256_file(path: Path) -> str:
@@ -317,6 +317,18 @@ def build_report() -> dict[str, Any]:
         "bitstream": artifact(BITSTREAM),
         "hwh": artifact(HWH),
     }
+    route_timing_ok = timing["timing_met"] and timing["report_says_timing_met"]
+    bit_hwh_present = artifacts["bitstream"]["size_bytes"] > 0 and artifacts["hwh"]["size_bytes"] > 0
+    known_limitations = [
+        "HLS ENCODER_LOOP final II is 2 due Resource Limitation; accepted for this gate.",
+        "Vivado power is vectorless/report_power estimate with Medium confidence; not board energy.",
+        "No PYNQ-Z2 board execution, latency, throughput, or dataset correctness claim is made.",
+    ]
+    if not route_timing_ok:
+        known_limitations.append(
+            "Integrated Vivado routed timing is not met; this bitstream is functional-smoke evidence only, not a timing/performance lock."
+        )
+
     report = {
         "schema": SCHEMA,
         "evidence_level": EVIDENCE_LEVEL,
@@ -340,24 +352,21 @@ def build_report() -> dict[str, Any]:
             "timing": timing,
             "utilization": utilization,
             "power_estimate": power,
-            "all_timing_met": timing["timing_met"] and timing["report_says_timing_met"],
-            "bitstream_and_hwh_present": artifacts["bitstream"]["size_bytes"] > 0
-            and artifacts["hwh"]["size_bytes"] > 0,
+            "all_timing_met": route_timing_ok,
+            "bitstream_and_hwh_present": bit_hwh_present,
         },
         "all_ok": (
             hls_csim["passed"]
             and hls_synthesis["passed"]
             and csynth["timing_estimate_meets_target"]
-            and timing["timing_met"]
-            and timing["report_says_timing_met"]
-            and artifacts["bitstream"]["size_bytes"] > 0
-            and artifacts["hwh"]["size_bytes"] > 0
+            and route_timing_ok
+            and bit_hwh_present
         ),
-        "known_limitations": [
-            "HLS ENCODER_LOOP final II is 2 due Resource Limitation; accepted for this gate.",
-            "Vivado power is vectorless/report_power estimate with Medium confidence; not board energy.",
-            "No PYNQ-Z2 board execution, latency, throughput, or dataset correctness claim is made.",
-        ],
+        "functional_artifact_ok": hls_csim["passed"]
+        and hls_synthesis["passed"]
+        and csynth["timing_estimate_meets_target"]
+        and bit_hwh_present,
+        "known_limitations": known_limitations,
         "claim_boundary": CLAIM_BOUNDARY,
     }
     report["hashes"] = {"build_evidence_sha256": sha256_json(report)}
@@ -376,13 +385,19 @@ def write_markdown(path: Path, report: dict[str, Any]) -> None:
     power = report["vivado_routed"]["power_estimate"]
     artifacts = report["artifacts"]
     warnings = timing["methodology_warnings"]
+    route_timing_ok = report["vivado_routed"]["all_timing_met"]
+    status = (
+        "HLS C-sim, HLS synthesis/IP package, and integrated Vivado route timing passed"
+        if route_timing_ok
+        else "HLS C-sim/synthesis passed and integrated bit/HWH generated; routed timing not met"
+    )
     warning_rows = "\n".join(
         f"| {item['rule']} | {item['severity']} | {item['violations']} | {item['description']} |"
         for item in warnings
     )
     text = f"""# SpikeMold HLS/Vivado Build Evidence Report
 
-Status: HLS C-sim, HLS synthesis/IP package, and integrated Vivado route passed
+Status: {status}
 
 ## Evidence Level
 
@@ -417,7 +432,11 @@ HLS resource estimate:
 | routed WNS | `{timing["wns_ns"]}` ns | timing summary |
 | routed TNS failing endpoints | `{timing["tns_failing_endpoints"]}` | timing summary |
 | all timing met | `{report["vivado_routed"]["all_timing_met"]}` | timing summary |
-| bitstream present | `{report["vivado_routed"]["bitstream_and_hwh_present"]}` | `outputs/spikemold_pynq_z2.bit` + `.hwh` |
+| bitstream present | `{report["vivado_routed"]["bitstream_and_hwh_present"]}` | `{report["artifacts"]["bitstream"]["path"]}` + `{report["artifacts"]["hwh"]["path"]}` |
+
+Timing status: `{status}`. When `all timing met` is `False`, the bit/HWH may be
+used only for functional board smoke; do not use it for latency, throughput, or
+frequency claims.
 
 Routed utilization:
 

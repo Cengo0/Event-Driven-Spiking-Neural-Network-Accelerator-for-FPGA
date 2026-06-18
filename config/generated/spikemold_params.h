@@ -11,14 +11,14 @@
 const int SNN_NUM_GROUPS            = 16;
 const int SNN_NEURONS_PER_GROUP     = 128;  // max(group_sizes)
 const int SNN_MAX_NEURONS_PER_GROUP = 128;
-const int SNN_MAX_FANOUT_INTER      = 16;
-const int SNN_ROUTER_MAX_FANOUT     = 32;
+const int SNN_MAX_FANOUT_INTER      = 32;
+const int SNN_ROUTER_MAX_FANOUT     = 64;
 const int SNN_ROUTER_DELAY_WIDTH    = 8;
 const int SNN_ROUTER_USE_DIRECT_OFFSET_MAP = 0;
 const int SNN_ROUTER_USE_TABLE_FALLBACK = 0;
 const int SNN_ROUTER_DIRECT_MAP_WINDOWS = 4;
 const int SNN_ROUTER_CONN_RAM_STYLE_DIST = 0;
-const int SNN_SPIKE_BUFFER_DEPTH    = 64;
+const int SNN_SPIKE_BUFFER_DEPTH    = 128;
 const int SNN_TOTAL_NEURONS         = 2048;
 
 // ─── Data Widths ───────────────────────────────────────────────────
@@ -33,7 +33,7 @@ const int SNN_GROUP_ID_WIDTH      = 4;
 const int SNN_LOCAL_ID_WIDTH      = 7;
 const int SNN_GLOBAL_ID_WIDTH     = 11;
 const int SNN_NEURON_ID_WIDTH     = 11;  // Alias
-const int SNN_FANOUT_IDX_WIDTH    = 4;
+const int SNN_FANOUT_IDX_WIDTH    = 5;
 
 // ─── Derived Counts ────────────────────────────────────────────────
 const int SNN_MAX_NEURONS         = 2048;
@@ -105,12 +105,12 @@ const int SNN_PACKED_BUFFER_BYTES = 262144;
 #define SNN_WEIGHT_TILING_ENABLE 1
 #define SNN_WEIGHT_TILING_LARGE_ONLY 1
 #define SNN_WEIGHT_TILING_LARGE_CONN_MIN_WEIGHTS 65536
-#define SNN_WEIGHT_TILING_SRC_CHUNK 196
-#define SNN_WEIGHT_TILING_DST_CHUNK 128
+#define SNN_WEIGHT_TILING_SRC_CHUNK 256
+#define SNN_WEIGHT_TILING_DST_CHUNK 192
 #define SNN_WEIGHT_TILING_DOUBLE_BUFFER 0
 #define SNN_WEIGHT_TILING_ACTIVE_BUFFERS 1
-#define SNN_WEIGHT_TILING_ACTIVE_TILE_WEIGHTS 25088
-#define SNN_WEIGHT_TILING_ACTIVE_TILE_BYTES 25088
+#define SNN_WEIGHT_TILING_ACTIVE_TILE_WEIGHTS 49152
+#define SNN_WEIGHT_TILING_ACTIVE_TILE_BYTES 49152
 
 // ─── Fixed-Point (ap_fixed<16,8>) ─────────────────────────────────
 const int SNN_FIXED_POINT_FRAC_BITS = 8;

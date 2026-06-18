@@ -3,6 +3,7 @@ import json
 from spikepress.architecture_trace_generator import (
     TRACE_SCHEMA,
     InputSpike,
+    generate_eventconv_active_readout_trace,
     generate_eventconv_trace,
     generate_fc_lif_trace,
     pack_spikemold_event_word64,
@@ -51,6 +52,33 @@ def test_eventconv_trace_uses_shared_kernel_agu_semantics():
     assert trace["counters"]["generated_update_count"] == 4
     assert trace["counters"]["active_neuron_count"] == 4
     assert trace["counters"]["commit_count"] == 1
+
+
+def test_eventconv_active_readout_trace_defers_commits_to_packet_end():
+    trace = generate_eventconv_active_readout_trace(
+        input_spikes=[
+            InputSpike(tick=0, src_id=0, y=1, x=1, channel=0),
+            InputSpike(tick=1, src_id=1, y=2, x=2, channel=0),
+            InputSpike(tick=2, src_id=2, y=0, x=0, channel=0),
+        ],
+        kernel=[[[[1, 2], [3, 4]]]],
+        input_shape=(1, 3, 3),
+        stride=1,
+        padding=0,
+        commit_thresholds={0: 3, 1: 3, 2: 3, 3: 3},
+    ).to_dict()
+
+    assert trace["metadata"]["commit_mode"] == "packet_end_active_set"
+    assert trace["metadata"]["active_neuron_count_after_commit"] == 1
+    assert trace["counters"]["input_event_count"] == 3
+    assert trace["counters"]["generated_update_count"] == 6
+    assert trace["counters"]["commit_count"] == 3
+    assert trace["commits"] == [
+        {"dst_id": 3, "kind": "commit", "tick": 2, "value": 5},
+        {"dst_id": 1, "kind": "commit", "tick": 2, "value": 3},
+        {"dst_id": 0, "kind": "commit", "tick": 2, "value": 5},
+    ]
+    assert trace["final_state"] == {"2": 2}
 
 
 def test_trace_json_roundtrip(tmp_path):

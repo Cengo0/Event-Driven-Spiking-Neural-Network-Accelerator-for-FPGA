@@ -50,7 +50,7 @@ module spike_conv_active_commit #(
     reg reset_channel_done;
 
     wire active_index_in_range =
-        (active_index < active_count_latched) && (active_index < STATE_COUNT);
+        (active_index < active_neuron_count) && (active_index < STATE_COUNT);
     wire [DEST_ID_WIDTH-1:0] current_dest_id =
         active_id_flat[active_index*DEST_ID_WIDTH +: DEST_ID_WIDTH];
     wire current_dest_valid = (current_dest_id < STATE_COUNT);
@@ -162,7 +162,10 @@ module spike_conv_active_commit #(
                         reset_channel_done <= 1'b0;
                         commit_emit_count <= commit_emit_count + 32'd1;
                         readout_checksum <= readout_checksum + held_state_value;
-                        active_index <= active_index + 32'd1;
+                        // The reset path compacts the active list. Keep the
+                        // same index so the shifted next active neuron is not
+                        // skipped after a commit/reset pair.
+                        active_index <= active_index;
                         state <= STATE_CHECK;
                     end
                 end

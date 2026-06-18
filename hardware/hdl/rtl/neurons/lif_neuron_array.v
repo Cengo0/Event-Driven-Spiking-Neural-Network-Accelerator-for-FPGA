@@ -48,6 +48,7 @@ module lif_neuron_array #(
     // Output spike interface
     output wire                         m_axis_spike_valid,
     output wire [NEURON_ID_WIDTH-1:0]   m_axis_spike_neuron_id,
+    output wire [DATA_WIDTH-1:0]        m_axis_spike_value,
     input  wire                         m_axis_spike_ready,
 
     // Configuration interface
@@ -64,6 +65,7 @@ module lif_neuron_array #(
     output wire [31:0]                  spike_count,
     output wire                         array_busy,
     output wire [31:0]                  throughput_counter,
+    output wire [31:0]                  state_checksum,
     output wire [7:0]                   active_neurons
 );
 
@@ -166,6 +168,7 @@ module lif_neuron_array #(
     reg                       sp_fired;
     reg                       neuron_fire_pulse;
     reg [NEURON_ID_WIDTH-1:0] neuron_fire_id;
+    reg [DATA_WIDTH-1:0]      neuron_fire_value;
     reg [DATA_WIDTH-1:0]      mem_pipe;
     reg [REFRAC_WIDTH-1:0]    ref_pipe;
     reg                       leak_spike_pending;
@@ -198,32 +201,61 @@ module lif_neuron_array #(
     (* use_dsp = "yes" *) wire [DATA_WIDTH:0] synaptic_sum_pipe;
     assign synaptic_sum_pipe = {1'b0, mem_pipe} + {{(DATA_WIDTH-WEIGHT_WIDTH+1){1'b0}}, sp_weight};
 
+    function signed [31:0] membrane_delta;
+        input [DATA_WIDTH-1:0] old_mem;
+        input [DATA_WIDTH-1:0] new_mem;
+        reg signed [31:0] old_ext;
+        reg signed [31:0] new_ext;
+        begin
+            old_ext = $signed({1'b0, old_mem});
+            new_ext = $signed({1'b0, new_mem});
+            membrane_delta = new_ext - old_ext;
+        end
+    endfunction
+
     //=========================================================================
     // Main State Machine
     //=========================================================================
-    localparam [2:0]
+    localparam [3:0]
         ST_IDLE     = 3'd0,
         ST_LEAK_RD  = 3'd1,
         ST_LEAK_CMP = 3'd2,
         ST_LEAK_WR  = 3'd3,
         ST_SPIKE_RD = 3'd4,
         ST_SPIKE_CMP = 3'd5,
-        ST_SPIKE_WR = 3'd6;
+        ST_SPIKE_WR = 3'd6,
+        ST_CFG_RD   = 4'd7,
+        ST_CFG_WAIT = 4'd8,
+        ST_CFG_WR   = 4'd9;
 
-    reg [2:0] state;
+    reg [3:0] state;
     reg [NEURON_ID_WIDTH-1:0] leak_idx;
     reg leak_cycle_done;
+    reg signed [31:0] state_checksum_reg;
 
     // Leak hold registers
     reg [NEURON_ID_WIDTH-1:0] leak_addr_hold;
+    reg                       cfg_pending;
+    reg [NEURON_ID_WIDTH-1:0] cfg_addr_hold;
+    reg [31:0]                cfg_data_hold;
+    wire leak_scan_enabled = (global_leak_rate != {LEAK_WIDTH{1'b0}}) ||
+                             (global_refrac_period != {REFRAC_WIDTH{1'b0}});
 
-    assign array_busy = (state != ST_IDLE) || !fifo_empty;
+    wire [STATE_WIDTH-1:0] cfg_state_next =
+        (cfg_data_hold[31:30] == 2'b00) ? {cfg_data_hold[DATA_WIDTH-1:0], ref_rd} :
+        (cfg_data_hold[31:30] == 2'b01) ? {mem_rd, cfg_data_hold[REFRAC_WIDTH-1:0]} :
+                                          bram_dout;
+    wire [DATA_WIDTH-1:0] cfg_mem_next = cfg_state_next[STATE_WIDTH-1:REFRAC_WIDTH];
+
+    assign array_busy = (state != ST_IDLE) || cfg_pending || !fifo_empty ||
+                        (enable && leak_scan_enabled && !leak_cycle_done);
 
     always @(posedge clk) begin
         if (!rst_n) begin
             state <= ST_IDLE;
             leak_idx <= 0;
             leak_cycle_done <= 0;
+            state_checksum_reg <= 32'sd0;
             bram_we <= 0;
             bram_wr_addr <= 0;
             bram_rd_addr <= 0;
@@ -234,6 +266,7 @@ module lif_neuron_array #(
             sp_fired <= 0;
             neuron_fire_pulse <= 0;
             neuron_fire_id <= 0;
+            neuron_fire_value <= 0;
             mem_pipe <= 0;
             ref_pipe <= 0;
             leak_spike_pending <= 0;
@@ -241,6 +274,9 @@ module lif_neuron_array #(
             leak_sp_weight_pending <= 0;
             leak_sp_exc_pending <= 0;
             leak_addr_hold <= 0;
+            cfg_pending <= 0;
+            cfg_addr_hold <= 0;
+            cfg_data_hold <= 0;
             sf_set_pending <= 0;
             sf_set_addr <= 0;
             sf_set_bit <= 0;
@@ -253,19 +289,28 @@ module lif_neuron_array #(
             sf_set_pending <= 0;
             neuron_fire_pulse <= 0;
 
+            if (config_we && config_addr < NUM_NEURONS && !cfg_pending && state == ST_IDLE) begin
+                cfg_pending <= 1'b1;
+                cfg_addr_hold <= config_addr;
+                cfg_data_hold <= config_data;
+            end
+
             // FIFO write (always active)
             if (s_axis_spike_valid && !fifo_full) begin
                 spike_fifo[fifo_wr_ptr] <= {s_axis_spike_exc_inh, s_axis_spike_weight, s_axis_spike_dest_id};
                 fifo_wr_ptr <= fifo_wr_ptr + 1;
             end
 
-            if (enable || state != ST_IDLE) begin
+            if (enable || state != ST_IDLE || cfg_pending) begin
                 case (state)
                     //------------------------------------------------------
                     ST_IDLE: begin
                         sp_fired <= 0;
 
-                        if (!fifo_empty) begin
+                        if (cfg_pending) begin
+                            bram_rd_addr <= cfg_addr_hold;
+                            state <= ST_CFG_RD;
+                        end else if (!fifo_empty) begin
                             // Capture spike from FIFO, issue BRAM read
                             sp_addr   <= fifo_dest;
                             sp_weight <= fifo_weight;
@@ -273,7 +318,7 @@ module lif_neuron_array #(
                             bram_rd_addr <= fifo_dest;
                             fifo_rd_ptr <= fifo_rd_ptr + 1;
                             state <= ST_SPIKE_RD;
-                        end else if (!leak_cycle_done) begin
+                        end else if (leak_scan_enabled && !leak_cycle_done) begin
                             bram_rd_addr <= leak_idx;
                             state <= ST_LEAK_RD;
                         end
@@ -318,12 +363,19 @@ module lif_neuron_array #(
                         bram_we  <= 1;
                         bram_wr_addr <= leak_addr_hold;  // Write port (separate from read)
 
-                        if (ref_pipe > 0)
+                        if (ref_pipe > 0) begin
                             bram_din <= {{DATA_WIDTH{1'b0}}, ref_pipe - 1'b1};
-                        else if (mem_pipe > leak_total)
+                            state_checksum_reg <= state_checksum_reg +
+                                membrane_delta(mem_pipe, {DATA_WIDTH{1'b0}});
+                        end else if (mem_pipe > leak_total) begin
                             bram_din <= {mem_pipe - leak_total, {REFRAC_WIDTH{1'b0}}};
-                        else
+                            state_checksum_reg <= state_checksum_reg +
+                                membrane_delta(mem_pipe, mem_pipe - leak_total);
+                        end else begin
                             bram_din <= {STATE_WIDTH{1'b0}};
+                            state_checksum_reg <= state_checksum_reg +
+                                membrane_delta(mem_pipe, {DATA_WIDTH{1'b0}});
+                        end
 
                         // Advance leak index
                         leak_idx <= leak_addr_hold + 1'b1;
@@ -381,27 +433,59 @@ module lif_neuron_array #(
                             bram_din <= {mem_pipe, ref_pipe};  // Keep as-is during refractory
                         end else if (sp_fired) begin
                             bram_din <= {{DATA_WIDTH{1'b0}}, global_refrac_period};
+                            state_checksum_reg <= state_checksum_reg +
+                                membrane_delta(mem_pipe, {DATA_WIDTH{1'b0}});
                             sf_set_pending <= 1;
                             sf_set_addr <= sp_addr[NEURON_ID_WIDTH-1:3];
                             sf_set_bit  <= sp_addr[2:0];
                             neuron_fire_pulse <= 1;
                             neuron_fire_id <= sp_addr;
+                            neuron_fire_value <= synaptic_sum_pipe[DATA_WIDTH] ?
+                                {DATA_WIDTH{1'b1}} : synaptic_sum_pipe[DATA_WIDTH-1:0];
                         end else begin
                             // Not fired - update membrane
                             if (sp_exc) begin
-                                if (synaptic_sum_pipe[DATA_WIDTH])
+                                if (synaptic_sum_pipe[DATA_WIDTH]) begin
                                     bram_din <= {{DATA_WIDTH{1'b1}}, ref_pipe};  // Saturate
-                                else
+                                    state_checksum_reg <= state_checksum_reg +
+                                        membrane_delta(mem_pipe, {DATA_WIDTH{1'b1}});
+                                end else begin
                                     bram_din <= {synaptic_sum_pipe[DATA_WIDTH-1:0], ref_pipe};
+                                    state_checksum_reg <= state_checksum_reg +
+                                        membrane_delta(mem_pipe, synaptic_sum_pipe[DATA_WIDTH-1:0]);
+                                end
                             end else begin
                                 // Inhibitory
-                                if (mem_pipe >= sp_weight)
+                                if (mem_pipe >= sp_weight) begin
                                     bram_din <= {mem_pipe - {{(DATA_WIDTH-WEIGHT_WIDTH){1'b0}}, sp_weight}, ref_pipe};
-                                else
+                                    state_checksum_reg <= state_checksum_reg +
+                                        membrane_delta(mem_pipe, mem_pipe - {{(DATA_WIDTH-WEIGHT_WIDTH){1'b0}}, sp_weight});
+                                end else begin
                                     bram_din <= {{DATA_WIDTH{1'b0}}, ref_pipe};
+                                    state_checksum_reg <= state_checksum_reg +
+                                        membrane_delta(mem_pipe, {DATA_WIDTH{1'b0}});
+                                end
                             end
                         end
 
+                        state <= ST_IDLE;
+                    end
+
+                    ST_CFG_RD: begin
+                        state <= ST_CFG_WAIT;
+                    end
+
+                    ST_CFG_WAIT: begin
+                        state <= ST_CFG_WR;
+                    end
+
+                    ST_CFG_WR: begin
+                        bram_we <= 1;
+                        bram_wr_addr <= cfg_addr_hold;
+                        bram_din <= cfg_state_next;
+                        state_checksum_reg <= state_checksum_reg +
+                            membrane_delta(mem_rd, cfg_mem_next);
+                        cfg_pending <= 1'b0;
                         state <= ST_IDLE;
                     end
 
@@ -411,22 +495,11 @@ module lif_neuron_array #(
                 // Reset leak_cycle_done for continuous operation
                 if (leak_cycle_done && fifo_empty && state == ST_IDLE)
                     leak_cycle_done <= 0;
-
-                // Config write override (highest priority)
-                if (config_we && config_addr < NUM_NEURONS) begin
-                    bram_we  <= 1;
-                    bram_wr_addr <= config_addr;
-                    case (config_data[31:30])
-                        2'b00: bram_din <= {config_data[DATA_WIDTH-1:0], bram_dout[REFRAC_WIDTH-1:0]};
-                        2'b01: bram_din <= {bram_dout[STATE_WIDTH-1:REFRAC_WIDTH], config_data[REFRAC_WIDTH-1:0]};
-                        default: bram_din <= bram_dout;
-                    endcase
-                end
             end
 
             // FIFO count management
             // Detect transitions that consume from FIFO
-            if (state == ST_IDLE && !fifo_empty && enable) begin
+            if (state == ST_IDLE && !fifo_empty && enable && !cfg_pending) begin
                 // Will consume one entry
                 if (s_axis_spike_valid && !fifo_full)
                     fifo_count <= fifo_count;  // simultaneous push+pop
@@ -450,7 +523,9 @@ module lif_neuron_array #(
     localparam OUT_FIFO_DEPTH = NUM_NEURONS;
     localparam OUT_FIFO_PTR_W = (OUT_FIFO_DEPTH <= 1) ? 1 : $clog2(OUT_FIFO_DEPTH);
 
-    reg [NEURON_ID_WIDTH-1:0] out_spike_fifo [0:OUT_FIFO_DEPTH-1];
+    localparam OUT_FIFO_DATA_WIDTH = NEURON_ID_WIDTH + DATA_WIDTH;
+
+    reg [OUT_FIFO_DATA_WIDTH-1:0] out_spike_fifo [0:OUT_FIFO_DEPTH-1];
     reg [OUT_FIFO_PTR_W-1:0]  out_fifo_wr_ptr;
     reg [OUT_FIFO_PTR_W-1:0]  out_fifo_rd_ptr;
     reg [OUT_FIFO_PTR_W:0]    out_fifo_count;
@@ -462,7 +537,8 @@ module lif_neuron_array #(
     wire out_fifo_push  = neuron_fire_pulse && (!out_fifo_full || out_fifo_pop);
 
     assign m_axis_spike_valid     = !out_fifo_empty;
-    assign m_axis_spike_neuron_id = out_spike_fifo[out_fifo_rd_ptr];
+    assign m_axis_spike_neuron_id = out_spike_fifo[out_fifo_rd_ptr][NEURON_ID_WIDTH-1:0];
+    assign m_axis_spike_value     = out_spike_fifo[out_fifo_rd_ptr][OUT_FIFO_DATA_WIDTH-1:NEURON_ID_WIDTH];
 
     reg [31:0] total_spikes;
     reg [31:0] throughput_cnt;
@@ -471,6 +547,7 @@ module lif_neuron_array #(
     assign spike_count        = total_spikes;
     assign throughput_counter = throughput_cnt;
     assign active_neurons     = active_neuron_cnt;
+    assign state_checksum     = state_checksum_reg[31:0];
 
     always @(posedge clk) begin
         if (!rst_n) begin
@@ -493,7 +570,7 @@ module lif_neuron_array #(
             end
 
             if (out_fifo_push) begin
-                out_spike_fifo[out_fifo_wr_ptr] <= neuron_fire_id;
+                out_spike_fifo[out_fifo_wr_ptr] <= {neuron_fire_value, neuron_fire_id};
                 if (out_fifo_wr_ptr == OUT_FIFO_DEPTH - 1)
                     out_fifo_wr_ptr <= 0;
                 else
@@ -534,7 +611,7 @@ module lif_neuron_array #(
         for (init_i = 0; init_i < SPIKE_BUFFER_DEPTH; init_i = init_i + 1)
             spike_fifo[init_i] = {FIFO_WIDTH{1'b0}};
         for (init_i = 0; init_i < OUT_FIFO_DEPTH; init_i = init_i + 1)
-            out_spike_fifo[init_i] = {NEURON_ID_WIDTH{1'b0}};
+            out_spike_fifo[init_i] = {OUT_FIFO_DATA_WIDTH{1'b0}};
     end
 
 endmodule
