@@ -124,6 +124,11 @@ outputs/*
 !outputs/.gitkeep
 fpga.zip
 
+# Local dataset/download/profiling snapshots. Keep these out of release commits;
+# curated traces and reports capture the reproducible evidence.
+drive-download-*.zip
+profiler_*.json
+
 # ============================================================
 # Local research / working docs
 # ============================================================
