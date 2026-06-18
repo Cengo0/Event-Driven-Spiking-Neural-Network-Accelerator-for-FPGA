@@ -1,18 +1,20 @@
 # Batch 1C EventConv Primitive Report
 
-Status: C0/C1/C2/C3/C4/C5 board-free gate passed
+Status: C0/C1/C2/C3/C4/C5 plus burst-boundary PYNQ-Z2 smoke gate passed
 
 ## Evidence Level
 
-`rtl_xsim_eventconv_primitive_no_board`
+`pynq_axi_dma0_direct_rtl_eventconv_burst_boundary_state_checksum_readback`
 
-No board execution was run. This report does not claim PYNQ-Z2 PL deployment,
-latency, throughput, or energy.
+PYNQ-Z2 board execution is locked for the fixed-shape EventConv tiny and
+burst-boundary trace smokes. This report does not claim latency, throughput, or
+energy.
 
 ## Generated
 
 - `golden_traces/v1/eventconv_agu_c0_tiny_v1.json`
 - `golden_traces/v1/eventconv_8x8_tiny_v1.json`
+- `golden_traces/v1/eventconv_burst_boundary_v1.json`
 - `hardware/hdl/rtl/core/spike_conv_agu.v`
 - `hardware/hdl/rtl/core/spike_conv_state_update.v`
 - `hardware/hdl/rtl/core/spike_conv_active_commit.v`
@@ -29,9 +31,11 @@ latency, throughput, or energy.
 | C0 trace-locked tiny case | PASS | `scripts/check_batch1c_eventconv.py` |
 | C1 AGU-only | PASS | Vivado xsim `tb_spike_conv_agu`: 19 PASS, 0 FAIL |
 | C2 AGU + state update | PASS | Vivado xsim `tb_spike_conv_state_update`: 19 PASS, 0 FAIL |
-| C3 AGU + active-set commit | PASS | Vivado xsim `tb_spike_conv_active_commit`: 36 PASS, 0 FAIL |
+| C3 AGU + active-set commit | PASS | Vivado xsim `tb_spike_conv_active_commit`: 49 PASS, 0 FAIL |
 | C4 scale-up | PASS | Vivado xsim `tb_spike_conv_c4_scaleup`: 46 PASS, 0 FAIL |
 | C5 readout backpressure | PASS | Vivado xsim `tb_spike_conv_commit_backpressure`: 31 PASS, 0 FAIL |
+| burst-boundary active readout trace | PASS | `golden_traces/v1/eventconv_burst_boundary_v1.json` |
+| burst-boundary PYNQ-Z2 smoke | PASS | `outputs/board/eventconv_burst_boundary_smoke_result_20260615.json` |
 
 ## C0 Trace Contract
 
@@ -123,12 +127,48 @@ Expected C5 counters:
 - full-neuron scan count: `0`
 - output backpressure cycles: `> 0`
 
+## Burst-Boundary Active Readout Contract
+
+The burst-boundary gate uses three input spikes on the fixed 3x3/2x2 EventConv
+board shape:
+
+- centered input `(x=1, y=1)`
+- bottom-right boundary input `(x=2, y=2)`
+- top-left boundary input `(x=0, y=0)`
+
+Invalid boundary taps are skipped, so the trace generates six updates rather
+than twelve. Packet-end active-set readout with threshold `3` emits:
+
+| Order | Destination | State |
+|---:|---:|---:|
+| 0 | 3 | 5 |
+| 1 | 1 | 3 |
+| 2 | 0 | 5 |
+
+After reset-to-zero for committed destinations, final nonzero state is:
+
+| Destination | Final State |
+|---:|---:|
+| 2 | 2 |
+
+Expected burst-boundary counters:
+
+- input event count: `3`
+- generated update count: `6`
+- active neuron count before commit: `4`
+- active neuron count after commit: `1`
+- commit output count: `3`
+- state reads: `6`
+- state writes: `9`
+- inner-loop DDR bytes: `0`
+- Python inner-loop steps: `0`
+
 ## Residual Risks
 
-- C4 uses centered input spikes; boundary padding invalid-coordinate behavior is
-  still a follow-up gate.
+- Burst-boundary board execution is locked for the fixed 3x3 input / 2x2 output
+  EventConv backend; configurable shape/kernel descriptors are still pending.
 - C4 state space is 64 destinations; wider output maps still need resource and
-  destination-width gates before board claims.
+  destination-width gates before wider board claims.
 
 ## Runtime Assumptions
 
@@ -139,6 +179,7 @@ Expected C5 counters:
 
 ## Next Gate
 
-Batch 1C board-free primitive gates cover centered EventConv scale-up and
-readout backpressure. Next EventConv gate is boundary/invalid-coordinate and
-wider-destination evidence before board/runtime integration.
+Batch 1C board-free primitive gates cover centered EventConv scale-up,
+burst-boundary invalid-tap skip behavior, and readout backpressure. The fixed
+PYNQ-Z2 EventConv smoke gate is now locked. Next EventConv gate is configurable
+shape/kernel descriptor evidence before wider-destination claims.

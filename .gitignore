@@ -128,6 +128,7 @@ fpga.zip
 # curated traces and reports capture the reproducible evidence.
 drive-download-*.zip
 profiler_*.json
+golden_traces/v1/nmnist_eventconv_sample_*.json
 
 # ============================================================
 # Local research / working docs

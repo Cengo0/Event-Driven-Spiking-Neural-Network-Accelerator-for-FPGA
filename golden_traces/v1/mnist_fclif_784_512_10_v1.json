@@ -1,0 +1,3745 @@
+{
+  "commits": [
+    {
+      "dst_id": 0,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 16,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 32,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 48,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 64,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 80,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 96,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 112,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 128,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 144,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 160,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 176,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 192,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 208,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 224,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 240,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 256,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 272,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 288,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 304,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 320,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 336,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 352,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 368,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 384,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 400,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 416,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 432,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 448,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 464,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 480,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 496,
+      "kind": "commit",
+      "tick": 0,
+      "value": 10
+    },
+    {
+      "dst_id": 0,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 1,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 2,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 3,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 4,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 5,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 6,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 7,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 8,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 9,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 0,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 1,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 2,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 3,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 4,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 5,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 6,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 7,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 8,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 9,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 0,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 1,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 2,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 3,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 4,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 5,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 6,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 7,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 8,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 9,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 0,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 1,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 2,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 3,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 4,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 5,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 6,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 7,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 8,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    },
+    {
+      "dst_id": 9,
+      "kind": "commit",
+      "tick": 0,
+      "value": 4
+    }
+  ],
+  "counters": {
+    "active_neuron_count": 41,
+    "commit_count": 72,
+    "ddr_bytes_inner_loop": 0,
+    "generated_update_count": 400,
+    "input_event_count": 79,
+    "python_inner_loop_steps": 0,
+    "state_reads": 400,
+    "state_writes": 472
+  },
+  "final_state": {},
+  "hashes": {
+    "commits_sha256": "2cfeb2f393cfd285e5136b650b86fd1e1da7f75fecb69705cc6279f438b2707d",
+    "final_state_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "input_sha256": "6a3d04cbf66232f4906730e8d4ee0ea2d3eaff0b578baba327ee578fb952bab1",
+    "trace_sha256": "56474f182387cc3f85cdc0d322696860fc3e9438c9afc614fa42f86aefc6cac3",
+    "updates_sha256": "cdd999387b988db88b0f1959ff67bc4f26e057e9af78f8c2d455c91df3414b5b"
+  },
+  "inputs": [
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 0,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 10,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 20,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 30,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 40,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 50,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 60,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 70,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 80,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 90,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 100,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 110,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 120,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 130,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 140,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 150,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 160,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 170,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 180,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 190,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 200,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 210,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 220,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 230,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 240,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 250,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 260,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 270,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 280,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 290,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 300,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 310,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 320,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 330,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 340,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 350,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 360,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 370,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 380,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 390,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 400,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 410,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 420,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 430,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 440,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 450,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 460,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 470,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 480,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 490,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 500,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 510,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 520,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 530,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 540,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 550,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 560,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 570,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 580,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 590,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 600,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 610,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 620,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 630,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 640,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 650,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 660,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 670,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 680,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 690,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 700,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 710,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 720,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 730,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 740,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 750,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 760,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 770,
+      "tick": 0
+    },
+    {
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 780,
+      "tick": 0
+    }
+  ],
+  "metadata": {
+    "layer_names": [
+      "hidden",
+      "output"
+    ],
+    "num_layers": 2,
+    "primitive": "multilayer_fc_lif",
+    "reset_mode": "zero",
+    "weight_storage": "explicit_sparse"
+  },
+  "schema": "spikemold.trace.v1",
+  "target": "pynq-z2",
+  "trace_id": "mnist_fclif_784_512_10_v1",
+  "updates": [
+    {
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 16,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 32,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 48,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 64,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 80,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 96,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 112,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 128,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 144,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 160,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 176,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 192,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 208,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 224,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 240,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 256,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 272,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 288,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 304,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 320,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 336,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 352,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 368,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 384,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 400,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 416,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 432,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 448,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 464,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 480,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 496,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 16,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 32,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 48,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 64,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 80,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 96,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 112,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 128,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 144,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 160,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 176,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 192,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 208,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 224,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 240,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 256,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 272,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 288,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 304,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 320,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 336,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 352,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 368,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 384,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 400,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 416,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 432,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 448,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 464,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 480,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 496,
+      "kind": "synaptic_update",
+      "src_id": 80,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 16,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 32,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 48,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 64,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 80,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 96,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 112,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 128,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 144,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 160,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 176,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 192,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 208,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 224,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 240,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 256,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 272,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 288,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 304,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 320,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 336,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 352,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 368,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 384,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 400,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 416,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 432,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 448,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 464,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 480,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 496,
+      "kind": "synaptic_update",
+      "src_id": 160,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 16,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 32,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 48,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 64,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 80,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 96,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 112,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 128,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 144,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 160,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 176,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 192,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 208,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 224,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 240,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 256,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 272,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 288,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 304,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 320,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 336,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 352,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 368,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 384,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 400,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 416,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 432,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 448,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 464,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 480,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 496,
+      "kind": "synaptic_update",
+      "src_id": 240,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 16,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 32,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 48,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 64,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 80,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 96,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 112,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 128,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 144,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 160,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 176,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 192,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 208,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 224,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 240,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 256,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 272,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 288,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 304,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 320,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 336,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 352,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 368,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 384,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 400,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 416,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 432,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 448,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 464,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 480,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 496,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 16,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 32,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 48,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 64,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 80,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 96,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 112,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 128,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 144,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 160,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 176,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 192,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 208,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 224,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 240,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 256,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 272,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 288,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 304,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 320,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 336,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 352,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 368,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 384,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 400,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 416,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 432,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 448,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 464,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 480,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 496,
+      "kind": "synaptic_update",
+      "src_id": 400,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 16,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 32,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 48,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 64,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 80,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 96,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 112,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 128,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 144,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 160,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 176,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 192,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 208,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 224,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 240,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 256,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 272,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 288,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 304,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 320,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 336,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 352,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 368,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 384,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 400,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 416,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 432,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 448,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 464,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 480,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 496,
+      "kind": "synaptic_update",
+      "src_id": 480,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 16,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 32,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 48,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 64,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 80,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 96,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 112,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 128,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 144,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 160,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 176,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 192,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 208,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 224,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 240,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 256,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 272,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 288,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 304,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 320,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 336,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 352,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 368,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 384,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 400,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 416,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 432,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 448,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 464,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 480,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 496,
+      "kind": "synaptic_update",
+      "src_id": 560,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 16,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 32,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 48,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 64,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 80,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 96,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 112,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 128,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 144,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 160,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 176,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 192,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 208,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 224,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 240,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 256,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 272,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 288,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 304,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 320,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 336,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 352,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 368,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 384,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 400,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 416,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 432,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 448,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 464,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 480,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 496,
+      "kind": "synaptic_update",
+      "src_id": 640,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 16,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 32,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 48,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 64,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 80,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 96,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 112,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 128,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 144,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 160,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 176,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 192,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 208,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 224,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 240,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 256,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 272,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 288,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 304,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 320,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 336,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 352,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 368,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 384,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 400,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 416,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 432,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 448,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 464,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 480,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 496,
+      "kind": "synaptic_update",
+      "src_id": 720,
+      "tick": 0,
+      "weight": 1
+    },
+    {
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 1,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 2,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 3,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 4,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 5,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 6,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 7,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 8,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 9,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 64,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 1,
+      "kind": "synaptic_update",
+      "src_id": 64,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 2,
+      "kind": "synaptic_update",
+      "src_id": 64,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 3,
+      "kind": "synaptic_update",
+      "src_id": 64,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 4,
+      "kind": "synaptic_update",
+      "src_id": 64,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 5,
+      "kind": "synaptic_update",
+      "src_id": 64,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 6,
+      "kind": "synaptic_update",
+      "src_id": 64,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 7,
+      "kind": "synaptic_update",
+      "src_id": 64,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 8,
+      "kind": "synaptic_update",
+      "src_id": 64,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 9,
+      "kind": "synaptic_update",
+      "src_id": 64,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 128,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 1,
+      "kind": "synaptic_update",
+      "src_id": 128,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 2,
+      "kind": "synaptic_update",
+      "src_id": 128,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 3,
+      "kind": "synaptic_update",
+      "src_id": 128,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 4,
+      "kind": "synaptic_update",
+      "src_id": 128,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 5,
+      "kind": "synaptic_update",
+      "src_id": 128,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 6,
+      "kind": "synaptic_update",
+      "src_id": 128,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 7,
+      "kind": "synaptic_update",
+      "src_id": 128,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 8,
+      "kind": "synaptic_update",
+      "src_id": 128,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 9,
+      "kind": "synaptic_update",
+      "src_id": 128,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 192,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 1,
+      "kind": "synaptic_update",
+      "src_id": 192,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 2,
+      "kind": "synaptic_update",
+      "src_id": 192,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 3,
+      "kind": "synaptic_update",
+      "src_id": 192,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 4,
+      "kind": "synaptic_update",
+      "src_id": 192,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 5,
+      "kind": "synaptic_update",
+      "src_id": 192,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 6,
+      "kind": "synaptic_update",
+      "src_id": 192,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 7,
+      "kind": "synaptic_update",
+      "src_id": 192,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 8,
+      "kind": "synaptic_update",
+      "src_id": 192,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 9,
+      "kind": "synaptic_update",
+      "src_id": 192,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 256,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 1,
+      "kind": "synaptic_update",
+      "src_id": 256,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 2,
+      "kind": "synaptic_update",
+      "src_id": 256,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 3,
+      "kind": "synaptic_update",
+      "src_id": 256,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 4,
+      "kind": "synaptic_update",
+      "src_id": 256,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 5,
+      "kind": "synaptic_update",
+      "src_id": 256,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 6,
+      "kind": "synaptic_update",
+      "src_id": 256,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 7,
+      "kind": "synaptic_update",
+      "src_id": 256,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 8,
+      "kind": "synaptic_update",
+      "src_id": 256,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 9,
+      "kind": "synaptic_update",
+      "src_id": 256,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 1,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 2,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 3,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 4,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 5,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 6,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 7,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 8,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 9,
+      "kind": "synaptic_update",
+      "src_id": 320,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 384,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 1,
+      "kind": "synaptic_update",
+      "src_id": 384,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 2,
+      "kind": "synaptic_update",
+      "src_id": 384,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 3,
+      "kind": "synaptic_update",
+      "src_id": 384,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 4,
+      "kind": "synaptic_update",
+      "src_id": 384,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 5,
+      "kind": "synaptic_update",
+      "src_id": 384,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 6,
+      "kind": "synaptic_update",
+      "src_id": 384,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 7,
+      "kind": "synaptic_update",
+      "src_id": 384,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 8,
+      "kind": "synaptic_update",
+      "src_id": 384,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 9,
+      "kind": "synaptic_update",
+      "src_id": 384,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 448,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 1,
+      "kind": "synaptic_update",
+      "src_id": 448,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 2,
+      "kind": "synaptic_update",
+      "src_id": 448,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 3,
+      "kind": "synaptic_update",
+      "src_id": 448,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 4,
+      "kind": "synaptic_update",
+      "src_id": 448,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 5,
+      "kind": "synaptic_update",
+      "src_id": 448,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 6,
+      "kind": "synaptic_update",
+      "src_id": 448,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 7,
+      "kind": "synaptic_update",
+      "src_id": 448,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 8,
+      "kind": "synaptic_update",
+      "src_id": 448,
+      "tick": 0,
+      "weight": 2
+    },
+    {
+      "dst_id": 9,
+      "kind": "synaptic_update",
+      "src_id": 448,
+      "tick": 0,
+      "weight": 2
+    }
+  ]
+}

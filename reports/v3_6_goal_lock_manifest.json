@@ -1,0 +1,147 @@
+{
+  "schema": "spikemold.v3_6_goal_lock_manifest.v1",
+  "generated_at": "2026-06-19T03:43:13+09:00",
+  "target_board": "PYNQ-Z2 / Zynq-7020",
+  "implementation_commit": "0c7fa9c0ac7005bd1c473a20f517830f247e2e9e",
+  "lock_scope": "SpikePress + SpikeMold v3.6 mainline functional implementation lock",
+  "lock_status": "complete_for_v3_6_mainline_functional_lock",
+  "selected_backend": "spikemold_fc_eventconv",
+  "evidence_level": "hls_csim_hls_synth_vivado_routed_plus_pynq_tiny_board_smokes",
+  "claim_boundary": {
+    "allowed": [
+      "contract freeze exists",
+      "architecture-neutral integer traces exist",
+      "event budget and architecture selection reports pass",
+      "HLS C-sim, HLS synthesis/package, and integrated Vivado routed timing evidence exists",
+      "PYNQ-Z2 direct RTL spike transport smoke passed",
+      "PYNQ-Z2 EventWord64-lowered input smoke passed",
+      "PYNQ-Z2 tiny flat FC-LIF commit-value/state-checksum smoke passed",
+      "PYNQ-Z2 tiny EventConv commit-value/state-checksum smoke passed",
+      "PYNQ-Z2 EventConv burst-boundary commit-value/state-checksum smoke passed"
+    ],
+    "not_allowed": [
+      "latency claim",
+      "throughput claim",
+      "energy claim",
+      "dataset accuracy claim",
+      "full-network PYNQ-Z2 correctness claim",
+      "full-state dump correctness claim",
+      "descriptor-configured arbitrary EventConv shape/kernel board claim"
+    ]
+  },
+  "verifier_commands": [
+    {
+      "command": "source /home/jwlee/miniconda3/etc/profile.d/conda.sh && conda activate fpga && rtk python scripts/check_spikemold_batch0_1a.py",
+      "expected_result": "PASS: SpikeMold Batch 0 + initial Batch 1A artifacts valid"
+    },
+    {
+      "command": "source /home/jwlee/miniconda3/etc/profile.d/conda.sh && conda activate fpga && rtk python scripts/check_batch1b_transport.py",
+      "expected_result": "PASS: Batch 1B transport + SpikeMold flat FC-LIF smoke artifacts valid"
+    },
+    {
+      "command": "source /home/jwlee/miniconda3/etc/profile.d/conda.sh && conda activate fpga && rtk python scripts/check_batch1c_eventconv.py",
+      "expected_result": "PASS: Batch 1C EventConv C0/C1/C2/C3/C4/C5/burst-boundary artifacts valid"
+    },
+    {
+      "command": "source /home/jwlee/miniconda3/etc/profile.d/conda.sh && conda activate fpga && rtk python scripts/check_verifier_gate.py",
+      "expected_result": "PASS: verifier gate review artifacts valid"
+    },
+    {
+      "command": "source /home/jwlee/miniconda3/etc/profile.d/conda.sh && conda activate fpga && rtk python scripts/check_spikemold_build_evidence_report.py",
+      "expected_result": "PASS: SpikeMold HLS/Vivado build evidence valid"
+    },
+    {
+      "command": "source /home/jwlee/miniconda3/etc/profile.d/conda.sh && conda activate fpga && rtk python scripts/check_architecture_selection.py",
+      "expected_result": "PASS: Architecture selection V1 report valid"
+    }
+  ],
+  "locked_artifacts": [
+    {
+      "path": "outputs/spikemold_pynq_z2_eventconv_20mhz.bit",
+      "sha256": "5b6b3d64a8263b3e6b075c934bcef0d3684d576756cba600711d2918d863d1d0",
+      "bytes": 4045700,
+      "tracked_by_git": false
+    },
+    {
+      "path": "outputs/spikemold_pynq_z2_eventconv_20mhz.hwh",
+      "sha256": "9447e36cbfc687c8cf0683b6ae05671ad4ef9bb017ef78c1a0777b73d6a87ec3",
+      "bytes": 525968,
+      "tracked_by_git": false
+    },
+    {
+      "path": "hardware/hls/hls_output/hls/impl/ip/component.xml",
+      "sha256": "14bf8959bbbc54bd93ea6ad1b6c9555e49e940990fef2d0f58e599b66f761982",
+      "bytes": 159756,
+      "tracked_by_git": false
+    },
+    {
+      "path": "hardware/hls/hls_output/spikemold_top_hls.zip",
+      "sha256": "bbe0d83b87e990d4d9e94acc18646f15978fa76d634d5fdbc2c545db3c4ada70",
+      "bytes": 108917,
+      "tracked_by_git": false
+    },
+    {
+      "path": "outputs/board/dma_spike_smoke_result_20260614.json",
+      "sha256": "b7daca42d0b32db257f50b83844c6568a390421df843d0a709235f4bd627b2b6",
+      "tracked_by_git": false
+    },
+    {
+      "path": "outputs/board/dma_spike_smoke_eventword64_result_20260614.json",
+      "sha256": "9bf055fdf7798509ce570e9b90f5182df997405d2cb3351470358b83638525e5",
+      "tracked_by_git": false
+    },
+    {
+      "path": "outputs/board/flat_fc_lif_trace_smoke_result_20260614.json",
+      "sha256": "c9d492153a693330e4f7b069b435aab9c9b1a33880362e72e7775272f02b10de",
+      "tracked_by_git": false
+    },
+    {
+      "path": "outputs/board/eventconv_trace_smoke_result_20260614.json",
+      "sha256": "93807bc8a43a465c3e4da2e7bc8d24aa437d60ead4c9db4e7525dd5dbcbdf2c8",
+      "tracked_by_git": false
+    },
+    {
+      "path": "outputs/board/eventconv_burst_boundary_smoke_result_20260615.json",
+      "sha256": "ad712e86fd05670ce42b0ce48b2aa87a3e0030cde11577773b2eab4dfd317fad",
+      "tracked_by_git": false
+    }
+  ],
+  "curated_reports": [
+    "reports/v3_6_goal_lock_report.md",
+    "reports/v3_6_goal_lock_manifest.json",
+    "reports/verifier_gate_review.md",
+    "reports/design_guide_v3_6_implementation_report.md",
+    "reports/batch_0_1a_1b_1c_full_verification_report.md",
+    "reports/spikemold_build_evidence_report.md",
+    "reports/spikemold_flat_fc_lif_trace_smoke_report.md",
+    "reports/spikemold_eventconv_trace_smoke_report.md",
+    "reports/spikemold_dma_spike_smoke_report.md"
+  ],
+  "curated_trace_families": [
+    "golden_traces/v1/fc_lif_tiny_v1.json",
+    "golden_traces/v1/eventconv_8x8_tiny_v1.json",
+    "golden_traces/v1/eventconv_agu_c0_tiny_v1.json",
+    "golden_traces/v1/eventconv_burst_boundary_v1.json",
+    "golden_traces/v1/mnist_fclif_784_512_10_v1.json",
+    "golden_traces/v1/mnist_eventconv_28x28_3x3_v1.json",
+    "golden_traces/v1/cifar10_eventconv_sample_*.json",
+    "golden_traces/v1/cifar10_eventconv_batch_5_v1.json"
+  ],
+  "ignored_local_artifacts": [
+    "outputs/*",
+    "data/*",
+    "*.pth",
+    "*.pt",
+    "drive-download-*.zip",
+    "profiler_*.json",
+    "golden_traces/v1/nmnist_eventconv_sample_*.json",
+    "hardware/hls/hls_output*/",
+    "hardware/hls/hls_csim_output*/"
+  ],
+  "next_gates_for_stronger_claims": [
+    "descriptor-configured EventConv shape/kernel board evidence",
+    "wider destination/state-space board smoke",
+    "full-network board equivalence",
+    "latency/throughput/energy measurement with same-run counters and host timing"
+  ]
+}

@@ -1,0 +1,161 @@
+{
+  "commits": [
+    {
+      "dst_id": 3,
+      "kind": "commit",
+      "tick": 2,
+      "value": 5
+    },
+    {
+      "dst_id": 1,
+      "kind": "commit",
+      "tick": 2,
+      "value": 3
+    },
+    {
+      "dst_id": 0,
+      "kind": "commit",
+      "tick": 2,
+      "value": 5
+    }
+  ],
+  "counters": {
+    "active_neuron_count": 4,
+    "commit_count": 3,
+    "ddr_bytes_inner_loop": 0,
+    "generated_update_count": 6,
+    "input_event_count": 3,
+    "python_inner_loop_steps": 0,
+    "state_reads": 6,
+    "state_writes": 9
+  },
+  "final_state": {
+    "2": 2
+  },
+  "hashes": {
+    "commits_sha256": "6fb6219f91b0c481f4ae32f77cb562793372d6dfe47808198a6f31a01506d6b6",
+    "final_state_sha256": "63adeeb5dfc2eef69cf6f88c528843cbb316e4468057601154346b4a562b427a",
+    "input_sha256": "e702e4a26ba0afbbc8ce0bddff17e54d1fb328250414fec977b8acd627a272fa",
+    "trace_sha256": "3820e89b514b88c93e5f3d2bba74b318047704c76c071763421cb3917fb2a308",
+    "updates_sha256": "fa55ddb3954bfd190f96ca3abacc29645ccd50e9f45332d09938e014658c5d35"
+  },
+  "inputs": [
+    {
+      "channel": 0,
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 0,
+      "tick": 0,
+      "x": 1,
+      "y": 1
+    },
+    {
+      "channel": 0,
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 1,
+      "tick": 1,
+      "x": 2,
+      "y": 2
+    },
+    {
+      "channel": 0,
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 2,
+      "tick": 2,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "metadata": {
+    "active_neuron_count_after_commit": 1,
+    "commit_mode": "packet_end_active_set",
+    "input_shape": [
+      1,
+      3,
+      3
+    ],
+    "kernel_shape": [
+      1,
+      1,
+      2,
+      2
+    ],
+    "output_shape": [
+      1,
+      2,
+      2
+    ],
+    "padding": 0,
+    "primitive": "eventconv_agu",
+    "readout_scan_count": 4,
+    "stride": 1,
+    "weight_storage": "shared_kernel"
+  },
+  "schema": "spikemold.trace.v1",
+  "target": "architecture-neutral",
+  "trace_id": "eventconv_burst_boundary_v1",
+  "updates": [
+    {
+      "channel": 0,
+      "dst_id": 3,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 1,
+      "x": 1,
+      "y": 1
+    },
+    {
+      "channel": 0,
+      "dst_id": 2,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 2,
+      "x": 0,
+      "y": 1
+    },
+    {
+      "channel": 0,
+      "dst_id": 1,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 3,
+      "x": 1,
+      "y": 0
+    },
+    {
+      "channel": 0,
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 4,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "channel": 0,
+      "dst_id": 3,
+      "kind": "synaptic_update",
+      "src_id": 1,
+      "tick": 1,
+      "weight": 4,
+      "x": 1,
+      "y": 1
+    },
+    {
+      "channel": 0,
+      "dst_id": 0,
+      "kind": "synaptic_update",
+      "src_id": 2,
+      "tick": 2,
+      "weight": 1,
+      "x": 0,
+      "y": 0
+    }
+  ]
+}

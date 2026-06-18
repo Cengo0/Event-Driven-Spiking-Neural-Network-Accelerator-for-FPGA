@@ -12,6 +12,7 @@ Date: 2026-06-14
 - `contracts/REGISTER_MAP_MINIMAL_V1.md`
 - `contracts/RESOURCE_BUDGET_V1.md`
 - `contracts/ARCHITECTURE_PATTERN_POLICY_V1.md`
+- `contracts/AGENT_HANDOFF_PROTOCOL_V1.md`
 
 ## Policy Decision
 
@@ -23,6 +24,9 @@ failure modes instead:
 - unbounded fanout without compiler rejection
 - full-neuron scan as the primary mode
 - silent semantic changes
+
+`AGENT_HANDOFF_PROTOCOL_V1.md` now binds subagent handoff records to the
+architecture policy and requires each handoff to name the evidence level reached.
 
 ## Evidence Boundary
 
