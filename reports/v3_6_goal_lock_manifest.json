@@ -148,6 +148,14 @@
       }
     ]
   },
+  "remote_backup": {
+    "remote": "origin",
+    "branch": "spikemold-v3.6-lock",
+    "pushed": true,
+    "pushed_at": "2026-06-20",
+    "pull_request_url": "https://github.com/metr0jw/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/pull/new/spikemold-v3.6-lock",
+    "main_push_status": "not_pushed_to_main_remote_main_has_unrelated_newer_history"
+  },
   "curated_reports": [
     "reports/v3_6_goal_lock_report.md",
     "reports/v3_6_goal_lock_manifest.json",

@@ -101,6 +101,24 @@ Runtime note: use `sudo -n env XILINX_XRT=/usr ...` so PYNQ sees the embedded de
 These reruns prove the release bundle can reproduce the locked tiny board smokes.
 They do not expand the claim boundary to full-network correctness or performance.
 
+## Remote Backup
+
+Remote backup branch:
+
+```text
+origin/spikemold-v3.6-lock
+```
+
+Pull request URL:
+
+```text
+https://github.com/metr0jw/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/pull/new/spikemold-v3.6-lock
+```
+
+`origin/main` was not overwritten because remote `main` has a newer divergent
+public-documentation/runtime history. This lock remains backed up on the
+dedicated branch above.
+
 ## Final Verifier Commands
 
 Run these from repo root:
