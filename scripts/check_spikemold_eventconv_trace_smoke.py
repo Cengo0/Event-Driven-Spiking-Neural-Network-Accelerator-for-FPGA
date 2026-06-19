@@ -13,6 +13,8 @@ REPORT_MD = ROOT / "reports" / "spikemold_eventconv_trace_smoke_report.md"
 SCHEMA = "spikemold.pynq_eventconv_trace_smoke.v1"
 BIT_SHA256 = "5b6b3d64a8263b3e6b075c934bcef0d3684d576756cba600711d2918d863d1d0"
 HWH_SHA256 = "9447e36cbfc687c8cf0683b6ae05671ad4ef9bb017ef78c1a0777b73d6a87ec3"
+DESC_BIT_SHA256 = "3543f15996830c68693eb8b33099cfa08ddc3787f5d153a007282aa02859894e"
+DESC_HWH_SHA256 = "8968cfc6ea303b6364c41e0263e3caaf8278e6be15a9e3c2ee40191463a000c6"
 
 TRACE_SPECS = {
     "tiny": {
@@ -47,6 +49,46 @@ TRACE_SPECS = {
         "generated_updates": 6,
         "active_neurons_after_commit": 1,
     },
+    "descriptor-tiny": {
+        "path": ROOT / "outputs" / "board" / "eventconv_desc_tiny_20260620.json",
+        "variant": "tiny",
+        "evidence_level": "pynq_board_eventconv_multi_commit_state_checksum_smoke",
+        "claim_boundary": "pynq_axi_dma0_direct_rtl_tiny_eventconv_multi_commit_state_checksum_readback",
+        "model_name": "batch_1c_tiny_eventconv_c4_multi_commit",
+        "threshold": 2,
+        "input_axis32": [16842752],
+        "output_words": [16386, 24577, 32768],
+        "readout_ids": [2, 1, 0],
+        "commit_values": [2, 3, 4],
+        "final_state": {"3": 1},
+        "state_checksum": 1,
+        "active_commit_reads": 4,
+        "generated_updates": 4,
+        "active_neurons_after_commit": 1,
+        "bit_sha256": DESC_BIT_SHA256,
+        "hwh_sha256": DESC_HWH_SHA256,
+        "descriptor_required": True,
+    },
+    "descriptor-burst-boundary": {
+        "path": ROOT / "outputs" / "board" / "eventconv_desc_burst_boundary_20260620.json",
+        "variant": "burst-boundary",
+        "evidence_level": "pynq_board_eventconv_burst_boundary_state_checksum_smoke",
+        "claim_boundary": "pynq_axi_dma0_direct_rtl_eventconv_burst_boundary_state_checksum_readback",
+        "model_name": "batch_1c_eventconv_c4_burst_boundary",
+        "threshold": 3,
+        "input_axis32": [16842752, 33685504, 0],
+        "output_words": [40963, 24577, 40960],
+        "readout_ids": [3, 1, 0],
+        "commit_values": [5, 3, 5],
+        "final_state": {"2": 2},
+        "state_checksum": 2,
+        "active_commit_reads": 4,
+        "generated_updates": 6,
+        "active_neurons_after_commit": 1,
+        "bit_sha256": DESC_BIT_SHA256,
+        "hwh_sha256": DESC_HWH_SHA256,
+        "descriptor_required": True,
+    },
 }
 
 
@@ -77,7 +119,8 @@ def check_trace_result(name: str, spec: Mapping[str, object]) -> None:
     result = load_json(path)
     if result.get("schema") != SCHEMA:
         fail(f"{name} schema mismatch")
-    if result.get("variant") != name:
+    expected_variant = spec.get("variant", name)
+    if result.get("variant") != expected_variant:
         fail(f"{name} variant mismatch")
     if result.get("evidence_level") != spec["evidence_level"]:
         fail(f"{name} evidence level mismatch")
@@ -97,8 +140,12 @@ def check_trace_result(name: str, spec: Mapping[str, object]) -> None:
         fail(f"{name} commit threshold mismatch")
 
     descriptor = result.get("descriptor")
+    if spec.get("descriptor_required") is True and descriptor is None:
+        fail(f"{name} descriptor evidence required")
     if descriptor is not None:
         descriptor_map = require_mapping(descriptor, f"{name} descriptor")
+        if spec.get("descriptor_required") is True and descriptor_map.get("write_enabled") is not True:
+            fail(f"{name} descriptor writes must be enabled")
         if descriptor_map.get("shape0_expected") != 0x04020303:
             fail(f"{name} EventConv shape descriptor mismatch")
         if descriptor_map.get("kernel0_expected") != 0x04030201:
@@ -187,16 +234,23 @@ def check_trace_result(name: str, spec: Mapping[str, object]) -> None:
 
     bitstream = require_mapping(result.get("bitstream"), f"{name} bitstream")
     hwh = require_mapping(result.get("hwh"), f"{name} hwh")
-    if bitstream.get("sha256") != BIT_SHA256:
+    expected_bit_sha256 = spec.get("bit_sha256", BIT_SHA256)
+    expected_hwh_sha256 = spec.get("hwh_sha256", HWH_SHA256)
+    if bitstream.get("sha256") != expected_bit_sha256:
         fail(f"{name} bitstream sha256 mismatch")
-    if hwh.get("sha256") != HWH_SHA256:
+    if hwh.get("sha256") != expected_hwh_sha256:
         fail(f"{name} HWH sha256 mismatch")
 
 
 def main() -> int:
     if not REPORT_MD.exists():
         fail(f"missing report: {REPORT_MD}")
-    if "TO_BE_FILLED" in BIT_SHA256 or "TO_BE_FILLED" in HWH_SHA256:
+    if (
+        "TO_BE_FILLED" in BIT_SHA256
+        or "TO_BE_FILLED" in HWH_SHA256
+        or "TO_BE_FILLED" in DESC_BIT_SHA256
+        or "TO_BE_FILLED" in DESC_HWH_SHA256
+    ):
         fail("bit/hwh sha256 constants must be filled after rebuild")
 
     for name, spec in TRACE_SPECS.items():
@@ -210,6 +264,11 @@ def main() -> int:
         "multi-commit",
         "boundary coordinates skip invalid taps",
         "state checksum",
+        "Descriptor-capable rerun",
+        "EVENTCONV_SHAPE0",
+        "EVENTCONV_KERNEL0",
+        DESC_BIT_SHA256,
+        DESC_HWH_SHA256,
         "not latency",
         BIT_SHA256,
         HWH_SHA256,
