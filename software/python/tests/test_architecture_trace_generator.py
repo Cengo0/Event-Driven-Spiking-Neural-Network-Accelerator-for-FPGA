@@ -4,6 +4,7 @@ from spikepress.architecture_trace_generator import (
     TRACE_SCHEMA,
     InputSpike,
     generate_eventconv_active_readout_trace,
+    generate_eventconv_fclif_trace,
     generate_eventconv_trace,
     generate_fc_lif_trace,
     pack_spikemold_event_word64,
@@ -79,6 +80,34 @@ def test_eventconv_active_readout_trace_defers_commits_to_packet_end():
         {"dst_id": 0, "kind": "commit", "tick": 2, "value": 5},
     ]
     assert trace["final_state"] == {"2": 2}
+
+
+def test_eventconv_fclif_trace_uses_internal_conv_commits_for_readout():
+    trace = generate_eventconv_fclif_trace(
+        input_spikes=[InputSpike(tick=0, src_id=0, y=1, x=1, channel=0)],
+        kernel=[[[[1, 1], [1, 1]]]],
+        input_shape=(1, 3, 3),
+        readout_weights=[
+            [1, 0],
+            [0, 2],
+            [3, 0],
+            [0, 4],
+        ],
+        stride=1,
+        padding=0,
+        conv_thresholds={0: 1, 1: 1, 2: 1, 3: 1},
+        readout_thresholds={4: 3, 5: 4},
+    ).to_dict()
+
+    assert trace["metadata"]["primitive"] == "eventconv_fclif"
+    assert trace["metadata"]["internal_conv_commit_count"] == 4
+    assert trace["metadata"]["readout_id_start"] == 4
+    assert trace["counters"]["generated_update_count"] == 8
+    assert trace["counters"]["commit_count"] == 2
+    assert trace["commits"] == [
+        {"dst_id": 5, "kind": "commit", "tick": 0, "value": 4},
+        {"dst_id": 4, "kind": "commit", "tick": 0, "value": 3},
+    ]
 
 
 def test_trace_json_roundtrip(tmp_path):

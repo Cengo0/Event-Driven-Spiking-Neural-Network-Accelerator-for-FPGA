@@ -1,0 +1,538 @@
+{
+  "commits": [
+    {
+      "dst_id": 791,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 787,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 784,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 790,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 790,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 789,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 791,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 788,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 789,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 785,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 785,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 784,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 786,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 793,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    }
+  ],
+  "counters": {
+    "active_neuron_count": 35,
+    "commit_count": 14,
+    "ddr_bytes_inner_loop": 0,
+    "generated_update_count": 40,
+    "input_event_count": 3,
+    "python_inner_loop_steps": 0,
+    "state_reads": 40,
+    "state_writes": 68
+  },
+  "final_state": {
+    "150": -1,
+    "164": -1,
+    "241": -1,
+    "242": -1,
+    "346": -1,
+    "347": -1,
+    "45": -1,
+    "59": -1,
+    "633": -1,
+    "648": -1,
+    "738": -1,
+    "753": -1
+  },
+  "hashes": {
+    "commits_sha256": "cae5f830cdabbd420a77d287b6c982f876c4feb988745c0e727c31e6e6c6abf3",
+    "final_state_sha256": "d0b03dfb05652abe78f4be14650dadc1950e8dc60b83e65d501a3c58b5031f53",
+    "input_sha256": "801be84d3bc7750c912c91cc481d97950d219fdb8643cccfaeaf94a8f0b1880e",
+    "trace_sha256": "beefd5f3d055f036c7536db154c45c69d68acc5430639e83cdb0281f4aac5770",
+    "updates_sha256": "a5fb007cd31bdd43be528ada7cd9b1b85aab6e05f6176268fae3acbb6ca3dafa"
+  },
+  "inputs": [
+    {
+      "channel": 0,
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 0,
+      "tick": 0,
+      "x": 14,
+      "y": 14
+    },
+    {
+      "channel": 0,
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 1,
+      "tick": 1,
+      "x": 7,
+      "y": 7
+    },
+    {
+      "channel": 0,
+      "kind": "input_spike",
+      "payload": 1,
+      "src_id": 2,
+      "tick": 2,
+      "x": 21,
+      "y": 21
+    }
+  ],
+  "metadata": {
+    "conv_commit_mode": "packet_end_active_set",
+    "conv_state_count": 784,
+    "eventconv_output_shape": [
+      4,
+      14,
+      14
+    ],
+    "input_shape": [
+      1,
+      28,
+      28
+    ],
+    "internal_conv_commit_count": 14,
+    "kernel_shape": [
+      4,
+      1,
+      3,
+      3
+    ],
+    "padding": 1,
+    "primitive": "eventconv_fclif",
+    "readout_classes": 10,
+    "readout_id_start": 784,
+    "readout_weight_storage": "row_major_conv_state_to_class",
+    "stride": 2
+  },
+  "schema": "spikemold.trace.v1",
+  "target": "pynq-z2",
+  "trace_id": "mnist_eventconv_fclif_frozen_v1",
+  "updates": [
+    {
+      "channel": 2,
+      "dst_id": 497,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 2,
+      "x": 7,
+      "y": 7
+    },
+    {
+      "channel": 3,
+      "dst_id": 693,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": 2,
+      "x": 7,
+      "y": 7
+    },
+    {
+      "channel": 0,
+      "dst_id": 60,
+      "kind": "synaptic_update",
+      "src_id": 1,
+      "tick": 1,
+      "weight": 1,
+      "x": 4,
+      "y": 4
+    },
+    {
+      "channel": 0,
+      "dst_id": 59,
+      "kind": "synaptic_update",
+      "src_id": 1,
+      "tick": 1,
+      "weight": -1,
+      "x": 3,
+      "y": 4
+    },
+    {
+      "channel": 0,
+      "dst_id": 46,
+      "kind": "synaptic_update",
+      "src_id": 1,
+      "tick": 1,
+      "weight": 1,
+      "x": 4,
+      "y": 3
+    },
+    {
+      "channel": 0,
+      "dst_id": 45,
+      "kind": "synaptic_update",
+      "src_id": 1,
+      "tick": 1,
+      "weight": -1,
+      "x": 3,
+      "y": 3
+    },
+    {
+      "channel": 1,
+      "dst_id": 256,
+      "kind": "synaptic_update",
+      "src_id": 1,
+      "tick": 1,
+      "weight": 1,
+      "x": 4,
+      "y": 4
+    },
+    {
+      "channel": 1,
+      "dst_id": 255,
+      "kind": "synaptic_update",
+      "src_id": 1,
+      "tick": 1,
+      "weight": 1,
+      "x": 3,
+      "y": 4
+    },
+    {
+      "channel": 1,
+      "dst_id": 242,
+      "kind": "synaptic_update",
+      "src_id": 1,
+      "tick": 1,
+      "weight": -1,
+      "x": 4,
+      "y": 3
+    },
+    {
+      "channel": 1,
+      "dst_id": 241,
+      "kind": "synaptic_update",
+      "src_id": 1,
+      "tick": 1,
+      "weight": -1,
+      "x": 3,
+      "y": 3
+    },
+    {
+      "channel": 3,
+      "dst_id": 648,
+      "kind": "synaptic_update",
+      "src_id": 1,
+      "tick": 1,
+      "weight": -1,
+      "x": 4,
+      "y": 4
+    },
+    {
+      "channel": 3,
+      "dst_id": 647,
+      "kind": "synaptic_update",
+      "src_id": 1,
+      "tick": 1,
+      "weight": 1,
+      "x": 3,
+      "y": 4
+    },
+    {
+      "channel": 3,
+      "dst_id": 634,
+      "kind": "synaptic_update",
+      "src_id": 1,
+      "tick": 1,
+      "weight": 1,
+      "x": 4,
+      "y": 3
+    },
+    {
+      "channel": 3,
+      "dst_id": 633,
+      "kind": "synaptic_update",
+      "src_id": 1,
+      "tick": 1,
+      "weight": -1,
+      "x": 3,
+      "y": 3
+    },
+    {
+      "channel": 0,
+      "dst_id": 165,
+      "kind": "synaptic_update",
+      "src_id": 2,
+      "tick": 2,
+      "weight": 1,
+      "x": 11,
+      "y": 11
+    },
+    {
+      "channel": 0,
+      "dst_id": 164,
+      "kind": "synaptic_update",
+      "src_id": 2,
+      "tick": 2,
+      "weight": -1,
+      "x": 10,
+      "y": 11
+    },
+    {
+      "channel": 0,
+      "dst_id": 151,
+      "kind": "synaptic_update",
+      "src_id": 2,
+      "tick": 2,
+      "weight": 1,
+      "x": 11,
+      "y": 10
+    },
+    {
+      "channel": 0,
+      "dst_id": 150,
+      "kind": "synaptic_update",
+      "src_id": 2,
+      "tick": 2,
+      "weight": -1,
+      "x": 10,
+      "y": 10
+    },
+    {
+      "channel": 1,
+      "dst_id": 361,
+      "kind": "synaptic_update",
+      "src_id": 2,
+      "tick": 2,
+      "weight": 1,
+      "x": 11,
+      "y": 11
+    },
+    {
+      "channel": 1,
+      "dst_id": 360,
+      "kind": "synaptic_update",
+      "src_id": 2,
+      "tick": 2,
+      "weight": 1,
+      "x": 10,
+      "y": 11
+    },
+    {
+      "channel": 1,
+      "dst_id": 347,
+      "kind": "synaptic_update",
+      "src_id": 2,
+      "tick": 2,
+      "weight": -1,
+      "x": 11,
+      "y": 10
+    },
+    {
+      "channel": 1,
+      "dst_id": 346,
+      "kind": "synaptic_update",
+      "src_id": 2,
+      "tick": 2,
+      "weight": -1,
+      "x": 10,
+      "y": 10
+    },
+    {
+      "channel": 3,
+      "dst_id": 753,
+      "kind": "synaptic_update",
+      "src_id": 2,
+      "tick": 2,
+      "weight": -1,
+      "x": 11,
+      "y": 11
+    },
+    {
+      "channel": 3,
+      "dst_id": 752,
+      "kind": "synaptic_update",
+      "src_id": 2,
+      "tick": 2,
+      "weight": 1,
+      "x": 10,
+      "y": 11
+    },
+    {
+      "channel": 3,
+      "dst_id": 739,
+      "kind": "synaptic_update",
+      "src_id": 2,
+      "tick": 2,
+      "weight": 1,
+      "x": 11,
+      "y": 10
+    },
+    {
+      "channel": 3,
+      "dst_id": 738,
+      "kind": "synaptic_update",
+      "src_id": 2,
+      "tick": 2,
+      "weight": -1,
+      "x": 10,
+      "y": 10
+    },
+    {
+      "dst_id": 791,
+      "kind": "synaptic_update",
+      "src_id": 497,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 787,
+      "kind": "synaptic_update",
+      "src_id": 693,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 784,
+      "kind": "synaptic_update",
+      "src_id": 60,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 790,
+      "kind": "synaptic_update",
+      "src_id": 46,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 790,
+      "kind": "synaptic_update",
+      "src_id": 256,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 789,
+      "kind": "synaptic_update",
+      "src_id": 255,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 791,
+      "kind": "synaptic_update",
+      "src_id": 647,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 788,
+      "kind": "synaptic_update",
+      "src_id": 634,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 789,
+      "kind": "synaptic_update",
+      "src_id": 165,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 785,
+      "kind": "synaptic_update",
+      "src_id": 151,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 785,
+      "kind": "synaptic_update",
+      "src_id": 361,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 784,
+      "kind": "synaptic_update",
+      "src_id": 360,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 786,
+      "kind": "synaptic_update",
+      "src_id": 752,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 793,
+      "kind": "synaptic_update",
+      "src_id": 739,
+      "tick": 2,
+      "weight": 1
+    }
+  ]
+}

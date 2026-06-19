@@ -482,13 +482,53 @@ class SpikingModel(torch.nn.Module):
                     )
                 self._weights[i].copy_(torch.from_numpy(w))
 
-    def to_artifact(self, *args, **kwargs):
+    def to_artifact(
+        self,
+        *,
+        artifact_id: str = "trained_snn",
+        target: str = "pynq-z2",
+        hw_weight_scale: float = 1.0,
+        hw_weight_clip: Optional[tuple[int, int]] = None,
+    ) -> SpikeMoldArtifact:
         if getattr(self, '_is_hybrid', False) and self.fc is not None and hasattr(self.fc, 'to_artifact'):
-            return self.fc.to_artifact(*args, **kwargs)
-        if hasattr(self, '_weights'):
-            # delegate to original impl if present, or error
-            pass
-        raise NotImplementedError("Use get_weights for hybrid (conv kernels + fc) or implement for pure FC")
+            return self.fc.to_artifact(
+                artifact_id=artifact_id,
+                target=target,
+                hw_weight_scale=hw_weight_scale,
+                hw_weight_clip=hw_weight_clip,
+            )
+        if not hasattr(self, '_weights'):
+            raise NotImplementedError("Use get_weights for hybrid models without FC head")
+
+        compiled = self._compile_to_topology()
+        weight_dict: Dict[str, np.ndarray] = {}
+        for index, projection in enumerate(compiled.projections):
+            weights = self._weights[index].detach().cpu().numpy() * float(hw_weight_scale)
+            if hw_weight_clip is not None:
+                weights = np.clip(weights, hw_weight_clip[0], hw_weight_clip[1])
+            weight_dict[projection.name] = np.rint(weights).astype(np.int8)
+
+        return build_spikemold_artifact(
+            compiled,
+            weight_dict,
+            target=target,
+            artifact_id=artifact_id,
+        )
+
+    def _compile_to_topology(self) -> CompiledSpikePressTopology:
+        network = SpikePressNetwork()
+
+        populations: List[SpikePressNeuronPopulation] = []
+        for index, size in enumerate(self.layer_sizes):
+            populations.append(
+                network.add_population(SpikePressNeuronPopulation(size, name=f"layer_{index}"))
+            )
+
+        for index in range(self.num_layers):
+            projection = SpikePressProjection(populations[index], populations[index + 1])
+            network.add_projection(projection)
+
+        return network.compile()
 
 
 class SpikingEventConv(torch.nn.Module):

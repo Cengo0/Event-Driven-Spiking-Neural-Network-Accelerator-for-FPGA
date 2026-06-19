@@ -150,8 +150,8 @@ def parse_args() -> argparse.Namespace:
         "--arch",
         type=str,
         default="fc",
-        choices=["fc", "block", "hybrid"],
-        help="Architecture: fc (simple), block (block-sparse FC for max resources), hybrid (EventConv + FC)",
+        choices=["fc", "block", "hybrid", "frozen"],
+        help="Architecture: fc (simple), block (block-sparse FC), hybrid (large EventConv + FC), frozen (final EventConv-FC slice)",
     )
     return parser.parse_args()
 
@@ -240,6 +240,25 @@ def main() -> int:
                 output_mode="spike_count",
                 timestep_vectorized=args.vectorize_timesteps,
             )
+        elif args.arch == "frozen":
+            conv_specs = [
+                {"in_c": input_c, "out_c": 4, "k": 3, "s": 2, "p": 1},
+            ]
+            fc_sizes = [4 * 14 * 14, num_classes]
+            model = SpikingModel(
+                conv_specs=conv_specs,
+                fc_sizes=fc_sizes,
+                lif_config=lif_config,
+                weight_init_scale=0.5,
+                device=args.device,
+                surrogate="fast_sigmoid",
+                surrogate_slope=25.0,
+                input_encoding="rate",
+                output_mode="spike_count",
+                timestep_vectorized=args.vectorize_timesteps,
+            )
+            setattr(args, "hidden_size", 0)
+            print("Frozen final-goal MNIST: EventConv(1x28x28, 4x3x3, stride=2, padding=1) + FC-LIF(784->10)")
         elif args.arch == "hybrid":
             # MNIST hybrid for SpikeMold PYNQ-Z2 co-design test (EventConv front-end + large block-sparse FC).
             # Lighter 6-layer EventConv (ends at 512ch, ~1x1 spatial, feat~512) to keep compute reasonable for speed tests.
@@ -635,7 +654,32 @@ def main() -> int:
         output_path = Path(args.output)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         artifact = None  # ensure name exists; will be set only on successful FC artifact creation
-        if hasattr(model, "fc") and hasattr(model.fc, "to_artifact"):
+        if args.arch == "frozen":
+            try:
+                from spikepress.spikemold_artifact import build_eventconv_fclif_artifact, write_spikemold_artifact
+                from spikepress.transport import build_eventconv_fclif_config_plan
+
+                weights = model.get_weights()
+                conv_kernel = weights["conv_weights"][0]
+                readout_weights = weights["fc_weights"][0]
+                artifact = build_eventconv_fclif_artifact(
+                    kernel=conv_kernel,
+                    readout_weights=readout_weights,
+                    conv_threshold=1,
+                    readout_thresholds=[1] * num_classes,
+                    artifact_id=f"{args.dataset}_{args.arch}_locked",
+                    target="pynq-z2",
+                )
+                write_spikemold_artifact(output_path, artifact)
+                config_plan = build_eventconv_fclif_config_plan(artifact.manifest)
+                config_plan_path = output_path.with_suffix(".config_plan.json")
+                config_plan_path.write_text(json.dumps(config_plan, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+                print(f"Exported frozen full EventConv-FC artifact to {output_path}")
+                print(f"Exported frozen board config plan to {config_plan_path}")
+            except Exception as e:
+                print(f"Frozen EventConv-FC export failed: {e}")
+                artifact = None
+        elif hasattr(model, "fc") and hasattr(model.fc, "to_artifact"):
             try:
                 artifact = model.fc.to_artifact(
                     artifact_id=f"{args.dataset}_{args.arch}_{args.hidden_size}_locked",
@@ -755,7 +799,8 @@ def main() -> int:
         }
 
         # Write artifact
-        from spikepress.spikemold_artifact import write_spikemold_artifact
+        from spikepress.spikemold_artifact import refresh_spikemold_artifact_hash, write_spikemold_artifact
+        artifact = refresh_spikemold_artifact_hash(artifact)
         write_spikemold_artifact(output_path, artifact)
     else:
         print("Hybrid: main artifact write skipped (kernels + hybrid weights dump produced above for lock).")

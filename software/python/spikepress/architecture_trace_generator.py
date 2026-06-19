@@ -415,6 +415,141 @@ def generate_eventconv_active_readout_trace(
     )
 
 
+def generate_eventconv_fclif_trace(
+    input_spikes: Iterable[InputSpike],
+    kernel: Sequence[Sequence[Sequence[Sequence[int]]]],
+    input_shape: Tuple[int, int, int],
+    readout_weights: Sequence[Sequence[int]],
+    stride: int = 2,
+    padding: int = 1,
+    conv_thresholds: Optional[Mapping[int, int]] = None,
+    readout_thresholds: Optional[Mapping[int, int]] = None,
+    readout_id_start: Optional[int] = None,
+    trace_id: str = "eventconv_fclif_mnist_slice",
+    target: str = "pynq-z2",
+) -> SpikeMoldContractTrace:
+    """Generate frozen EventConv -> FC-LIF trace for SpikePress/SpikeMold.
+
+    EventConv commits are internal spikes into the FC readout. The public
+    `commits` list contains only final readout commits, matching the intended
+    board output FIFO for the final-goal slice.
+    """
+
+    in_channels, in_h, in_w = input_shape
+    out_channels = len(kernel)
+    if out_channels == 0:
+        raise ValueError("kernel must have at least one output channel")
+    kernel_h = len(kernel[0][0])
+    kernel_w = len(kernel[0][0][0])
+    out_h = ((in_h + 2 * padding - kernel_h) // stride) + 1
+    out_w = ((in_w + 2 * padding - kernel_w) // stride) + 1
+    conv_state_count = out_channels * out_h * out_w
+    if conv_state_count <= 0:
+        raise ValueError("invalid EventConv output shape")
+
+    readout_rows = [list(row) for row in readout_weights]
+    if len(readout_rows) != conv_state_count:
+        raise ValueError(
+            f"readout row count must equal conv state count: {len(readout_rows)} != {conv_state_count}"
+        )
+    readout_cols = len(readout_rows[0]) if readout_rows else 0
+    if readout_cols <= 0:
+        raise ValueError("readout must have at least one output class")
+    for row in readout_rows:
+        if len(row) != readout_cols:
+            raise ValueError("readout rows must have consistent class count")
+
+    if readout_id_start is None:
+        readout_id_start = conv_state_count
+
+    if conv_thresholds is None:
+        conv_thresholds = {state_id: 1 for state_id in range(conv_state_count)}
+    if readout_thresholds is None:
+        readout_thresholds = {
+            readout_id_start + class_id: 1 for class_id in range(readout_cols)
+        }
+
+    conv_trace = generate_eventconv_active_readout_trace(
+        input_spikes=input_spikes,
+        kernel=kernel,
+        input_shape=input_shape,
+        stride=stride,
+        padding=padding,
+        commit_thresholds=conv_thresholds,
+        trace_id=f"{trace_id}_eventconv_internal",
+    )
+
+    readout_state: MutableMapping[int, int] = {}
+    readout_updates: List[SynapticUpdate] = []
+    readout_commits: List[ActiveSetCommit] = []
+    readout_active = set()
+
+    for conv_commit in conv_trace.commits:
+        src = int(conv_commit.dst_id)
+        if not 0 <= src < conv_state_count:
+            raise ValueError(f"conv commit id out of readout range: {src}")
+        for class_id, weight in enumerate(readout_rows[src]):
+            weight = int(weight)
+            if weight == 0:
+                continue
+            dst = readout_id_start + class_id
+            readout_updates.append(
+                SynapticUpdate(
+                    tick=int(conv_commit.tick),
+                    src_id=src,
+                    dst_id=dst,
+                    weight=weight,
+                )
+            )
+            readout_active.add(dst)
+            readout_state[dst] = _clamp_i32(readout_state.get(dst, 0) + weight)
+            if readout_state[dst] >= int(readout_thresholds.get(dst, INT32_MAX)):
+                readout_commits.append(ActiveSetCommit(conv_commit.tick, dst, readout_state[dst]))
+                readout_state[dst] = 0
+
+    conv_final = {int(k): int(v) for k, v in conv_trace.final_state.items() if int(v) != 0}
+    readout_final = {dst: value for dst, value in readout_state.items() if value != 0}
+    final_state = {**conv_final, **readout_final}
+    conv_active = {update.dst_id for update in conv_trace.updates}
+    all_updates: List[SynapticUpdate] = list(conv_trace.updates) + readout_updates
+    conv_reset_writes = len(conv_trace.commits)
+    readout_reset_writes = len(readout_commits)
+    counters = TraceCounters(
+        input_event_count=len(conv_trace.inputs),
+        generated_update_count=len(all_updates),
+        active_neuron_count=len(conv_active | readout_active),
+        commit_count=len(readout_commits),
+        state_reads=len(all_updates),
+        state_writes=len(all_updates) + conv_reset_writes + readout_reset_writes,
+        ddr_bytes_inner_loop=0,
+        python_inner_loop_steps=0,
+    )
+
+    return SpikeMoldContractTrace(
+        trace_id=trace_id,
+        target=target,
+        metadata={
+            "primitive": "eventconv_fclif",
+            "input_shape": [in_channels, in_h, in_w],
+            "eventconv_output_shape": [out_channels, out_h, out_w],
+            "kernel_shape": [out_channels, in_channels, kernel_h, kernel_w],
+            "stride": int(stride),
+            "padding": int(padding),
+            "conv_state_count": int(conv_state_count),
+            "readout_id_start": int(readout_id_start),
+            "readout_classes": int(readout_cols),
+            "internal_conv_commit_count": len(conv_trace.commits),
+            "conv_commit_mode": "packet_end_active_set",
+            "readout_weight_storage": "row_major_conv_state_to_class",
+        },
+        inputs=conv_trace.inputs,
+        updates=all_updates,
+        commits=readout_commits,
+        final_state=final_state,
+        counters=counters,
+    )
+
+
 # =============================================================================
 # Multi-layer FC-LIF trace generation
 # =============================================================================

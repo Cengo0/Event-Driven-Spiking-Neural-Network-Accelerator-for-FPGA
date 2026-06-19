@@ -1,13 +1,18 @@
 import pytest
+import numpy as np
 
-from spikepress import InputSpike, fc_lif_model, pack_spikemold_event_word64
+from spikepress import InputSpike, build_eventconv_fclif_artifact, fc_lif_model, pack_spikemold_event_word64
 from spikepress.transport import (
     REGISTER_OFFSETS,
     build_batch_1b_transport_smoke,
+    build_eventconv_fclif_config_plan,
     decode_eventword64_input,
     event_word_type,
     lower_eventword64_input_to_axis32,
+    pack_eventconv_coord32_input,
+    pack_eventconv_coord32_inputs,
     pack_input_spikes,
+    pack_router_connection_word,
     run_axi_lite_smoke,
     run_dma_loopback,
     run_eventword64_to_axis32_lowering_smoke,
@@ -107,6 +112,33 @@ def test_flat_fc_lif_smoke_matches_golden_trace():
     assert smoke["counters"]["update_count"] == 5
     assert smoke["counters"]["active_count"] == 2
     assert smoke["counters"]["output_words"] == 1
+
+
+def test_eventconv_coord32_pack_and_config_plan():
+    spike = InputSpike(tick=3, src_id=7, y=2, x=1, channel=0, payload=-1)
+    assert pack_eventconv_coord32_input(spike) == 0x010200FF
+    assert pack_eventconv_coord32_inputs([spike]) == [0x010200FF]
+
+    kernel = np.ones((4, 1, 3, 3), dtype=np.int16)
+    readout = np.zeros((4 * 14 * 14, 10), dtype=np.int16)
+    readout[0, 0] = 3
+    readout[0, 1] = -2
+    artifact = build_eventconv_fclif_artifact(
+        kernel=kernel,
+        readout_weights=readout,
+        conv_threshold=1,
+        readout_thresholds=[1] * 10,
+    )
+    plan = build_eventconv_fclif_config_plan(artifact.manifest)
+
+    assert plan["schema"] == "spikemold.eventconv_fclif_config_plan.v1"
+    assert plan["backend_mode"] == 2
+    assert plan["eventconv_shape0"] == 0x04031C1C
+    assert len(plan["kernel_config_writes"]) == 9
+    assert plan["kernel_config_writes"][0]["address"] == 0x02000000
+    assert plan["router_config_writes"][1]["address"] == 0
+    assert plan["router_config_writes"][1]["data"] == pack_router_connection_word(784, 3)
+    assert plan["router_config_writes"][2]["data"] == pack_router_connection_word(785, -2)
 
 
 def test_batch_1b_transport_smoke_rejects_forbidden_runtime_assumptions():

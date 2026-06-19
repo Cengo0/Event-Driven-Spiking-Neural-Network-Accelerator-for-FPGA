@@ -184,11 +184,14 @@ module spikemold_integrated_top #(
     wire                       neuron_array_busy;
     wire                       flat_backend_mode;
     wire                       eventconv_backend_mode;
+    wire                       eventconv_fclif_backend_mode;
+    wire                       eventconv_any_backend_mode;
 
     // EventConv smoke backend: one 3x3/2x2 shared-kernel primitive.
     // Shape is still statically specialized; kernel weights come from AXI-Lite.
     localparam [1:0] BACKEND_MODE_FLAT      = 2'd0;
     localparam [1:0] BACKEND_MODE_EVENTCONV = 2'd1;
+    localparam [1:0] BACKEND_MODE_EVENTCONV_FCLIF = 2'd2;
     localparam EVENTCONV_KERNEL_SIZE        = 2;
     localparam EVENTCONV_INPUT_WIDTH        = 3;
     localparam EVENTCONV_INPUT_HEIGHT       = 3;
@@ -200,6 +203,18 @@ module spikemold_integrated_top #(
     localparam EVENTCONV_KERNEL_WORDS =
         EVENTCONV_KERNEL_SIZE * EVENTCONV_KERNEL_SIZE *
         EVENTCONV_NUM_CHANNELS * EVENTCONV_OUTPUT_CHANNELS;
+    localparam FCLIF_EVENTCONV_KERNEL_SIZE        = 3;
+    localparam FCLIF_EVENTCONV_INPUT_WIDTH        = 28;
+    localparam FCLIF_EVENTCONV_INPUT_HEIGHT       = 28;
+    localparam FCLIF_EVENTCONV_NUM_CHANNELS       = 1;
+    localparam FCLIF_EVENTCONV_OUTPUT_CHANNELS    = 4;
+    localparam FCLIF_EVENTCONV_STATE_COUNT        = 784;
+    localparam FCLIF_EVENTCONV_STATE_WIDTH        = 16;
+    localparam FCLIF_EVENTCONV_DEST_ID_WIDTH      = 16;
+    localparam FCLIF_READOUT_ID_START             = 784;
+    localparam FCLIF_EVENTCONV_KERNEL_WORDS =
+        FCLIF_EVENTCONV_KERNEL_SIZE * FCLIF_EVENTCONV_KERNEL_SIZE *
+        FCLIF_EVENTCONV_NUM_CHANNELS * FCLIF_EVENTCONV_OUTPUT_CHANNELS;
 
     wire eventconv_enable;
     wire eventconv_clear;
@@ -239,22 +254,82 @@ module spikemold_integrated_top #(
     wire [31:0] eventconv_full_scan_count;
     wire signed [31:0] eventconv_readout_checksum;
     wire [31:0] eventconv_output_backpressure_cycle_count;
+    wire spike_out_fifo_full;
     reg  eventconv_input_seen;
     reg  eventconv_packet_done;
     reg  eventconv_commit_started;
     reg  eventconv_commit_done_latched;
     wire eventconv_run_busy;
 
+    wire fclif_eventconv_enable;
+    wire fclif_eventconv_clear;
+    wire fclif_eventconv_input_tready;
+    wire fclif_eventconv_input_fire;
+    wire fclif_eventconv_update_tvalid;
+    wire fclif_eventconv_update_tready;
+    wire [31:0] fclif_eventconv_update_tdata;
+    wire signed [7:0] fclif_eventconv_update_weight;
+    wire [7:0] fclif_eventconv_kernel_weight_out;
+    reg  [(FCLIF_EVENTCONV_KERNEL_WORDS*8)-1:0] fclif_eventconv_kernel_weight_flat;
+    wire [31:0] fclif_eventconv_spikes_processed;
+    wire [31:0] fclif_eventconv_updates_generated;
+    wire [31:0] fclif_eventconv_address_errors;
+    wire [(FCLIF_EVENTCONV_STATE_COUNT*FCLIF_EVENTCONV_STATE_WIDTH)-1:0] fclif_eventconv_state_flat;
+    wire [(FCLIF_EVENTCONV_STATE_COUNT*FCLIF_EVENTCONV_DEST_ID_WIDTH)-1:0] fclif_eventconv_active_id_flat;
+    wire [FCLIF_EVENTCONV_STATE_COUNT-1:0] fclif_eventconv_active_mask;
+    wire fclif_eventconv_shape_supported;
+    wire [31:0] fclif_eventconv_active_neuron_count;
+    wire [31:0] fclif_eventconv_state_read_count;
+    wire [31:0] fclif_eventconv_state_write_count;
+    wire [31:0] fclif_eventconv_update_count;
+    wire [31:0] fclif_eventconv_commit_reset_count;
+    wire [31:0] fclif_eventconv_invalid_dest_count;
+    wire signed [31:0] fclif_eventconv_state_checksum;
+    reg  fclif_eventconv_commit_start;
+    wire fclif_eventconv_commit_busy;
+    wire fclif_eventconv_commit_done;
+    wire fclif_eventconv_commit_tvalid;
+    wire [31:0] fclif_eventconv_commit_tdata;
+    wire fclif_eventconv_commit_tready;
+    wire fclif_eventconv_reset_tvalid;
+    wire [FCLIF_EVENTCONV_DEST_ID_WIDTH-1:0] fclif_eventconv_reset_tdest;
+    wire fclif_eventconv_reset_tready;
+    wire [31:0] fclif_eventconv_active_commit_read_count;
+    wire [31:0] fclif_eventconv_commit_emit_count;
+    wire [31:0] fclif_eventconv_full_scan_count;
+    wire signed [31:0] fclif_eventconv_readout_checksum;
+    wire [31:0] fclif_eventconv_output_backpressure_cycle_count;
+    reg  fclif_eventconv_input_seen;
+    reg  fclif_eventconv_packet_done;
+    reg  fclif_eventconv_commit_started;
+    reg  fclif_eventconv_commit_done_latched;
+    wire fclif_eventconv_run_busy;
+
     assign rst_n = rst_n_vec[0];
     assign flat_backend_mode = (cfg_backend_mode == BACKEND_MODE_FLAT);
     assign eventconv_backend_mode = (cfg_backend_mode == BACKEND_MODE_EVENTCONV);
+    assign eventconv_fclif_backend_mode = (cfg_backend_mode == BACKEND_MODE_EVENTCONV_FCLIF);
+    assign eventconv_any_backend_mode = eventconv_backend_mode | eventconv_fclif_backend_mode;
     assign eventconv_shape_supported =
         cfg_eventconv_shape0 == {8'd4, 8'd2, 8'd3, 8'd3};
+    assign fclif_eventconv_shape_supported =
+        cfg_eventconv_shape0 == {8'd4, 8'd3, 8'd28, 8'd28};
     assign eventconv_enable = bd_spikemold_enable[0] &
                               eventconv_backend_mode &
                               eventconv_shape_supported;
     assign eventconv_clear = !eventconv_backend_mode | !eventconv_shape_supported;
-    assign cfg_eventconv_desc_status = {29'd0, 1'b1, 1'b1, eventconv_shape_supported};
+    assign fclif_eventconv_enable = bd_spikemold_enable[0] &
+                                    eventconv_fclif_backend_mode &
+                                    fclif_eventconv_shape_supported;
+    assign fclif_eventconv_clear = !eventconv_fclif_backend_mode | !fclif_eventconv_shape_supported;
+    assign cfg_eventconv_desc_status = {
+        27'd0,
+        eventconv_fclif_backend_mode,
+        fclif_eventconv_shape_supported,
+        1'b1,
+        1'b1,
+        eventconv_shape_supported
+    };
     //=========================================================================
     // Block Design Instantiation
     //=========================================================================
@@ -424,25 +499,38 @@ module spikemold_integrated_top #(
 
     assign axis_spike_accept_event = axis_spike_pending & router_input_ready;
     assign axis_spike_can_capture = !axis_spike_pending | axis_spike_accept_event;
-    assign bd_dma_spike_in_tready = eventconv_backend_mode
-                                    ? eventconv_input_tready
-                                    : (bd_spikemold_enable[0] & axis_spike_can_capture);
+    assign bd_dma_spike_in_tready = eventconv_fclif_backend_mode
+                                    ? fclif_eventconv_input_tready
+                                    : (eventconv_backend_mode
+                                       ? eventconv_input_tready
+                                       : (bd_spikemold_enable[0] & axis_spike_can_capture));
     assign axis_spike_in_fire = flat_backend_mode & bd_dma_spike_in_tvalid & bd_dma_spike_in_tready;
     assign eventconv_input_fire = eventconv_backend_mode & bd_dma_spike_in_tvalid & bd_dma_spike_in_tready;
+    assign fclif_eventconv_input_fire = eventconv_fclif_backend_mode & bd_dma_spike_in_tvalid & bd_dma_spike_in_tready;
 
     //=========================================================================
     // Spike Input Mux  (DMA ingress priority > recurrent)
     //=========================================================================
     assign spike_in_in_router_range = (axis_spike_pending_id < NUM_NEURONS);
-    assign router_input_valid     = flat_backend_mode &
-                                    ((axis_spike_pending & spike_in_in_router_range) | neuron_spike_valid);
-    assign router_input_neuron_id = (axis_spike_pending & spike_in_in_router_range)
-                                    ? axis_spike_pending_id[NEURON_ID_WIDTH-1:0]
-                                    : neuron_spike_id;
+    wire [FCLIF_EVENTCONV_DEST_ID_WIDTH-1:0] fclif_eventconv_commit_dest_id =
+        fclif_eventconv_commit_tdata[31:16];
+    wire fclif_commit_in_router_range =
+        fclif_eventconv_commit_dest_id < NUM_NEURONS;
+    assign router_input_valid     = eventconv_fclif_backend_mode
+                                    ? (fclif_eventconv_commit_tvalid & fclif_commit_in_router_range)
+                                    : (flat_backend_mode &
+                                      ((axis_spike_pending & spike_in_in_router_range) | neuron_spike_valid));
+    assign router_input_neuron_id = eventconv_fclif_backend_mode
+                                    ? fclif_eventconv_commit_dest_id[NEURON_ID_WIDTH-1:0]
+                                    : ((axis_spike_pending & spike_in_in_router_range)
+                                       ? axis_spike_pending_id[NEURON_ID_WIDTH-1:0]
+                                       : neuron_spike_id);
     assign bd_spike_in_ready      = 1'b1;
-    assign neuron_spike_ready_wire = flat_backend_mode &
-                                     router_input_ready &
-                                     ~(axis_spike_pending & spike_in_in_router_range);
+    assign neuron_spike_ready_wire = eventconv_fclif_backend_mode
+                                     ? !spike_out_fifo_full
+                                     : (flat_backend_mode &
+                                        router_input_ready &
+                                        ~(axis_spike_pending & spike_in_in_router_range));
 
     //=========================================================================
     // Tiny EventConv Backend
@@ -573,6 +661,153 @@ module spikemold_integrated_top #(
         .output_backpressure_cycle_count    (eventconv_output_backpressure_cycle_count)
     );
 
+    always @(posedge clk) begin
+        if (!rst_n || bd_spikemold_reset[0]) begin
+            fclif_eventconv_kernel_weight_flat <= {(FCLIF_EVENTCONV_KERNEL_WORDS*8){1'b0}};
+        end else if (cfg_router_config_we && cfg_router_config_addr[31:24] == 8'h02) begin
+            case (cfg_router_config_addr[3:0])
+                4'd0: fclif_eventconv_kernel_weight_flat[31:0]    <= cfg_router_config_wdata;
+                4'd1: fclif_eventconv_kernel_weight_flat[63:32]   <= cfg_router_config_wdata;
+                4'd2: fclif_eventconv_kernel_weight_flat[95:64]   <= cfg_router_config_wdata;
+                4'd3: fclif_eventconv_kernel_weight_flat[127:96]  <= cfg_router_config_wdata;
+                4'd4: fclif_eventconv_kernel_weight_flat[159:128] <= cfg_router_config_wdata;
+                4'd5: fclif_eventconv_kernel_weight_flat[191:160] <= cfg_router_config_wdata;
+                4'd6: fclif_eventconv_kernel_weight_flat[223:192] <= cfg_router_config_wdata;
+                4'd7: fclif_eventconv_kernel_weight_flat[255:224] <= cfg_router_config_wdata;
+                4'd8: fclif_eventconv_kernel_weight_flat[287:256] <= cfg_router_config_wdata;
+                default: fclif_eventconv_kernel_weight_flat <= fclif_eventconv_kernel_weight_flat;
+            endcase
+        end
+    end
+
+    always @(posedge clk) begin
+        if (!rst_n || bd_spikemold_reset[0] || !eventconv_fclif_backend_mode) begin
+            fclif_eventconv_input_seen <= 1'b0;
+            fclif_eventconv_packet_done <= 1'b0;
+            fclif_eventconv_commit_started <= 1'b0;
+            fclif_eventconv_commit_done_latched <= 1'b0;
+            fclif_eventconv_commit_start <= 1'b0;
+        end else begin
+            fclif_eventconv_commit_start <= 1'b0;
+
+            if (fclif_eventconv_input_fire) begin
+                fclif_eventconv_input_seen <= 1'b1;
+                fclif_eventconv_commit_done_latched <= 1'b0;
+                if (bd_dma_spike_in_tlast) begin
+                    fclif_eventconv_packet_done <= 1'b1;
+                end
+            end
+
+            if (fclif_eventconv_commit_done) begin
+                fclif_eventconv_commit_done_latched <= 1'b1;
+            end
+
+            if (fclif_eventconv_input_seen &&
+                fclif_eventconv_packet_done &&
+                !fclif_eventconv_commit_started &&
+                !fclif_eventconv_commit_busy &&
+                fclif_eventconv_input_tready &&
+                (fclif_eventconv_updates_generated != 32'd0)) begin
+                fclif_eventconv_commit_start <= 1'b1;
+                fclif_eventconv_commit_started <= 1'b1;
+            end
+        end
+    end
+
+    assign fclif_eventconv_run_busy =
+        eventconv_fclif_backend_mode &&
+        (fclif_eventconv_input_seen || fclif_eventconv_commit_started) &&
+        !fclif_eventconv_commit_done_latched;
+
+    assign fclif_eventconv_update_weight = fclif_eventconv_kernel_weight_out;
+
+    spike_conv_agu #(
+        .KERNEL_SIZE        (FCLIF_EVENTCONV_KERNEL_SIZE),
+        .INPUT_WIDTH        (FCLIF_EVENTCONV_INPUT_WIDTH),
+        .INPUT_HEIGHT       (FCLIF_EVENTCONV_INPUT_HEIGHT),
+        .NUM_CHANNELS       (FCLIF_EVENTCONV_NUM_CHANNELS),
+        .OUTPUT_CHANNELS    (FCLIF_EVENTCONV_OUTPUT_CHANNELS),
+        .STRIDE             (2),
+        .PADDING            (1),
+        .KERNEL_WEIGHT_BITS (8)
+    ) u_fclif_eventconv_agu (
+        .clk                    (clk),
+        .rst_n                  (rst_n & ~bd_spikemold_reset[0]),
+        .enable                 (fclif_eventconv_enable),
+        .s_axis_spike_tvalid    (eventconv_fclif_backend_mode & bd_dma_spike_in_tvalid),
+        .s_axis_spike_tdata     (bd_dma_spike_in_tdata),
+        .s_axis_spike_tready    (fclif_eventconv_input_tready),
+        .m_axis_spike_tvalid    (fclif_eventconv_update_tvalid),
+        .m_axis_spike_tdata     (fclif_eventconv_update_tdata),
+        .m_axis_spike_tready    (fclif_eventconv_update_tready),
+        .kernel_weight_out      (fclif_eventconv_kernel_weight_out),
+        .kernel_weight_flat     (fclif_eventconv_kernel_weight_flat),
+        .conv_spikes_processed  (fclif_eventconv_spikes_processed),
+        .conv_updates_generated (fclif_eventconv_updates_generated),
+        .conv_address_errors    (fclif_eventconv_address_errors)
+    );
+
+    spike_conv_state_update #(
+        .STATE_COUNT   (FCLIF_EVENTCONV_STATE_COUNT),
+        .DEST_ID_WIDTH (FCLIF_EVENTCONV_DEST_ID_WIDTH),
+        .STATE_WIDTH   (FCLIF_EVENTCONV_STATE_WIDTH),
+        .WEIGHT_WIDTH  (8)
+    ) u_fclif_eventconv_state (
+        .clk                    (clk),
+        .rst_n                  (rst_n & ~bd_spikemold_reset[0]),
+        .enable                 (fclif_eventconv_enable),
+        .clear                  (fclif_eventconv_clear),
+        .s_axis_update_tvalid   (fclif_eventconv_update_tvalid),
+        .s_axis_update_tdata    (fclif_eventconv_update_tdata),
+        .update_weight          (fclif_eventconv_update_weight),
+        .s_axis_update_tready   (fclif_eventconv_update_tready),
+        .s_axis_reset_tvalid    (fclif_eventconv_reset_tvalid),
+        .s_axis_reset_tdest     (fclif_eventconv_reset_tdest),
+        .s_axis_reset_tready    (fclif_eventconv_reset_tready),
+        .state_flat             (fclif_eventconv_state_flat),
+        .active_id_flat         (fclif_eventconv_active_id_flat),
+        .active_mask            (fclif_eventconv_active_mask),
+        .active_neuron_count    (fclif_eventconv_active_neuron_count),
+        .state_read_count       (fclif_eventconv_state_read_count),
+        .state_write_count      (fclif_eventconv_state_write_count),
+        .update_count           (fclif_eventconv_update_count),
+        .commit_reset_count     (fclif_eventconv_commit_reset_count),
+        .invalid_dest_count     (fclif_eventconv_invalid_dest_count),
+        .state_checksum         (fclif_eventconv_state_checksum)
+    );
+
+    spike_conv_active_commit #(
+        .STATE_COUNT   (FCLIF_EVENTCONV_STATE_COUNT),
+        .DEST_ID_WIDTH (FCLIF_EVENTCONV_DEST_ID_WIDTH),
+        .STATE_WIDTH   (FCLIF_EVENTCONV_STATE_WIDTH)
+    ) u_fclif_eventconv_commit (
+        .clk                                (clk),
+        .rst_n                              (rst_n & ~bd_spikemold_reset[0]),
+        .enable                             (fclif_eventconv_enable),
+        .clear                              (fclif_eventconv_clear),
+        .commit_start                       (fclif_eventconv_commit_start),
+        .commit_threshold                   (cfg_global_threshold[FCLIF_EVENTCONV_STATE_WIDTH-1:0]),
+        .active_neuron_count                (fclif_eventconv_active_neuron_count),
+        .active_id_flat                     (fclif_eventconv_active_id_flat),
+        .state_flat                         (fclif_eventconv_state_flat),
+        .commit_busy                        (fclif_eventconv_commit_busy),
+        .commit_done                        (fclif_eventconv_commit_done),
+        .m_axis_commit_tvalid               (fclif_eventconv_commit_tvalid),
+        .m_axis_commit_tdata                (fclif_eventconv_commit_tdata),
+        .m_axis_commit_tready               (fclif_eventconv_commit_tready),
+        .m_axis_reset_tvalid                (fclif_eventconv_reset_tvalid),
+        .m_axis_reset_tdest                 (fclif_eventconv_reset_tdest),
+        .m_axis_reset_tready                (fclif_eventconv_reset_tready),
+        .active_commit_read_count           (fclif_eventconv_active_commit_read_count),
+        .commit_emit_count                  (fclif_eventconv_commit_emit_count),
+        .full_scan_count                    (fclif_eventconv_full_scan_count),
+        .readout_checksum                   (fclif_eventconv_readout_checksum),
+        .output_backpressure_cycle_count    (fclif_eventconv_output_backpressure_cycle_count)
+    );
+
+    assign fclif_eventconv_commit_tready =
+        eventconv_fclif_backend_mode & router_input_ready & fclif_commit_in_router_range;
+
     //=========================================================================
     // FIFO Bridge  RTL neuron output -> DMA0 S2MM
     // Neuron pulse can arrive while DMA S2MM ready is deasserted. A single hold
@@ -597,7 +832,7 @@ module spikemold_integrated_top #(
     reg [31:0]                  output_bridge_drop_count_reg;
 
     wire spike_out_fifo_empty = (spike_out_fifo_count == 0);
-    wire spike_out_fifo_full  = (spike_out_fifo_count == SPIKE_OUT_FIFO_DEPTH);
+    assign spike_out_fifo_full  = (spike_out_fifo_count == SPIKE_OUT_FIFO_DEPTH);
     // Capture exactly the post-spikes popped from the LIF output FIFO. This
     // keeps repeated same-id/value commits visible to the board readback path.
     wire neuron_spike_event = neuron_spike_valid && neuron_spike_ready_wire;
@@ -696,7 +931,8 @@ module spikemold_integrated_top #(
     reg        pl_service_seen_busy;
 
     wire hls_input_accept_event =
-        eventconv_backend_mode ? eventconv_input_fire : axis_spike_accept_event;
+        eventconv_fclif_backend_mode ? fclif_eventconv_input_fire :
+        (eventconv_backend_mode ? eventconv_input_fire : axis_spike_accept_event);
     wire pl_output_commit_event =
         eventconv_backend_mode ? eventconv_output_event : neuron_spike_event;
 
@@ -763,7 +999,8 @@ module spikemold_integrated_top #(
     assign cfg_service_cycles_counter = pl_service_cycles_latched;
     assign cfg_pl_busy_cycles_counter = axis_valid_seen_count;
     assign cfg_output_drain_cycles_counter =
-        eventconv_backend_mode ? eventconv_active_commit_read_count : axis_router_accept_count;
+        eventconv_fclif_backend_mode ? fclif_eventconv_active_commit_read_count :
+        (eventconv_backend_mode ? eventconv_active_commit_read_count : axis_router_accept_count);
     assign cfg_output_bridge_status = {
         16'd0,
         axis_spike_pending,
@@ -780,25 +1017,34 @@ module spikemold_integrated_top #(
     assign cfg_output_bridge_event_count = output_bridge_event_count_reg;
     assign cfg_output_bridge_emit_count = output_bridge_emit_count_reg;
     assign router_spike_count =
-        eventconv_backend_mode ? eventconv_update_count : flat_router_spike_count;
+        eventconv_fclif_backend_mode ? fclif_eventconv_update_count :
+        (eventconv_backend_mode ? eventconv_update_count : flat_router_spike_count);
     assign neuron_spike_count =
-        eventconv_backend_mode ? eventconv_commit_emit_count : flat_neuron_spike_count;
+        eventconv_fclif_backend_mode ? flat_neuron_spike_count :
+        (eventconv_backend_mode ? eventconv_commit_emit_count : flat_neuron_spike_count);
     assign fifo_overflow =
-        eventconv_backend_mode ? (eventconv_invalid_dest_count != 32'd0) : flat_fifo_overflow;
+        eventconv_fclif_backend_mode ? (fclif_eventconv_invalid_dest_count != 32'd0) :
+        (eventconv_backend_mode ? (eventconv_invalid_dest_count != 32'd0) : flat_fifo_overflow);
     assign active_neurons =
-        eventconv_backend_mode ? eventconv_active_neuron_count[7:0] : flat_active_neurons;
+        eventconv_fclif_backend_mode ? fclif_eventconv_active_neuron_count[7:0] :
+        (eventconv_backend_mode ? eventconv_active_neuron_count[7:0] : flat_active_neurons);
     assign neuron_state_checksum =
-        eventconv_backend_mode ? eventconv_state_checksum[31:0] : flat_neuron_state_checksum;
+        eventconv_fclif_backend_mode ? (fclif_eventconv_state_checksum[31:0] + flat_neuron_state_checksum) :
+        (eventconv_backend_mode ? eventconv_state_checksum[31:0] : flat_neuron_state_checksum);
 
     //=========================================================================
     // SpikeMold Status
     //=========================================================================
-    assign bd_spikemold_ready = eventconv_backend_mode
-                                ? ~eventconv_run_busy
-                                : (~router_busy & ~neuron_array_busy);
-    assign bd_spikemold_busy  = eventconv_backend_mode
-                                ? eventconv_run_busy
-                                : (router_busy | neuron_array_busy);
+    assign bd_spikemold_ready = eventconv_fclif_backend_mode
+                                ? ~(fclif_eventconv_run_busy | router_busy | neuron_array_busy | !spike_out_fifo_empty)
+                                : (eventconv_backend_mode
+                                   ? ~eventconv_run_busy
+                                   : (~router_busy & ~neuron_array_busy));
+    assign bd_spikemold_busy  = eventconv_fclif_backend_mode
+                                ? (fclif_eventconv_run_busy | router_busy | neuron_array_busy | !spike_out_fifo_empty)
+                                : (eventconv_backend_mode
+                                   ? eventconv_run_busy
+                                   : (router_busy | neuron_array_busy));
 
     //=========================================================================
     // Router Config Queue (decoupled control path)
@@ -896,7 +1142,7 @@ module spikemold_integrated_top #(
     ) u_neuron_array (
         .clk                    (clk),
         .rst_n                  (rst_n & ~bd_spikemold_reset[0]),
-        .enable                 (bd_spikemold_enable[0] & flat_backend_mode),
+        .enable                 (bd_spikemold_enable[0] & (flat_backend_mode | eventconv_fclif_backend_mode)),
         .s_axis_spike_valid     (router_spike_valid),
         .s_axis_spike_dest_id   (router_spike_dest_id),
         .s_axis_spike_weight    (router_spike_weight),

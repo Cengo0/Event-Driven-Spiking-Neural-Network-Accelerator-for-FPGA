@@ -17,6 +17,11 @@ from .architecture_trace_generator import (
     pack_spikemold_event_word64,
     sha256_json,
 )
+from .spikemold_artifact import (
+    EVENTCONV_FCLIF_KERNEL_CONFIG_PREFIX,
+    EVENTCONV_FCLIF_KIND,
+    validate_eventconv_fclif_manifest,
+)
 
 
 TRANSPORT_SMOKE_SCHEMA = "spikemold.batch_1b_transport_smoke.v1"
@@ -25,6 +30,8 @@ DMA_LOOPBACK_SCHEMA = "spikemold.dma_loopback_smoke.v1"
 EVENTWORD_COUNTER_SCHEMA = "spikemold.eventword64_counter_smoke.v1"
 EVENTWORD_TO_AXIS32_SCHEMA = "spikemold.eventword64_to_axis32_lowering.v1"
 FLAT_FC_LIF_SMOKE_SCHEMA = "spikemold.flat_fc_lif_smoke.v1"
+EVENTCONV_COORD32_SCHEMA = "spikemold.eventconv_coord32_inputs.v1"
+EVENTCONV_FCLIF_CONFIG_SCHEMA = "spikemold.eventconv_fclif_config_plan.v1"
 EVIDENCE_LEVEL = "software_transport_smoke_no_board"
 
 AER32_ID_BITS = 13
@@ -34,6 +41,7 @@ AER32_ID_MASK = (1 << AER32_ID_BITS) - 1
 AER32_WEIGHT_LO = AER32_ID_BITS
 AER32_TIMESTAMP_LO = AER32_ID_BITS + AER32_WEIGHT_BITS
 DIRECT_RTL_PHYSICAL_NEURONS = 1024
+EVENTCONV_FCLIF_BACKEND_MODE = 2
 
 REGISTER_OFFSETS: Mapping[str, int] = {
     "CTRL": 0x00,
@@ -52,6 +60,10 @@ REGISTER_OFFSETS: Mapping[str, int] = {
     "STALL_COUNT": 0x34,
     "ERROR_CODE": 0x38,
 }
+
+ROUTER_CONN_COUNT_PREFIX = 0x01000000
+ROUTER_CLEAR_COUNTER_PREFIX = 0x02000000
+ROUTER_MAX_FANOUT = 32
 
 STATUS_IDLE = 1 << 0
 STATUS_BUSY = 1 << 1
@@ -102,6 +114,156 @@ def _sha256_u64_words(words: Sequence[int]) -> str:
 def _sha256_u32_words(words: Sequence[int]) -> str:
     data = b"".join(int(word).to_bytes(4, "little") for word in words)
     return hashlib.sha256(data).hexdigest()
+
+
+def pack_eventconv_coord32_input(spike: InputSpike) -> int:
+    """Pack EventConv coordinate input for the direct RTL AXIS32 path."""
+
+    if spike.x is None or spike.y is None or spike.channel is None:
+        raise ValueError("EventConv coord32 input requires x, y, and channel")
+    x = int(spike.x)
+    y = int(spike.y)
+    channel = int(spike.channel)
+    payload = int(spike.payload)
+    if not 0 <= x < 256:
+        raise ValueError(f"x out of coord32 range: {x}")
+    if not 0 <= y < 256:
+        raise ValueError(f"y out of coord32 range: {y}")
+    if not 0 <= channel < 256:
+        raise ValueError(f"channel out of coord32 range: {channel}")
+    if not -128 <= payload <= 127:
+        raise ValueError(f"payload out of signed int8 range: {payload}")
+    return ((x & 0xFF) << 24) | ((y & 0xFF) << 16) | ((channel & 0xFF) << 8) | (payload & 0xFF)
+
+
+def pack_eventconv_coord32_inputs(input_spikes: Iterable[InputSpike]) -> list[int]:
+    return [
+        pack_eventconv_coord32_input(spike)
+        for spike in sorted(list(input_spikes), key=lambda event: (event.tick, event.src_id))
+    ]
+
+
+def pack_router_connection_word(dest_id: int, weight: int, *, delay: int = 0) -> int:
+    """Pack a router connection word for `spike_router.v`.
+
+    Negative weights use the router inhibitory bit with unsigned magnitude.
+    """
+
+    if not 0 <= int(dest_id) < DIRECT_RTL_PHYSICAL_NEURONS:
+        raise ValueError(f"dest_id out of range: {dest_id}")
+    if int(weight) == 0:
+        return 0
+    if int(weight) < -255 or int(weight) > 255:
+        raise ValueError(f"router weight magnitude exceeds 8 bits: {weight}")
+    exc = int(weight) >= 0
+    magnitude = abs(int(weight)) & 0xFF
+    return (
+        (int(dest_id) & 0x3FF)
+        | ((int(delay) & 0xFF) << 10)
+        | (magnitude << 18)
+        | ((1 if exc else 0) << 26)
+        | (1 << 27)
+    )
+
+
+def build_eventconv_fclif_config_plan(manifest: Mapping[str, object]) -> Dict[str, object]:
+    """Build board config writes for frozen EventConv -> FC-LIF artifact."""
+
+    validate_eventconv_fclif_manifest(manifest)
+    weights = manifest.get("weights", {})
+    network = manifest.get("network", {})
+    thresholds = manifest.get("thresholds", {})
+    if not isinstance(weights, Mapping) or not isinstance(network, Mapping) or not isinstance(thresholds, Mapping):
+        raise ValueError("manifest weights/network/thresholds must be mappings")
+    values = [int(v) for v in weights.get("values", [])]
+    kernel_count = int(weights.get("kernel_count", 0))
+    readout_count = int(weights.get("readout_count", 0))
+    if len(values) != kernel_count + readout_count:
+        raise ValueError("artifact weight count mismatch")
+    eventconv = network["eventconv"]  # type: ignore[index]
+    readout = network["readout"]  # type: ignore[index]
+    if not isinstance(eventconv, Mapping) or not isinstance(readout, Mapping):
+        raise ValueError("eventconv/readout sections must be mappings")
+
+    kernel_values = values[:kernel_count]
+    readout_values = values[kernel_count:]
+    readout_source_size = int(readout["source_size"])
+    readout_target_size = int(readout["target_size"])
+    readout_target_start = int(readout["target_id_start"])
+    if len(readout_values) != readout_source_size * readout_target_size:
+        raise ValueError("readout weight payload mismatch")
+
+    kernel_config_writes = []
+    for word_index in range((kernel_count + 3) // 4):
+        word = 0
+        for byte_index in range(4):
+            value_index = word_index * 4 + byte_index
+            if value_index < kernel_count:
+                word |= (kernel_values[value_index] & 0xFF) << (8 * byte_index)
+        kernel_config_writes.append(
+            {
+                "target": "router_config_snoop",
+                "address": EVENTCONV_FCLIF_KERNEL_CONFIG_PREFIX | word_index,
+                "data": word,
+            }
+        )
+
+    router_config_writes = [
+        {"target": "router", "address": ROUTER_CLEAR_COUNTER_PREFIX, "data": 1}
+    ]
+    for src in range(readout_source_size):
+        fanout = []
+        for class_id in range(readout_target_size):
+            weight = int(readout_values[src * readout_target_size + class_id])
+            if weight == 0:
+                continue
+            fanout.append(
+                {
+                    "dest_id": readout_target_start + class_id,
+                    "weight": weight,
+                    "word": pack_router_connection_word(readout_target_start + class_id, weight),
+                }
+            )
+        if len(fanout) > ROUTER_MAX_FANOUT:
+            raise ValueError(f"source {src} fanout {len(fanout)} exceeds {ROUTER_MAX_FANOUT}")
+        for offset, route in enumerate(fanout):
+            router_config_writes.append(
+                {"target": "router", "address": src * ROUTER_MAX_FANOUT + offset, "data": route["word"]}
+            )
+        if len(fanout) < ROUTER_MAX_FANOUT:
+            router_config_writes.append(
+                {"target": "router", "address": src * ROUTER_MAX_FANOUT + len(fanout), "data": 0}
+            )
+        router_config_writes.append(
+            {"target": "router", "address": ROUTER_CONN_COUNT_PREFIX | src, "data": len(fanout)}
+        )
+
+    shape = eventconv["input_shape"]  # type: ignore[index]
+    kernel_shape = eventconv["kernel_shape"]  # type: ignore[index]
+    output_shape = eventconv["output_shape"]  # type: ignore[index]
+    shape0 = (
+        (int(output_shape[0]) & 0xFF) << 24
+        | (int(kernel_shape[2]) & 0xFF) << 16
+        | (int(shape[2]) & 0xFF) << 8
+        | (int(shape[1]) & 0xFF)
+    )
+    return {
+        "schema": EVENTCONV_FCLIF_CONFIG_SCHEMA,
+        "artifact_id": manifest.get("artifact_id", ""),
+        "artifact_kind": EVENTCONV_FCLIF_KIND,
+        "backend_mode": EVENTCONV_FCLIF_BACKEND_MODE,
+        "threshold": int(thresholds["conv_commit"]),
+        "neuron_params": 0,
+        "eventconv_shape0": shape0,
+        "kernel_config_writes": kernel_config_writes,
+        "router_config_writes": router_config_writes,
+        "counts": {
+            "kernel_words": len(kernel_config_writes),
+            "router_writes": len(router_config_writes),
+            "readout_sources": readout_source_size,
+            "readout_targets": readout_target_size,
+        },
+    }
 
 
 def event_word_type(word: int) -> int:
