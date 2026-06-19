@@ -38,6 +38,7 @@ module tb_spikemold_config_regs_output_diag;
     reg [31:0] output_bridge_event_count;
     reg [31:0] output_bridge_emit_count;
     reg [31:0] state_checksum;
+    reg [31:0] eventconv_desc_status;
 
     wire router_config_we;
     wire [31:0] router_config_addr;
@@ -49,6 +50,8 @@ module tb_spikemold_config_regs_output_diag;
     wire [7:0] global_leak_rate;
     wire [7:0] global_refrac_period;
     wire [1:0] backend_mode;
+    wire [31:0] eventconv_shape0;
+    wire [31:0] eventconv_kernel0;
 
     integer pass_count = 0;
     integer fail_count = 0;
@@ -87,6 +90,8 @@ module tb_spikemold_config_regs_output_diag;
         .global_leak_rate(global_leak_rate),
         .global_refrac_period(global_refrac_period),
         .backend_mode(backend_mode),
+        .eventconv_shape0(eventconv_shape0),
+        .eventconv_kernel0(eventconv_kernel0),
         .router_spike_count(router_spike_count),
         .neuron_spike_count(neuron_spike_count),
         .fifo_overflow(fifo_overflow),
@@ -99,7 +104,8 @@ module tb_spikemold_config_regs_output_diag;
         .output_bridge_drop_count(output_bridge_drop_count),
         .output_bridge_event_count(output_bridge_event_count),
         .output_bridge_emit_count(output_bridge_emit_count),
-        .state_checksum(state_checksum)
+        .state_checksum(state_checksum),
+        .eventconv_desc_status(eventconv_desc_status)
     );
 
     task automatic check;
@@ -166,6 +172,7 @@ module tb_spikemold_config_regs_output_diag;
         output_bridge_event_count = 32'd19;
         output_bridge_emit_count = 32'd12;
         state_checksum = 32'd5;
+        eventconv_desc_status = 32'h00000007;
 
         repeat (3) @(posedge clk);
         @(negedge clk);
@@ -209,6 +216,17 @@ module tb_spikemold_config_regs_output_diag;
 
         axil_read(7'h4C, read_value);
         check("BACKEND_MODE defaults to flat path", read_value == 32'd0);
+
+        axil_read(7'h50, read_value);
+        check("EVENTCONV_SHAPE0 defaults to tiny descriptor", read_value == 32'h04020303);
+        check("EVENTCONV_SHAPE0 output port mirrors register", eventconv_shape0 == 32'h04020303);
+
+        axil_read(7'h54, read_value);
+        check("EVENTCONV_KERNEL0 defaults to tiny 2x2 kernel", read_value == 32'h04030201);
+        check("EVENTCONV_KERNEL0 output port mirrors register", eventconv_kernel0 == 32'h04030201);
+
+        axil_read(7'h58, read_value);
+        check("EVENTCONV_DESC_STATUS returns RTL descriptor flags", read_value == eventconv_desc_status);
 
         $display("Results: %0d PASS, %0d FAIL", pass_count, fail_count);
         if (fail_count == 0) begin

@@ -20,6 +20,9 @@ DEFAULT_VARIANT = "tiny"
 
 BACKEND_MODE_FLAT = 0
 BACKEND_MODE_EVENTCONV = 1
+EVENTCONV_SHAPE0_TINY = 0x04020303
+EVENTCONV_DESC_STATUS_SHAPE_SUPPORTED = 1 << 0
+EVENTCONV_DESC_STATUS_KERNEL_RUNTIME = 1 << 1
 
 TRACE_VARIANTS = {
     "tiny": {
@@ -102,11 +105,25 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--timeout-polls", type=int, default=100000)
     parser.add_argument("--timeout-seconds", type=int, default=40)
     parser.add_argument("--time-steps", type=int, default=2048)
+    parser.add_argument(
+        "--write-eventconv-descriptor",
+        action="store_true",
+        help="Write/read EventConv descriptor extension registers before running; requires a rebuilt bitstream with descriptor support.",
+    )
     return parser.parse_args()
 
 
 def pack_eventconv_axis32(*, x: int, y: int, channel: int) -> int:
     return ((int(x) & 0xFF) << 24) | ((int(y) & 0xFF) << 16) | ((int(channel) & 0xFF) << 8)
+
+
+def pack_eventconv_kernel0(kernel: object) -> int:
+    weights = kernel[0][0]  # type: ignore[index]
+    flat = [int(weights[0][0]), int(weights[0][1]), int(weights[1][0]), int(weights[1][1])]  # type: ignore[index]
+    value = 0
+    for idx, weight in enumerate(flat):
+        value |= (weight & 0xFF) << (idx * 8)
+    return value
 
 
 def build_failure_result(
@@ -197,6 +214,13 @@ def main() -> int:
             release_run = dma_smoke.start_and_poll(ip, args.timeout_polls)
 
             stage = "rtl_eventconv_config"
+            descriptor_expected = {
+                "shape0": EVENTCONV_SHAPE0_TINY,
+                "kernel0": pack_eventconv_kernel0(model["kernel"]),
+            }
+            if args.write_eventconv_descriptor:
+                config_ip.write(dma_smoke.CONFIG_OFFSETS["EVENTCONV_SHAPE0"], descriptor_expected["shape0"])
+                config_ip.write(dma_smoke.CONFIG_OFFSETS["EVENTCONV_KERNEL0"], descriptor_expected["kernel0"])
             config_ip.write(dma_smoke.CONFIG_OFFSETS["BACKEND_MODE"], BACKEND_MODE_EVENTCONV)
             config_ip.write(dma_smoke.CONFIG_OFFSETS["THRESHOLD"], model["commit_threshold"] & 0xFFFF)
             config_ip.write(dma_smoke.CONFIG_OFFSETS["NEURON_PARAMS"], 0)
@@ -256,6 +280,19 @@ def main() -> int:
             "output_bridge_emits_match": config_after["output_br_emits"] == len(output_words_expected),
             "multi_commit_packet_drained": len(output_words) == len(output_words_expected),
         }
+        descriptor_checks = {}
+        if args.write_eventconv_descriptor:
+            descriptor_checks = {
+                "eventconv_shape0_matches": config_after["eventconv_shape0"] == descriptor_expected["shape0"],
+                "eventconv_kernel0_matches": config_after["eventconv_kernel0"] == descriptor_expected["kernel0"],
+                "eventconv_descriptor_shape_supported": (
+                    config_after["eventconv_desc_status"] & EVENTCONV_DESC_STATUS_SHAPE_SUPPORTED
+                ) != 0,
+                "eventconv_descriptor_kernel_runtime": (
+                    config_after["eventconv_desc_status"] & EVENTCONV_DESC_STATUS_KERNEL_RUNTIME
+                ) != 0,
+            }
+            required_checks.update(descriptor_checks)
         diagnostic_checks = {
             "no_output_bridge_drops": config_after["output_br_drops"] == 0,
             "no_eventconv_invalid_dest": (config_after["status"] & 0x1) == 0,
@@ -284,6 +321,14 @@ def main() -> int:
                 "eventconv_state_zeroed_by": "EventConv state_update reset/clear path",
                 "hls_soft_reset_clears_eventconv_state": True,
                 "state_checksum_validity": "valid after HLS reset plus backend_mode=EventConv tiny trace run",
+            },
+            "descriptor": {
+                "write_enabled": bool(args.write_eventconv_descriptor),
+                "shape0_expected": descriptor_expected["shape0"],
+                "kernel0_expected": descriptor_expected["kernel0"],
+                "shape0_boundary": "current RTL accepts only 3x3 input, 2x2 kernel, 4-state EventConv smoke",
+                "kernel0_boundary": "packed int8 2x2 kernel register drives AGU runtime weights when descriptor-capable bitstream is used",
+                "checks": descriptor_checks,
             },
             "input_spikes": spec["input_spikes"],
             "input_axis32": input_axis32,

@@ -144,6 +144,9 @@ foreach required_pin {
     output_bridge_drop_count
     output_bridge_event_count
     output_bridge_emit_count
+    eventconv_shape0
+    eventconv_kernel0
+    eventconv_desc_status
     state_checksum
     backend_mode
 } {
@@ -378,6 +381,8 @@ create_bd_port -dir O -from 15 -to 0 cfg_global_threshold -type data
 create_bd_port -dir O -from 7 -to 0 cfg_global_leak_rate -type data
 create_bd_port -dir O -from 7 -to 0 cfg_global_refrac_period -type data
 create_bd_port -dir O -from 1 -to 0 cfg_backend_mode -type data
+create_bd_port -dir O -from 31 -to 0 cfg_eventconv_shape0 -type data
+create_bd_port -dir O -from 31 -to 0 cfg_eventconv_kernel0 -type data
 create_bd_port -dir I -from 31 -to 0 cfg_router_spike_count -type data
 create_bd_port -dir I -from 31 -to 0 cfg_neuron_spike_count -type data
 create_bd_port -dir I cfg_fifo_overflow -type data
@@ -390,6 +395,7 @@ create_bd_port -dir I -from 31 -to 0 cfg_output_bridge_status -type data
 create_bd_port -dir I -from 31 -to 0 cfg_output_bridge_drop_count -type data
 create_bd_port -dir I -from 31 -to 0 cfg_output_bridge_event_count -type data
 create_bd_port -dir I -from 31 -to 0 cfg_output_bridge_emit_count -type data
+create_bd_port -dir I -from 31 -to 0 cfg_eventconv_desc_status -type data
 create_bd_port -dir I -from 31 -to 0 cfg_state_checksum -type data
 
 # Connect config regs to external ports
@@ -404,6 +410,8 @@ connect_bd_net [get_bd_pins spikemold_config_regs_0/global_threshold]     [get_b
 connect_bd_net [get_bd_pins spikemold_config_regs_0/global_leak_rate]     [get_bd_ports cfg_global_leak_rate]
 connect_bd_net [get_bd_pins spikemold_config_regs_0/global_refrac_period] [get_bd_ports cfg_global_refrac_period]
 connect_bd_net [get_bd_pins spikemold_config_regs_0/backend_mode]         [get_bd_ports cfg_backend_mode]
+connect_bd_net [get_bd_pins spikemold_config_regs_0/eventconv_shape0]     [get_bd_ports cfg_eventconv_shape0]
+connect_bd_net [get_bd_pins spikemold_config_regs_0/eventconv_kernel0]    [get_bd_ports cfg_eventconv_kernel0]
 connect_bd_net [get_bd_ports cfg_router_spike_count]                 [get_bd_pins spikemold_config_regs_0/router_spike_count]
 connect_bd_net [get_bd_ports cfg_neuron_spike_count]                 [get_bd_pins spikemold_config_regs_0/neuron_spike_count]
 connect_bd_net [get_bd_ports cfg_fifo_overflow]                      [get_bd_pins spikemold_config_regs_0/fifo_overflow]
@@ -416,6 +424,7 @@ connect_bd_net [get_bd_ports cfg_output_bridge_status]                [get_bd_pi
 connect_bd_net [get_bd_ports cfg_output_bridge_drop_count]            [get_bd_pins spikemold_config_regs_0/output_bridge_drop_count]
 connect_bd_net [get_bd_ports cfg_output_bridge_event_count]           [get_bd_pins spikemold_config_regs_0/output_bridge_event_count]
 connect_bd_net [get_bd_ports cfg_output_bridge_emit_count]            [get_bd_pins spikemold_config_regs_0/output_bridge_emit_count]
+connect_bd_net [get_bd_ports cfg_eventconv_desc_status]               [get_bd_pins spikemold_config_regs_0/eventconv_desc_status]
 connect_bd_net [get_bd_ports cfg_state_checksum]                      [get_bd_pins spikemold_config_regs_0/state_checksum]
 
 # Clock/reset external ports

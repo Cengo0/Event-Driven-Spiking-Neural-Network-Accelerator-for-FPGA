@@ -96,6 +96,24 @@ def check_trace_result(name: str, spec: Mapping[str, object]) -> None:
     if model.get("commit_threshold") != spec["threshold"]:
         fail(f"{name} commit threshold mismatch")
 
+    descriptor = result.get("descriptor")
+    if descriptor is not None:
+        descriptor_map = require_mapping(descriptor, f"{name} descriptor")
+        if descriptor_map.get("shape0_expected") != 0x04020303:
+            fail(f"{name} EventConv shape descriptor mismatch")
+        if descriptor_map.get("kernel0_expected") != 0x04030201:
+            fail(f"{name} EventConv kernel descriptor mismatch")
+        if descriptor_map.get("write_enabled") is True:
+            descriptor_checks = require_mapping(descriptor_map.get("checks"), f"{name} descriptor checks")
+            for key in [
+                "eventconv_shape0_matches",
+                "eventconv_kernel0_matches",
+                "eventconv_descriptor_shape_supported",
+                "eventconv_descriptor_kernel_runtime",
+            ]:
+                if descriptor_checks.get(key) is not True:
+                    fail(f"{name} descriptor check failed: {key}")
+
     if result.get("input_axis32") != spec["input_axis32"]:
         fail(f"{name} input AXIS32 mismatch")
 

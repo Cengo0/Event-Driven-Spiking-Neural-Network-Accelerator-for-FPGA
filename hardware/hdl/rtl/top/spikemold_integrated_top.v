@@ -120,6 +120,8 @@ module spikemold_integrated_top #(
     wire [7:0]  cfg_global_leak_rate;
     wire [7:0]  cfg_global_refrac_period;
     wire [1:0]  cfg_backend_mode;
+    wire [31:0] cfg_eventconv_shape0;
+    wire [31:0] cfg_eventconv_kernel0;
 
     // Status
     wire [31:0] router_spike_count;
@@ -139,6 +141,7 @@ module spikemold_integrated_top #(
     wire [31:0] cfg_output_bridge_event_count;
     wire [31:0] cfg_output_bridge_emit_count;
     wire [31:0] neuron_throughput_counter;
+    wire [31:0] cfg_eventconv_desc_status;
     wire [31:0] neuron_state_checksum;
     wire [31:0] flat_neuron_state_checksum;
     wire [15:0] threshold_out;
@@ -182,7 +185,8 @@ module spikemold_integrated_top #(
     wire                       flat_backend_mode;
     wire                       eventconv_backend_mode;
 
-    // Tiny EventConv smoke backend: one 3x3/2x2 shared-kernel primitive.
+    // EventConv smoke backend: one 3x3/2x2 shared-kernel primitive.
+    // Shape is still statically specialized; kernel weights come from AXI-Lite.
     localparam [1:0] BACKEND_MODE_FLAT      = 2'd0;
     localparam [1:0] BACKEND_MODE_EVENTCONV = 2'd1;
     localparam EVENTCONV_KERNEL_SIZE        = 2;
@@ -213,6 +217,7 @@ module spikemold_integrated_top #(
     wire [(EVENTCONV_STATE_COUNT*EVENTCONV_STATE_WIDTH)-1:0] eventconv_state_flat;
     wire [(EVENTCONV_STATE_COUNT*EVENTCONV_DEST_ID_WIDTH)-1:0] eventconv_active_id_flat;
     wire [EVENTCONV_STATE_COUNT-1:0] eventconv_active_mask;
+    wire eventconv_shape_supported;
     wire [31:0] eventconv_active_neuron_count;
     wire [31:0] eventconv_state_read_count;
     wire [31:0] eventconv_state_write_count;
@@ -243,8 +248,13 @@ module spikemold_integrated_top #(
     assign rst_n = rst_n_vec[0];
     assign flat_backend_mode = (cfg_backend_mode == BACKEND_MODE_FLAT);
     assign eventconv_backend_mode = (cfg_backend_mode == BACKEND_MODE_EVENTCONV);
-    assign eventconv_enable = bd_spikemold_enable[0] & eventconv_backend_mode;
-    assign eventconv_clear = !eventconv_backend_mode;
+    assign eventconv_shape_supported =
+        cfg_eventconv_shape0 == {8'd4, 8'd2, 8'd3, 8'd3};
+    assign eventconv_enable = bd_spikemold_enable[0] &
+                              eventconv_backend_mode &
+                              eventconv_shape_supported;
+    assign eventconv_clear = !eventconv_backend_mode | !eventconv_shape_supported;
+    assign cfg_eventconv_desc_status = {29'd0, 1'b1, 1'b1, eventconv_shape_supported};
     //=========================================================================
     // Block Design Instantiation
     //=========================================================================
@@ -323,6 +333,8 @@ module spikemold_integrated_top #(
         .cfg_global_leak_rate    (cfg_global_leak_rate),
         .cfg_global_refrac_period(cfg_global_refrac_period),
         .cfg_backend_mode        (cfg_backend_mode),
+        .cfg_eventconv_shape0    (cfg_eventconv_shape0),
+        .cfg_eventconv_kernel0   (cfg_eventconv_kernel0),
 
         // Status feedback
         .cfg_router_spike_count  (router_spike_count),
@@ -337,6 +349,7 @@ module spikemold_integrated_top #(
         .cfg_output_bridge_drop_count(cfg_output_bridge_drop_count),
         .cfg_output_bridge_event_count(cfg_output_bridge_event_count),
         .cfg_output_bridge_emit_count(cfg_output_bridge_emit_count),
+        .cfg_eventconv_desc_status(cfg_eventconv_desc_status),
         .cfg_state_checksum     (neuron_state_checksum)
     );
 
@@ -434,7 +447,7 @@ module spikemold_integrated_top #(
     //=========================================================================
     // Tiny EventConv Backend
     //=========================================================================
-    assign eventconv_kernel_weight_flat = {8'd4, 8'd3, 8'd2, 8'd1};
+    assign eventconv_kernel_weight_flat = cfg_eventconv_kernel0;
     assign eventconv_update_weight = eventconv_kernel_weight_out;
 
     always @(posedge clk) begin

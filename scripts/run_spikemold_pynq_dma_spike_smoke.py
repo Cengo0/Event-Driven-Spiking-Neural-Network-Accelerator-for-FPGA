@@ -58,6 +58,9 @@ CONFIG_OFFSETS = {
     "OUTPUT_DRAIN_CYCLES": 0x44,
     "STATE_CHECKSUM": 0x48,
     "BACKEND_MODE": 0x4C,
+    "EVENTCONV_SHAPE0": 0x50,
+    "EVENTCONV_KERNEL0": 0x54,
+    "EVENTCONV_DESC_STATUS": 0x58,
 }
 
 AP_START = 1 << 0
@@ -212,6 +215,9 @@ def config_snapshot(config_ip: object) -> dict[str, int]:
             "OUTPUT_DRAIN_CYCLES",
             "STATE_CHECKSUM",
             "BACKEND_MODE",
+            "EVENTCONV_SHAPE0",
+            "EVENTCONV_KERNEL0",
+            "EVENTCONV_DESC_STATUS",
         }
     }
 

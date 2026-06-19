@@ -27,7 +27,19 @@ must preserve these addresses or provide an explicit compatibility shim.
 | `0x30` | `ACTIVE_COUNT` | RO | unique active neurons committed |
 | `0x34` | `STALL_COUNT` | RO | backpressure cycles |
 | `0x38` | `ERROR_CODE` | RO | zero on success |
-| `0x4C` | `BACKEND_MODE` | RW | backend selector: 0 flat FC-LIF, 1 tiny EventConv smoke |
+| `0x4C` | `BACKEND_MODE` | RW | backend selector: 0 flat FC-LIF, 1 EventConv smoke |
+| `0x50` | `EVENTCONV_SHAPE0` | RW | compatible EventConv descriptor: [7:0] input_width, [15:8] input_height, [23:16] kernel_size, [31:24] state_count; current accepted value is `0x04020303` |
+| `0x54` | `EVENTCONV_KERNEL0` | RW | packed EventConv int8 kernel weights for current 2x2 gate: [7:0] k00, [15:8] k01, [23:16] k10, [31:24] k11; default `0x04030201` |
+| `0x58` | `EVENTCONV_DESC_STATUS` | RO | bit0 shape descriptor accepted by current RTL, bit1 kernel register drives AGU runtime weights, bit2 shape is still static-gated tiny RTL |
+
+## EventConv Descriptor Boundary
+
+The descriptor extension is a compatible register-map step toward configurable
+EventConv. At this gate, `EVENTCONV_KERNEL0` drives the integrated EventConv AGU
+weights, while `EVENTCONV_SHAPE0` is accepted only for the existing tiny
+3x3-input, 2x2-kernel, 4-state RTL specialization. Arbitrary EventConv
+shape/kernel board claims remain outside this contract until rebuilt bit/HWH
+evidence proves the wider descriptor path.
 
 ## Required Smoke Behavior
 
