@@ -86,6 +86,21 @@ Vivado reports, board smoke JSON outputs, and HLS IP package/readback files.
 It excludes checkpoints, dataset downloads, profiler dumps, and large local
 training artifacts.
 
+## Release Bundle Board Rerun
+
+Rerun date: 2026-06-20
+Board: PYNQ-Z2 at `192.168.0.54`
+Runtime note: use `sudo -n env XILINX_XRT=/usr ...` so PYNQ sees the embedded device.
+
+| Rerun | Result | SHA-256 |
+|---|---:|---|
+| `outputs/release/flat_fc_lif_rerun_20260620_xrt.json` | PASS | `5a6d014a28359feeba9c80fcc685929bb06b912a35b71070f0b4db748a68e379` |
+| `outputs/release/eventconv_tiny_rerun_20260620_xrt.json` | PASS | `99cc4a6350b6c9b83c4a92ccbddef03c2541c425a4dca361f17cf8ea4cb7e81d` |
+| `outputs/release/eventconv_burst_boundary_rerun_20260620_xrt.json` | PASS | `10fb33e1299494707041239df10c93115f465357706a22f4c0079e3e99dbf603` |
+
+These reruns prove the release bundle can reproduce the locked tiny board smokes.
+They do not expand the claim boundary to full-network correctness or performance.
+
 ## Final Verifier Commands
 
 Run these from repo root:

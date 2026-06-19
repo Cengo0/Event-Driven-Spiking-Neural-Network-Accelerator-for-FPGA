@@ -120,6 +120,34 @@
       "HLS component.xml and packaged IP zip"
     ]
   },
+  "release_bundle_board_rerun": {
+    "board": "PYNQ-Z2 at 192.168.0.54",
+    "run_date": "2026-06-20",
+    "environment_note": "PYNQ board rerun requires XILINX_XRT=/usr under sudo -n",
+    "results": [
+      {
+        "path": "outputs/release/flat_fc_lif_rerun_20260620_xrt.json",
+        "sha256": "5a6d014a28359feeba9c80fcc685929bb06b912a35b71070f0b4db748a68e379",
+        "ok": true,
+        "board_executed": true,
+        "claim_boundary": "pynq_axi_dma0_direct_rtl_tiny_flat_fc_lif_commit_value_state_checksum_readback"
+      },
+      {
+        "path": "outputs/release/eventconv_tiny_rerun_20260620_xrt.json",
+        "sha256": "99cc4a6350b6c9b83c4a92ccbddef03c2541c425a4dca361f17cf8ea4cb7e81d",
+        "ok": true,
+        "board_executed": true,
+        "claim_boundary": "pynq_axi_dma0_direct_rtl_tiny_eventconv_multi_commit_state_checksum_readback"
+      },
+      {
+        "path": "outputs/release/eventconv_burst_boundary_rerun_20260620_xrt.json",
+        "sha256": "10fb33e1299494707041239df10c93115f465357706a22f4c0079e3e99dbf603",
+        "ok": true,
+        "board_executed": true,
+        "claim_boundary": "pynq_axi_dma0_direct_rtl_eventconv_burst_boundary_state_checksum_readback"
+      }
+    ]
+  },
   "curated_reports": [
     "reports/v3_6_goal_lock_report.md",
     "reports/v3_6_goal_lock_manifest.json",
