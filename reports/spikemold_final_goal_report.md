@@ -132,5 +132,9 @@ Follow-on multi-sample sparse MNIST-derived board evidence is recorded in
 `reports/spikemold_mnist_multisample_board_report.md`. It does not expand the
 claim boundary to full MNIST board accuracy.
 
+Follow-on top-8 sparse MNIST-derived board evidence is recorded in
+`reports/spikemold_mnist_top8_board_report.md`. It increases the sparse input
+event budget only; it is not full MNIST board accuracy.
+
 Post-lock evidence reconciliation is recorded in
 `reports/spikemold_post_lock_followon_report.md`.

@@ -196,6 +196,11 @@
       "result": "PASS"
     },
     {
+      "path": "reports/spikemold_mnist_top8_board_report.md",
+      "boundary": "five MNIST-derived sparse top-8 event samples equivalence only",
+      "result": "PASS"
+    },
+    {
       "path": "reports/spikemold_eventconv_trace_smoke_report.md",
       "boundary": "descriptor-configured tiny EventConv specialization only",
       "result": "PASS"

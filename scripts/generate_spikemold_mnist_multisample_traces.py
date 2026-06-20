@@ -34,6 +34,11 @@ SCHEMA = "spikemold.mnist_eventconv_fclif_multisample_traces.v1"
 CLAIM_BOUNDARY = "mnist_derived_sparse_event_samples_equivalence_only_no_accuracy_latency_throughput_energy"
 
 
+def repo_path(value: str | Path) -> Path:
+    path = Path(value)
+    return path if path.is_absolute() else ROOT / path
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--artifact", default=str(DEFAULT_ARTIFACT))
@@ -115,9 +120,9 @@ def image_to_topk_spikes(image: Any, *, top_k: int) -> tuple[list[InputSpike], l
 
 def main() -> int:
     args = parse_args()
-    artifact_path = Path(args.artifact)
-    output_dir = Path(args.output_dir)
-    manifest_path = Path(args.manifest)
+    artifact_path = repo_path(args.artifact)
+    output_dir = repo_path(args.output_dir)
+    manifest_path = repo_path(args.manifest)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     artifact = read_spikemold_artifact(artifact_path)
