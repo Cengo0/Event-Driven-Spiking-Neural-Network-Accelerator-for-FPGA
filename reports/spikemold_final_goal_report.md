@@ -123,7 +123,11 @@ Expected result: the seven checker commands print `PASS`, the targeted Python su
 
 ## Next Gates Outside This Lock
 
-- Multi-sample or full MNIST board-equivalence run.
+- Full MNIST board-equivalence or board-accuracy run.
 - Descriptor-configured arbitrary EventConv board proof.
 - Wider network/state-space board proof.
 - Same-run measured latency, throughput, and energy methodology.
+
+Follow-on multi-sample sparse MNIST-derived board evidence is recorded in
+`reports/spikemold_mnist_multisample_board_report.md`. It does not expand the
+claim boundary to full MNIST board accuracy.
