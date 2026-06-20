@@ -129,13 +129,14 @@ def test_eventconv_coord32_pack_and_config_plan():
         conv_threshold=1,
         readout_thresholds=[1] * 10,
     )
-    plan = build_eventconv_fclif_config_plan(artifact.manifest)
+    plan = build_eventconv_fclif_config_plan(artifact.manifest, expected_output_words=7)
 
     assert plan["schema"] == "spikemold.eventconv_fclif_config_plan.v1"
     assert plan["backend_mode"] == 2
     assert plan["eventconv_shape0"] == 0x04031C1C
+    assert plan["eventconv_output_count0"] == 7
     assert len(plan["kernel_config_writes"]) == 9
-    assert plan["kernel_config_writes"][0]["address"] == 0x02000000
+    assert plan["kernel_config_writes"][0]["address"] == 0x03000000
     assert plan["router_config_writes"][1]["address"] == 0
     assert plan["router_config_writes"][1]["data"] == pack_router_connection_word(784, 3)
     assert plan["router_config_writes"][2]["data"] == pack_router_connection_word(785, -2)

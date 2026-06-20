@@ -23,6 +23,7 @@ module tb_router_ct;
     parameter FANOUT_IDX_WIDTH  = `SNN_FANOUT_IDX_WIDTH;
     localparam CT_ADDR_WIDTH    = GROUP_ID_WIDTH + LOCAL_ID_WIDTH + FANOUT_IDX_WIDTH;
     localparam CT_DATA_WIDTH    = 1 + GROUP_ID_WIDTH + LOCAL_ID_WIDTH + WEIGHT_WIDTH + 1;
+    localparam CT_DEPTH         = 1 << CT_ADDR_WIDTH;
 
     //-------------------------------------------------------------------------
     // Clock / Reset
@@ -301,7 +302,7 @@ module tb_router_ct;
         integer timeout;
     begin
         timeout = 0;
-        while (!route_clear_done && timeout < 40000) begin
+        while (!route_clear_done && timeout < (CT_DEPTH + 2000)) begin
             @(posedge clk);
             timeout = timeout + 1;
         end
@@ -611,19 +612,19 @@ module tb_router_ct;
         end
 
         //---------------------------------------------------------------------
-        // TEST 23: Max fanout iteration (all 16 entries)
+        // TEST 23: Max fanout iteration (all configured entries)
         //---------------------------------------------------------------------
-        $display("\n--- Test 23: Max Fanout (16 entries) ---");
+        $display("\n--- Test 23: Max Fanout (configured entries) ---");
         begin : test23_block
             integer fi;
             integer fanout_before;
-            // Program all 16 fanout entries for group 3 neuron 0
-            for (fi = 0; fi < 16; fi = fi + 1) begin
+            // Program all fanout entries for group 3 neuron 0
+            for (fi = 0; fi < MAX_FANOUT_INTER; fi = fi + 1) begin
                 program_ct_entry(
                     4'd3, 7'd0,
                     fi[FANOUT_IDX_WIDTH-1:0],
                     1'b1,
-                    fi[GROUP_ID_WIDTH-1:0],    // Route to each group
+                    (fi % NUM_GROUPS),         // Route across groups
                     7'd1,                       // Neuron 1 in each group
                     8'd4,                       // Weight 4
                     1'b1                        // Excitatory
@@ -643,10 +644,10 @@ module tb_router_ct;
             wait_router_idle;
             repeat (50) @(posedge clk);
 
-            check(23, "Max fanout: 16 deliveries",
-                  (delivered_count == 16));
-            check(35, "Max fanout scans exactly 16 CT entries",
-                  (router_fanout_scan_count == fanout_before + 16));
+            check(23, "Max fanout: configured deliveries",
+                  (delivered_count == MAX_FANOUT_INTER));
+            check(35, "Max fanout scans exactly configured CT entries",
+                  (router_fanout_scan_count == fanout_before + MAX_FANOUT_INTER));
         end
 
         //---------------------------------------------------------------------

@@ -299,6 +299,11 @@ module spikemold_integrated_top #(
     wire [31:0] fclif_eventconv_full_scan_count;
     wire signed [31:0] fclif_eventconv_readout_checksum;
     wire [31:0] fclif_eventconv_output_backpressure_cycle_count;
+    wire fclif_eventconv_active_read_req;
+    wire [31:0] fclif_eventconv_active_read_index;
+    wire fclif_eventconv_active_read_valid;
+    wire [FCLIF_EVENTCONV_DEST_ID_WIDTH-1:0] fclif_eventconv_active_read_dest_id;
+    wire signed [FCLIF_EVENTCONV_STATE_WIDTH-1:0] fclif_eventconv_active_read_state_value;
     reg  fclif_eventconv_input_seen;
     reg  fclif_eventconv_packet_done;
     reg  fclif_eventconv_commit_started;
@@ -620,6 +625,11 @@ module spikemold_integrated_top #(
         .s_axis_reset_tvalid    (eventconv_reset_tvalid),
         .s_axis_reset_tdest     (eventconv_reset_tdest),
         .s_axis_reset_tready    (eventconv_reset_tready),
+        .active_read_req        (1'b0),
+        .active_read_index      (32'd0),
+        .active_read_valid      (),
+        .active_read_dest_id    (),
+        .active_read_state_value(),
         .state_flat             (eventconv_state_flat),
         .active_id_flat         (eventconv_active_id_flat),
         .active_mask            (eventconv_active_mask),
@@ -664,7 +674,7 @@ module spikemold_integrated_top #(
     always @(posedge clk) begin
         if (!rst_n || bd_spikemold_reset[0]) begin
             fclif_eventconv_kernel_weight_flat <= {(FCLIF_EVENTCONV_KERNEL_WORDS*8){1'b0}};
-        end else if (cfg_router_config_we && cfg_router_config_addr[31:24] == 8'h02) begin
+        end else if (cfg_router_config_we && cfg_router_config_addr[31:24] == 8'h03) begin
             case (cfg_router_config_addr[3:0])
                 4'd0: fclif_eventconv_kernel_weight_flat[31:0]    <= cfg_router_config_wdata;
                 4'd1: fclif_eventconv_kernel_weight_flat[63:32]   <= cfg_router_config_wdata;
@@ -751,7 +761,8 @@ module spikemold_integrated_top #(
         .STATE_COUNT   (FCLIF_EVENTCONV_STATE_COUNT),
         .DEST_ID_WIDTH (FCLIF_EVENTCONV_DEST_ID_WIDTH),
         .STATE_WIDTH   (FCLIF_EVENTCONV_STATE_WIDTH),
-        .WEIGHT_WIDTH  (8)
+        .WEIGHT_WIDTH  (8),
+        .COMPACT_ON_RESET (0)
     ) u_fclif_eventconv_state (
         .clk                    (clk),
         .rst_n                  (rst_n & ~bd_spikemold_reset[0]),
@@ -764,9 +775,14 @@ module spikemold_integrated_top #(
         .s_axis_reset_tvalid    (fclif_eventconv_reset_tvalid),
         .s_axis_reset_tdest     (fclif_eventconv_reset_tdest),
         .s_axis_reset_tready    (fclif_eventconv_reset_tready),
-        .state_flat             (fclif_eventconv_state_flat),
-        .active_id_flat         (fclif_eventconv_active_id_flat),
-        .active_mask            (fclif_eventconv_active_mask),
+        .active_read_req        (fclif_eventconv_active_read_req),
+        .active_read_index      (fclif_eventconv_active_read_index),
+        .active_read_valid      (fclif_eventconv_active_read_valid),
+        .active_read_dest_id    (fclif_eventconv_active_read_dest_id),
+        .active_read_state_value(fclif_eventconv_active_read_state_value),
+        .state_flat             (),
+        .active_id_flat         (),
+        .active_mask            (),
         .active_neuron_count    (fclif_eventconv_active_neuron_count),
         .state_read_count       (fclif_eventconv_state_read_count),
         .state_write_count      (fclif_eventconv_state_write_count),
@@ -779,7 +795,9 @@ module spikemold_integrated_top #(
     spike_conv_active_commit #(
         .STATE_COUNT   (FCLIF_EVENTCONV_STATE_COUNT),
         .DEST_ID_WIDTH (FCLIF_EVENTCONV_DEST_ID_WIDTH),
-        .STATE_WIDTH   (FCLIF_EVENTCONV_STATE_WIDTH)
+        .STATE_WIDTH   (FCLIF_EVENTCONV_STATE_WIDTH),
+        .USE_READ_PORT (1),
+        .RESET_COMPACTS_ACTIVE_LIST (0)
     ) u_fclif_eventconv_commit (
         .clk                                (clk),
         .rst_n                              (rst_n & ~bd_spikemold_reset[0]),
@@ -788,8 +806,13 @@ module spikemold_integrated_top #(
         .commit_start                       (fclif_eventconv_commit_start),
         .commit_threshold                   (cfg_global_threshold[FCLIF_EVENTCONV_STATE_WIDTH-1:0]),
         .active_neuron_count                (fclif_eventconv_active_neuron_count),
-        .active_id_flat                     (fclif_eventconv_active_id_flat),
-        .state_flat                         (fclif_eventconv_state_flat),
+        .active_id_flat                     (),
+        .state_flat                         (),
+        .active_read_req                    (fclif_eventconv_active_read_req),
+        .active_read_index                  (fclif_eventconv_active_read_index),
+        .active_read_valid                  (fclif_eventconv_active_read_valid),
+        .active_read_dest_id                (fclif_eventconv_active_read_dest_id),
+        .active_read_state_value            (fclif_eventconv_active_read_state_value),
         .commit_busy                        (fclif_eventconv_commit_busy),
         .commit_done                        (fclif_eventconv_commit_done),
         .m_axis_commit_tvalid               (fclif_eventconv_commit_tvalid),
@@ -818,7 +841,7 @@ module spikemold_integrated_top #(
     wire [SPIKE_AXIS_ID_WIDTH-1:0] neuron_spike_id_axis =
         {{(SPIKE_AXIS_ID_WIDTH-NEURON_ID_WIDTH){1'b0}}, neuron_spike_id};
     wire neuron_in_hls_range = (neuron_spike_id_axis < AXIS_MAX_NEURON_ID);
-    localparam SPIKE_OUT_FIFO_DEPTH = 32;
+    localparam SPIKE_OUT_FIFO_DEPTH = 64;
     localparam SPIKE_OUT_FIFO_AW    = $clog2(SPIKE_OUT_FIFO_DEPTH);
     localparam SPIKE_OUT_FIFO_DW    = SPIKE_AXIS_ID_WIDTH + DATA_WIDTH;
     localparam [SPIKE_OUT_FIFO_AW-1:0] SPIKE_OUT_FIFO_LAST = {SPIKE_OUT_FIFO_AW{1'b1}};
@@ -830,6 +853,8 @@ module spikemold_integrated_top #(
     reg [31:0]                  output_bridge_event_count_reg;
     reg [31:0]                  output_bridge_emit_count_reg;
     reg [31:0]                  output_bridge_drop_count_reg;
+    reg                         fclif_output_done_latched;
+    reg [15:0]                  fclif_output_words_remaining;
 
     wire spike_out_fifo_empty = (spike_out_fifo_count == 0);
     assign spike_out_fifo_full  = (spike_out_fifo_count == SPIKE_OUT_FIFO_DEPTH);
@@ -860,10 +885,27 @@ module spikemold_integrated_top #(
         (spike_out_fifo_wr_ptr == SPIKE_OUT_FIFO_LAST) ? {SPIKE_OUT_FIFO_AW{1'b0}} : (spike_out_fifo_wr_ptr + 1'b1);
     wire [SPIKE_OUT_FIFO_AW-1:0] spike_out_fifo_rd_ptr_next =
         (spike_out_fifo_rd_ptr == SPIKE_OUT_FIFO_LAST) ? {SPIKE_OUT_FIFO_AW{1'b0}} : (spike_out_fifo_rd_ptr + 1'b1);
+    wire eventconv_stream_backend_mode = eventconv_backend_mode | eventconv_fclif_backend_mode;
     wire eventconv_drain_ready =
-        eventconv_backend_mode && (eventconv_commit_done_latched || eventconv_commit_done);
+        eventconv_backend_mode ? (eventconv_commit_done_latched || eventconv_commit_done) :
+        (eventconv_fclif_backend_mode ? (fclif_eventconv_commit_done_latched || fclif_eventconv_commit_done) : 1'b1);
+    wire fclif_eventconv_downstream_idle =
+        (fclif_eventconv_commit_done_latched || fclif_eventconv_commit_done) &&
+        !router_busy && !router_spike_valid && !neuron_array_busy && !neuron_spike_valid;
+    wire [15:0] fclif_expected_output_words = cfg_eventconv_kernel0[15:0];
+    wire fclif_expected_output_count_programmed = (fclif_expected_output_words != 16'd0);
+    wire fclif_first_input_fire =
+        eventconv_fclif_backend_mode && fclif_eventconv_input_fire && !fclif_eventconv_input_seen;
+    wire fclif_counted_tlast_ready =
+        fclif_expected_output_count_programmed && (fclif_output_words_remaining == 16'd1);
+    wire eventconv_tlast_ready =
+        eventconv_backend_mode ? (eventconv_commit_done_latched || eventconv_commit_done) :
+        (eventconv_fclif_backend_mode
+            ? (fclif_counted_tlast_ready ||
+               (!fclif_expected_output_count_programmed && fclif_output_done_latched))
+            : 1'b1);
     wire spike_out_fifo_dma_valid =
-        !spike_out_fifo_empty && (!eventconv_backend_mode || eventconv_drain_ready);
+        !spike_out_fifo_empty && (!eventconv_stream_backend_mode || eventconv_drain_ready);
 
     always @(posedge clk) begin
         if (!rst_n || bd_spikemold_reset[0]) begin
@@ -873,7 +915,25 @@ module spikemold_integrated_top #(
             output_bridge_event_count_reg <= 32'd0;
             output_bridge_emit_count_reg  <= 32'd0;
             output_bridge_drop_count_reg  <= 32'd0;
+            fclif_output_done_latched <= 1'b0;
+            fclif_output_words_remaining <= 16'd0;
         end else begin
+            if (!eventconv_fclif_backend_mode || fclif_eventconv_input_fire) begin
+                fclif_output_done_latched <= 1'b0;
+            end else if (fclif_eventconv_downstream_idle) begin
+                fclif_output_done_latched <= 1'b1;
+            end
+
+            if (!eventconv_fclif_backend_mode) begin
+                fclif_output_words_remaining <= 16'd0;
+            end else if (fclif_first_input_fire) begin
+                fclif_output_words_remaining <= fclif_expected_output_words;
+            end else if (spike_out_fifo_pop &&
+                         fclif_expected_output_count_programmed &&
+                         (fclif_output_words_remaining != 16'd0)) begin
+                fclif_output_words_remaining <= fclif_output_words_remaining - 16'd1;
+            end
+
             if (spike_out_fifo_push && !spike_out_fifo_full) begin
                 spike_out_fifo_mem[spike_out_fifo_wr_ptr] <= {selected_output_value, selected_output_id};
                 spike_out_fifo_wr_ptr <= spike_out_fifo_wr_ptr_next;
@@ -909,94 +969,15 @@ module spikemold_integrated_top #(
         spike_out_fifo_head[SPIKE_AXIS_ID_WIDTH-1:0]
     };
     assign bd_dma_spike_out_tkeep = 4'hF;
-    assign bd_dma_spike_out_tlast = eventconv_backend_mode
-                                    ? (bd_dma_spike_out_tvalid && (spike_out_fifo_count == 1))
+    assign bd_dma_spike_out_tlast = eventconv_stream_backend_mode
+                                    ? (bd_dma_spike_out_tvalid && eventconv_tlast_ready && (spike_out_fifo_count == 1))
                                     : bd_dma_spike_out_tvalid;
     assign eventconv_commit_tready = eventconv_backend_mode & !spike_out_fifo_full;
 
-    //=========================================================================
-    // PL-only latency counter (cycles)
-    // Measures: first accepted AXIS input spike -> first neuron output spike.
-    // Exported through cfg_throughput_counter (0x24) for host-side conversion:
-    //   latency_ms = cycles / f_clk_hz * 1000
-    //=========================================================================
-    reg [31:0] pl_latency_cycles_cur;
-    reg [31:0] pl_latency_cycles_latched;
-    reg        pl_latency_active;
-    reg        pl_latency_done;
-    reg [31:0] pl_service_cycles_cur;
-    reg [31:0] pl_service_cycles_latched;
-    reg        pl_service_active;
-    reg        pl_service_done;
-    reg        pl_service_seen_busy;
-
-    wire hls_input_accept_event =
-        eventconv_fclif_backend_mode ? fclif_eventconv_input_fire :
-        (eventconv_backend_mode ? eventconv_input_fire : axis_spike_accept_event);
-    wire pl_output_commit_event =
-        eventconv_backend_mode ? eventconv_output_event : neuron_spike_event;
-
-    always @(posedge clk) begin
-        if (!rst_n || bd_spikemold_reset[0]) begin
-            pl_latency_cycles_cur    <= 32'd0;
-            pl_latency_cycles_latched<= 32'd0;
-            pl_latency_active        <= 1'b0;
-            pl_latency_done          <= 1'b0;
-            pl_service_cycles_cur    <= 32'd0;
-            pl_service_cycles_latched<= 32'd0;
-            pl_service_active        <= 1'b0;
-            pl_service_done          <= 1'b0;
-            pl_service_seen_busy     <= 1'b0;
-        end else if (!bd_spikemold_enable[0]) begin
-            // Inter-image idle window: keep last latched value readable.
-            pl_latency_cycles_cur <= 32'd0;
-            pl_latency_active     <= 1'b0;
-            pl_latency_done       <= 1'b0;
-            pl_service_cycles_cur <= 32'd0;
-            pl_service_active     <= 1'b0;
-            pl_service_done       <= 1'b0;
-            pl_service_seen_busy  <= 1'b0;
-        end else begin
-            if (!pl_latency_active && !pl_latency_done) begin
-                if (hls_input_accept_event) begin
-                    pl_latency_cycles_cur     <= 32'd0;
-                    pl_latency_cycles_latched <= 32'd0;
-                    pl_latency_active         <= 1'b1;
-                end
-            end else if (pl_latency_active) begin
-                pl_latency_cycles_cur <= pl_latency_cycles_cur + 1'b1;
-                if (pl_output_commit_event) begin
-                    pl_latency_cycles_latched <= pl_latency_cycles_cur + 1'b1;
-                    pl_latency_active         <= 1'b0;
-                    pl_latency_done           <= 1'b1;
-                end
-            end
-
-            // Service-time cycles:
-            // first accepted input spike -> return to idle after busy period.
-            if (!pl_service_active && !pl_service_done) begin
-                if (hls_input_accept_event) begin
-                    pl_service_cycles_cur     <= 32'd0;
-                    pl_service_cycles_latched <= 32'd0;
-                    pl_service_active         <= 1'b1;
-                    pl_service_seen_busy      <= bd_spikemold_busy;
-                end
-            end else if (pl_service_active) begin
-                pl_service_cycles_cur <= pl_service_cycles_cur + 1'b1;
-                if (bd_spikemold_busy) begin
-                    pl_service_seen_busy <= 1'b1;
-                end
-                if ((pl_service_seen_busy || bd_spikemold_busy) && !bd_spikemold_busy) begin
-                    pl_service_cycles_latched <= pl_service_cycles_cur + 1'b1;
-                    pl_service_active         <= 1'b0;
-                    pl_service_done           <= 1'b1;
-                end
-            end
-        end
-    end
-
-    assign cfg_throughput_counter = pl_latency_cycles_latched;
-    assign cfg_service_cycles_counter = pl_service_cycles_latched;
+    // Latency/service counters are intentionally disabled for the final-goal
+    // board smoke. The locked claim excludes latency, throughput, and energy.
+    assign cfg_throughput_counter = 32'd0;
+    assign cfg_service_cycles_counter = 32'd0;
     assign cfg_pl_busy_cycles_counter = axis_valid_seen_count;
     assign cfg_output_drain_cycles_counter =
         eventconv_fclif_backend_mode ? fclif_eventconv_active_commit_read_count :

@@ -166,7 +166,11 @@ def pack_router_connection_word(dest_id: int, weight: int, *, delay: int = 0) ->
     )
 
 
-def build_eventconv_fclif_config_plan(manifest: Mapping[str, object]) -> Dict[str, object]:
+def build_eventconv_fclif_config_plan(
+    manifest: Mapping[str, object],
+    *,
+    expected_output_words: int | None = None,
+) -> Dict[str, object]:
     """Build board config writes for frozen EventConv -> FC-LIF artifact."""
 
     validate_eventconv_fclif_manifest(manifest)
@@ -247,6 +251,10 @@ def build_eventconv_fclif_config_plan(manifest: Mapping[str, object]) -> Dict[st
         | (int(shape[2]) & 0xFF) << 8
         | (int(shape[1]) & 0xFF)
     )
+    output_word_count = 0 if expected_output_words is None else int(expected_output_words)
+    if not 0 <= output_word_count <= 0xFFFF:
+        raise ValueError(f"expected_output_words out of 16-bit range: {output_word_count}")
+
     return {
         "schema": EVENTCONV_FCLIF_CONFIG_SCHEMA,
         "artifact_id": manifest.get("artifact_id", ""),
@@ -255,6 +263,7 @@ def build_eventconv_fclif_config_plan(manifest: Mapping[str, object]) -> Dict[st
         "threshold": int(thresholds["conv_commit"]),
         "neuron_params": 0,
         "eventconv_shape0": shape0,
+        "eventconv_output_count0": output_word_count,
         "kernel_config_writes": kernel_config_writes,
         "router_config_writes": router_config_writes,
         "counts": {

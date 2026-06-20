@@ -65,6 +65,7 @@ CONFIG_OFFSETS = {
 
 AP_START = 1 << 0
 AP_DONE = 1 << 1
+AP_IDLE = 1 << 2
 
 CTRL_ENABLE = 1 << 0
 CTRL_RESET = 1 << 1
@@ -140,7 +141,7 @@ def resolve_attr(overlay: object, name: str) -> object:
 def poll_done(ip: object, timeout_polls: int) -> tuple[int, int]:
     for poll in range(timeout_polls):
         ctrl = int(ip.read(HLS_OFFSETS["AP_CTRL"]))
-        if ctrl & AP_DONE:
+        if (ctrl & AP_DONE) or ((ctrl & AP_IDLE) and not (ctrl & AP_START) and poll > 0):
             return ctrl, poll + 1
     raise TimeoutError(f"HLS IP did not assert ap_done within {timeout_polls} polls")
 

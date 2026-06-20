@@ -66,6 +66,12 @@ if {[info exists ::env(SPIKEMOLD_OUTPUT_BASENAME)] && $::env(SPIKEMOLD_OUTPUT_BA
 }
 puts "Using output basename: $output_basename"
 
+set use_weight_dma 1
+if {[info exists ::env(SPIKEMOLD_DISABLE_WEIGHT_DMA)] && $::env(SPIKEMOLD_DISABLE_WEIGHT_DMA) ne ""} {
+    set use_weight_dma [expr {int($::env(SPIKEMOLD_DISABLE_WEIGHT_DMA)) ? 0 : 1}]
+}
+puts "Using weight DMA: $use_weight_dma"
+
 # =============================================================================
 # Create Block Design
 # =============================================================================
@@ -114,19 +120,21 @@ set_property -dict [list \
     CONFIG.c_s_axis_s2mm_tdata_width {32} \
 ] [get_bd_cells axi_dma_0]
 
-# --- AXI DMA (weight stream / checkpoint) ---
-create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 axi_dma_1
-set_property -dict [list \
-    CONFIG.c_include_sg {0} \
-    CONFIG.c_sg_include_stscntrl_strm {0} \
-    CONFIG.c_sg_length_width {23} \
-    CONFIG.c_mm2s_burst_size {16} \
-    CONFIG.c_s2mm_burst_size {16} \
-    CONFIG.c_m_axi_mm2s_data_width {32} \
-    CONFIG.c_m_axi_s2mm_data_width {32} \
-    CONFIG.c_m_axis_mm2s_tdata_width {32} \
-    CONFIG.c_s_axis_s2mm_tdata_width {32} \
-] [get_bd_cells axi_dma_1]
+if {$use_weight_dma} {
+    # --- AXI DMA (weight stream / checkpoint) ---
+    create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 axi_dma_1
+    set_property -dict [list \
+        CONFIG.c_include_sg {0} \
+        CONFIG.c_sg_include_stscntrl_strm {0} \
+        CONFIG.c_sg_length_width {23} \
+        CONFIG.c_mm2s_burst_size {16} \
+        CONFIG.c_s2mm_burst_size {16} \
+        CONFIG.c_m_axi_mm2s_data_width {32} \
+        CONFIG.c_m_axi_s2mm_data_width {32} \
+        CONFIG.c_m_axis_mm2s_tdata_width {32} \
+        CONFIG.c_s_axis_s2mm_tdata_width {32} \
+    ] [get_bd_cells axi_dma_1]
+}
 
 # --- SpikeMold HLS IP ---
 create_bd_cell -type ip -vlnv xilinx.com:hls:spikemold_top_hls:1.0 spikemold_top_hls_0
@@ -155,13 +163,15 @@ foreach required_pin {
     }
 }
 
-# --- AXI Interconnect for GP0 (4 slaves: HLS, Config, spike DMA, weight DMA) ---
+# --- AXI Interconnect for GP0 (HLS, Config, spike DMA, optional weight DMA) ---
+set gp_num_mi [expr {$use_weight_dma ? 4 : 3}]
 create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_0
-set_property CONFIG.NUM_MI {4} [get_bd_cells axi_interconnect_0]
+set_property CONFIG.NUM_MI $gp_num_mi [get_bd_cells axi_interconnect_0]
 
-# --- AXI Interconnect for HP0 (4 masters: two DMA engines, MM2S/S2MM each) ---
+# --- AXI Interconnect for HP0 (spike DMA plus optional weight DMA) ---
+set hp_num_si [expr {$use_weight_dma ? 4 : 2}]
 create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_hp0
-set_property -dict [list CONFIG.NUM_SI {4} CONFIG.NUM_MI {1}] [get_bd_cells axi_interconnect_hp0]
+set_property -dict [list CONFIG.NUM_SI $hp_num_si CONFIG.NUM_MI {1}] [get_bd_cells axi_interconnect_hp0]
 
 # --- Constants ---
 create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 const_zero_1bit
@@ -179,14 +189,12 @@ set_property -dict [list CONFIG.CONST_VAL {0} CONFIG.CONST_WIDTH {4}] [get_bd_ce
 # =============================================================================
 # Clock and Reset Connections
 # =============================================================================
-connect_bd_net [get_bd_pins processing_system7_0/FCLK_CLK0] \
+set clock_pins [list \
+    [get_bd_pins processing_system7_0/FCLK_CLK0] \
     [get_bd_pins proc_sys_reset_0/slowest_sync_clk] \
     [get_bd_pins axi_dma_0/s_axi_lite_aclk] \
     [get_bd_pins axi_dma_0/m_axi_mm2s_aclk] \
     [get_bd_pins axi_dma_0/m_axi_s2mm_aclk] \
-    [get_bd_pins axi_dma_1/s_axi_lite_aclk] \
-    [get_bd_pins axi_dma_1/m_axi_mm2s_aclk] \
-    [get_bd_pins axi_dma_1/m_axi_s2mm_aclk] \
     [get_bd_pins spikemold_top_hls_0/ap_clk] \
     [get_bd_pins spikemold_config_regs_0/s_axi_aclk] \
     [get_bd_pins axi_interconnect_0/ACLK] \
@@ -194,36 +202,50 @@ connect_bd_net [get_bd_pins processing_system7_0/FCLK_CLK0] \
     [get_bd_pins axi_interconnect_0/M00_ACLK] \
     [get_bd_pins axi_interconnect_0/M01_ACLK] \
     [get_bd_pins axi_interconnect_0/M02_ACLK] \
-    [get_bd_pins axi_interconnect_0/M03_ACLK] \
     [get_bd_pins axi_interconnect_hp0/ACLK] \
     [get_bd_pins axi_interconnect_hp0/S00_ACLK] \
     [get_bd_pins axi_interconnect_hp0/S01_ACLK] \
-    [get_bd_pins axi_interconnect_hp0/S02_ACLK] \
-    [get_bd_pins axi_interconnect_hp0/S03_ACLK] \
     [get_bd_pins axi_interconnect_hp0/M00_ACLK] \
     [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] \
-    [get_bd_pins processing_system7_0/S_AXI_HP0_ACLK]
+    [get_bd_pins processing_system7_0/S_AXI_HP0_ACLK] \
+]
+if {$use_weight_dma} {
+    lappend clock_pins \
+        [get_bd_pins axi_dma_1/s_axi_lite_aclk] \
+        [get_bd_pins axi_dma_1/m_axi_mm2s_aclk] \
+        [get_bd_pins axi_dma_1/m_axi_s2mm_aclk] \
+        [get_bd_pins axi_interconnect_0/M03_ACLK] \
+        [get_bd_pins axi_interconnect_hp0/S02_ACLK] \
+        [get_bd_pins axi_interconnect_hp0/S03_ACLK]
+}
+connect_bd_net {*}$clock_pins
 
 connect_bd_net [get_bd_pins processing_system7_0/FCLK_RESET0_N] \
     [get_bd_pins proc_sys_reset_0/ext_reset_in]
 
-connect_bd_net [get_bd_pins proc_sys_reset_0/peripheral_aresetn] \
+set reset_pins [list \
+    [get_bd_pins proc_sys_reset_0/peripheral_aresetn] \
     [get_bd_pins spikemold_top_hls_0/ap_rst_n] \
     [get_bd_pins spikemold_config_regs_0/s_axi_aresetn] \
     [get_bd_pins axi_dma_0/axi_resetn] \
-    [get_bd_pins axi_dma_1/axi_resetn] \
     [get_bd_pins axi_interconnect_0/ARESETN] \
     [get_bd_pins axi_interconnect_0/S00_ARESETN] \
     [get_bd_pins axi_interconnect_0/M00_ARESETN] \
     [get_bd_pins axi_interconnect_0/M01_ARESETN] \
     [get_bd_pins axi_interconnect_0/M02_ARESETN] \
-    [get_bd_pins axi_interconnect_0/M03_ARESETN] \
     [get_bd_pins axi_interconnect_hp0/ARESETN] \
     [get_bd_pins axi_interconnect_hp0/S00_ARESETN] \
     [get_bd_pins axi_interconnect_hp0/S01_ARESETN] \
-    [get_bd_pins axi_interconnect_hp0/S02_ARESETN] \
-    [get_bd_pins axi_interconnect_hp0/S03_ARESETN] \
-    [get_bd_pins axi_interconnect_hp0/M00_ARESETN]
+    [get_bd_pins axi_interconnect_hp0/M00_ARESETN] \
+]
+if {$use_weight_dma} {
+    lappend reset_pins \
+        [get_bd_pins axi_dma_1/axi_resetn] \
+        [get_bd_pins axi_interconnect_0/M03_ARESETN] \
+        [get_bd_pins axi_interconnect_hp0/S02_ARESETN] \
+        [get_bd_pins axi_interconnect_hp0/S03_ARESETN]
+}
+connect_bd_net {*}$reset_pins
 
 # =============================================================================
 # AXI GP0 Interconnect (PS → Slaves)
@@ -243,9 +265,11 @@ connect_bd_intf_net [get_bd_intf_pins axi_interconnect_0/M01_AXI] \
 connect_bd_intf_net [get_bd_intf_pins axi_interconnect_0/M02_AXI] \
     [get_bd_intf_pins axi_dma_0/S_AXI_LITE]
 
-# M03 → axi_dma_1/S_AXI_LITE
-connect_bd_intf_net [get_bd_intf_pins axi_interconnect_0/M03_AXI] \
-    [get_bd_intf_pins axi_dma_1/S_AXI_LITE]
+if {$use_weight_dma} {
+    # M03 -> axi_dma_1/S_AXI_LITE
+    connect_bd_intf_net [get_bd_intf_pins axi_interconnect_0/M03_AXI] \
+        [get_bd_intf_pins axi_dma_1/S_AXI_LITE]
+}
 
 # =============================================================================
 # AXI HP0 Interconnect (DMA → DDR)
@@ -254,10 +278,12 @@ connect_bd_intf_net [get_bd_intf_pins axi_dma_0/M_AXI_MM2S] \
     [get_bd_intf_pins axi_interconnect_hp0/S00_AXI]
 connect_bd_intf_net [get_bd_intf_pins axi_dma_0/M_AXI_S2MM] \
     [get_bd_intf_pins axi_interconnect_hp0/S01_AXI]
-connect_bd_intf_net [get_bd_intf_pins axi_dma_1/M_AXI_MM2S] \
-    [get_bd_intf_pins axi_interconnect_hp0/S02_AXI]
-connect_bd_intf_net [get_bd_intf_pins axi_dma_1/M_AXI_S2MM] \
-    [get_bd_intf_pins axi_interconnect_hp0/S03_AXI]
+if {$use_weight_dma} {
+    connect_bd_intf_net [get_bd_intf_pins axi_dma_1/M_AXI_MM2S] \
+        [get_bd_intf_pins axi_interconnect_hp0/S02_AXI]
+    connect_bd_intf_net [get_bd_intf_pins axi_dma_1/M_AXI_S2MM] \
+        [get_bd_intf_pins axi_interconnect_hp0/S03_AXI]
+}
 connect_bd_intf_net [get_bd_intf_pins axi_interconnect_hp0/M00_AXI] \
     [get_bd_intf_pins processing_system7_0/S_AXI_HP0]
 
@@ -297,13 +323,27 @@ connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins spikemold_top_hl
 connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins spikemold_top_hls_0/s_axis_spikes_TVALID]
 connect_bd_net [get_bd_pins const_one_1bit/dout]   [get_bd_pins spikemold_top_hls_0/m_axis_spikes_TREADY]
 
-# Weight DMA paths:
-#   MM2S -> HLS s_axis_weights   (weight load mode)
-#   HLS  -> S2MM                 (checkpoint / weight read mode)
-connect_bd_intf_net [get_bd_intf_pins axi_dma_1/M_AXIS_MM2S] \
-    [get_bd_intf_pins spikemold_top_hls_0/s_axis_weights]
-connect_bd_intf_net [get_bd_intf_pins spikemold_top_hls_0/m_axis_weights] \
-    [get_bd_intf_pins axi_dma_1/S_AXIS_S2MM]
+if {$use_weight_dma} {
+    # Weight DMA paths:
+    #   MM2S -> HLS s_axis_weights   (weight load mode)
+    #   HLS  -> S2MM                 (checkpoint / weight read mode)
+    connect_bd_intf_net [get_bd_intf_pins axi_dma_1/M_AXIS_MM2S] \
+        [get_bd_intf_pins spikemold_top_hls_0/s_axis_weights]
+    connect_bd_intf_net [get_bd_intf_pins spikemold_top_hls_0/m_axis_weights] \
+        [get_bd_intf_pins axi_dma_1/S_AXIS_S2MM]
+} else {
+    # Final-goal EventConv-FC-LIF smoke configures weights through config_regs;
+    # the legacy HLS weight stream stays idle in this build profile.
+    connect_bd_net [get_bd_pins const_zero_32bit/dout] [get_bd_pins spikemold_top_hls_0/s_axis_weights_TDATA]
+    connect_bd_net [get_bd_pins const_zero_4bit/dout]  [get_bd_pins spikemold_top_hls_0/s_axis_weights_TKEEP]
+    connect_bd_net [get_bd_pins const_zero_4bit/dout]  [get_bd_pins spikemold_top_hls_0/s_axis_weights_TSTRB]
+    connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins spikemold_top_hls_0/s_axis_weights_TLAST]
+    connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins spikemold_top_hls_0/s_axis_weights_TVALID]
+    connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins spikemold_top_hls_0/s_axis_weights_TID]
+    connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins spikemold_top_hls_0/s_axis_weights_TDEST]
+    connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins spikemold_top_hls_0/s_axis_weights_TUSER]
+    connect_bd_net [get_bd_pins const_one_1bit/dout]   [get_bd_pins spikemold_top_hls_0/m_axis_weights_TREADY]
+}
 
 # Tie off unused AXI-Stream port (s_axis_data)
 # This input needs TVALID=0 when not used.
@@ -500,6 +540,20 @@ add_files -norecurse ${rtl_dir}/top/spikemold_integrated_top.v
 
 # Set spikemold_integrated_top as the real top module
 set_property top spikemold_integrated_top [get_filesets sources_1]
+set top_generics [list]
+if {[info exists ::env(SPIKEMOLD_TOP_NUM_NEURONS)] && $::env(SPIKEMOLD_TOP_NUM_NEURONS) ne ""} {
+    set top_num_neurons [expr {int($::env(SPIKEMOLD_TOP_NUM_NEURONS))}]
+    lappend top_generics NUM_NEURONS=$top_num_neurons HLS_MAX_NEURONS=$top_num_neurons
+    puts "Using top generic override: NUM_NEURONS=$top_num_neurons HLS_MAX_NEURONS=$top_num_neurons"
+}
+if {[info exists ::env(SPIKEMOLD_ROUTER_BUFFER_DEPTH)] && $::env(SPIKEMOLD_ROUTER_BUFFER_DEPTH) ne ""} {
+    set router_buffer_depth [expr {int($::env(SPIKEMOLD_ROUTER_BUFFER_DEPTH))}]
+    lappend top_generics ROUTER_BUFFER_DEPTH=$router_buffer_depth
+    puts "Using top generic override: ROUTER_BUFFER_DEPTH=$router_buffer_depth"
+}
+if {[llength $top_generics] > 0} {
+    set_property generic $top_generics [get_filesets sources_1]
+}
 update_compile_order -fileset sources_1
 
 # Add PYNQ-Z2 constraints
@@ -511,6 +565,12 @@ if {[file exists ${project_dir}/hardware/constraints/pynq_z2.xdc]} {
 # Synthesis
 # =============================================================================
 puts "===== Starting Synthesis ====="
+set synth_directive "Default"
+if {[info exists ::env(SPIKEMOLD_SYNTH_DIRECTIVE)] && $::env(SPIKEMOLD_SYNTH_DIRECTIVE) ne ""} {
+    set synth_directive $::env(SPIKEMOLD_SYNTH_DIRECTIVE)
+}
+set_property STEPS.SYNTH_DESIGN.ARGS.DIRECTIVE $synth_directive [get_runs synth_1]
+puts "Using synth directive: $synth_directive"
 launch_runs synth_1 -jobs 4
 wait_on_run synth_1
 

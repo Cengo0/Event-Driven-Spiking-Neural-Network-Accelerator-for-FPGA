@@ -1,0 +1,192 @@
+{
+  "schema": "spikemold.final_goal_lock_manifest.v1",
+  "generated_at": "2026-06-20T11:30:00+09:00",
+  "target_board": "PYNQ-Z2 / Zynq-7020",
+  "base_commit_before_lock_commit": "70112eab289d4478fffc2ce3a282b505546ab1dd",
+  "lock_status": "locked_fixed_mnist_eventconv_fc_sample_equivalence_only",
+  "selected_backend": "eventconv_fclif",
+  "claim_boundary": {
+    "allowed": [
+      "fixed MNIST EventConv-FC sample equivalence only",
+      "software training gate met before synthesis",
+      "integer golden trace and runtime config plan derived from the same trained artifact",
+      "PYNQ-Z2 board run exact-matched the 36-word golden output with zero output drops"
+    ],
+    "not_claimed": [
+      "full MNIST board accuracy",
+      "latency",
+      "throughput",
+      "energy",
+      "arbitrary EventConv shape/kernel support",
+      "full-network board correctness"
+    ]
+  },
+  "training_gate": {
+    "dataset": "MNIST",
+    "architecture": "EventConv(1x28x28, 4 filters, 3x3, stride 2, padding 1) -> sparse FC-LIF(784->10)",
+    "minimum_accuracy": 0.9,
+    "final_validation_accuracy": 0.9544,
+    "num_epochs": 1,
+    "num_steps": 16,
+    "batch_size": 128,
+    "learning_rate": 0.01,
+    "hw_weight_scale": 8.0
+  },
+  "artifacts": {
+    "spikemold_artifact": {
+      "path": "outputs/artifacts/mnist_eventconv_fclif_frozen.json",
+      "file_sha256": "21a9faa8f0469f329ab193f3a50a25053f08e862bc2458e240775b02fc74e58c",
+      "manifest_sha256": "439b702ee516b7564f08143bfd63b2cb46d185a42aba9436ca00fa979f9fd8dd",
+      "bytes": 77201,
+      "tracked_by_git": false
+    },
+    "golden_trace": {
+      "path": "golden_traces/v1/mnist_eventconv_fclif_frozen_v1.json",
+      "file_sha256": "dc7f57038deeb154fb02621a0a94f6c84e31aaf906e36315367cbfa6cc4801ff",
+      "trace_sha256": "4c543d8041c641c4f8351134c9dc77acd1e8483616ed5eb94d3b947f5da64a35",
+      "commits_sha256": "19a2009b7ab6089f1ad16d7dc7b7ea5ca63d41cf7de81c9b7acd11807b4bd78e",
+      "commit_count": 36,
+      "bytes": 22875,
+      "tracked_by_git": true
+    },
+    "runtime_config_plan": {
+      "path": "outputs/runtime/mnist_eventconv_fclif_config_plan.json",
+      "file_sha256": "68e7a70c3aa02d3cc0a66c7a64c6a627a6389348b6a5b03f4caef3ad02e8cbcb",
+      "kernel_config_prefix_hex": "0x03000000",
+      "kernel_config_writes": 9,
+      "router_config_writes": 6625,
+      "eventconv_output_count0": 36,
+      "bytes": 565189,
+      "tracked_by_git": false
+    },
+    "bitstream": {
+      "path": "outputs/spikemold_pynq_z2_frozen_mnist_10mhz.bit",
+      "sha256": "c307b9b8bfeb7bc33be3ee9275f28130ff5027db012b10e00392078e45257b09",
+      "bytes": 4045700,
+      "tracked_by_git": false
+    },
+    "hwh": {
+      "path": "outputs/spikemold_pynq_z2_frozen_mnist_10mhz.hwh",
+      "sha256": "2816d9ad88f736ac9b9b6cfa585c817ee606be7bd02a8151b95687061d29d355",
+      "bytes": 406907,
+      "tracked_by_git": false
+    },
+    "board_result": {
+      "path": "outputs/board/eventconv_fclif_frozen_mnist_10mhz_result_20260620.json",
+      "sha256": "b0beca695277f7776596e442c0a8147e79ce36e1a13a27551f8c5ce93369e278",
+      "bytes": 4469,
+      "tracked_by_git": false
+    }
+  },
+  "vivado_build": {
+    "toolchain": "/tools/Xilinx/2025.2/Vivado",
+    "command": "source /home/jwlee/miniconda3/etc/profile.d/conda.sh && conda activate fpga && source /tools/Xilinx/2025.2/Vivado/settings64.sh && SPIKEMOLD_PL_CLK_MHZ=10 SPIKEMOLD_TOP_NUM_NEURONS=800 SPIKEMOLD_ROUTER_BUFFER_DEPTH=256 SPIKEMOLD_DISABLE_WEIGHT_DMA=1 SPIKEMOLD_SYNTH_DIRECTIVE=RuntimeOptimized SPIKEMOLD_OUTPUT_BASENAME=spikemold_pynq_z2_frozen_mnist_10mhz rtk vivado -mode batch -source hardware/scripts/rebuild_integrated.tcl",
+    "result": "PASS",
+    "timing": {
+      "wns_ns": 58.849,
+      "tns_ns": 0.0,
+      "whs_ns": 0.031,
+      "ths_ns": 0.0,
+      "constraints_met": true
+    },
+    "utilization": {
+      "slice_luts": {
+        "used": 26298,
+        "available": 53200,
+        "percent": 49.43
+      },
+      "slice_registers": {
+        "used": 33089,
+        "available": 106400,
+        "percent": 31.1
+      },
+      "block_ram_tiles": {
+        "used": 97,
+        "available": 140,
+        "percent": 69.29
+      },
+      "dsps": {
+        "used": 4,
+        "available": 220,
+        "percent": 1.82
+      }
+    }
+  },
+  "board_run": {
+    "board": "PYNQ-Z2 at 192.168.0.54",
+    "command": "cd /home/xilinx/spikemold_final_goal && sudo -n env XILINX_XRT=/usr /usr/local/share/pynq-venv/bin/python3 scripts/run_spikemold_pynq_eventconv_fclif.py --bitstream outputs/spikemold_pynq_z2_frozen_mnist_10mhz.bit --hwh outputs/spikemold_pynq_z2_frozen_mnist_10mhz.hwh --artifact outputs/artifacts/mnist_eventconv_fclif_frozen.json --trace golden_traces/v1/mnist_eventconv_fclif_frozen_v1.json --output-json outputs/board/eventconv_fclif_frozen_mnist_10mhz_result_20260620.json --timeout-seconds 600 --time-steps 4096",
+    "result": "PASS",
+    "ok": true,
+    "board_executed": true,
+    "output_words": 36,
+    "expected_words": 36,
+    "checks": {
+      "backend_mode": true,
+      "shape_supported": true,
+      "no_output_drops": true,
+      "output_event_count_exact": true,
+      "output_emit_count_exact": true,
+      "output_words_match": true
+    },
+    "config_after": {
+      "backend_mode": 2,
+      "eventconv_shape0": 67312668,
+      "eventconv_kernel0": 36,
+      "output_br_events": 36,
+      "output_br_emits": 36,
+      "output_br_drops": 0,
+      "neuron_spike_cnt": 36,
+      "router_spike_cnt": 27,
+      "service_cycles": 0,
+      "throughput": 0
+    },
+    "elapsed_host_seconds_recorded_as_metadata_only": 5.287022965960205
+  },
+  "rtl_xsim": {
+    "command": "source /home/jwlee/miniconda3/etc/profile.d/conda.sh && conda activate fpga && rtk bash hardware/scripts/run_testbenches.sh",
+    "result": "PASS",
+    "pass_count": 420,
+    "fail_count": 0
+  },
+  "python_tests": {
+    "command": "source /home/jwlee/miniconda3/etc/profile.d/conda.sh && conda activate fpga && rtk pytest -q software/python/tests/test_architecture_trace_generator.py software/python/tests/test_spikemold_transport.py software/python/tests/test_spikemold_artifact.py software/python/tests/test_spikemold_training.py",
+    "result": "PASS",
+    "passed": 32
+  },
+  "verifier_commands": [
+    {
+      "command": "source /home/jwlee/miniconda3/etc/profile.d/conda.sh && conda activate fpga && rtk python scripts/check_spikemold_batch0_1a.py",
+      "expected_result": "PASS: SpikeMold Batch 0 + initial Batch 1A artifacts valid"
+    },
+    {
+      "command": "source /home/jwlee/miniconda3/etc/profile.d/conda.sh && conda activate fpga && rtk python scripts/check_batch1b_transport.py",
+      "expected_result": "PASS: Batch 1B transport + SpikeMold flat FC-LIF smoke artifacts valid"
+    },
+    {
+      "command": "source /home/jwlee/miniconda3/etc/profile.d/conda.sh && conda activate fpga && rtk python scripts/check_batch1c_eventconv.py",
+      "expected_result": "PASS: Batch 1C EventConv C0/C1/C2/C3/C4/C5/burst-boundary artifacts valid"
+    },
+    {
+      "command": "source /home/jwlee/miniconda3/etc/profile.d/conda.sh && conda activate fpga && rtk python scripts/check_verifier_gate.py",
+      "expected_result": "PASS: verifier gate review artifacts valid"
+    },
+    {
+      "command": "source /home/jwlee/miniconda3/etc/profile.d/conda.sh && conda activate fpga && rtk python scripts/check_spikemold_build_evidence_report.py",
+      "expected_result": "PASS: SpikeMold HLS/Vivado build evidence valid"
+    },
+    {
+      "command": "source /home/jwlee/miniconda3/etc/profile.d/conda.sh && conda activate fpga && rtk python scripts/check_architecture_selection.py",
+      "expected_result": "PASS: Architecture selection V1 report valid"
+    },
+    {
+      "command": "source /home/jwlee/miniconda3/etc/profile.d/conda.sh && conda activate fpga && rtk python scripts/check_spikemold_final_goal.py",
+      "expected_result": "PASS: SpikeMold final-goal frozen SpikePress/SpikeMold artifacts valid"
+    }
+  ],
+  "next_gates_for_stronger_claims": [
+    "multi-sample or full MNIST board-equivalence run",
+    "descriptor-configured arbitrary EventConv board proof",
+    "wider network/state-space board proof",
+    "same-run measured latency, throughput, and energy methodology"
+  ]
+}

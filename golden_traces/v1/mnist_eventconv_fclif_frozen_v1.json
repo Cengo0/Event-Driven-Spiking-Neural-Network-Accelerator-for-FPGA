@@ -1,6 +1,90 @@
 {
   "commits": [
     {
+      "dst_id": 786,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 788,
+      "kind": "commit",
+      "tick": 2,
+      "value": 2
+    },
+    {
+      "dst_id": 789,
+      "kind": "commit",
+      "tick": 2,
+      "value": 4
+    },
+    {
+      "dst_id": 785,
+      "kind": "commit",
+      "tick": 2,
+      "value": 3
+    },
+    {
+      "dst_id": 788,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 793,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 786,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 787,
+      "kind": "commit",
+      "tick": 2,
+      "value": 2
+    },
+    {
+      "dst_id": 791,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 787,
+      "kind": "commit",
+      "tick": 2,
+      "value": 2
+    },
+    {
+      "dst_id": 791,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 785,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 787,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 788,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
       "dst_id": 791,
       "kind": "commit",
       "tick": 2,
@@ -13,61 +97,7 @@
       "value": 1
     },
     {
-      "dst_id": 784,
-      "kind": "commit",
-      "tick": 2,
-      "value": 1
-    },
-    {
-      "dst_id": 790,
-      "kind": "commit",
-      "tick": 2,
-      "value": 1
-    },
-    {
-      "dst_id": 790,
-      "kind": "commit",
-      "tick": 2,
-      "value": 1
-    },
-    {
-      "dst_id": 789,
-      "kind": "commit",
-      "tick": 2,
-      "value": 1
-    },
-    {
       "dst_id": 791,
-      "kind": "commit",
-      "tick": 2,
-      "value": 1
-    },
-    {
-      "dst_id": 788,
-      "kind": "commit",
-      "tick": 2,
-      "value": 1
-    },
-    {
-      "dst_id": 789,
-      "kind": "commit",
-      "tick": 2,
-      "value": 1
-    },
-    {
-      "dst_id": 785,
-      "kind": "commit",
-      "tick": 2,
-      "value": 1
-    },
-    {
-      "dst_id": 785,
-      "kind": "commit",
-      "tick": 2,
-      "value": 1
-    },
-    {
-      "dst_id": 784,
       "kind": "commit",
       "tick": 2,
       "value": 1
@@ -79,42 +109,145 @@
       "value": 1
     },
     {
-      "dst_id": 793,
+      "dst_id": 787,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 791,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 786,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 787,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 792,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 785,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 789,
+      "kind": "commit",
+      "tick": 2,
+      "value": 2
+    },
+    {
+      "dst_id": 785,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 786,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 785,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 786,
+      "kind": "commit",
+      "tick": 2,
+      "value": 4
+    },
+    {
+      "dst_id": 784,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 785,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 787,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 786,
+      "kind": "commit",
+      "tick": 2,
+      "value": 3
+    },
+    {
+      "dst_id": 784,
+      "kind": "commit",
+      "tick": 2,
+      "value": 1
+    },
+    {
+      "dst_id": 786,
+      "kind": "commit",
+      "tick": 2,
+      "value": 2
+    },
+    {
+      "dst_id": 790,
       "kind": "commit",
       "tick": 2,
       "value": 1
     }
   ],
   "counters": {
-    "active_neuron_count": 35,
-    "commit_count": 14,
+    "active_neuron_count": 37,
+    "commit_count": 36,
     "ddr_bytes_inner_loop": 0,
-    "generated_update_count": 40,
+    "generated_update_count": 131,
     "input_event_count": 3,
     "python_inner_loop_steps": 0,
-    "state_reads": 40,
-    "state_writes": 68
+    "state_reads": 131,
+    "state_writes": 181
   },
   "final_state": {
-    "150": -1,
-    "164": -1,
-    "241": -1,
-    "242": -1,
-    "346": -1,
-    "347": -1,
-    "45": -1,
-    "59": -1,
-    "633": -1,
-    "648": -1,
-    "738": -1,
-    "753": -1
+    "105": -1,
+    "150": -2,
+    "151": -4,
+    "255": -5,
+    "256": -4,
+    "360": -5,
+    "361": -4,
+    "45": -2,
+    "46": -4,
+    "647": -4,
+    "648": -4,
+    "752": -4,
+    "753": -4
   },
   "hashes": {
-    "commits_sha256": "cae5f830cdabbd420a77d287b6c982f876c4feb988745c0e727c31e6e6c6abf3",
-    "final_state_sha256": "d0b03dfb05652abe78f4be14650dadc1950e8dc60b83e65d501a3c58b5031f53",
+    "commits_sha256": "19a2009b7ab6089f1ad16d7dc7b7ea5ca63d41cf7de81c9b7acd11807b4bd78e",
+    "final_state_sha256": "0d5893d8f5fc3beb1a1bdcb744453a14b5ad382749145f90f0309dbe11c96453",
     "input_sha256": "801be84d3bc7750c912c91cc481d97950d219fdb8643cccfaeaf94a8f0b1880e",
-    "trace_sha256": "beefd5f3d055f036c7536db154c45c69d68acc5430639e83cdb0281f4aac5770",
-    "updates_sha256": "a5fb007cd31bdd43be528ada7cd9b1b85aab6e05f6176268fae3acbb6ca3dafa"
+    "trace_sha256": "4c543d8041c641c4f8351134c9dc77acd1e8483616ed5eb94d3b947f5da64a35",
+    "updates_sha256": "54fd80039b876b49f5a0bfeed4a49f2c515988c398647f50d335185f166b1996"
   },
   "inputs": [
     {
@@ -169,6 +302,7 @@
     "primitive": "eventconv_fclif",
     "readout_classes": 10,
     "readout_id_start": 784,
+    "readout_lif_weight_semantics": "router_exc_inh_magnitude_clamped",
     "readout_weight_storage": "row_major_conv_state_to_class",
     "stride": 2
   },
@@ -177,8 +311,18 @@
   "trace_id": "mnist_eventconv_fclif_frozen_v1",
   "updates": [
     {
-      "channel": 2,
-      "dst_id": 497,
+      "channel": 0,
+      "dst_id": 105,
+      "kind": "synaptic_update",
+      "src_id": 0,
+      "tick": 0,
+      "weight": -1,
+      "x": 7,
+      "y": 7
+    },
+    {
+      "channel": 1,
+      "dst_id": 301,
       "kind": "synaptic_update",
       "src_id": 0,
       "tick": 0,
@@ -187,12 +331,12 @@
       "y": 7
     },
     {
-      "channel": 3,
-      "dst_id": 693,
+      "channel": 2,
+      "dst_id": 497,
       "kind": "synaptic_update",
       "src_id": 0,
       "tick": 0,
-      "weight": 2,
+      "weight": 3,
       "x": 7,
       "y": 7
     },
@@ -212,7 +356,7 @@
       "kind": "synaptic_update",
       "src_id": 1,
       "tick": 1,
-      "weight": -1,
+      "weight": 2,
       "x": 3,
       "y": 4
     },
@@ -222,7 +366,7 @@
       "kind": "synaptic_update",
       "src_id": 1,
       "tick": 1,
-      "weight": 1,
+      "weight": -4,
       "x": 4,
       "y": 3
     },
@@ -232,7 +376,7 @@
       "kind": "synaptic_update",
       "src_id": 1,
       "tick": 1,
-      "weight": -1,
+      "weight": -2,
       "x": 3,
       "y": 3
     },
@@ -242,7 +386,7 @@
       "kind": "synaptic_update",
       "src_id": 1,
       "tick": 1,
-      "weight": 1,
+      "weight": -4,
       "x": 4,
       "y": 4
     },
@@ -252,7 +396,7 @@
       "kind": "synaptic_update",
       "src_id": 1,
       "tick": 1,
-      "weight": 1,
+      "weight": -5,
       "x": 3,
       "y": 4
     },
@@ -262,17 +406,17 @@
       "kind": "synaptic_update",
       "src_id": 1,
       "tick": 1,
-      "weight": -1,
+      "weight": 3,
       "x": 4,
       "y": 3
     },
     {
-      "channel": 1,
-      "dst_id": 241,
+      "channel": 2,
+      "dst_id": 437,
       "kind": "synaptic_update",
       "src_id": 1,
       "tick": 1,
-      "weight": -1,
+      "weight": 1,
       "x": 3,
       "y": 3
     },
@@ -282,7 +426,7 @@
       "kind": "synaptic_update",
       "src_id": 1,
       "tick": 1,
-      "weight": -1,
+      "weight": -4,
       "x": 4,
       "y": 4
     },
@@ -292,7 +436,7 @@
       "kind": "synaptic_update",
       "src_id": 1,
       "tick": 1,
-      "weight": 1,
+      "weight": -4,
       "x": 3,
       "y": 4
     },
@@ -302,7 +446,7 @@
       "kind": "synaptic_update",
       "src_id": 1,
       "tick": 1,
-      "weight": 1,
+      "weight": 2,
       "x": 4,
       "y": 3
     },
@@ -312,7 +456,7 @@
       "kind": "synaptic_update",
       "src_id": 1,
       "tick": 1,
-      "weight": -1,
+      "weight": 3,
       "x": 3,
       "y": 3
     },
@@ -332,7 +476,7 @@
       "kind": "synaptic_update",
       "src_id": 2,
       "tick": 2,
-      "weight": -1,
+      "weight": 2,
       "x": 10,
       "y": 11
     },
@@ -342,7 +486,7 @@
       "kind": "synaptic_update",
       "src_id": 2,
       "tick": 2,
-      "weight": 1,
+      "weight": -4,
       "x": 11,
       "y": 10
     },
@@ -352,7 +496,7 @@
       "kind": "synaptic_update",
       "src_id": 2,
       "tick": 2,
-      "weight": -1,
+      "weight": -2,
       "x": 10,
       "y": 10
     },
@@ -362,7 +506,7 @@
       "kind": "synaptic_update",
       "src_id": 2,
       "tick": 2,
-      "weight": 1,
+      "weight": -4,
       "x": 11,
       "y": 11
     },
@@ -372,7 +516,7 @@
       "kind": "synaptic_update",
       "src_id": 2,
       "tick": 2,
-      "weight": 1,
+      "weight": -5,
       "x": 10,
       "y": 11
     },
@@ -382,17 +526,17 @@
       "kind": "synaptic_update",
       "src_id": 2,
       "tick": 2,
-      "weight": -1,
+      "weight": 3,
       "x": 11,
       "y": 10
     },
     {
-      "channel": 1,
-      "dst_id": 346,
+      "channel": 2,
+      "dst_id": 542,
       "kind": "synaptic_update",
       "src_id": 2,
       "tick": 2,
-      "weight": -1,
+      "weight": 1,
       "x": 10,
       "y": 10
     },
@@ -402,7 +546,7 @@
       "kind": "synaptic_update",
       "src_id": 2,
       "tick": 2,
-      "weight": -1,
+      "weight": -4,
       "x": 11,
       "y": 11
     },
@@ -412,7 +556,7 @@
       "kind": "synaptic_update",
       "src_id": 2,
       "tick": 2,
-      "weight": 1,
+      "weight": -4,
       "x": 10,
       "y": 11
     },
@@ -422,7 +566,7 @@
       "kind": "synaptic_update",
       "src_id": 2,
       "tick": 2,
-      "weight": 1,
+      "weight": 2,
       "x": 11,
       "y": 10
     },
@@ -432,21 +576,112 @@
       "kind": "synaptic_update",
       "src_id": 2,
       "tick": 2,
-      "weight": -1,
+      "weight": 3,
       "x": 10,
       "y": 10
     },
     {
+      "dst_id": 784,
+      "kind": "synaptic_update",
+      "src_id": 301,
+      "tick": 2,
+      "weight": -2
+    },
+    {
+      "dst_id": 785,
+      "kind": "synaptic_update",
+      "src_id": 301,
+      "tick": 2,
+      "weight": -2
+    },
+    {
+      "dst_id": 786,
+      "kind": "synaptic_update",
+      "src_id": 301,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 788,
+      "kind": "synaptic_update",
+      "src_id": 301,
+      "tick": 2,
+      "weight": 2
+    },
+    {
+      "dst_id": 789,
+      "kind": "synaptic_update",
+      "src_id": 301,
+      "tick": 2,
+      "weight": 4
+    },
+    {
+      "dst_id": 790,
+      "kind": "synaptic_update",
+      "src_id": 301,
+      "tick": 2,
+      "weight": -1
+    },
+    {
       "dst_id": 791,
+      "kind": "synaptic_update",
+      "src_id": 301,
+      "tick": 2,
+      "weight": -6
+    },
+    {
+      "dst_id": 792,
+      "kind": "synaptic_update",
+      "src_id": 301,
+      "tick": 2,
+      "weight": -2
+    },
+    {
+      "dst_id": 793,
+      "kind": "synaptic_update",
+      "src_id": 301,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 784,
+      "kind": "synaptic_update",
+      "src_id": 497,
+      "tick": 2,
+      "weight": -3
+    },
+    {
+      "dst_id": 785,
+      "kind": "synaptic_update",
+      "src_id": 497,
+      "tick": 2,
+      "weight": 3
+    },
+    {
+      "dst_id": 786,
+      "kind": "synaptic_update",
+      "src_id": 497,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 788,
       "kind": "synaptic_update",
       "src_id": 497,
       "tick": 2,
       "weight": 1
     },
     {
-      "dst_id": 787,
+      "dst_id": 789,
       "kind": "synaptic_update",
-      "src_id": 693,
+      "src_id": 497,
+      "tick": 2,
+      "weight": -2
+    },
+    {
+      "dst_id": 793,
+      "kind": "synaptic_update",
+      "src_id": 497,
       "tick": 2,
       "weight": 1
     },
@@ -455,33 +690,257 @@
       "kind": "synaptic_update",
       "src_id": 60,
       "tick": 2,
-      "weight": 1
+      "weight": -1
     },
     {
-      "dst_id": 790,
+      "dst_id": 785,
       "kind": "synaptic_update",
-      "src_id": 46,
+      "src_id": 60,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 786,
+      "kind": "synaptic_update",
+      "src_id": 60,
       "tick": 2,
       "weight": 1
     },
     {
+      "dst_id": 787,
+      "kind": "synaptic_update",
+      "src_id": 60,
+      "tick": 2,
+      "weight": 2
+    },
+    {
+      "dst_id": 788,
+      "kind": "synaptic_update",
+      "src_id": 60,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 789,
+      "kind": "synaptic_update",
+      "src_id": 60,
+      "tick": 2,
+      "weight": -1
+    },
+    {
       "dst_id": 790,
       "kind": "synaptic_update",
-      "src_id": 256,
+      "src_id": 60,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 791,
+      "kind": "synaptic_update",
+      "src_id": 60,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 792,
+      "kind": "synaptic_update",
+      "src_id": 60,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 793,
+      "kind": "synaptic_update",
+      "src_id": 60,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 784,
+      "kind": "synaptic_update",
+      "src_id": 59,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 785,
+      "kind": "synaptic_update",
+      "src_id": 59,
+      "tick": 2,
+      "weight": -2
+    },
+    {
+      "dst_id": 787,
+      "kind": "synaptic_update",
+      "src_id": 59,
+      "tick": 2,
+      "weight": 2
+    },
+    {
+      "dst_id": 788,
+      "kind": "synaptic_update",
+      "src_id": 59,
+      "tick": 2,
+      "weight": -2
+    },
+    {
+      "dst_id": 789,
+      "kind": "synaptic_update",
+      "src_id": 59,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 791,
+      "kind": "synaptic_update",
+      "src_id": 59,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 792,
+      "kind": "synaptic_update",
+      "src_id": 59,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 793,
+      "kind": "synaptic_update",
+      "src_id": 59,
+      "tick": 2,
+      "weight": -2
+    },
+    {
+      "dst_id": 784,
+      "kind": "synaptic_update",
+      "src_id": 242,
+      "tick": 2,
+      "weight": -2
+    },
+    {
+      "dst_id": 785,
+      "kind": "synaptic_update",
+      "src_id": 242,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 787,
+      "kind": "synaptic_update",
+      "src_id": 242,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 788,
+      "kind": "synaptic_update",
+      "src_id": 242,
       "tick": 2,
       "weight": 1
     },
     {
       "dst_id": 789,
       "kind": "synaptic_update",
-      "src_id": 255,
+      "src_id": 242,
       "tick": 2,
-      "weight": 1
+      "weight": -1
+    },
+    {
+      "dst_id": 790,
+      "kind": "synaptic_update",
+      "src_id": 242,
+      "tick": 2,
+      "weight": -2
     },
     {
       "dst_id": 791,
       "kind": "synaptic_update",
-      "src_id": 647,
+      "src_id": 242,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 792,
+      "kind": "synaptic_update",
+      "src_id": 242,
+      "tick": 2,
+      "weight": -2
+    },
+    {
+      "dst_id": 793,
+      "kind": "synaptic_update",
+      "src_id": 242,
+      "tick": 2,
+      "weight": -2
+    },
+    {
+      "dst_id": 784,
+      "kind": "synaptic_update",
+      "src_id": 437,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 785,
+      "kind": "synaptic_update",
+      "src_id": 437,
+      "tick": 2,
+      "weight": -2
+    },
+    {
+      "dst_id": 787,
+      "kind": "synaptic_update",
+      "src_id": 437,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 789,
+      "kind": "synaptic_update",
+      "src_id": 437,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 791,
+      "kind": "synaptic_update",
+      "src_id": 437,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 793,
+      "kind": "synaptic_update",
+      "src_id": 437,
+      "tick": 2,
+      "weight": -2
+    },
+    {
+      "dst_id": 784,
+      "kind": "synaptic_update",
+      "src_id": 634,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 785,
+      "kind": "synaptic_update",
+      "src_id": 634,
+      "tick": 2,
+      "weight": -2
+    },
+    {
+      "dst_id": 786,
+      "kind": "synaptic_update",
+      "src_id": 634,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 787,
+      "kind": "synaptic_update",
+      "src_id": 634,
       "tick": 2,
       "weight": 1
     },
@@ -490,49 +949,364 @@
       "kind": "synaptic_update",
       "src_id": 634,
       "tick": 2,
-      "weight": 1
+      "weight": -1
     },
     {
       "dst_id": 789,
       "kind": "synaptic_update",
-      "src_id": 165,
+      "src_id": 634,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 790,
+      "kind": "synaptic_update",
+      "src_id": 634,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 791,
+      "kind": "synaptic_update",
+      "src_id": 634,
       "tick": 2,
       "weight": 1
     },
     {
       "dst_id": 785,
       "kind": "synaptic_update",
-      "src_id": 151,
+      "src_id": 633,
       "tick": 2,
-      "weight": 1
-    },
-    {
-      "dst_id": 785,
-      "kind": "synaptic_update",
-      "src_id": 361,
-      "tick": 2,
-      "weight": 1
-    },
-    {
-      "dst_id": 784,
-      "kind": "synaptic_update",
-      "src_id": 360,
-      "tick": 2,
-      "weight": 1
+      "weight": -1
     },
     {
       "dst_id": 786,
       "kind": "synaptic_update",
-      "src_id": 752,
+      "src_id": 633,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 787,
+      "kind": "synaptic_update",
+      "src_id": 633,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 788,
+      "kind": "synaptic_update",
+      "src_id": 633,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 789,
+      "kind": "synaptic_update",
+      "src_id": 633,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 790,
+      "kind": "synaptic_update",
+      "src_id": 633,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 792,
+      "kind": "synaptic_update",
+      "src_id": 633,
       "tick": 2,
       "weight": 1
     },
     {
       "dst_id": 793,
       "kind": "synaptic_update",
-      "src_id": 739,
+      "src_id": 633,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 785,
+      "kind": "synaptic_update",
+      "src_id": 165,
       "tick": 2,
       "weight": 1
+    },
+    {
+      "dst_id": 787,
+      "kind": "synaptic_update",
+      "src_id": 165,
+      "tick": 2,
+      "weight": -2
+    },
+    {
+      "dst_id": 788,
+      "kind": "synaptic_update",
+      "src_id": 165,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 789,
+      "kind": "synaptic_update",
+      "src_id": 165,
+      "tick": 2,
+      "weight": 2
+    },
+    {
+      "dst_id": 791,
+      "kind": "synaptic_update",
+      "src_id": 165,
+      "tick": 2,
+      "weight": -2
+    },
+    {
+      "dst_id": 785,
+      "kind": "synaptic_update",
+      "src_id": 164,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 786,
+      "kind": "synaptic_update",
+      "src_id": 164,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 787,
+      "kind": "synaptic_update",
+      "src_id": 164,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 788,
+      "kind": "synaptic_update",
+      "src_id": 164,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 791,
+      "kind": "synaptic_update",
+      "src_id": 164,
+      "tick": 2,
+      "weight": -3
+    },
+    {
+      "dst_id": 793,
+      "kind": "synaptic_update",
+      "src_id": 164,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 784,
+      "kind": "synaptic_update",
+      "src_id": 347,
+      "tick": 2,
+      "weight": -4
+    },
+    {
+      "dst_id": 785,
+      "kind": "synaptic_update",
+      "src_id": 347,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 786,
+      "kind": "synaptic_update",
+      "src_id": 347,
+      "tick": 2,
+      "weight": 4
+    },
+    {
+      "dst_id": 787,
+      "kind": "synaptic_update",
+      "src_id": 347,
+      "tick": 2,
+      "weight": -4
+    },
+    {
+      "dst_id": 789,
+      "kind": "synaptic_update",
+      "src_id": 347,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 790,
+      "kind": "synaptic_update",
+      "src_id": 347,
+      "tick": 2,
+      "weight": -3
+    },
+    {
+      "dst_id": 791,
+      "kind": "synaptic_update",
+      "src_id": 347,
+      "tick": 2,
+      "weight": -2
+    },
+    {
+      "dst_id": 792,
+      "kind": "synaptic_update",
+      "src_id": 347,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 784,
+      "kind": "synaptic_update",
+      "src_id": 542,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 785,
+      "kind": "synaptic_update",
+      "src_id": 542,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 787,
+      "kind": "synaptic_update",
+      "src_id": 542,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 791,
+      "kind": "synaptic_update",
+      "src_id": 542,
+      "tick": 2,
+      "weight": -2
+    },
+    {
+      "dst_id": 793,
+      "kind": "synaptic_update",
+      "src_id": 542,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 784,
+      "kind": "synaptic_update",
+      "src_id": 739,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 786,
+      "kind": "synaptic_update",
+      "src_id": 739,
+      "tick": 2,
+      "weight": 3
+    },
+    {
+      "dst_id": 787,
+      "kind": "synaptic_update",
+      "src_id": 739,
+      "tick": 2,
+      "weight": -3
+    },
+    {
+      "dst_id": 788,
+      "kind": "synaptic_update",
+      "src_id": 739,
+      "tick": 2,
+      "weight": -2
+    },
+    {
+      "dst_id": 789,
+      "kind": "synaptic_update",
+      "src_id": 739,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 792,
+      "kind": "synaptic_update",
+      "src_id": 739,
+      "tick": 2,
+      "weight": -2
+    },
+    {
+      "dst_id": 793,
+      "kind": "synaptic_update",
+      "src_id": 739,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 784,
+      "kind": "synaptic_update",
+      "src_id": 738,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 786,
+      "kind": "synaptic_update",
+      "src_id": 738,
+      "tick": 2,
+      "weight": 2
+    },
+    {
+      "dst_id": 787,
+      "kind": "synaptic_update",
+      "src_id": 738,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 788,
+      "kind": "synaptic_update",
+      "src_id": 738,
+      "tick": 2,
+      "weight": -3
+    },
+    {
+      "dst_id": 789,
+      "kind": "synaptic_update",
+      "src_id": 738,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 790,
+      "kind": "synaptic_update",
+      "src_id": 738,
+      "tick": 2,
+      "weight": 1
+    },
+    {
+      "dst_id": 791,
+      "kind": "synaptic_update",
+      "src_id": 738,
+      "tick": 2,
+      "weight": -2
+    },
+    {
+      "dst_id": 792,
+      "kind": "synaptic_update",
+      "src_id": 738,
+      "tick": 2,
+      "weight": -1
+    },
+    {
+      "dst_id": 793,
+      "kind": "synaptic_update",
+      "src_id": 738,
+      "tick": 2,
+      "weight": -2
     }
   ]
 }

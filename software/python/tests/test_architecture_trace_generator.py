@@ -110,6 +110,39 @@ def test_eventconv_fclif_trace_uses_internal_conv_commits_for_readout():
     ]
 
 
+def test_eventconv_fclif_trace_uses_router_lif_inhibitory_semantics():
+    trace = generate_eventconv_fclif_trace(
+        input_spikes=[
+            InputSpike(tick=0, src_id=0, y=0, x=0, channel=0),
+            InputSpike(tick=1, src_id=1, y=0, x=1, channel=0),
+        ],
+        kernel=[[[[1]]]],
+        input_shape=(1, 3, 3),
+        readout_weights=[
+            [2, -1],
+            [2, -1],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+        ],
+        stride=1,
+        padding=0,
+        conv_thresholds={0: 1, 1: 1},
+        readout_thresholds={9: 3, 10: 1},
+        readout_id_start=9,
+    ).to_dict()
+
+    assert trace["metadata"]["readout_lif_weight_semantics"] == "router_exc_inh_magnitude_clamped"
+    assert trace["counters"]["commit_count"] == 1
+    assert trace["commits"] == [
+        {"dst_id": 9, "kind": "commit", "tick": 1, "value": 4},
+    ]
+
+
 def test_trace_json_roundtrip(tmp_path):
     path = tmp_path / "trace.json"
     trace = generate_fc_lif_trace(

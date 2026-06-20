@@ -9,7 +9,8 @@ module spike_conv_state_update #(
     parameter STATE_COUNT = 16,
     parameter DEST_ID_WIDTH = 16,
     parameter STATE_WIDTH = 16,
-    parameter WEIGHT_WIDTH = 8
+    parameter WEIGHT_WIDTH = 8,
+    parameter COMPACT_ON_RESET = 1
 )(
     input  wire                         clk,
     input  wire                         rst_n,
@@ -24,6 +25,12 @@ module spike_conv_state_update #(
     input  wire                         s_axis_reset_tvalid,
     input  wire [DEST_ID_WIDTH-1:0]     s_axis_reset_tdest,
     output wire                         s_axis_reset_tready,
+
+    input  wire                         active_read_req,
+    input  wire [31:0]                  active_read_index,
+    output reg                          active_read_valid,
+    output reg  [DEST_ID_WIDTH-1:0]     active_read_dest_id,
+    output reg signed [STATE_WIDTH-1:0] active_read_state_value,
 
     output wire [(STATE_COUNT*STATE_WIDTH)-1:0] state_flat,
     output wire [(STATE_COUNT*DEST_ID_WIDTH)-1:0] active_id_flat,
@@ -54,6 +61,16 @@ module spike_conv_state_update #(
     wire reset_fire = enable && s_axis_reset_tvalid && s_axis_reset_tready;
     wire signed [STATE_WIDTH-1:0] extended_weight =
         {{(STATE_WIDTH-WEIGHT_WIDTH){update_weight[WEIGHT_WIDTH-1]}}, update_weight};
+    wire active_read_index_valid =
+        (active_read_index < STATE_COUNT) &&
+        ((COMPACT_ON_RESET != 0) ? (active_read_index < active_neuron_count) : 1'b1);
+    wire [STATE_INDEX_WIDTH-1:0] active_read_mem_index =
+        active_read_index[STATE_INDEX_WIDTH-1:0];
+    reg active_read_stage_valid;
+    reg [DEST_ID_WIDTH-1:0] active_read_stage_dest_id;
+    wire active_read_stage_dest_valid = (active_read_stage_dest_id < STATE_COUNT);
+    wire [STATE_INDEX_WIDTH-1:0] active_read_stage_state_index =
+        active_read_stage_dest_id[STATE_INDEX_WIDTH-1:0];
     reg reset_id_found;
     reg [STATE_INDEX_WIDTH-1:0] reset_list_index;
 
@@ -65,18 +82,27 @@ module spike_conv_state_update #(
     assign s_axis_update_tready = enable && !s_axis_reset_tvalid;
     assign s_axis_reset_tready = enable;
 
-    always @(*) begin
-        reset_id_found = 1'b0;
-        reset_list_index = {STATE_INDEX_WIDTH{1'b0}};
-        for (search_i = 0; search_i < STATE_COUNT; search_i = search_i + 1) begin
-            if (!reset_id_found &&
-                (search_i < active_neuron_count) &&
-                (active_ids[search_i] == s_axis_reset_tdest)) begin
-                reset_id_found = 1'b1;
-                reset_list_index = search_i[STATE_INDEX_WIDTH-1:0];
+    generate
+        if (COMPACT_ON_RESET != 0) begin : gen_reset_search
+            always @(*) begin
+                reset_id_found = 1'b0;
+                reset_list_index = {STATE_INDEX_WIDTH{1'b0}};
+                for (search_i = 0; search_i < STATE_COUNT; search_i = search_i + 1) begin
+                    if (!reset_id_found &&
+                        (search_i < active_neuron_count) &&
+                        (active_ids[search_i] == s_axis_reset_tdest)) begin
+                        reset_id_found = 1'b1;
+                        reset_list_index = search_i[STATE_INDEX_WIDTH-1:0];
+                    end
+                end
+            end
+        end else begin : gen_no_reset_search
+            always @(*) begin
+                reset_id_found = 1'b0;
+                reset_list_index = {STATE_INDEX_WIDTH{1'b0}};
             end
         end
-    end
+    endgenerate
 
     generate
         for (gi = 0; gi < STATE_COUNT; gi = gi + 1) begin : gen_state_flat
@@ -99,7 +125,24 @@ module spike_conv_state_update #(
             commit_reset_count <= 32'd0;
             invalid_dest_count <= 32'd0;
             state_checksum <= 32'sd0;
+            active_read_valid <= 1'b0;
+            active_read_dest_id <= {DEST_ID_WIDTH{1'b0}};
+            active_read_state_value <= {STATE_WIDTH{1'b0}};
+            active_read_stage_valid <= 1'b0;
+            active_read_stage_dest_id <= {DEST_ID_WIDTH{1'b0}};
         end else if (reset_fire) begin
+            active_read_valid <= active_read_stage_valid && active_read_stage_dest_valid;
+            active_read_dest_id <= active_read_stage_dest_id;
+            active_read_state_value <= active_read_stage_dest_valid
+                ? state_mem[active_read_stage_state_index]
+                : {STATE_WIDTH{1'b0}};
+            if (enable && active_read_req && active_read_index_valid) begin
+                active_read_stage_valid <= 1'b1;
+                active_read_stage_dest_id <= active_ids[active_read_mem_index];
+            end else begin
+                active_read_stage_valid <= 1'b0;
+                active_read_stage_dest_id <= {DEST_ID_WIDTH{1'b0}};
+            end
             if (reset_dest_valid) begin
                 state_checksum <= state_checksum - state_mem[reset_index];
                 state_mem[reset_index] <= {STATE_WIDTH{1'b0}};
@@ -110,7 +153,7 @@ module spike_conv_state_update #(
                     if (active_neuron_count > 32'd0) begin
                         active_neuron_count <= active_neuron_count - 32'd1;
                     end
-                    if (reset_id_found) begin
+                    if ((COMPACT_ON_RESET != 0) && reset_id_found) begin
                         for (compact_i = 0; compact_i < STATE_COUNT - 1; compact_i = compact_i + 1) begin
                             if (compact_i >= reset_list_index) begin
                                 active_ids[compact_i] <= active_ids[compact_i + 1];
@@ -123,6 +166,18 @@ module spike_conv_state_update #(
                 invalid_dest_count <= invalid_dest_count + 32'd1;
             end
         end else if (update_fire) begin
+            active_read_valid <= active_read_stage_valid && active_read_stage_dest_valid;
+            active_read_dest_id <= active_read_stage_dest_id;
+            active_read_state_value <= active_read_stage_dest_valid
+                ? state_mem[active_read_stage_state_index]
+                : {STATE_WIDTH{1'b0}};
+            if (enable && active_read_req && active_read_index_valid) begin
+                active_read_stage_valid <= 1'b1;
+                active_read_stage_dest_id <= active_ids[active_read_mem_index];
+            end else begin
+                active_read_stage_valid <= 1'b0;
+                active_read_stage_dest_id <= {DEST_ID_WIDTH{1'b0}};
+            end
             if (dest_valid) begin
                 state_mem[update_index] <= state_mem[update_index] + extended_weight;
                 state_read_count <= state_read_count + 32'd1;
@@ -136,6 +191,19 @@ module spike_conv_state_update #(
                 end
             end else begin
                 invalid_dest_count <= invalid_dest_count + 32'd1;
+            end
+        end else begin
+            active_read_valid <= active_read_stage_valid && active_read_stage_dest_valid;
+            active_read_dest_id <= active_read_stage_dest_id;
+            active_read_state_value <= active_read_stage_dest_valid
+                ? state_mem[active_read_stage_state_index]
+                : {STATE_WIDTH{1'b0}};
+            if (enable && active_read_req && active_read_index_valid) begin
+                active_read_stage_valid <= 1'b1;
+                active_read_stage_dest_id <= active_ids[active_read_mem_index];
+            end else begin
+                active_read_stage_valid <= 1'b0;
+                active_read_stage_dest_id <= {DEST_ID_WIDTH{1'b0}};
             end
         end
     end

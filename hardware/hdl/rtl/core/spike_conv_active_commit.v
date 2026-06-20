@@ -8,7 +8,9 @@
 module spike_conv_active_commit #(
     parameter STATE_COUNT = 16,
     parameter DEST_ID_WIDTH = 16,
-    parameter STATE_WIDTH = 16
+    parameter STATE_WIDTH = 16,
+    parameter USE_READ_PORT = 0,
+    parameter RESET_COMPACTS_ACTIVE_LIST = 1
 )(
     input  wire                         clk,
     input  wire                         rst_n,
@@ -20,6 +22,12 @@ module spike_conv_active_commit #(
     input  wire [31:0]                  active_neuron_count,
     input  wire [(STATE_COUNT*DEST_ID_WIDTH)-1:0] active_id_flat,
     input  wire [(STATE_COUNT*STATE_WIDTH)-1:0] state_flat,
+
+    output reg                          active_read_req,
+    output reg  [31:0]                  active_read_index,
+    input  wire                         active_read_valid,
+    input  wire [DEST_ID_WIDTH-1:0]     active_read_dest_id,
+    input  wire signed [STATE_WIDTH-1:0] active_read_state_value,
 
     output reg                          commit_busy,
     output reg                          commit_done,
@@ -39,7 +47,8 @@ module spike_conv_active_commit #(
 
     localparam STATE_IDLE = 2'd0;
     localparam STATE_CHECK = 2'd1;
-    localparam STATE_EMIT = 2'd2;
+    localparam STATE_WAIT_READ = 2'd2;
+    localparam STATE_EMIT = 2'd3;
 
     reg [1:0] state;
     reg [31:0] active_index;
@@ -49,8 +58,10 @@ module spike_conv_active_commit #(
     reg commit_channel_done;
     reg reset_channel_done;
 
+    wire [31:0] active_range_count =
+        (USE_READ_PORT != 0) ? active_count_latched : active_neuron_count;
     wire active_index_in_range =
-        (active_index < active_neuron_count) && (active_index < STATE_COUNT);
+        (active_index < active_range_count) && (active_index < STATE_COUNT);
     wire [DEST_ID_WIDTH-1:0] current_dest_id =
         active_id_flat[active_index*DEST_ID_WIDTH +: DEST_ID_WIDTH];
     wire current_dest_valid = (current_dest_id < STATE_COUNT);
@@ -58,6 +69,9 @@ module spike_conv_active_commit #(
         state_flat[current_dest_id*STATE_WIDTH +: STATE_WIDTH];
     wire current_should_emit =
         current_dest_valid && (current_state_value >= commit_threshold);
+    wire read_port_dest_valid = (active_read_dest_id < STATE_COUNT);
+    wire read_port_should_emit =
+        read_port_dest_valid && (active_read_state_value >= commit_threshold);
     wire commit_output_fire = m_axis_commit_tvalid && m_axis_commit_tready;
     wire reset_output_fire = m_axis_reset_tvalid && m_axis_reset_tready;
     wire emit_complete =
@@ -79,6 +93,8 @@ module spike_conv_active_commit #(
             m_axis_commit_tdata <= 32'd0;
             m_axis_reset_tvalid <= 1'b0;
             m_axis_reset_tdest <= {DEST_ID_WIDTH{1'b0}};
+            active_read_req <= 1'b0;
+            active_read_index <= 32'd0;
             active_commit_read_count <= 32'd0;
             commit_emit_count <= 32'd0;
             full_scan_count <= 32'd0;
@@ -93,15 +109,22 @@ module spike_conv_active_commit #(
             commit_done <= 1'b0;
             m_axis_commit_tvalid <= 1'b0;
             m_axis_reset_tvalid <= 1'b0;
+            active_read_req <= 1'b0;
+            active_read_index <= 32'd0;
             commit_channel_done <= 1'b0;
             reset_channel_done <= 1'b0;
         end else begin
             commit_done <= 1'b0;
+            if (USE_READ_PORT == 0) begin
+                active_read_req <= 1'b0;
+                active_read_index <= 32'd0;
+            end
 
             case (state)
                 STATE_IDLE: begin
                     m_axis_commit_tvalid <= 1'b0;
                     m_axis_reset_tvalid <= 1'b0;
+                    active_read_req <= 1'b0;
                     commit_channel_done <= 1'b0;
                     reset_channel_done <= 1'b0;
                     if (commit_start) begin
@@ -122,6 +145,10 @@ module spike_conv_active_commit #(
                         commit_busy <= 1'b0;
                         commit_done <= 1'b1;
                         state <= STATE_IDLE;
+                    end else if (USE_READ_PORT != 0) begin
+                        active_read_req <= 1'b1;
+                        active_read_index <= active_index;
+                        state <= STATE_WAIT_READ;
                     end else begin
                         active_commit_read_count <= active_commit_read_count + 32'd1;
                         if (current_should_emit) begin
@@ -139,6 +166,30 @@ module spike_conv_active_commit #(
                             state <= STATE_EMIT;
                         end else begin
                             active_index <= active_index + 32'd1;
+                        end
+                    end
+                end
+
+                STATE_WAIT_READ: begin
+                    active_read_req <= 1'b0;
+                    if (active_read_valid) begin
+                        active_commit_read_count <= active_commit_read_count + 32'd1;
+                        if (read_port_should_emit) begin
+                            held_dest_id <= active_read_dest_id;
+                            held_state_value <= active_read_state_value;
+                            m_axis_commit_tdata <= {
+                                active_read_dest_id[15:0],
+                                active_read_state_value[15:0]
+                            };
+                            m_axis_commit_tvalid <= 1'b1;
+                            m_axis_reset_tdest <= active_read_dest_id;
+                            m_axis_reset_tvalid <= 1'b1;
+                            commit_channel_done <= 1'b0;
+                            reset_channel_done <= 1'b0;
+                            state <= STATE_EMIT;
+                        end else begin
+                            active_index <= active_index + 32'd1;
+                            state <= STATE_CHECK;
                         end
                     end
                 end
@@ -162,10 +213,11 @@ module spike_conv_active_commit #(
                         reset_channel_done <= 1'b0;
                         commit_emit_count <= commit_emit_count + 32'd1;
                         readout_checksum <= readout_checksum + held_state_value;
-                        // The reset path compacts the active list. Keep the
-                        // same index so the shifted next active neuron is not
-                        // skipped after a commit/reset pair.
-                        active_index <= active_index;
+                        // Compacting reset paths shift the next active entry
+                        // into this index. Non-compacting paths move forward.
+                        active_index <= (RESET_COMPACTS_ACTIVE_LIST != 0)
+                            ? active_index
+                            : (active_index + 32'd1);
                         state <= STATE_CHECK;
                     end
                 end
@@ -175,6 +227,7 @@ module spike_conv_active_commit #(
                     commit_busy <= 1'b0;
                     m_axis_commit_tvalid <= 1'b0;
                     m_axis_reset_tvalid <= 1'b0;
+                    active_read_req <= 1'b0;
                     commit_channel_done <= 1'b0;
                     reset_channel_done <= 1'b0;
                 end

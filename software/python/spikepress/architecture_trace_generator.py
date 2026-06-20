@@ -431,8 +431,10 @@ def generate_eventconv_fclif_trace(
     """Generate frozen EventConv -> FC-LIF trace for SpikePress/SpikeMold.
 
     EventConv commits are internal spikes into the FC readout. The public
-    `commits` list contains only final readout commits, matching the intended
-    board output FIFO for the final-goal slice.
+    `commits` list contains final FC-LIF output spikes, matching the routed
+    board output FIFO for the final-goal slice. Readout weights follow the
+    SpikeMold router/LIF contract: positive weights are excitatory magnitudes,
+    negative weights are inhibitory magnitudes clamped at zero.
     """
 
     in_channels, in_h, in_w = input_shape
@@ -502,10 +504,15 @@ def generate_eventconv_fclif_trace(
                 )
             )
             readout_active.add(dst)
-            readout_state[dst] = _clamp_i32(readout_state.get(dst, 0) + weight)
-            if readout_state[dst] >= int(readout_thresholds.get(dst, INT32_MAX)):
-                readout_commits.append(ActiveSetCommit(conv_commit.tick, dst, readout_state[dst]))
-                readout_state[dst] = 0
+            old_state = int(readout_state.get(dst, 0))
+            if weight >= 0:
+                new_state = _clamp_i32(old_state + weight)
+                if new_state >= int(readout_thresholds.get(dst, INT32_MAX)):
+                    readout_commits.append(ActiveSetCommit(conv_commit.tick, dst, new_state))
+                    new_state = 0
+            else:
+                new_state = max(0, old_state - abs(weight))
+            readout_state[dst] = new_state
 
     conv_final = {int(k): int(v) for k, v in conv_trace.final_state.items() if int(v) != 0}
     readout_final = {dst: value for dst, value in readout_state.items() if value != 0}
@@ -541,6 +548,7 @@ def generate_eventconv_fclif_trace(
             "internal_conv_commit_count": len(conv_trace.commits),
             "conv_commit_mode": "packet_end_active_set",
             "readout_weight_storage": "row_major_conv_state_to_class",
+            "readout_lif_weight_semantics": "router_exc_inh_magnitude_clamped",
         },
         inputs=conv_trace.inputs,
         updates=all_updates,

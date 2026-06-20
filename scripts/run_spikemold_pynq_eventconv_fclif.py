@@ -118,11 +118,14 @@ def main() -> int:
         artifact = read_spikemold_artifact(artifact_path)
         deploy_report = validate_eventconv_fclif_manifest(artifact.manifest)
         trace = json.loads(trace_path.read_text(encoding="utf-8"))
-        config_plan = build_eventconv_fclif_config_plan(artifact.manifest)
         input_words = pack_eventconv_coord32_inputs(trace_inputs_to_spikes(trace))
         expected_words = expected_commit_words(trace)
         if not expected_words:
             raise ValueError("golden trace has no readout commits")
+        config_plan = build_eventconv_fclif_config_plan(
+            artifact.manifest,
+            expected_output_words=len(expected_words),
+        )
 
         try:
             from pynq import Overlay, allocate  # type: ignore
@@ -156,6 +159,10 @@ def main() -> int:
             stage = "rtl_config"
             config_ip.write(dma_smoke.CONFIG_OFFSETS["BACKEND_MODE"], int(config_plan["backend_mode"]))
             config_ip.write(dma_smoke.CONFIG_OFFSETS["EVENTCONV_SHAPE0"], int(config_plan["eventconv_shape0"]))
+            config_ip.write(
+                dma_smoke.CONFIG_OFFSETS["EVENTCONV_KERNEL0"],
+                int(config_plan["eventconv_output_count0"]),
+            )
             config_ip.write(dma_smoke.CONFIG_OFFSETS["THRESHOLD"], int(config_plan["threshold"]) & 0xFFFF)
             config_ip.write(dma_smoke.CONFIG_OFFSETS["NEURON_PARAMS"], int(config_plan["neuron_params"]) & 0xFFFF)
             for write in config_plan["kernel_config_writes"]:
@@ -200,7 +207,15 @@ def main() -> int:
             if hasattr(recv_buf, "freebuffer"):
                 recv_buf.freebuffer()
 
-        ok = output_words == expected_words
+        checks = {
+            "output_words_match": output_words == expected_words,
+            "backend_mode": config_after.get("backend_mode") == 2,
+            "shape_supported": bool(config_after.get("eventconv_desc_status", 0) & (1 << 3)),
+            "no_output_drops": config_after.get("output_br_drops") == 0,
+            "output_event_count_exact": config_after.get("output_br_events") == len(expected_words),
+            "output_emit_count_exact": config_after.get("output_br_emits") == len(expected_words),
+        }
+        ok = all(checks.values())
         result = {
             "schema": SCHEMA,
             "evidence_level": "pynq_board_eventconv_fclif",
@@ -240,12 +255,7 @@ def main() -> int:
             "config_before": config_before,
             "config_after": config_after,
             "runs": {"reset": reset_run, "reset_release": release_run, "eventconv_fclif": run},
-            "checks": {
-                "output_words_match": ok,
-                "backend_mode": config_after.get("backend_mode") == 2,
-                "shape_supported": bool(config_after.get("eventconv_desc_status", 0) & (1 << 3)),
-                "no_output_drops": config_after.get("output_br_drops") == 0,
-            },
+            "checks": checks,
         }
     except Exception as exc:
         result = build_failure(args, bitstream, hwh, f"{stage}: {type(exc).__name__}: {exc}")

@@ -29,7 +29,7 @@ must preserve these addresses or provide an explicit compatibility shim.
 | `0x38` | `ERROR_CODE` | RO | zero on success |
 | `0x4C` | `BACKEND_MODE` | RW | backend selector: 0 flat FC-LIF, 1 EventConv smoke, 2 frozen EventConv-FC slice |
 | `0x50` | `EVENTCONV_SHAPE0` | RW | compatible EventConv descriptor. Mode 1 accepts `0x04020303`; mode 2 accepts `0x04031c1c` (`28x28`, `3x3`, 4 output channels) |
-| `0x54` | `EVENTCONV_KERNEL0` | RW | packed EventConv int8 kernel weights for mode-1 2x2 smoke only; mode 2 loads 36 kernel bytes through config writes `0x02000000..0x02000008` |
+| `0x54` | `EVENTCONV_KERNEL0` | RW | packed EventConv int8 kernel weights for mode-1 2x2 smoke only; mode 2 loads 36 kernel bytes through config writes `0x03000000..0x03000008` |
 | `0x58` | `EVENTCONV_DESC_STATUS` | RO | mode/shape status. bit0 mode-1 shape accepted, bit1 kernel register drives mode-1 AGU, bit2 mode-1 static gate present, bit3 mode-2 shape accepted, bit4 mode-2 selected |
 
 ## EventConv Descriptor Boundary

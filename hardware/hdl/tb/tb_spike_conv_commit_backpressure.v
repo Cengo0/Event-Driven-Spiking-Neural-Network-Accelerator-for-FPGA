@@ -41,7 +41,8 @@ module tb_spike_conv_commit_backpressure;
     spike_conv_active_commit #(
         .STATE_COUNT(STATE_COUNT),
         .DEST_ID_WIDTH(DEST_ID_WIDTH),
-        .STATE_WIDTH(STATE_WIDTH)
+        .STATE_WIDTH(STATE_WIDTH),
+        .RESET_COMPACTS_ACTIVE_LIST(0)
     ) u_commit (
         .clk(clk),
         .rst_n(rst_n),

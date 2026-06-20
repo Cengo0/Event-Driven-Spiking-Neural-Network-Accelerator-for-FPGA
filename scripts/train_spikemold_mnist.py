@@ -39,6 +39,7 @@ Forward modes (selectable):
 
 import argparse
 import json
+import random
 import sys
 import time
 from pathlib import Path
@@ -153,6 +154,18 @@ def parse_args() -> argparse.Namespace:
         choices=["fc", "block", "hybrid", "frozen"],
         help="Architecture: fc (simple), block (block-sparse FC), hybrid (large EventConv + FC), frozen (final EventConv-FC slice)",
     )
+    parser.add_argument(
+        "--hw-weight-scale",
+        type=float,
+        default=1.0,
+        help="Scale trained frozen EventConv/FC weights before int8 SpikeMold export (default: 1.0)",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=42,
+        help="Random seed for model init, dataloader order, and rate-coded spikes (default: 42)",
+    )
     return parser.parse_args()
 
 
@@ -208,6 +221,12 @@ def main() -> int:
     from torch.utils.data import DataLoader
     from torchvision import datasets, transforms
     import torch
+
+    random.seed(args.seed)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(args.seed)
 
     # Configure LIF/IF neurons.
     # For best surrogate training acc (other teams): decay=0.9 (leaky), reset="zero" or subtract, direct encoding, T=25, slope=25.
@@ -478,7 +497,7 @@ def main() -> int:
     # Increased to 16 samples for the reduced hybrid (16k hidden) case.
     # Use random permutation (seeded for reproducibility) instead of the first N images
     # so the rate estimate is more representative of the test distribution.
-    torch.manual_seed(42)
+    torch.manual_seed(args.seed)
     perm = torch.randperm(len(test_dataset))[:16]
     activity_calib = torch.stack([test_dataset[i][0] for i in perm])
 
@@ -660,8 +679,8 @@ def main() -> int:
                 from spikepress.transport import build_eventconv_fclif_config_plan
 
                 weights = model.get_weights()
-                conv_kernel = weights["conv_weights"][0]
-                readout_weights = weights["fc_weights"][0]
+                conv_kernel = np.asarray(weights["conv_weights"][0], dtype=np.float32) * float(args.hw_weight_scale)
+                readout_weights = np.asarray(weights["fc_weights"][0], dtype=np.float32) * float(args.hw_weight_scale)
                 artifact = build_eventconv_fclif_artifact(
                     kernel=conv_kernel,
                     readout_weights=readout_weights,
@@ -701,7 +720,7 @@ def main() -> int:
             conv_kernels_q = []
             for c in (model.convs or []):
                 w = c.weight.detach().cpu()
-                w_q = torch.clamp(w, -8.0, 7.0).round().to(torch.int8)
+                w_q = torch.clamp(w * float(args.hw_weight_scale), -8.0, 7.0).round().to(torch.int8)
                 conv_kernels_q.append(w_q.tolist())
             kernel_path = output_path.parent / f"{args.dataset}_{args.arch}_{args.hidden_size}_conv_kernels_int8.json"
             kernel_path.parent.mkdir(parents=True, exist_ok=True)
@@ -709,7 +728,7 @@ def main() -> int:
                 _json.dump({
                     "conv_kernels": conv_kernels_q,
                     "kernel_shapes": [list(c.weight.shape) for c in (model.convs or [])],
-                    "quant_scale": 1.0,
+                    "quant_scale": float(args.hw_weight_scale),
                     "note": "Use with EventConv AGU in SpikeMold (shared kernel_cout_cin_ky_kx_int8)"
                 }, kf, indent=2)
             print(f"Saved quantized conv kernels for SpikeMold EventConv to {kernel_path}")
@@ -794,6 +813,7 @@ def main() -> int:
             "learning_rate": args.lr,
             "hidden_size": args.hidden_size,
             "num_steps": args.num_steps,
+            "hw_weight_scale": float(args.hw_weight_scale),
             "final_validation_accuracy": final_val["accuracy"],
             "training_time_minutes": total_time / 60,
         }

@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -16,7 +17,14 @@ if str(PYTHON_ROOT) not in sys.path:
     sys.path.insert(0, str(PYTHON_ROOT))
 
 from spikepress.architecture_trace_generator import InputSpike, generate_eventconv_fclif_trace  # noqa: E402
-from spikepress.spikemold_artifact import build_eventconv_fclif_artifact, write_spikemold_artifact  # noqa: E402
+from spikepress.spikemold_artifact import (  # noqa: E402
+    EVENTCONV_FCLIF_KERNEL_CONFIG_PREFIX,
+    SpikeMoldArtifact,
+    build_eventconv_fclif_artifact,
+    read_spikemold_artifact,
+    refresh_spikemold_artifact_hash,
+    write_spikemold_artifact,
+)
 from spikepress.transport import build_eventconv_fclif_config_plan  # noqa: E402
 
 
@@ -24,6 +32,23 @@ ARTIFACT_PATH = ROOT / "outputs" / "artifacts" / "mnist_eventconv_fclif_frozen.j
 TRACE_PATH = ROOT / "golden_traces" / "v1" / "mnist_eventconv_fclif_frozen_v1.json"
 CONFIG_PLAN_PATH = ROOT / "outputs" / "runtime" / "mnist_eventconv_fclif_config_plan.json"
 REPORT_PATH = ROOT / "reports" / "spikemold_final_goal_report.md"
+MIN_TRAINED_ACCURACY = 0.90
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--source",
+        choices=["auto", "artifact", "deterministic"],
+        default="auto",
+        help="Artifact source. auto uses a trained artifact when present; deterministic emits the smoke seed artifact.",
+    )
+    parser.add_argument(
+        "--require-trained",
+        action="store_true",
+        help="Fail unless the canonical artifact carries final_validation_accuracy >= 90%%.",
+    )
+    return parser.parse_args()
 
 
 def build_kernel() -> np.ndarray:
@@ -57,33 +82,120 @@ def build_sample_input() -> list[InputSpike]:
     ]
 
 
+def split_artifact_weights(artifact: object) -> tuple[np.ndarray, np.ndarray]:
+    manifest = artifact.manifest  # type: ignore[attr-defined]
+    network = manifest["network"]
+    eventconv = network["eventconv"]
+    readout = network["readout"]
+    weights = manifest["weights"]
+    values = np.asarray(weights["values"], dtype=np.int8)
+    kernel_count = int(weights["kernel_count"])
+    kernel_shape = tuple(int(v) for v in eventconv["kernel_shape"])
+    readout_shape = (int(readout["source_size"]), int(readout["target_size"]))
+    kernel = values[:kernel_count].reshape(kernel_shape)
+    readout_weights = values[kernel_count:].reshape(readout_shape)
+    return kernel.astype(np.int16), readout_weights.astype(np.int16)
+
+
+def migrate_artifact_runtime_prefix(artifact: object) -> tuple[object, bool]:
+    manifest = artifact.manifest  # type: ignore[attr-defined]
+    runtime = manifest.get("runtime", {})
+    if (
+        isinstance(runtime, dict)
+        and int(runtime.get("eventconv_kernel_config_prefix", -1)) == EVENTCONV_FCLIF_KERNEL_CONFIG_PREFIX
+    ):
+        return artifact, False
+
+    kernel, readout = split_artifact_weights(artifact)
+    network = manifest["network"]
+    eventconv = network["eventconv"]
+    thresholds = manifest["thresholds"]
+    rebuilt = build_eventconv_fclif_artifact(
+        kernel=kernel,
+        readout_weights=readout,
+        conv_threshold=int(thresholds["conv_commit"]),
+        readout_thresholds=[int(v) for v in thresholds["readout"]],
+        target=str(manifest.get("target", "pynq-z2")),
+        artifact_id=str(manifest.get("artifact_id", "mnist_eventconv_fclif_frozen")),
+        input_shape=tuple(int(v) for v in eventconv["input_shape"]),
+        stride=int(eventconv["stride"]),
+        padding=int(eventconv["padding"]),
+    )
+    rebuilt_manifest = dict(rebuilt.manifest)
+    if "training" in manifest:
+        rebuilt_manifest["training"] = dict(manifest["training"])
+    rebuilt = SpikeMoldArtifact(manifest=rebuilt_manifest, flat_weights=rebuilt.flat_weights)
+    return refresh_spikemold_artifact_hash(rebuilt), True
+
+
+def load_or_build_artifact(source: str) -> tuple[object, str]:
+    if source == "artifact" or (source == "auto" and ARTIFACT_PATH.exists()):
+        artifact = read_spikemold_artifact(ARTIFACT_PATH)
+        artifact, migrated = migrate_artifact_runtime_prefix(artifact)
+        if migrated:
+            write_spikemold_artifact(ARTIFACT_PATH, artifact)
+        suffix = "_runtime_prefix_migrated" if migrated else ""
+        return artifact, f"trained_or_existing_artifact{suffix}"
+
+    artifact = build_eventconv_fclif_artifact(
+        kernel=build_kernel(),
+        readout_weights=build_sparse_readout(),
+        conv_threshold=1,
+        readout_thresholds=[1] * 10,
+        artifact_id="mnist_eventconv_fclif_frozen",
+    )
+    write_spikemold_artifact(ARTIFACT_PATH, artifact)
+    return artifact, "deterministic_smoke_seed"
+
+
+def check_training_gate(artifact: object, *, required: bool) -> str:
+    manifest = artifact.manifest  # type: ignore[attr-defined]
+    training = manifest.get("training", {})
+    if not isinstance(training, dict) or "final_validation_accuracy" not in training:
+        if required:
+            raise SystemExit("missing trained MNIST accuracy in artifact manifest")
+        return "not recorded"
+    accuracy = float(training["final_validation_accuracy"])
+    if accuracy < MIN_TRAINED_ACCURACY:
+        raise SystemExit(
+            f"trained MNIST accuracy {accuracy:.4f} below required {MIN_TRAINED_ACCURACY:.2f}"
+        )
+    return f"{accuracy * 100:.2f}%"
+
+
 def write_json(path: Path, data: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
-def write_report(artifact: object, trace: object, config_plan: dict[str, object]) -> None:
+def write_report(artifact: object, trace: object, config_plan: dict[str, object], source_label: str, training_gate: str) -> None:
     manifest = artifact.manifest  # type: ignore[attr-defined]
     trace_dict = trace.to_dict()  # type: ignore[attr-defined]
+    readout = manifest["network"]["readout"]
+    hashes = manifest["hashes"]
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     REPORT_PATH.write_text(
         "\n".join(
             [
                 "# SpikeMold Final Goal Contract Report",
                 "",
-                "Status: host-side frozen SpikePress/SpikeMold contract generated.",
+                "Status: trained frozen SpikePress/SpikeMold contract generated and locked.",
                 "",
                 "## Frozen Slice",
                 "",
                 "- Model: `EventConv(1x28x28, 4 filters, 3x3, stride 2, padding 1) -> sparse FC-LIF(784->10)`",
                 "- Hardware states: `794` (`784` EventConv states + `10` readout states)",
                 "- Backend mode: `2`",
-                "- Router fanout limit: `32`; generated sparse readout max fanout: `1`",
+                f"- Router fanout limit: `32`; artifact readout max fanout: `{readout['max_fanout']}`",
+                f"- Training gate: `{training_gate}` final validation accuracy (`>=90%` required before synthesis)",
+                f"- Artifact source: `{source_label}`",
                 "",
                 "## Artifacts",
                 "",
                 f"- Artifact: `{ARTIFACT_PATH.relative_to(ROOT)}`",
-                f"- Artifact SHA256: `{manifest['hashes']['artifact_sha256']}`",
+                f"- Artifact SHA256: `{hashes['artifact_sha256']}`",
+                f"- EventConv kernel SHA256: `{hashes['eventconv_kernel_sha256']}`",
+                f"- Readout weights SHA256: `{hashes['readout_weights_sha256']}`",
                 f"- Golden trace: `{TRACE_PATH.relative_to(ROOT)}`",
                 f"- Trace SHA256: `{trace_dict['hashes']['trace_sha256']}`",
                 f"- Config plan: `{CONFIG_PLAN_PATH.relative_to(ROOT)}`",
@@ -103,7 +215,7 @@ def write_report(artifact: object, trace: object, config_plan: dict[str, object]
                 "",
                 "## Next Gate",
                 "",
-                "Run `python scripts/check_spikemold_final_goal.py`, focused frozen-slice xsim, then at most two integrated Vivado builds.",
+                "Run `python scripts/check_spikemold_final_goal.py`, focused frozen-slice xsim, then one integrated Vivado build.",
                 "",
             ]
         ),
@@ -112,17 +224,12 @@ def write_report(artifact: object, trace: object, config_plan: dict[str, object]
 
 
 def main() -> int:
-    kernel = build_kernel()
-    readout = build_sparse_readout()
+    args = parse_args()
+    artifact, source_label = load_or_build_artifact(args.source)
+    training_gate = check_training_gate(artifact, required=args.require_trained)
+    kernel, readout = split_artifact_weights(artifact)
     input_spikes = build_sample_input()
 
-    artifact = build_eventconv_fclif_artifact(
-        kernel=kernel,
-        readout_weights=readout,
-        conv_threshold=1,
-        readout_thresholds=[1] * 10,
-        artifact_id="mnist_eventconv_fclif_frozen",
-    )
     trace = generate_eventconv_fclif_trace(
         input_spikes=input_spikes,
         kernel=kernel.tolist(),
@@ -135,12 +242,14 @@ def main() -> int:
         trace_id="mnist_eventconv_fclif_frozen_v1",
         target="pynq-z2",
     )
-    config_plan = build_eventconv_fclif_config_plan(artifact.manifest)
+    config_plan = build_eventconv_fclif_config_plan(
+        artifact.manifest,
+        expected_output_words=len(trace.commits),
+    )
 
-    write_spikemold_artifact(ARTIFACT_PATH, artifact)
     trace.write_json(TRACE_PATH)
     write_json(CONFIG_PLAN_PATH, config_plan)
-    write_report(artifact, trace, config_plan)
+    write_report(artifact, trace, config_plan, source_label, training_gate)
 
     print(f"Wrote {ARTIFACT_PATH.relative_to(ROOT)}")
     print(f"Wrote {TRACE_PATH.relative_to(ROOT)}")
