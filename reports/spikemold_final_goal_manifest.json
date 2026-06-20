@@ -184,9 +184,26 @@
     }
   ],
   "next_gates_for_stronger_claims": [
-    "multi-sample or full MNIST board-equivalence run",
+    "full MNIST board-equivalence run",
     "descriptor-configured arbitrary EventConv board proof",
     "wider network/state-space board proof",
     "same-run measured latency, throughput, and energy methodology"
+  ],
+  "follow_on_evidence": [
+    {
+      "path": "reports/spikemold_mnist_multisample_board_report.md",
+      "boundary": "five MNIST-derived sparse top-3 event samples equivalence only",
+      "result": "PASS"
+    },
+    {
+      "path": "reports/spikemold_eventconv_trace_smoke_report.md",
+      "boundary": "descriptor-configured tiny EventConv specialization only",
+      "result": "PASS"
+    },
+    {
+      "path": "reports/spikemold_post_lock_followon_report.md",
+      "boundary": "follow-on evidence reconciliation; no full accuracy or performance claim",
+      "result": "PASS"
+    }
   ]
 }
