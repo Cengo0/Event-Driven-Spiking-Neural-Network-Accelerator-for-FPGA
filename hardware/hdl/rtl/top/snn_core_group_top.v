@@ -69,7 +69,7 @@
 //-----------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
-`include "snn_params.vh"
+`include "/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/config/generated/snn_params.vh"
 
 module snn_core_group_top #(
     // Core Group Parameters (defaults from snn_params.yaml via snn_params.vh)

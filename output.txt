@@ -1,0 +1,99 @@
+[378853.540321] usb 3-13: new high-speed USB device number 6 using xhci_hcd
+[378859.306381] usb 3-13: device descriptor read/all, error -110
+[378859.622321] usb 3-13: new high-speed USB device number 7 using xhci_hcd
+[378859.751298] usb 3-13: New USB device found, idVendor=0403, idProduct=6010, bcdDevice= 7.00
+[378859.751309] usb 3-13: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[378859.751313] usb 3-13: Product: TUL
+[378859.751317] usb 3-13: Manufacturer: Xilinx
+[378859.751320] usb 3-13: SerialNumber: 1234-tul
+[378859.753599] ftdi_sio 3-13:1.0: FTDI USB Serial Device converter detected
+[378859.753674] usb 3-13: Detected FT2232H
+[378859.753931] usb 3-13: FTDI USB Serial Device converter now attached to ttyUSB0
+[378859.755087] ftdi_sio 3-13:1.1: FTDI USB Serial Device converter detected
+[378859.755137] usb 3-13: Detected FT2232H
+[378859.755377] usb 3-13: FTDI USB Serial Device converter now attached to ttyUSB1
+[378860.028455] [UFW BLOCK] IN=enp7s0 OUT= MAC=01:00:5e:00:00:01:64:70:02:44:75:a0:08:00 SRC=192.168.0.1 DST=224.0.0.1 LEN=32 TOS=0x00 PREC=0xC0 TTL=1 ID=0 DF PROTO=2 
+[378860.034467] [UFW BLOCK] IN=enp7s0 OUT= MAC=01:00:5e:00:00:01:64:70:02:44:75:a0:08:00 SRC=192.168.0.1 DST=224.0.0.1 LEN=32 TOS=0x00 PREC=0xC0 TTL=1 ID=0 DF PROTO=2 
+[378860.250497] [UFW BLOCK] IN=enp7s0 OUT= MAC=01:00:5e:00:00:01:64:70:02:44:75:a0:08:00 SRC=192.168.0.1 DST=224.0.0.1 LEN=32 TOS=0x00 PREC=0xC0 TTL=1 ID=0 DF PROTO=2 
+[378862.448549] igb 0000:06:00.0 enp6s0: igb: enp6s0 NIC Link is Up 1000 Mbps Full Duplex, Flow Control: RX
+[378862.531824] [UFW BLOCK] IN=enp7s0 OUT= MAC=01:00:5e:00:00:01:64:70:02:44:75:a0:08:00 SRC=192.168.0.1 DST=224.0.0.1 LEN=32 TOS=0x00 PREC=0xC0 TTL=1 ID=0 DF PROTO=2 
+[378912.532799] igb 0000:06:00.0 enp6s0: igb: enp6s0 NIC Link is Down
+[378915.555035] igb 0000:06:00.0 enp6s0: igb: enp6s0 NIC Link is Up 1000 Mbps Full Duplex, Flow Control: RX
+[378979.728588] usb 3-13: USB disconnect, device number 7
+[378979.728947] ftdi_sio ttyUSB0: FTDI USB Serial Device converter now disconnected from ttyUSB0
+[378979.728986] ftdi_sio 3-13:1.0: device disconnected
+[378979.729317] ftdi_sio ttyUSB1: FTDI USB Serial Device converter now disconnected from ttyUSB1
+[378979.729346] ftdi_sio 3-13:1.1: device disconnected
+[378979.977955] usb 3-13: new high-speed USB device number 8 using xhci_hcd
+[378979.995078] [UFW BLOCK] IN=enp7s0 OUT= MAC=01:00:5e:00:00:01:64:70:02:44:75:a0:08:00 SRC=192.168.0.1 DST=224.0.0.1 LEN=32 TOS=0x00 PREC=0xC0 TTL=1 ID=0 DF PROTO=2 
+[378980.001083] [UFW BLOCK] IN=enp7s0 OUT= MAC=01:00:5e:00:00:01:64:70:02:44:75:a0:08:00 SRC=192.168.0.1 DST=224.0.0.1 LEN=32 TOS=0x00 PREC=0xC0 TTL=1 ID=0 DF PROTO=2 
+[378980.106875] usb 3-13: New USB device found, idVendor=0403, idProduct=6010, bcdDevice= 7.00
+[378980.106885] usb 3-13: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[378980.106890] usb 3-13: Product: TUL
+[378980.106893] usb 3-13: Manufacturer: Xilinx
+[378980.106896] usb 3-13: SerialNumber: 1234-tul
+[378980.109268] ftdi_sio 3-13:1.0: FTDI USB Serial Device converter detected
+[378980.109357] usb 3-13: Detected FT2232H
+[378980.109566] usb 3-13: FTDI USB Serial Device converter now attached to ttyUSB0
+[378980.110841] ftdi_sio 3-13:1.1: FTDI USB Serial Device converter detected
+[378980.110930] usb 3-13: Detected FT2232H
+[378980.111150] usb 3-13: FTDI USB Serial Device converter now attached to ttyUSB1
+[378980.128166] [UFW BLOCK] IN=enp7s0 OUT= MAC=01:00:5e:00:00:01:64:70:02:44:75:a0:08:00 SRC=192.168.0.1 DST=224.0.0.1 LEN=32 TOS=0x00 PREC=0xC0 TTL=1 ID=0 DF PROTO=2 
+[378980.290835] usb 3-13: USB disconnect, device number 8
+[378980.291195] ftdi_sio ttyUSB0: FTDI USB Serial Device converter now disconnected from ttyUSB0
+[378980.291219] ftdi_sio 3-13:1.0: device disconnected
+[378980.291876] ftdi_sio ttyUSB1: FTDI USB Serial Device converter now disconnected from ttyUSB1
+[378980.291909] ftdi_sio 3-13:1.1: device disconnected
+[378980.405085] [UFW BLOCK] IN=enp7s0 OUT= MAC=01:00:5e:00:00:01:64:70:02:44:75:a0:08:00 SRC=192.168.0.1 DST=224.0.0.1 LEN=32 TOS=0x00 PREC=0xC0 TTL=1 ID=0 DF PROTO=2 
+[378980.411368] [UFW BLOCK] IN=enp7s0 OUT= MAC=01:00:5e:00:00:01:64:70:02:44:75:a0:08:00 SRC=192.168.0.1 DST=224.0.0.1 LEN=32 TOS=0x00 PREC=0xC0 TTL=1 ID=0 DF PROTO=2 
+[378980.541000] usb 3-13: new high-speed USB device number 9 using xhci_hcd
+[378980.670008] usb 3-13: New USB device found, idVendor=0403, idProduct=6010, bcdDevice= 7.00
+[378980.670019] usb 3-13: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[378980.670024] usb 3-13: Product: TUL
+[378980.670027] usb 3-13: Manufacturer: Xilinx
+[378980.670031] usb 3-13: SerialNumber: 1234-tul
+[378980.672276] ftdi_sio 3-13:1.0: FTDI USB Serial Device converter detected
+[378980.672397] usb 3-13: Detected FT2232H
+[378980.672655] usb 3-13: FTDI USB Serial Device converter now attached to ttyUSB0
+[378980.673931] ftdi_sio 3-13:1.1: FTDI USB Serial Device converter detected
+[378980.674034] usb 3-13: Detected FT2232H
+[378980.674226] usb 3-13: FTDI USB Serial Device converter now attached to ttyUSB1
+[378980.904148] [UFW BLOCK] IN=enp7s0 OUT= MAC=01:00:5e:00:00:01:64:70:02:44:75:a0:08:00 SRC=192.168.0.1 DST=224.0.0.1 LEN=32 TOS=0x00 PREC=0xC0 TTL=1 ID=0 DF PROTO=2 
+[378980.961095] [UFW BLOCK] IN=enp7s0 OUT= MAC=01:00:5e:00:00:01:64:70:02:44:75:a0:08:00 SRC=192.168.0.1 DST=224.0.0.1 LEN=32 TOS=0x00 PREC=0xC0 TTL=1 ID=0 DF PROTO=2 
+[378980.967187] [UFW BLOCK] IN=enp7s0 OUT= MAC=01:00:5e:00:00:01:64:70:02:44:75:a0:08:00 SRC=192.168.0.1 DST=224.0.0.1 LEN=32 TOS=0x00 PREC=0xC0 TTL=1 ID=0 DF PROTO=2 
+[378981.056456] usb 3-13: USB disconnect, device number 9
+[378981.056775] ftdi_sio ttyUSB0: FTDI USB Serial Device converter now disconnected from ttyUSB0
+[378981.056812] ftdi_sio 3-13:1.0: device disconnected
+[378981.057125] ftdi_sio ttyUSB1: FTDI USB Serial Device converter now disconnected from ttyUSB1
+[378981.057153] ftdi_sio 3-13:1.1: device disconnected
+[378981.306049] usb 3-13: new high-speed USB device number 10 using xhci_hcd
+[378981.340156] [UFW BLOCK] IN=enp7s0 OUT= MAC=01:00:5e:00:00:01:64:70:02:44:75:a0:08:00 SRC=192.168.0.1 DST=224.0.0.1 LEN=32 TOS=0x00 PREC=0xC0 TTL=1 ID=0 DF PROTO=2 
+[378981.346164] [UFW BLOCK] IN=enp7s0 OUT= MAC=01:00:5e:00:00:01:64:70:02:44:75:a0:08:00 SRC=192.168.0.1 DST=224.0.0.1 LEN=32 TOS=0x00 PREC=0xC0 TTL=1 ID=0 DF PROTO=2 
+[378981.435028] usb 3-13: New USB device found, idVendor=0403, idProduct=6010, bcdDevice= 7.00
+[378981.435038] usb 3-13: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[378981.435043] usb 3-13: Product: TUL
+[378981.435046] usb 3-13: Manufacturer: Xilinx
+[378981.435049] usb 3-13: SerialNumber: 1234-tul
+[378981.437169] ftdi_sio 3-13:1.0: FTDI USB Serial Device converter detected
+[378981.437245] usb 3-13: Detected FT2232H
+[378981.437435] usb 3-13: FTDI USB Serial Device converter now attached to ttyUSB0
+[378981.438506] ftdi_sio 3-13:1.1: FTDI USB Serial Device converter detected
+[378981.438555] usb 3-13: Detected FT2232H
+[378981.438734] usb 3-13: FTDI USB Serial Device converter now attached to ttyUSB1
+[378981.511590] usb 3-13: USB disconnect, device number 10
+[378981.512073] ftdi_sio ttyUSB0: FTDI USB Serial Device converter now disconnected from ttyUSB0
+[378981.512119] ftdi_sio 3-13:1.0: device disconnected
+[378981.512627] ftdi_sio ttyUSB1: FTDI USB Serial Device converter now disconnected from ttyUSB1
+[378981.512678] ftdi_sio 3-13:1.1: device disconnected
+[378981.762100] usb 3-13: new high-speed USB device number 11 using xhci_hcd
+[378981.876148] usb 3-13: Device not responding to setup address.
+[378982.080131] usb 3-13: Device not responding to setup address.
+[378982.288138] usb 3-13: device not accepting address 11, error -71
+[378983.176218] usb usb3-port13: Cannot enable. Maybe the USB cable is bad?
+[378983.176331] usb usb3-port13: attempt power cycle
+[378983.972280] usb 3-13: new high-speed USB device number 13 using xhci_hcd
+[378983.972315] usb 3-13: Device not responding to setup address.
+[378984.176308] usb 3-13: Device not responding to setup address.
+[378984.384307] usb 3-13: device not accepting address 13, error -71
+[378985.272424] usb usb3-port13: Cannot enable. Maybe the USB cable is bad?
+[378985.272515] usb usb3-port13: unable to enumerate USB device

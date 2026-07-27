@@ -28,7 +28,7 @@
 //-----------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
-`include "snn_params.vh"
+`include "/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/config/generated/snn_params.vh"
 
 module event_router_ng #(
     parameter NUM_GROUPS        = `SNN_NUM_GROUPS,

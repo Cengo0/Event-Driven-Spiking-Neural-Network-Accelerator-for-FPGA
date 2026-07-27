@@ -11,10 +11,13 @@ import numpy as np
 import time
 import argparse
 
-from snn_fpga_accelerator import (
-    SNNAccelerator, SNNModel, SNNLayer, CPUvsSNNComparator
+from software.python.snn_fpga_accelerator.accelerator import SNNAccelerator
+
+from software.python.snn_fpga_accelerator.pytorch_interface import (
+    SNNModel, SNNLayer, CPUvsSNNComparator
 )
-from snn_fpga_accelerator.spike_encoding import PoissonEncoder
+
+from software.python.snn_fpga_accelerator.spike_encoding import PoissonEncoder
 
 # Check PyTorch availability
 try:

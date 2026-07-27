@@ -8,9 +8,9 @@ Demonstrates:
 """
 
 import numpy as np
-from snn_fpga_accelerator import SNNAccelerator
-from snn_fpga_accelerator.spike_encoding import RateEncoder
-from snn_fpga_accelerator.pytorch_interface import (
+from software.python.snn_fpga_accelerator.accelerator import SNNAccelerator
+from software.python.snn_fpga_accelerator.spike_encoding import RateEncoder
+from software.python.snn_fpga_accelerator.pytorch_interface import (
     SNNModel, SNNLayer, CPUvsSNNComparator
 )
 
@@ -50,12 +50,12 @@ def create_snn_model_from_pytorch(torch_model, input_size=784, hidden_size=128, 
     # Create SNN layers with same weights
     layer1 = SNNLayer(input_size=input_size, output_size=hidden_size, layer_type="fully_connected")
     layer1.set_weights(fc1_weight, fc1_bias)
-    layer1.set_neuron_parameters(threshold=0.5, leak_rate=0.05, refractory_period=3)
+    layer1.set_neuron_parameters(threshold=0.005, leak_rate=0.01, refractory_period=3)
     snn_model.add_layer(layer1)
     
     layer2 = SNNLayer(input_size=hidden_size, output_size=output_size, layer_type="fully_connected")
     layer2.set_weights(fc2_weight, fc2_bias)
-    layer2.set_neuron_parameters(threshold=0.5, leak_rate=0.05, refractory_period=3)
+    layer2.set_neuron_parameters(threshold=0.005, leak_rate=0.01, refractory_period=3)
     snn_model.add_layer(layer2)
     
     return snn_model
@@ -106,12 +106,12 @@ def main():
         
         layer1 = SNNLayer(input_size=784, output_size=128, layer_type="fully_connected")
         layer1.set_weights(np.random.randn(128, 784).astype(np.float32) * 0.5)
-        layer1.set_neuron_parameters(threshold=0.5, leak_rate=0.05, refractory_period=3)
+        layer1.set_neuron_parameters(threshold=0.005, leak_rate=0.001, refractory_period=3)
         snn_model.add_layer(layer1)
         
         layer2 = SNNLayer(input_size=128, output_size=10, layer_type="fully_connected")
         layer2.set_weights(np.random.randn(10, 128).astype(np.float32) * 0.5)
-        layer2.set_neuron_parameters(threshold=0.5, leak_rate=0.05, refractory_period=3)
+        layer2.set_neuron_parameters(threshold=0.005, leak_rate=0.001, refractory_period=3)
         snn_model.add_layer(layer2)
         
         # Initialize accelerator

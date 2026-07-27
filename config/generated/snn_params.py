@@ -1,7 +1,7 @@
 """
 SNN Accelerator Parameters — AUTO-GENERATED from snn_params.yaml
 
-Generated: 2026-02-22 16:30:32
+Generated: 2026-07-17 16:51:48
 DO NOT EDIT — modify config/snn_params.yaml and run generate_params.py
 """
 
