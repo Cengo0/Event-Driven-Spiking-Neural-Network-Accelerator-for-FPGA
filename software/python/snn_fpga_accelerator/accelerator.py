@@ -154,10 +154,11 @@ class _HardwareBackend:
 
     def _initialize(self) -> None:
         assert self.ip is not None
-        self.ip.write(0x00, 0x1)
-        time.sleep(0.01)
+        # Start the HLS core in a safe load state before any DMA transfer.
+        # The inference threshold is lowered later, after the model has been
+        # uploaded and the host is ready to collect output spikes.
         self.ip.write(0x00, 0x81)
-        self.ip.write(0x10, 200)  # Neuron Threshold
+        self.ip.write(0x10, 200)  # Safe load threshold
         self.ip.write(0x14, 0)    # Membrane Leak
         self.ip.write(0x18, 5)    # Refractory Period
 
@@ -469,22 +470,16 @@ class SNNAccelerator:
         if self._hardware_backend is None:
             return None
 
-        candidates = [
-            getattr(self._hardware_backend, "data_dma", None),
-            getattr(self._hardware_backend, "spike_dma", None),
-            getattr(self._hardware_backend, "weight_dma", None),
-        ]
-        send_dma = next((dma for dma in candidates if dma is not None and getattr(dma, "sendchannel", None) is not None), None)
-        recv_dma = next((dma for dma in candidates if dma is not None and getattr(dma, "recvchannel", None) is not None), None)
+        spike_dma = getattr(self._hardware_backend, "spike_dma", None)
 
-        if send_dma is None:
-            return None
-
-        if recv_dma is None:
+        if spike_dma is None:
             raise RuntimeError(
-                "No DMA receive channel is available in the current overlay. "
-                "The bitstream/HWH does not expose an output stream for spike capture."
+                "No 'spike_dma' channel is available in the current overlay. "
+                "The bitstream/HWH does not expose a 'spike_dma' for spike capture."
             )
+
+        send_dma = spike_dma
+        recv_dma = spike_dma
 
         logger.info(
             "Using DMA send=%s recv=%s for spike transfer",
@@ -735,12 +730,45 @@ class SNNAccelerator:
             raise RuntimeError("Hardware DMA engine not initialised")
 
         dma = self._hardware_backend.weight_dma
-        weight_buffer = allocate(shape=(weights.size,), dtype=np.int8)  # type: ignore[arg-type]
-        weight_data = np.clip(weights * 128, -128, 127).astype(np.int8)
-        weight_buffer[:] = weight_data.flatten()
-        dma.sendchannel.transfer(weight_buffer)  # type: ignore[attr-defined]
-        dma.sendchannel.wait()  # type: ignore[attr-defined]
-        logger.info("Uploaded %d weights to FPGA DMA", weights.size)
+        ip = self._hardware_backend.ip
+        
+        # Enter weight-load mode (set CTRL_ENABLE and CTRL_WEIGHT_LOAD bits)
+        control_word = ip.read(0x00)
+        logger.debug("Current control reg before weight-load: 0x%08X", control_word)
+        ip.write(0x00, control_word | 0xC1)
+        logger.debug("Set control reg for weight-load: 0x%08X", ip.read(0x00))
+
+        # Pack weights and provide diagnostics to help debug on-board failures
+        weight_words = self._pack_weight_words(weights)
+        logger.debug(
+            "Packing weights: input_shape=%s packed_count=%d min=%s max=%s",
+            getattr(weights, 'shape', None),
+            weight_words.size,
+            np.min(weights) if weights.size else None,
+            np.max(weights) if weights.size else None,
+        )
+
+        # Log a hex dump of the first words for on-target comparison
+        sample_n = min(32, weight_words.size)
+        sample_words = weight_words[:sample_n]
+        logger.debug("First %d packed weight words: %s", sample_n, ", ".join(f"0x{w:08X}" for w in sample_words))
+
+        weight_buffer = allocate(shape=(weight_words.size,), dtype=np.uint32)  # type: ignore[arg-type]
+        weight_buffer[:] = weight_words
+        weight_buffer.flush()  # type: ignore[attr-defined]
+
+        try:
+            if getattr(dma, 'sendchannel', None) is None:
+                raise CommunicationError("Weight DMA sendchannel missing or not available")
+            dma.sendchannel.transfer(weight_buffer)  # type: ignore[attr-defined]
+            dma.sendchannel.wait()  # type: ignore[attr-defined]
+            logger.debug("DMA transfer completed for %d words", weight_words.size)
+        finally:
+            # Always return to inference mode
+            ip.write(0x00, 0x81)
+            logger.debug("Control reg restored to inference mode: 0x%08X", ip.read(0x00))
+
+        logger.info("Uploaded %d packed synapses to FPGA DMA", weight_words.size)
 
     # ------------------------------------------------------------------
     # NeuronGroup-aware weight API  (Phase 6.5 flat buffer)
@@ -859,11 +887,85 @@ class SNNAccelerator:
             raise RuntimeError("Hardware DMA engine not initialised")
 
         dma = self._hardware_backend.weight_dma
+        ip = self._hardware_backend.ip
+        
+        # Enter weight-load mode
+        control_word = ip.read(0x00)
+        ip.write(0x00, control_word | 0xC1)
+
         weight_buffer = allocate(shape=(flat.size,), dtype=np.int8)  # type: ignore[arg-type]
         weight_buffer[:] = flat
-        dma.sendchannel.transfer(weight_buffer)  # type: ignore[attr-defined]
-        dma.sendchannel.wait()  # type: ignore[attr-defined]
+        weight_buffer.flush()  # type: ignore[attr-defined]
+
+        logger.debug("Uploading flat weight buffer: size=%d sample=%s", flat.size, flat[:32].tolist())
+
+        # Raw flat buffer mode is used by the compiled neuron-group layout.
+        # Keep it byte-for-byte identical to the pre-packed host buffer.
+        weight_buffer.flush()  # type: ignore[attr-defined]
+
+        try:
+            if getattr(dma, 'sendchannel', None) is None:
+                raise CommunicationError("Weight DMA sendchannel missing or not available")
+            dma.sendchannel.transfer(weight_buffer)  # type: ignore[attr-defined]
+            dma.sendchannel.wait()  # type: ignore[attr-defined]
+            logger.debug("DMA transfer completed for flat buffer (%d bytes)", flat.size)
+        finally:
+            # Always return to inference mode
+            ip.write(0x00, 0x81)
+            logger.debug("Control reg restored to inference mode: 0x%08X", ip.read(0x00))
+
         logger.info("Uploaded %d flat weights to FPGA DMA", flat.size)
+
+    def _pack_weight_words(self, weights: np.ndarray) -> np.ndarray:
+        """Pack a weight tensor into 32-bit HLS synapse packets.
+
+        Packet layout used by the HLS loader:
+        [29:26] packed weight bits
+        [25:13] post-synaptic neuron ID
+        [12:0]  pre-synaptic neuron ID
+
+        This matches the parity harness and the HLS logical neuron-id width.
+        For convolutional tensors we flatten each receptive field and assign
+        one post neuron per output channel.
+        """
+        weights_arr = np.asarray(weights)
+        packed_weights = np.rint(weights_arr).astype(np.int16)
+        packed_weights = np.clip(packed_weights, -8, 7).astype(np.int16)
+
+        def pack_word(pre_id: int, post_id: int, weight: int) -> int:
+            weight_bits = int(weight) & 0x0F
+            return ((weight_bits & 0x0F) << 26) | ((int(post_id) & 0x1FFF) << 13) | (int(pre_id) & 0x1FFF)
+
+        words: List[int] = []
+        if packed_weights.ndim == 2:
+            rows, cols = packed_weights.shape
+            for post_id in range(rows):
+                for pre_id in range(cols):
+                    words.append(pack_word(pre_id, post_id, int(packed_weights[post_id, pre_id])))
+            return np.asarray(words, dtype=np.uint32)
+
+        if packed_weights.ndim == 4:
+            out_channels, in_channels, kernel_h, kernel_w = packed_weights.shape
+            receptive_field = in_channels * kernel_h * kernel_w
+            for post_id in range(out_channels):
+                flat_kernel = packed_weights[post_id].reshape(-1)
+                for pre_id in range(receptive_field):
+                    words.append(pack_word(pre_id, post_id, int(flat_kernel[pre_id])))
+            return np.asarray(words, dtype=np.uint32)
+
+        raise WeightLoadError(
+            f"Unsupported weight tensor shape for DMA packing: {weights_arr.shape}",
+            weight_shape=weights_arr.shape,
+            error_code=3011,
+        )
+
+    def get_packed_weight_words(self, weights: np.ndarray) -> np.ndarray:
+        """Public helper: return the packed 32-bit synapse words without sending.
+
+        Use this to inspect and compare the host-generated packets with any
+        on-target captures (e.g. S2MM dump or logic analyzer output).
+        """
+        return self._pack_weight_words(weights)
 
     
     def send_spike_event(self, neuron_id: int, timestamp: float, weight: float = 1.0) -> None:
@@ -1256,6 +1358,21 @@ class SNNAccelerator:
             "Learning params written via legacy map (0x200/0x204). "
             "Use XRT backend for full learning_params_t support."
         )
+
+    def set_hardware_neuron_parameters(self, threshold: int, leak: int, refractory_period: int) -> None:
+        """Set the neuron parameters on the hardware."""
+        if self.simulation_mode:
+            logger.debug("Simulation mode: skipping hardware neuron parameter configuration")
+            return
+
+        if self._hardware_backend is None or self._hardware_backend.ip is None:
+            raise RuntimeError("Hardware backend not initialised")
+
+        ip = self._hardware_backend.ip
+        ip.write(0x10, threshold)
+        ip.write(0x14, leak)
+        ip.write(0x18, refractory_period)
+        logger.info(f"Set hardware neuron parameters: threshold={threshold}, leak={leak}, refractory={refractory_period}")
     
     def get_performance_stats(self) -> Dict:
         """Get performance statistics from the accelerator."""
@@ -1410,3 +1527,22 @@ class SNNAccelerator:
             if layer.weights is None:
                 continue
             self._load_weights(layer.weights)
+
+        self._warmup_hardware_core()
+
+    def _warmup_hardware_core(self, timeout_s: float = 0.25) -> None:
+        """Run a short one-shot launch so the HLS core clears one-time init work."""
+        if self._hardware_backend is None or self._hardware_backend.ip is None:
+            return
+
+        ip = self._hardware_backend.ip
+        try:
+            ip.write(0x00, 0x01)
+            deadline = time.monotonic() + timeout_s
+            while time.monotonic() < deadline:
+                ap = int(ip.read(0x00))
+                if ap & 0x06:
+                    break
+                time.sleep(0.005)
+        finally:
+            ip.write(0x00, 0x00)

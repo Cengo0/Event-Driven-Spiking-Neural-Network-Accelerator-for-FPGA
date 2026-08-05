@@ -21,13 +21,55 @@ from torch.utils.data import DataLoader, Dataset
 import matplotlib.pyplot as plt
 import time
 import argparse
+import importlib.util
 import logging
+import sys
+import types
 from pathlib import Path
 
-# Import our SNN accelerator package
-from snn_fpga_accelerator import SNNAccelerator, pytorch_to_snn, spike_encoding
-from snn_fpga_accelerator.learning import RSTDPLearning, STDPLearning
-from snn_fpga_accelerator.utils import setup_logging, load_config
+REPO_ROOT = Path(__file__).resolve().parents[1]
+PKG_PARENT = REPO_ROOT / "software" / "python"
+PKG_DIR = PKG_PARENT / "snn_fpga_accelerator"
+
+if str(PKG_PARENT) not in sys.path:
+    sys.path.insert(0, str(PKG_PARENT))
+
+
+def _load_local_module(module_name: str):
+    full_name = f"snn_fpga_accelerator.{module_name}"
+    if full_name in sys.modules:
+        return sys.modules[full_name]
+
+    module_path = PKG_DIR / f"{module_name}.py"
+    spec = importlib.util.spec_from_file_location(full_name, str(module_path))
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Failed to load {full_name} from {module_path}")
+
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[full_name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+if "snn_fpga_accelerator" not in sys.modules:
+    pkg = types.ModuleType("snn_fpga_accelerator")
+    pkg.__path__ = [str(PKG_DIR)]
+    pkg.__package__ = "snn_fpga_accelerator"
+    sys.modules["snn_fpga_accelerator"] = pkg
+
+
+spike_encoding = _load_local_module("spike_encoding")
+utils = _load_local_module("utils")
+learning = _load_local_module("learning")
+pytorch_interface = _load_local_module("pytorch_interface")
+accelerator_module = _load_local_module("accelerator")
+
+SNNAccelerator = accelerator_module.SNNAccelerator
+pytorch_to_snn = pytorch_interface.pytorch_to_snn
+RSTDPLearning = learning.RSTDPLearning
+STDPLearning = learning.STDPLearning
+setup_logging = utils.setup_logging
+load_config = utils.load_config
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -125,7 +167,6 @@ def prepare_mnist_data():
     # Data transforms
     transform = transforms.Compose([
         transforms.ToTensor(),
-        transforms.Normalize((0.1307,), (0.3081,))
     ])
     
     # Load datasets
@@ -178,7 +219,7 @@ def train_pytorch_model(model, train_loader, epochs=5, learning_rate=0.01):
 
         for batch_idx, (data, target) in enumerate(train_loader):
             batch_size = data.shape[0]
-            data_flat = data.view(batch_size, -1)
+            data_flat = data.view(batch_size, -1).clamp(0.0, 1.0)
 
             # Simple rate encoding: higher intensity -> more spikes
             input_spikes = (torch.rand(batch_size, 784, 100) < (data_flat.unsqueeze(2) * 0.5)).float()
@@ -240,14 +281,20 @@ def deploy_to_fpga(model, accelerator):
     logger.info("Deploying model to FPGA...")
     
     # Convert PyTorch model to FPGA format
-    network_config = pytorch_to_snn(model)
+    network_config = pytorch_to_snn(model, (784,))
     
     # Configure the accelerator
     accelerator.configure_network(network_config)
-    
-    # Load weights to FPGA
-    logger.info("Loading weights to FPGA memory...")
-    accelerator.load_weights(network_config['weights'])
+
+    # Warm up the core once so the first real inference is not consumed by
+    # one-time HLS initialization / state setup.
+    if not accelerator.simulation_mode:
+        try:
+            first_layer = network_config.layers[0] if network_config.layers else None
+            hw_threshold = int(round(first_layer.neuron_params.get("threshold", 1.0) * 6350)) if first_layer is not None else 200
+            accelerator.set_hardware_neuron_parameters(threshold=hw_threshold, leak=0, refractory_period=0)
+        except Exception:
+            logger.debug("Hardware neuron warmup parameter write failed", exc_info=True)
     
     # Verify deployment
     if accelerator.verify_weights():
@@ -269,15 +316,20 @@ def run_fpga_inference(accelerator, test_data, num_samples=100):
         if i >= num_samples:
             break
             
-        # Convert to spike encoding
-        data_flat = data.view(data.shape[0], -1)
-        spikes = spike_encoding.rate_encode(data_flat.numpy(), 
-                                          num_steps=100, 
-                                          max_rate=50.0)
+        # Convert to a full spike event list, not just the first time slice.
+        # The FPGA path expects a stream of events, and negative normalized
+        # values would otherwise collapse to an empty stimulus.
+        image = data[0].detach().cpu().numpy().clip(0.0, 1.0)
+        spikes = spike_encoding.encode_mnist_image(
+            image,
+            encoder_type="rate",
+            duration=0.1,
+            max_rate=50.0,
+        )
         
         # FPGA inference
         start_time = time.time()
-        fpga_output = accelerator.infer(spikes[0])  # Single sample
+        fpga_output = accelerator.infer(spikes)
         fpga_time = time.time() - start_time
         
         # Record results
@@ -328,27 +380,29 @@ def run_online_learning(accelerator, learning_data):
                 break
                 
             # Convert to spikes
-            data_flat = data.view(data.shape[0], -1)
-            spikes = spike_encoding.rate_encode(data_flat.numpy(), 
-                                              num_steps=100, 
-                                              max_rate=50.0)
+            image = data[0].detach().cpu().numpy().clip(0.0, 1.0)
+            spikes = spike_encoding.encode_mnist_image(
+                image,
+                encoder_type="rate",
+                duration=0.1,
+                max_rate=50.0,
+            )
             
-            for sample_idx in range(data.shape[0]):
-                # Forward pass
-                output = accelerator.infer_with_learning(spikes[sample_idx])
-                prediction = np.argmax(output)
+            # Forward pass
+            output = accelerator.infer_with_learning(spikes)
+            prediction = np.argmax(output)
                 
-                # Calculate reward
-                reward = 1.0 if prediction == target[sample_idx].item() else -0.1
-                
-                # Apply reward signal
-                accelerator.apply_reward(reward)
-                
-                # Update statistics
-                episode_reward += reward
-                if prediction == target[sample_idx].item():
-                    correct += 1
-                total += 1
+            # Calculate reward
+            reward = 1.0 if prediction == target[0].item() else -0.1
+
+            # Apply reward signal
+            accelerator.apply_reward(reward)
+
+            # Update statistics
+            episode_reward += reward
+            if prediction == target[0].item():
+                correct += 1
+            total += 1
         
         # Calculate episode statistics
         episode_accuracy = correct / total if total > 0 else 0
@@ -408,13 +462,16 @@ def benchmark_performance(accelerator, test_data):
             if i >= num_samples:
                 break
                 
-            data_flat = data.view(data.shape[0], -1)
-            spikes = spike_encoding.rate_encode(data_flat.numpy(), 
-                                              num_steps=100, 
-                                              max_rate=50.0)
+            image = data[0].detach().cpu().numpy().clip(0.0, 1.0)
+            spikes = spike_encoding.encode_mnist_image(
+                image,
+                encoder_type="rate",
+                duration=0.1,
+                max_rate=50.0,
+            )
             
             start_time = time.time()
-            _ = accelerator.infer(spikes[0])
+            _ = accelerator.infer(spikes)
             fpga_run_times.append(time.time() - start_time)
         
         fpga_times.extend(fpga_run_times)

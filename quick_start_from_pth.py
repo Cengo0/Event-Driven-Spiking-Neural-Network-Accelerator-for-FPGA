@@ -77,7 +77,7 @@ def load_snn_from_pth(pth_file_path):
     return snn_model
 
 def main():
-    print("PYNQ-Z2 SNN Accelerator - VGG-16 Loader")
+    print("PYNQ-Z2 SNN Accelerator - Mozafari Loader")
     print("-" * 60)
     
     # Initialize accelerator in simulation mode

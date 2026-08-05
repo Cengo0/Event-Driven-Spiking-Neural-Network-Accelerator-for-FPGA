@@ -6,6 +6,8 @@ from software.python.snn_fpga_accelerator.spike_encoding import LatencyEncoder
 from software.python.snn_fpga_accelerator.pytorch_interface import SNNModel, SNNLayer
 
 MOZAFARI_GABOR_ANGLES = (45.0, 90.0, 135.0, 180.0)
+MOZAFARI_HW_THRESHOLD_SCALE = 6350.0
+MOZAFARI_SAFE_LOAD_THRESHOLD = 200
 
 
 def build_gabor_kernel(kernel_size, theta_deg, sigma=1.0, freq=0.25, gamma=1.0, psi=0.0):
@@ -103,8 +105,9 @@ def load_snn_from_npy(weights_path, bias_path=None):
 
     if w.ndim == 4:
         # Mozafari s2 checkpoint: (out_channels, in_channels, kernel_h, kernel_w)
+        input_size = w.shape[1] * w.shape[2] * w.shape[3]
         layer = SNNLayer(
-            input_size=w.shape[1],
+            input_size=input_size,
             output_size=w.shape[0],
             layer_type="convolutional",
             in_channels=w.shape[1],
@@ -128,6 +131,16 @@ def load_snn_from_npy(weights_path, bias_path=None):
     
     return snn_model
 
+
+def estimate_hardware_threshold(snn_model):
+    """Convert the calibrated Mozafari neuron threshold into hardware units."""
+    if not snn_model.layers:
+        return MOZAFARI_SAFE_LOAD_THRESHOLD
+
+    threshold = float(snn_model.layers[0].neuron_params.get("threshold", 0.005))
+    hw_threshold = int(round(threshold * MOZAFARI_HW_THRESHOLD_SCALE))
+    return max(1, min(hw_threshold, 0xFFFF))
+
 def main():
     print("="*60)
     print("🚀 PYNQ-Z2 SNN HARDWARE DEPLOYMENT (NUMPY ONLY)")
@@ -147,6 +160,14 @@ def main():
         snn_model = load_snn_from_npy("mozafari_weights.npy", "mozafari_bias.npy")
         accelerator.configure_network(snn_model)
 
+        inference_threshold = estimate_hardware_threshold(snn_model)
+        print(f"Using hardware inference threshold: {inference_threshold}")
+        accelerator.set_hardware_neuron_parameters(
+            threshold=inference_threshold,
+            leak=0,
+            refractory_period=5,
+        )
+
         raw_image_path = "raw_input.npy"
         if os.path.exists(raw_image_path):
             raw_image = np.load(raw_image_path)
@@ -164,6 +185,9 @@ def main():
         input_dim = feature_map.size
         print(f"Mozafari feature map shape: {feature_map.shape} -> flattened {input_dim}")
         print(f"Encoded feature spikes: {len(spikes)}")
+        if len(spikes) == 0:
+            print("⚠️  No encoded spikes were generated; check the input image and preprocessing path.")
+            return
         
         print("\n⚡ TRIGGER SCA MEASUREMENT NOW ⚡")
         start_time = time.time()
