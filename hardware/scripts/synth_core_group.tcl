@@ -10,7 +10,7 @@ create_project -in_memory -part $part
 # Add RTL sources
 set rtl_dir "../hdl/rtl"
 
-set include_paths [list "$rtl_dir/core" "$rtl_dir/common" "$rtl_dir/include" "../../"]
+set include_paths [list "$rtl_dir/core" "$rtl_dir/common" "$rtl_dir/include" "../../config/generated" "../../"]
 set_property include_dirs $include_paths [current_fileset]
 
 # Core group modules

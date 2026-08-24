@@ -8,7 +8,7 @@ set -euo pipefail
 #     --output /home/xilinx/snn/mnist_10class_results_scenario1.json
 
 DATA_DIR="/home/xilinx/snn"
-INFER_SCRIPT="/home/xilinx/snn/tests/fpga_10class_inference.py"
+INFER_SCRIPT="/home/xilinx/snn/fpga_10class_inference.py"
 DEPLOYMENT_NPZ="/home/xilinx/snn/mnist_10class_deployment.npz"
 OUTPUT_JSON="/home/xilinx/snn/mnist_10class_results_scenario1.json"
 N=10000
