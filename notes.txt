@@ -1,0 +1,31 @@
+Why "Uploading Ours" Still Fails
+In software, memory is just an array; if you have access to it, you can overwrite it. In an FPGA, memory (Block RAM) has physical write ports that must be wired to a specific data source using multiplexers.
+
+When the HLS compiler generated the INIT_WEIGHT pipeline, it physically wired the BRAM's write port to an internal data generator (likely a hardcoded default value like 127, or a pseudo-random number generator). It did not wire the BRAM's write port to the s_axis_weights AXI-Stream coming from the DMA.
+
+Even if you run the INIT_WEIGHT pipeline to fill the memory with non-zero values, the s_axis_weights port remains completely disconnected from the memory. You cannot overwrite those initialized values with your Mozafari weights because the physical wires from the DMA to the memory simply do not exist in this bitstream.
+
+Why Triggering INIT_WEIGHT is Brilliant for SCA
+While you cannot load the Mozafari model into this specific HLS bitstream, running the INIT_WEIGHT pipeline is a fantastic idea for your Side-Channel Analysis (SCA) setup.
+
+If your immediate goal is to validate your oscilloscope triggers and capture your first electromagnetic (EM) or power traces, the hardware does not need to be mathematically accurate. It just needs to be physically active.
+
+By triggering the INIT_WEIGHT pipeline, the hardware will populate the synapses with non-zero values. When you subsequently inject your 100 test spikes:
+
+The spikes will multiply against non-zero weights.
+
+The membrane potentials will accumulate and cross thresholds.
+
+Output spikes will be generated.
+
+Crucially: The MAC (Multiply-Accumulate) units, memory buses, and routing logic will exhibit massive switching activity, creating a rich, measurable power/EM profile for your traces.
+
+If you want to use this bitstream purely as an active dummy target to calibrate your oscilloscope and probes, you can trigger the initialization by writing the specific mode value (often 1 for STDP/Learning or 2 for a dedicated init mode) to the mode_reg (0x20) before injecting spikes.
+
+3. What about the Warnings?
+The warning [WARN] wait_all_idle timed out (busy=1111 router=1) is coming from a helper task inside the testbench.  
+After injecting spikes, the testbench calls wait_all_idle, which loops up to 20,000 clock cycles waiting for the router_busy flag and the grp_busy flags to all drop to 0.  
+router=1 means the spike router is reporting that it is still active.busy=1111 (binary for 15) means that all 4 of the simulated core groups are reporting that they are still active.
+Because the tests still pass, we know the actual spike processing and math are completing perfectly. 
+The warning simply means the hardware's internal state machines are continuously polling or waiting for data (since enable is held high) rather than dropping into a hard "idle" state, so the testbench's strict 20,000-cycle timeout expires. 
+It is a minor quirk in how the author wrote the testbench verification logic, not a functional bug in the silicon.

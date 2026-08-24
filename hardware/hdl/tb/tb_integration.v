@@ -453,6 +453,10 @@ module tb_integration;
     // Main Test
     //=========================================================================
     initial begin
+        // to generate the waveform file!
+        $dumpfile("integration_waves.vcd");
+        $dumpvars(0, tb_integration);
+
         $display("=========================================================");
         $display("  Integration TB: %0d Groups x %0d Neurons = %0d Total",
                  NUM_GROUPS, NEURONS_PER_GROUP, NUM_GROUPS * NEURONS_PER_GROUP);

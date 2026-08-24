@@ -103,8 +103,13 @@ def load_snn_from_npy(weights_path, bias_path=None):
     w = np.load(weights_path)
     b = np.load(bias_path) if bias_path and os.path.exists(bias_path) else None
 
+    # *** QUANTIZATION FIX ***
+    # Scale the [-0.36, 0.38] floats up to the 4-bit [-7, 7] integer range
+    max_w = np.max(np.abs(w))
+    if max_w > 0:
+        w = (w / max_w) * 7.0
+
     if w.ndim == 4:
-        # Mozafari s2 checkpoint: (out_channels, in_channels, kernel_h, kernel_w)
         input_size = w.shape[1] * w.shape[2] * w.shape[3]
         layer = SNNLayer(
             input_size=input_size,
@@ -158,15 +163,15 @@ def main():
         print("Loading Mozafari model weights from .npy...")
         # Update these filenames if you named them differently
         snn_model = load_snn_from_npy("mozafari_weights.npy", "mozafari_bias.npy")
-        accelerator.configure_network(snn_model)
+        # accelerator.configure_network(snn_model)
 
-        inference_threshold = estimate_hardware_threshold(snn_model)
-        print(f"Using hardware inference threshold: {inference_threshold}")
-        accelerator.set_hardware_neuron_parameters(
-            threshold=inference_threshold,
-            leak=0,
-            refractory_period=5,
-        )
+        # inference_threshold = estimate_hardware_threshold(snn_model)
+        # print(f"Using hardware inference threshold: {inference_threshold}")
+        # accelerator.set_hardware_neuron_parameters(
+        #     threshold=inference_threshold,
+        #     leak=0,
+        #     refractory_period=5,
+        # )
 
         raw_image_path = "raw_input.npy"
         if os.path.exists(raw_image_path):

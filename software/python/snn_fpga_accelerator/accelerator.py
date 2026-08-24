@@ -128,7 +128,9 @@ class _HardwareBackend:
         self.bitstream_path = bitstream_path
         self.fpga_ip = fpga_ip
         self.overlay = None
-        self.dma = None
+        self.dma_spikes = None
+        self.dma_data = None
+        self.dma_weights = None
         self.ip = None
 
     def connect(self) -> None:
@@ -138,29 +140,21 @@ class _HardwareBackend:
         self.overlay = overlay
         overlay_any = cast(Any, overlay)
         self.ip = overlay_any.snn_top_hls_0
-        self.spike_dma = getattr(overlay_any, "axi_dma_1", None)
-        self.data_dma = getattr(overlay_any, "axi_dma_0", None)
-        self.weight_dma = getattr(overlay_any, "axi_dma_2", None)
-        for name, dma in (("axi_dma_0", self.data_dma), ("axi_dma_1", self.spike_dma), ("axi_dma_2", self.weight_dma)):
-            logger.info(
-                "DMA %s present=%s send=%s recv=%s",
-                name,
-                dma is not None,
-                getattr(dma, "sendchannel", None) is not None if dma is not None else False,
-                getattr(dma, "recvchannel", None) is not None if dma is not None else False,
-            )
+        # Map all three DMAs based on the block design
+        self.dma_spikes = overlay_any.axi_dma_1
+        self.dma_data = overlay_any.axi_dma_0
+        self.dma_weights = overlay_any.axi_dma_2
         self._initialize()
         logger.info("FPGA connection established")
 
     def _initialize(self) -> None:
         assert self.ip is not None
-        # Start the HLS core in a safe load state before any DMA transfer.
-        # The inference threshold is lowered later, after the model has been
-        # uploaded and the host is ready to collect output spikes.
         self.ip.write(0x00, 0x81)
-        self.ip.write(0x10, 200)  # Safe load threshold
-        self.ip.write(0x14, 0)    # Membrane Leak
-        self.ip.write(0x18, 5)    # Refractory Period
+        time.sleep(0.01)
+        # self.ip.write(0x00, 0x0)
+        # self.ip.write(0x10, 1000)
+        # self.ip.write(0x14, 10)
+        # self.ip.write(0x18, 5)
 
     def disconnect(self) -> None:
         logger.info("Releasing FPGA overlay")
@@ -168,8 +162,9 @@ class _HardwareBackend:
             del self.overlay
         self.overlay = None
         self.ip = None
-        self.dma = None
-
+        self.dma_spikes = None
+        self.dma_data = None
+        self.dma_weights = None
     # Additional hardware specific helpers are kept forward compatible with the
     # legacy implementation and are defined in the main accelerator class.
 
@@ -260,8 +255,8 @@ class SNNAccelerator:
         self.spike_history: List[List[SpikeEvent]] = []  # History for multi-step
 
         # XRT backend handle (optional)
-        self._xrt_backend: Optional[Any] = None
-        self._xrt_regmap: Optional[Any] = None
+        self._xrt_backend: Optional[XRTBackend] = None
+        self._xrt_regmap: Optional[RegisterMap] = None
         
     def load_bitstream(self, bitstream_path: Optional[str] = None) -> None:
         """Load the FPGA bitstream and initialize hardware (PYNQ path)."""
@@ -276,7 +271,7 @@ class SNNAccelerator:
             self._hardware_backend = _HardwareBackend(self.bitstream_path, self.fpga_ip)
         self._hardware_backend.connect()
 
-    def configure_xrt(self, xclbin_path: str, device_index: int = 0, reg_map: Optional[Any] = None) -> None:
+    def configure_xrt(self, xclbin_path: str, device_index: int = 0, reg_map: Optional[RegisterMap] = None) -> None:
         """Configure XRT backend for register writes (mode/time_steps/etc.)."""
         if XRTBackend is None:
             raise RuntimeError("XRT backend not available; install pyxrt/XRT runtime")
@@ -458,103 +453,6 @@ class SNNAccelerator:
         logger.info("XRT simulation completed: %d input, %d output spikes", 
                    len(input_spikes), len(output_spikes))
         return output_spikes
-
-    def _run_simulation_dma(self, input_spikes: List[SpikeEvent]) -> Optional[List[SpikeEvent]]:
-        """Run hardware inference through the PYNQ DMA stream path.
-
-        The generated hardware design exposes spike traffic on AXI DMA streams,
-        so the legacy register-polling path does not see real output events.
-        This helper batches input spikes into one MM2S transfer and drains the
-        corresponding S2MM stream into a local buffer.
-        """
-        if self._hardware_backend is None:
-            return None
-
-        spike_dma = getattr(self._hardware_backend, "spike_dma", None)
-
-        if spike_dma is None:
-            raise RuntimeError(
-                "No 'spike_dma' channel is available in the current overlay. "
-                "The bitstream/HWH does not expose a 'spike_dma' for spike capture."
-            )
-
-        send_dma = spike_dma
-        recv_dma = spike_dma
-
-        logger.info(
-            "Using DMA send=%s recv=%s for spike transfer",
-            getattr(send_dma, "name", send_dma.__class__.__name__),
-            getattr(recv_dma, "name", recv_dma.__class__.__name__),
-        )
-
-        input_data = self._pack_spike_events(input_spikes)
-        input_words = np.frombuffer(input_data, dtype="<u4")
-        if input_words.size == 0:
-            input_words = np.zeros(1, dtype=np.uint32)
-
-        # PYNQ DMA rejects buffers over 16,383 bytes; keep S2MM under that cap.
-        # 4,095 uint32 words = 16,380 bytes, which is the largest safe buffer.
-        output_words = min(max(1, input_words.size * 8), 4095)
-
-        if allocate is None:
-            return None
-
-        input_buffer = allocate(shape=(input_words.size,), dtype=np.uint32)  # type: ignore[arg-type]
-        output_buffer = allocate(shape=(output_words,), dtype=np.uint32)  # type: ignore[arg-type]
-        input_buffer[:] = input_words
-        output_buffer[:] = 0
-        input_buffer.flush()  # type: ignore[attr-defined]
-
-        if self._hardware_backend.ip is not None:
-            try:
-                self._hardware_backend.ip.write(0x00, 0x81)
-            except Exception:
-                pass
-
-        logger.info("Arming S2MM receive buffer (%d words)", output_words)
-        recv_dma.recvchannel.transfer(output_buffer)  # type: ignore[attr-defined]
-
-        logger.info("Sending %d input spike words via MM2S", input_words.size)
-        send_dma.sendchannel.transfer(input_buffer)  # type: ignore[attr-defined]
-
-        def wait_with_timeout(channel, label: str, timeout_s: float = 10.0) -> None:
-            finished = threading.Event()
-
-            def _wait() -> None:
-                channel.wait()  # type: ignore[attr-defined]
-                finished.set()
-
-            waiter = threading.Thread(target=_wait, daemon=True)
-            waiter.start()
-            if not finished.wait(timeout_s):
-                raise TimeoutError(f"{label} DMA wait timed out after {timeout_s:.1f}s")
-
-        logger.info("Waiting for MM2S completion")
-        wait_with_timeout(send_dma.sendchannel, "MM2S")  # type: ignore[arg-type]
-        logger.info("Waiting for S2MM completion")
-        try:
-            wait_with_timeout(recv_dma.recvchannel, "S2MM")  # type: ignore[arg-type]
-        except TimeoutError:
-            logger.warning(
-                "S2MM did not terminate within the timeout. "
-                "The accelerator may have produced no output spikes, so the DMA frame never closed."
-            )
-        output_buffer.invalidate()  # type: ignore[attr-defined]
-
-        out_words = np.asarray(output_buffer, dtype=np.uint32)
-        if np.any(out_words):
-            last_nonzero = int(np.max(np.nonzero(out_words)[0]))
-            out_words = out_words[: last_nonzero + 1]
-        else:
-            out_words = out_words[:0]
-
-        output_spikes = self._unpack_spike_events(out_words.tobytes())
-        logger.info(
-            "Hardware DMA simulation completed: %d input spikes, %d output spikes",
-            len(input_spikes),
-            len(output_spikes),
-        )
-        return output_spikes
     
     def _pack_spike_events(self, spikes: List[SpikeEvent]) -> bytes:
         """Pack spike events to 32-bit AER format bytes."""
@@ -726,49 +624,22 @@ class SNNAccelerator:
                 ) from e
 
         # PYNQ DMA path (legacy)
-        if self._hardware_backend is None or getattr(self._hardware_backend, 'weight_dma', None) is None:
-            raise RuntimeError("Hardware DMA engine not initialised")
+        if self._hardware_backend is None or self._hardware_backend.dma_weights is None:
+            raise RuntimeError("Hardware DMA weights engine not initialised")
 
-        dma = self._hardware_backend.weight_dma
-        ip = self._hardware_backend.ip
+        # Route weights to axi_dma_2
+        dma = self._hardware_backend.dma_weights
+
+        # 1. Allocate a 32-bit buffer to match the 32-bit AXI Stream TDATA
+        weight_buffer = allocate(shape=(weights.size,), dtype=np.int32)
         
-        # Enter weight-load mode (set CTRL_ENABLE and CTRL_WEIGHT_LOAD bits)
-        control_word = ip.read(0x00)
-        logger.debug("Current control reg before weight-load: 0x%08X", control_word)
-        ip.write(0x00, control_word | 0xC1)
-        logger.debug("Set control reg for weight-load: 0x%08X", ip.read(0x00))
-
-        # Pack weights and provide diagnostics to help debug on-board failures
-        weight_words = self._pack_weight_words(weights)
-        logger.debug(
-            "Packing weights: input_shape=%s packed_count=%d min=%s max=%s",
-            getattr(weights, 'shape', None),
-            weight_words.size,
-            np.min(weights) if weights.size else None,
-            np.max(weights) if weights.size else None,
-        )
-
-        # Log a hex dump of the first words for on-target comparison
-        sample_n = min(32, weight_words.size)
-        sample_words = weight_words[:sample_n]
-        logger.debug("First %d packed weight words: %s", sample_n, ", ".join(f"0x{w:08X}" for w in sample_words))
-
-        weight_buffer = allocate(shape=(weight_words.size,), dtype=np.uint32)  # type: ignore[arg-type]
-        weight_buffer[:] = weight_words
-        weight_buffer.flush()  # type: ignore[attr-defined]
-
-        try:
-            if getattr(dma, 'sendchannel', None) is None:
-                raise CommunicationError("Weight DMA sendchannel missing or not available")
-            dma.sendchannel.transfer(weight_buffer)  # type: ignore[attr-defined]
-            dma.sendchannel.wait()  # type: ignore[attr-defined]
-            logger.debug("DMA transfer completed for %d words", weight_words.size)
-        finally:
-            # Always return to inference mode
-            ip.write(0x00, 0x81)
-            logger.debug("Control reg restored to inference mode: 0x%08X", ip.read(0x00))
-
-        logger.info("Uploaded %d packed synapses to FPGA DMA", weight_words.size)
+        # 2. Cast directly to int32 (deploy_hardware.py already handles the [-7, 7] scaling)
+        weight_data = weights.astype(np.int32)
+        
+        weight_buffer[:] = weight_data.flatten()
+        dma.sendchannel.transfer(weight_buffer)
+        dma.sendchannel.wait()
+        logger.info("Uploaded %d weights to FPGA DMA", weights.size)
 
     # ------------------------------------------------------------------
     # NeuronGroup-aware weight API  (Phase 6.5 flat buffer)
@@ -883,89 +754,16 @@ class SNNAccelerator:
                     error_code=3021,
                 ) from e
 
-        if self._hardware_backend is None or getattr(self._hardware_backend, 'weight_dma', None) is None:
-            raise RuntimeError("Hardware DMA engine not initialised")
+        if self._hardware_backend is None or self._hardware_backend.dma_weights is None:
+            raise RuntimeError("Hardware DMA weights engine not initialised")
 
-        dma = self._hardware_backend.weight_dma
-        ip = self._hardware_backend.ip
-        
-        # Enter weight-load mode
-        control_word = ip.read(0x00)
-        ip.write(0x00, control_word | 0xC1)
-
+        # Route flat weights to axi_dma_2
+        dma = self._hardware_backend.dma_weights
         weight_buffer = allocate(shape=(flat.size,), dtype=np.int8)  # type: ignore[arg-type]
         weight_buffer[:] = flat
-        weight_buffer.flush()  # type: ignore[attr-defined]
-
-        logger.debug("Uploading flat weight buffer: size=%d sample=%s", flat.size, flat[:32].tolist())
-
-        # Raw flat buffer mode is used by the compiled neuron-group layout.
-        # Keep it byte-for-byte identical to the pre-packed host buffer.
-        weight_buffer.flush()  # type: ignore[attr-defined]
-
-        try:
-            if getattr(dma, 'sendchannel', None) is None:
-                raise CommunicationError("Weight DMA sendchannel missing or not available")
-            dma.sendchannel.transfer(weight_buffer)  # type: ignore[attr-defined]
-            dma.sendchannel.wait()  # type: ignore[attr-defined]
-            logger.debug("DMA transfer completed for flat buffer (%d bytes)", flat.size)
-        finally:
-            # Always return to inference mode
-            ip.write(0x00, 0x81)
-            logger.debug("Control reg restored to inference mode: 0x%08X", ip.read(0x00))
-
+        dma.sendchannel.transfer(weight_buffer)  # type: ignore[attr-defined]
+        dma.sendchannel.wait()  # type: ignore[attr-defined]
         logger.info("Uploaded %d flat weights to FPGA DMA", flat.size)
-
-    def _pack_weight_words(self, weights: np.ndarray) -> np.ndarray:
-        """Pack a weight tensor into 32-bit HLS synapse packets.
-
-        Packet layout used by the HLS loader:
-        [29:26] packed weight bits
-        [25:13] post-synaptic neuron ID
-        [12:0]  pre-synaptic neuron ID
-
-        This matches the parity harness and the HLS logical neuron-id width.
-        For convolutional tensors we flatten each receptive field and assign
-        one post neuron per output channel.
-        """
-        weights_arr = np.asarray(weights)
-        packed_weights = np.rint(weights_arr).astype(np.int16)
-        packed_weights = np.clip(packed_weights, -8, 7).astype(np.int16)
-
-        def pack_word(pre_id: int, post_id: int, weight: int) -> int:
-            weight_bits = int(weight) & 0x0F
-            return ((weight_bits & 0x0F) << 26) | ((int(post_id) & 0x1FFF) << 13) | (int(pre_id) & 0x1FFF)
-
-        words: List[int] = []
-        if packed_weights.ndim == 2:
-            rows, cols = packed_weights.shape
-            for post_id in range(rows):
-                for pre_id in range(cols):
-                    words.append(pack_word(pre_id, post_id, int(packed_weights[post_id, pre_id])))
-            return np.asarray(words, dtype=np.uint32)
-
-        if packed_weights.ndim == 4:
-            out_channels, in_channels, kernel_h, kernel_w = packed_weights.shape
-            receptive_field = in_channels * kernel_h * kernel_w
-            for post_id in range(out_channels):
-                flat_kernel = packed_weights[post_id].reshape(-1)
-                for pre_id in range(receptive_field):
-                    words.append(pack_word(pre_id, post_id, int(flat_kernel[pre_id])))
-            return np.asarray(words, dtype=np.uint32)
-
-        raise WeightLoadError(
-            f"Unsupported weight tensor shape for DMA packing: {weights_arr.shape}",
-            weight_shape=weights_arr.shape,
-            error_code=3011,
-        )
-
-    def get_packed_weight_words(self, weights: np.ndarray) -> np.ndarray:
-        """Public helper: return the packed 32-bit synapse words without sending.
-
-        Use this to inspect and compare the host-generated packets with any
-        on-target captures (e.g. S2MM dump or logic analyzer output).
-        """
-        return self._pack_weight_words(weights)
 
     
     def send_spike_event(self, neuron_id: int, timestamp: float, weight: float = 1.0) -> None:
@@ -1088,41 +886,52 @@ class SNNAccelerator:
         if self.use_xrt and self._xrt_backend is not None:
             return self._run_simulation_xrt(duration, input_spikes)
 
-        # PYNQ hardware path with DMA-backed spike streaming.
-        dma_output = self._run_simulation_dma(input_spikes)
-        if dma_output is not None:
-            return dma_output
-
-        # PYNQ hardware path
-        while not self.spike_queue.empty():
-            self.spike_queue.get()
-        while not self.output_queue.empty():
-            self.output_queue.get()
-
-        self.start_processing()
-        start_time = time.time()
-        for spike in sorted(input_spikes, key=lambda x: x.timestamp):
-            self.send_spike_event(spike.neuron_id, spike.timestamp, spike.weight)
-
-        elapsed = 0.0
-        output_spikes: List[SpikeEvent] = []
-        while elapsed < duration:
-            while not self.output_queue.empty():
-                output_spikes.append(self.output_queue.get())
-            time.sleep(0.01)
-            elapsed = time.time() - start_time
-
-        self.stop_processing()
-        while not self.output_queue.empty():
-            output_spikes.append(self.output_queue.get())
-
-        logger.info(
-            "Hardware simulation completed: %d input spikes, %d output spikes",
-            len(input_spikes),
-            len(output_spikes),
-        )
+        # --- NEW PYNQ HARDWARE DMA PATH ---
+        ip = self._hardware_backend.ip
+        dma = self._hardware_backend.dma_spikes
+        
+        # 1. Setup IP Registers using the correct hardware offsets
+        time_steps = int(duration / self.timestep_dt)
+        ip.write(0x20, 0)          # mode_reg = 0 (Inference)
+        ip.write(0x28, time_steps) # time_steps_reg
+        
+        # 2. Start IP (Enable AP_START and AUTO_RESTART)
+        ip.write(0x00, 0x81) 
+        
+        # 3. Pack input spikes into 32-bit AER words
+        if len(input_spikes) > 0:
+            packed_bytes = self._pack_spike_events(input_spikes)
+            input_buffer = allocate(shape=(len(input_spikes),), dtype=np.uint32)
+            np.copyto(input_buffer, np.frombuffer(packed_bytes, dtype=np.uint32))
+        else:
+            input_buffer = allocate(shape=(1,), dtype=np.uint32)
+            
+        # 4. Prepare output buffer for the receive channel
+        MAX_OUT = 4000
+        output_buffer = allocate(shape=(MAX_OUT,), dtype=np.uint32)
+        
+        # 5. Execute DMA Transfers
+        # Always start the receive channel first to catch immediate outputs
+        dma.recvchannel.transfer(output_buffer)
+        
+        if len(input_spikes) > 0:
+            dma.sendchannel.transfer(input_buffer)
+            dma.sendchannel.wait()
+            
+        # Allow a fixed window for hardware execution and trace capture
+        time.sleep(0.5) 
+        
+        # 6. Read output spike count from the correct register
+        num_output_spikes = ip.read(0x68) 
+        
+        # 7. Unpack results
+        output_spikes = []
+        if num_output_spikes > 0:
+            count = min(num_output_spikes, MAX_OUT)
+            output_bytes = output_buffer[:count].tobytes()
+            output_spikes = self._unpack_spike_events(output_bytes)
+            
         return output_spikes
-
     # ------------------------------------------------------------------
     # High-level convenience APIs
     # ------------------------------------------------------------------
@@ -1358,21 +1167,6 @@ class SNNAccelerator:
             "Learning params written via legacy map (0x200/0x204). "
             "Use XRT backend for full learning_params_t support."
         )
-
-    def set_hardware_neuron_parameters(self, threshold: int, leak: int, refractory_period: int) -> None:
-        """Set the neuron parameters on the hardware."""
-        if self.simulation_mode:
-            logger.debug("Simulation mode: skipping hardware neuron parameter configuration")
-            return
-
-        if self._hardware_backend is None or self._hardware_backend.ip is None:
-            raise RuntimeError("Hardware backend not initialised")
-
-        ip = self._hardware_backend.ip
-        ip.write(0x10, threshold)
-        ip.write(0x14, leak)
-        ip.write(0x18, refractory_period)
-        logger.info(f"Set hardware neuron parameters: threshold={threshold}, leak={leak}, refractory={refractory_period}")
     
     def get_performance_stats(self) -> Dict:
         """Get performance statistics from the accelerator."""
@@ -1527,22 +1321,3 @@ class SNNAccelerator:
             if layer.weights is None:
                 continue
             self._load_weights(layer.weights)
-
-        self._warmup_hardware_core()
-
-    def _warmup_hardware_core(self, timeout_s: float = 0.25) -> None:
-        """Run a short one-shot launch so the HLS core clears one-time init work."""
-        if self._hardware_backend is None or self._hardware_backend.ip is None:
-            return
-
-        ip = self._hardware_backend.ip
-        try:
-            ip.write(0x00, 0x01)
-            deadline = time.monotonic() + timeout_s
-            while time.monotonic() < deadline:
-                ap = int(ip.read(0x00))
-                if ap & 0x06:
-                    break
-                time.sleep(0.005)
-        finally:
-            ip.write(0x00, 0x00)
