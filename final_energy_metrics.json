@@ -1,0 +1,41 @@
+{
+  "inference_json": "mnist_results.json",
+  "power_json": "power_active.json",
+  "n_images": 10000,
+  "power": {
+    "active_w": 0.8468,
+    "idle_w": null,
+    "board_dynamic_w": null,
+    "source": "xadc",
+    "uncertainty_frac": 0.2,
+    "xpa_dynamic_w": 1.74
+  },
+  "latency": {
+    "system_ms_per_img": 4.323300766944886,
+    "pl_clock_hz": 80000000.0,
+    "pl_first_spike_cycles_mean": 12.0,
+    "pl_first_spike_ms_mean": 0.00015,
+    "pl_service_cycles_mean": 11.0,
+    "pl_service_ms_mean": 0.0001375
+  },
+  "events_per_img": {
+    "input_spikes": 150.0,
+    "router_spikes": 150.0,
+    "neuron_spikes": 150.0
+  },
+  "energy_mj_per_img": {
+    "board_e2e": 3.6609710894489296,
+    "board_first_spike_window": 0.00012702,
+    "board_service_window": 0.000116435,
+    "board_dynamic_service_window": null,
+    "pl_dynamic_first_spike_window": 0.000261,
+    "pl_dynamic_service_window": 0.00023925000000000001
+  },
+  "energy_uj_per_event": {
+    "board_e2e_per_input_spike": 24.40647392965953,
+    "board_e2e_per_router_spike": 24.40647392965953,
+    "board_e2e_per_neuron_spike": 24.40647392965953,
+    "board_service_per_input_spike": 0.0007762333333333334,
+    "pl_dynamic_service_per_input_spike": 0.001595
+  }
+}

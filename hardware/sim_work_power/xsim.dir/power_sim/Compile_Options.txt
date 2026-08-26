@@ -1,0 +1,1 @@
+-debug "typical" "tb_snn_power_sweep" -s "power_sim" 

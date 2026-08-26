@@ -1,0 +1,8 @@
+0.7
+2020.2
+Nov 14 2025
+12:36:23
+/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/common/fifo.v,1785144606,verilog,,/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/sim/tb_snn_power_sweep.v,,fifo,,,,,,,,
+/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/neurons/lif_neuron_array.v,1785144606,verilog,,/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/common/fifo.v,,lif_neuron_array,,,,,,,,
+/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/router/spike_router.v,1785144606,verilog,,/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/neurons/lif_neuron_array.v,,spike_router,,,,,,,,
+/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/sim/tb_snn_power_sweep.v,1785144606,verilog,,,,tb_snn_power_sweep,,,,,,,,

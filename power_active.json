@@ -1,0 +1,15 @@
+{
+  "mode": "standalone",
+  "duration_s": 60.0,
+  "n_samples": 1200,
+  "mean_total_W": 0.8468,
+  "min_total_W": 0.8452,
+  "max_total_W": 0.8481,
+  "per_rail": {
+    "XADC_TOTAL": {
+      "mean_W": 0.8468,
+      "min_W": 0.8452,
+      "max_W": 0.8481
+    }
+  }
+}
