@@ -1,0 +1,140 @@
+
+
+================================================================
+== Vitis HLS Report for 'snn_top_hls_Pipeline_RESET_TRACES'
+================================================================
+* Date:           Mon Aug 24 12:06:02 2026
+
+* Version:        2025.2 (Build 6295257 on Nov 14 2025)
+* Project:        hls_output
+* Solution:       hls (Vivado IP Flow Target)
+* Product family: zynq
+* Target device:  xc7z020-clg400-1
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+----------+----------+------------+
+    |  Clock |  Target  | Estimated| Uncertainty|
+    +--------+----------+----------+------------+
+    |ap_clk  |  10.00 ns|  5.590 ns|     2.70 ns|
+    +--------+----------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+-----------+-----------+-----+-----+-------------------+
+    |  Latency (cycles) |   Latency (absolute)  |  Interval |      Pipeline     |
+    |   min   |   max   |    min    |    max    | min | max |        Type       |
+    +---------+---------+-----------+-----------+-----+-----+-------------------+
+    |     4892|     4892|  48.920 us|  48.920 us|    0|    0|  loop pipeline stp|
+    +---------+---------+-----------+-----------+-----+-----+-------------------+
+
+    + Detail: 
+        * Instance: 
+        N/A
+
+        * Loop: 
+        +----------------+---------+---------+----------+-----------+-----------+------+----------+
+        |                |  Latency (cycles) | Iteration|  Initiation Interval  | Trip |          |
+        |    Loop Name   |   min   |   max   |  Latency |  achieved |   target  | Count| Pipelined|
+        +----------------+---------+---------+----------+-----------+-----------+------+----------+
+        |- RESET_TRACES  |     4890|     4890|         1|          1|          1|  4890|       yes|
+        +----------------+---------+---------+----------+-----------+-----------+------+----------+
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++-----------------+---------+-----+--------+-------+-----+
+|       Name      | BRAM_18K| DSP |   FF   |  LUT  | URAM|
++-----------------+---------+-----+--------+-------+-----+
+|DSP              |        -|    -|       -|      -|    -|
+|Expression       |        -|    -|       0|     28|    -|
+|FIFO             |        -|    -|       -|      -|    -|
+|Instance         |        -|    -|       -|      -|    -|
+|Memory           |        -|    -|       -|      -|    -|
+|Multiplexer      |        -|    -|       0|     27|    -|
+|Register         |        -|    -|      15|      -|    -|
++-----------------+---------+-----+--------+-------+-----+
+|Total            |        0|    0|      15|     55|    0|
++-----------------+---------+-----+--------+-------+-----+
+|Available        |      280|  220|  106400|  53200|    0|
++-----------------+---------+-----+--------+-------+-----+
+|Utilization (%)  |        0|    0|      ~0|     ~0|    0|
++-----------------+---------+-----+--------+-------+-----+
+
++ Detail: 
+    * Instance: 
+    N/A
+
+    * DSP: 
+    N/A
+
+    * Memory: 
+    N/A
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +---------------------+----------+----+---+----+------------+------------+
+    |    Variable Name    | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +---------------------+----------+----+---+----+------------+------------+
+    |add_ln790_fu_96_p2   |         +|   0|  0|  14|          13|           1|
+    |icmp_ln790_fu_90_p2  |      icmp|   0|  0|  14|          13|          13|
+    +---------------------+----------+----+---+----+------------+------------+
+    |Total                |          |   0|  0|  28|          26|          14|
+    +---------------------+----------+----+---+----+------------+------------+
+
+    * Multiplexer: 
+    +--------------------+----+-----------+-----+-----------+
+    |        Name        | LUT| Input Size| Bits| Total Bits|
+    +--------------------+----+-----------+-----+-----------+
+    |ap_done_int         |   9|          2|    1|          2|
+    |ap_sig_allocacmp_i  |   9|          2|   13|         26|
+    |i_1_fu_42           |   9|          2|   13|         26|
+    +--------------------+----+-----------+-----+-----------+
+    |Total               |  27|          6|   27|         54|
+    +--------------------+----+-----------+-----+-----------+
+
+    * Register: 
+    +-------------+----+----+-----+-----------+
+    |     Name    | FF | LUT| Bits| Const Bits|
+    +-------------+----+----+-----+-----------+
+    |ap_CS_fsm    |   1|   0|    1|          0|
+    |ap_done_reg  |   1|   0|    1|          0|
+    |i_1_fu_42    |  13|   0|   13|          0|
+    +-------------+----+----+-----+-----------+
+    |Total        |  15|   0|   15|          0|
+    +-------------+----+----+-----+-----------+
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++----------------------+-----+-----+------------+-----------------------------------+--------------+
+|       RTL Ports      | Dir | Bits|  Protocol  |           Source Object           |    C Type    |
++----------------------+-----+-----+------------+-----------------------------------+--------------+
+|ap_clk                |   in|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_RESET_TRACES|  return value|
+|ap_rst                |   in|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_RESET_TRACES|  return value|
+|ap_start              |   in|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_RESET_TRACES|  return value|
+|ap_done               |  out|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_RESET_TRACES|  return value|
+|ap_idle               |  out|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_RESET_TRACES|  return value|
+|ap_ready              |  out|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_RESET_TRACES|  return value|
+|pre_traces_address1   |  out|   13|   ap_memory|                         pre_traces|         array|
+|pre_traces_ce1        |  out|    1|   ap_memory|                         pre_traces|         array|
+|pre_traces_we1        |  out|    1|   ap_memory|                         pre_traces|         array|
+|pre_traces_d1         |  out|    8|   ap_memory|                         pre_traces|         array|
+|post_traces_address1  |  out|   13|   ap_memory|                        post_traces|         array|
+|post_traces_ce1       |  out|    1|   ap_memory|                        post_traces|         array|
+|post_traces_we1       |  out|    1|   ap_memory|                        post_traces|         array|
+|post_traces_d1        |  out|    8|   ap_memory|                        post_traces|         array|
++----------------------+-----+-----+------------+-----------------------------------+--------------+
+

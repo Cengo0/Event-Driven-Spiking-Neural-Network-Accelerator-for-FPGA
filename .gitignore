@@ -41,16 +41,16 @@ env/
 *.backup.*
 
 # Vivado project artifacts
-*.str
-*.wdb
-*.vcd
-.Xil/
-*.sim/
-*.cache/
-*.gen/
-*.hw/
-*.ip_user_files/
-*.runs/
+#*.str
+#*.wdb
+#*.vcd
+#.Xil/
+#*.sim/
+#*.cache/
+#*.gen/
+#*.hw/
+#*.ip_user_files/
+#*.runs/
 
 # ============================================================
 # HLS
@@ -66,16 +66,16 @@ hardware/hls/**/*.rlx
 hardware/hls/**/*.db
 
 # Vitis HLS build outputs
-hardware/hls/hls_output/
-hardware/hls/hls_csim_output/
-hardware/hls/snn_top_hls/
-hardware/hls/.Xil/
-hardware/hls/_x/
-hardware/hls/vitis_journal.py
+#hardware/hls/hls_output/
+#hardware/hls/hls_csim_output/
+#hardware/hls/snn_top_hls/
+#hardware/hls/.Xil/
+#hardware/hls/_x/
+#hardware/hls/vitis_journal.py
 
 # HLS test binaries
-hardware/hls/test/tb_snn_top
-hardware/hls/test/tb_*
+#hardware/hls/test/tb_snn_top
+#hardware/hls/test/tb_*
 !hardware/hls/test/tb_*.cpp
 
 # ============================================================
@@ -83,19 +83,19 @@ hardware/hls/test/tb_*
 # ============================================================
 
 # Simulation work directories
-hardware/sim_work/
-hardware/hdl/sim/
-hardware/hdl/build/
+#hardware/sim_work/
+#hardware/hdl/sim/
+#hardware/hdl/build/
 
 # Simulation outputs
-*.vvp
+#*.vvp
 
 # ============================================================
 # Build outputs (Vivado projects)
 # ============================================================
-build/
-hardware/build/
-hardware/ip_repo/
+#build/
+#hardware/build/
+#hardware/ip_repo/
 
 # ============================================================
 # Data / Models / Outputs
@@ -108,7 +108,7 @@ models/*
 !models/.gitkeep
 
 # Outputs — track reports and hwh, exclude large bitstreams
-outputs/*.bit
+#outputs/*.bit
 
 # ============================================================
 # Local research / working docs

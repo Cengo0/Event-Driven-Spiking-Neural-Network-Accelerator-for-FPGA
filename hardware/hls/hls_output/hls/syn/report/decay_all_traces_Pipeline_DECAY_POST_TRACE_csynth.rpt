@@ -1,0 +1,159 @@
+
+
+================================================================
+== Vitis HLS Report for 'decay_all_traces_Pipeline_DECAY_POST_TRACE'
+================================================================
+* Date:           Mon Aug 24 12:06:03 2026
+
+* Version:        2025.2 (Build 6295257 on Nov 14 2025)
+* Project:        hls_output
+* Solution:       hls (Vivado IP Flow Target)
+* Product family: zynq
+* Target device:  xc7z020-clg400-1
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+----------+----------+------------+
+    |  Clock |  Target  | Estimated| Uncertainty|
+    +--------+----------+----------+------------+
+    |ap_clk  |  10.00 ns|  7.173 ns|     2.70 ns|
+    +--------+----------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+-----------+-----------+-----+-----+-------------------+
+    |  Latency (cycles) |   Latency (absolute)  |  Interval |      Pipeline     |
+    |   min   |   max   |    min    |    max    | min | max |        Type       |
+    +---------+---------+-----------+-----------+-----+-----+-------------------+
+    |     4894|     4894|  48.940 us|  48.940 us|    0|    0|  loop pipeline stp|
+    +---------+---------+-----------+-----------+-----+-----+-------------------+
+
+    + Detail: 
+        * Instance: 
+        N/A
+
+        * Loop: 
+        +--------------------+---------+---------+----------+-----------+-----------+------+----------+
+        |                    |  Latency (cycles) | Iteration|  Initiation Interval  | Trip |          |
+        |      Loop Name     |   min   |   max   |  Latency |  achieved |   target  | Count| Pipelined|
+        +--------------------+---------+---------+----------+-----------+-----------+------+----------+
+        |- DECAY_POST_TRACE  |     4892|     4892|         4|          1|          1|  4890|       yes|
+        +--------------------+---------+---------+----------+-----------+-----------+------+----------+
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++-----------------+---------+-----+--------+-------+-----+
+|       Name      | BRAM_18K| DSP |   FF   |  LUT  | URAM|
++-----------------+---------+-----+--------+-------+-----+
+|DSP              |        -|    -|       -|      -|    -|
+|Expression       |        -|    -|       0|     45|    -|
+|FIFO             |        -|    -|       -|      -|    -|
+|Instance         |        -|    1|       0|      0|    -|
+|Memory           |        -|    -|       -|      -|    -|
+|Multiplexer      |        -|    -|       0|     36|    -|
+|Register         |        -|    -|     121|     32|    -|
++-----------------+---------+-----+--------+-------+-----+
+|Total            |        0|    1|     121|    113|    0|
++-----------------+---------+-----+--------+-------+-----+
+|Available        |      280|  220|  106400|  53200|    0|
++-----------------+---------+-----+--------+-------+-----+
+|Utilization (%)  |        0|   ~0|      ~0|     ~0|    0|
++-----------------+---------+-----+--------+-------+-----+
+
++ Detail: 
+    * Instance: 
+    +------------------------+--------------------+---------+----+---+----+-----+
+    |        Instance        |       Module       | BRAM_18K| DSP| FF| LUT| URAM|
+    +------------------------+--------------------+---------+----+---+----+-----+
+    |mul_8ns_8ns_16_3_1_U21  |mul_8ns_8ns_16_3_1  |        0|   1|  0|   0|    0|
+    +------------------------+--------------------+---------+----+---+----+-----+
+    |Total                   |                    |        0|   1|  0|   0|    0|
+    +------------------------+--------------------+---------+----+---+----+-----+
+
+    * DSP: 
+    N/A
+
+    * Memory: 
+    N/A
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +----------------------+----------+----+---+----+------------+------------+
+    |     Variable Name    | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +----------------------+----------+----+---+----+------------+------------+
+    |add_ln217_fu_107_p2   |         +|   0|  0|  14|          13|           1|
+    |sub_ln223_fu_142_p2   |         -|   0|  0|  15|           8|           8|
+    |icmp_ln217_fu_101_p2  |      icmp|   0|  0|  14|          13|          13|
+    |ap_enable_pp0         |       xor|   0|  0|   2|           1|           2|
+    +----------------------+----------+----+---+----+------------+------------+
+    |Total                 |          |   0|  0|  45|          35|          24|
+    +----------------------+----------+----+---+----+------------+------------+
+
+    * Multiplexer: 
+    +-------------------------+----+-----------+-----+-----------+
+    |           Name          | LUT| Input Size| Bits| Total Bits|
+    +-------------------------+----+-----------+-----+-----------+
+    |ap_done_int              |   9|          2|    1|          2|
+    |ap_enable_reg_pp0_iter1  |   9|          2|    1|          2|
+    |ap_sig_allocacmp_i       |   9|          2|   13|         26|
+    |i_5_fu_62                |   9|          2|   13|         26|
+    +-------------------------+----+-----------+-----+-----------+
+    |Total                    |  36|          8|   28|         56|
+    +-------------------------+----+-----------+-----+-----------+
+
+    * Register: 
+    +----------------------------------+----+----+-----+-----------+
+    |               Name               | FF | LUT| Bits| Const Bits|
+    +----------------------------------+----+----+-----+-----------+
+    |ap_CS_fsm                         |   1|   0|    1|          0|
+    |ap_done_reg                       |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter1           |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter2           |   1|   0|    1|          0|
+    |ap_enable_reg_pp0_iter3           |   1|   0|    1|          0|
+    |ap_loop_exit_ready_pp0_iter1_reg  |   1|   0|    1|          0|
+    |ap_loop_exit_ready_pp0_iter2_reg  |   1|   0|    1|          0|
+    |i_5_fu_62                         |  13|   0|   13|          0|
+    |post_traces_addr_reg_164          |  13|   0|   13|          0|
+    |t_reg_170                         |   8|   0|    8|          0|
+    |t_reg_170_pp0_iter2_reg           |   8|   0|    8|          0|
+    |zext_ln209_cast_reg_155           |   8|   0|   16|          8|
+    |post_traces_addr_reg_164          |  64|  32|   13|          0|
+    +----------------------------------+----+----+-----+-----------+
+    |Total                             | 121|  32|   78|          8|
+    +----------------------------------+----+----+-----+-----------+
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++----------------------+-----+-----+------------+--------------------------------------------+--------------+
+|       RTL Ports      | Dir | Bits|  Protocol  |                Source Object               |    C Type    |
++----------------------+-----+-----+------------+--------------------------------------------+--------------+
+|ap_clk                |   in|    1|  ap_ctrl_hs|  decay_all_traces_Pipeline_DECAY_POST_TRACE|  return value|
+|ap_rst                |   in|    1|  ap_ctrl_hs|  decay_all_traces_Pipeline_DECAY_POST_TRACE|  return value|
+|ap_start              |   in|    1|  ap_ctrl_hs|  decay_all_traces_Pipeline_DECAY_POST_TRACE|  return value|
+|ap_done               |  out|    1|  ap_ctrl_hs|  decay_all_traces_Pipeline_DECAY_POST_TRACE|  return value|
+|ap_idle               |  out|    1|  ap_ctrl_hs|  decay_all_traces_Pipeline_DECAY_POST_TRACE|  return value|
+|ap_ready              |  out|    1|  ap_ctrl_hs|  decay_all_traces_Pipeline_DECAY_POST_TRACE|  return value|
+|zext_ln209            |   in|    8|     ap_none|                                  zext_ln209|        scalar|
+|post_traces_address0  |  out|   13|   ap_memory|                                 post_traces|         array|
+|post_traces_ce0       |  out|    1|   ap_memory|                                 post_traces|         array|
+|post_traces_q0        |   in|    8|   ap_memory|                                 post_traces|         array|
+|post_traces_address1  |  out|   13|   ap_memory|                                 post_traces|         array|
+|post_traces_ce1       |  out|    1|   ap_memory|                                 post_traces|         array|
+|post_traces_we1       |  out|    1|   ap_memory|                                 post_traces|         array|
+|post_traces_d1        |  out|    8|   ap_memory|                                 post_traces|         array|
++----------------------+-----+-----+------------+--------------------------------------------+--------------+
+

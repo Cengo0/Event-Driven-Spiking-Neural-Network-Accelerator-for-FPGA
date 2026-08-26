@@ -1,0 +1,237 @@
+
+
+================================================================
+== Vitis HLS Report for 'process_pre_spike_aer'
+================================================================
+* Date:           Mon Aug 24 12:06:03 2026
+
+* Version:        2025.2 (Build 6295257 on Nov 14 2025)
+* Project:        hls_output
+* Solution:       hls (Vivado IP Flow Target)
+* Product family: zynq
+* Target device:  xc7z020-clg400-1
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+----------+----------+------------+
+    |  Clock |  Target  | Estimated| Uncertainty|
+    +--------+----------+----------+------------+
+    |ap_clk  |  10.00 ns|  6.649 ns|     2.70 ns|
+    +--------+----------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+----------+-----------+-----+------+---------+
+    |  Latency (cycles) |  Latency (absolute)  |  Interval  | Pipeline|
+    |   min   |   max   |    min   |    max    | min |  max |   Type  |
+    +---------+---------+----------+-----------+-----+------+---------+
+    |       27|     8379|  0.270 us|  83.790 us|   27|  8379|       no|
+    +---------+---------+----------+-----------+-----+------+---------+
+
+    + Detail: 
+        * Instance: 
+        +----------------------------------------------------+-----------------------------------------+---------+---------+----------+-----------+-----+-----+-------------------+
+        |                                                    |                                         |  Latency (cycles) |  Latency (absolute)  |  Interval |      Pipeline     |
+        |                      Instance                      |                  Module                 |   min   |   max   |    min   |    max    | min | max |        Type       |
+        +----------------------------------------------------+-----------------------------------------+---------+---------+----------+-----------+-----+-----+-------------------+
+        |grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_212  |process_pre_spike_aer_Pipeline_LTD_LOOP  |       25|     1039|  0.250 us|  10.390 us|    0|    0|  loop pipeline stp|
+        +----------------------------------------------------+-----------------------------------------+---------+---------+----------+-----------+-----+-----+-------------------+
+
+        * Loop: 
+        +-----------------+---------+---------+----------+-----------+-----------+------+----------+
+        |                 |  Latency (cycles) | Iteration|  Initiation Interval  | Trip |          |
+        |    Loop Name    |   min   |   max   |  Latency |  achieved |   target  | Count| Pipelined|
+        +-----------------+---------+---------+----------+-----------+-----------+------+----------+
+        |- LTD_CONN_LOOP  |       24|     8376|  3 ~ 1047|          -|          -|     8|        no|
+        +-----------------+---------+---------+----------+-----------+-----------+------+----------+
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++-----------------+---------+-----+--------+-------+-----+
+|       Name      | BRAM_18K| DSP |   FF   |  LUT  | URAM|
++-----------------+---------+-----+--------+-------+-----+
+|DSP              |        -|    1|       -|      -|    -|
+|Expression       |        -|    -|       0|    144|    -|
+|FIFO             |        -|    -|       -|      -|    -|
+|Instance         |        -|    3|     581|    472|    -|
+|Memory           |        0|    -|      56|      9|    -|
+|Multiplexer      |        -|    -|       0|    146|    -|
+|Register         |        -|    -|     207|      -|    -|
++-----------------+---------+-----+--------+-------+-----+
+|Total            |        0|    4|     844|    771|    0|
++-----------------+---------+-----+--------+-------+-----+
+|Available        |      280|  220|  106400|  53200|    0|
++-----------------+---------+-----+--------+-------+-----+
+|Utilization (%)  |        0|    1|      ~0|      1|    0|
++-----------------+---------+-----+--------+-------+-----+
+
++ Detail: 
+    * Instance: 
+    +----------------------------------------------------+-----------------------------------------+---------+----+-----+-----+-----+
+    |                      Instance                      |                  Module                 | BRAM_18K| DSP|  FF | LUT | URAM|
+    +----------------------------------------------------+-----------------------------------------+---------+----+-----+-----+-----+
+    |grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_212  |process_pre_spike_aer_Pipeline_LTD_LOOP  |        0|   3|  581|  472|    0|
+    +----------------------------------------------------+-----------------------------------------+---------+----+-----+-----+-----+
+    |Total                                               |                                         |        0|   3|  581|  472|    0|
+    +----------------------------------------------------+-----------------------------------------+---------+----+-----+-----+-----+
+
+    * DSP: 
+    +-------------------------------------+---------------------------------+--------------+
+    |               Instance              |              Module             |  Expression  |
+    +-------------------------------------+---------------------------------+--------------+
+    |mac_muladd_14s_11ns_20ns_24_4_1_U66  |mac_muladd_14s_11ns_20ns_24_4_1  |  i0 + i1 * i2|
+    +-------------------------------------+---------------------------------+--------------+
+
+    * Memory: 
+    +----------------------------------+------------------------------------------------------------------+---------+----+----+-----+------+-----+------+-------------+
+    |              Memory              |                              Module                              | BRAM_18K| FF | LUT| URAM| Words| Bits| Banks| W*Bits*Banks|
+    +----------------------------------+------------------------------------------------------------------+---------+----+----+-----+------+-----+------+-------------+
+    |CONNECTION_TABLE_dst_id_start_U   |process_pre_spike_aer_CONNECTION_TABLE_dst_id_start_ROM_AUTO_1R   |        0|  13|   2|    0|     8|   13|     1|          104|
+    |CONNECTION_TABLE_dst_size_U       |process_pre_spike_aer_CONNECTION_TABLE_dst_size_ROM_AUTO_1R       |        0|  11|   2|    0|     8|   11|     1|           88|
+    |CONNECTION_TABLE_src_id_start_U   |process_pre_spike_aer_CONNECTION_TABLE_src_id_start_ROM_AUTO_1R   |        0|  12|   2|    0|     8|   12|     1|           96|
+    |CONNECTION_TABLE_weight_offset_U  |process_pre_spike_aer_CONNECTION_TABLE_weight_offset_ROM_AUTO_1R  |        0|  20|   3|    0|     8|   20|     1|          160|
+    +----------------------------------+------------------------------------------------------------------+---------+----+----+-----+------+-----+------+-------------+
+    |Total                             |                                                                  |        0|  56|   9|    0|    32|   56|     4|          448|
+    +----------------------------------+------------------------------------------------------------------+---------+----+----+-----+------+-----+------+-------------+
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +----------------------------------+----------+----+---+----+------------+------------+
+    |           Variable Name          | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +----------------------------------+----------+----+---+----+------------+------------+
+    |add_ln254_fu_321_p2               |         +|   0|  0|  13|           4|           1|
+    |add_ln265_fu_388_p2               |         +|   0|  0|  31|          24|          24|
+    |new_trace_fu_282_p2               |         +|   0|  0|  14|           9|           8|
+    |src_end_fu_345_p2                 |         +|   0|  0|  14|          13|          13|
+    |local_src_fu_373_p2               |         -|   0|  0|  17|          14|          14|
+    |ap_block_state11_on_subcall_done  |       and|   0|  0|   2|           1|           1|
+    |icmp_ln254_fu_315_p2              |      icmp|   0|  0|  13|           4|           5|
+    |icmp_ln259_1_fu_356_p2            |      icmp|   0|  0|  14|          13|          13|
+    |icmp_ln259_fu_351_p2              |      icmp|   0|  0|  14|          13|          13|
+    |or_ln259_fu_367_p2                |        or|   0|  0|   2|           1|           1|
+    |select_ln246_fu_300_p3            |    select|   0|  0|   8|           1|           2|
+    |xor_ln259_fu_361_p2               |       xor|   0|  0|   2|           1|           2|
+    +----------------------------------+----------+----+---+----+------------+------------+
+    |Total                             |          |   0|  0| 144|          98|          97|
+    +----------------------------------+----------+----+---+----+------------+------------+
+
+    * Multiplexer: 
+    +------------------------+----+-----------+-----+-----------+
+    |          Name          | LUT| Input Size| Bits| Total Bits|
+    +------------------------+----+-----------+-----+-----------+
+    |ap_NS_fsm               |  65|         12|    1|         12|
+    |c_fu_102                |   9|          2|    4|          8|
+    |learn_bridge_data       |   9|          2|    4|          8|
+    |learn_bridge_dst        |   9|          2|    7|         14|
+    |learn_bridge_dst_group  |   9|          2|    4|          8|
+    |learn_bridge_exc        |   9|          2|    1|          2|
+    |learn_bridge_group      |   9|          2|    4|          8|
+    |learn_bridge_is_inter   |   9|          2|    1|          2|
+    |learn_bridge_src        |   9|          2|    7|         14|
+    |learn_bridge_valid_o    |   9|          2|    1|          2|
+    +------------------------+----+-----------+-----+-----------+
+    |Total                   | 146|         30|   34|         78|
+    +------------------------+----+-----------+-----+-----------+
+
+    * Register: 
+    +-----------------------------------------------------------------+----+----+-----+-----------+
+    |                               Name                              | FF | LUT| Bits| Const Bits|
+    +-----------------------------------------------------------------+----+----+-----+-----------+
+    |CONNECTION_TABLE_dst_id_start_load_reg_530                       |  13|   0|   13|          0|
+    |CONNECTION_TABLE_weight_offset_load_reg_519                      |  20|   0|   20|          0|
+    |add_ln254_reg_468                                                |   4|   0|    4|          0|
+    |add_ln265_reg_545                                                |  24|   0|   24|          0|
+    |ap_CS_fsm                                                        |  11|   0|   11|          0|
+    |base_offset_reg_540                                              |  24|   0|   24|          0|
+    |c_fu_102                                                         |   4|   0|    4|          0|
+    |empty_reg_419                                                    |   7|   0|    7|          0|
+    |grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_212_ap_start_reg  |   1|   0|    1|          0|
+    |learn_bridge_data_reg                                            |   4|   0|    4|          0|
+    |learn_bridge_dst_group_reg                                       |   4|   0|    4|          0|
+    |learn_bridge_dst_reg                                             |   7|   0|    7|          0|
+    |learn_bridge_exc_reg                                             |   1|   0|    1|          0|
+    |learn_bridge_group_reg                                           |   4|   0|    4|          0|
+    |learn_bridge_is_inter_reg                                        |   1|   0|    1|          0|
+    |learn_bridge_src_reg                                             |   7|   0|    7|          0|
+    |learn_bridge_valid_o_reg                                         |   1|   0|    1|          0|
+    |local_src_reg_494                                                |  14|   0|   14|          0|
+    |or_ln259_reg_490                                                 |   1|   0|    1|          0|
+    |pre_traces_addr_reg_424                                          |  13|   0|   13|          0|
+    |pre_traces_load_reg_440                                          |   8|   0|    8|          0|
+    |src_group_reg_435                                                |   4|   0|    4|          0|
+    |tmp_25_reg_430                                                   |   2|   0|    2|          0|
+    |zext_ln254_reg_473                                               |   4|   0|   64|         60|
+    |zext_ln262_1_reg_524                                             |  11|   0|   24|         13|
+    |zext_ln289_reg_460                                               |  13|   0|   14|          1|
+    +-----------------------------------------------------------------+----+----+-----+-----------+
+    |Total                                                            | 207|   0|  281|         74|
+    +-----------------------------------------------------------------+----+----+-----+-----------+
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++------------------------------------+-----+-----+------------+---------------------------+--------------+
+|              RTL Ports             | Dir | Bits|  Protocol  |       Source Object       |    C Type    |
++------------------------------------+-----+-----+------------+---------------------------+--------------+
+|ap_clk                              |   in|    1|  ap_ctrl_hs|      process_pre_spike_aer|  return value|
+|ap_rst                              |   in|    1|  ap_ctrl_hs|      process_pre_spike_aer|  return value|
+|ap_start                            |   in|    1|  ap_ctrl_hs|      process_pre_spike_aer|  return value|
+|ap_done                             |  out|    1|  ap_ctrl_hs|      process_pre_spike_aer|  return value|
+|ap_idle                             |  out|    1|  ap_ctrl_hs|      process_pre_spike_aer|  return value|
+|ap_ready                            |  out|    1|  ap_ctrl_hs|      process_pre_spike_aer|  return value|
+|pre_id                              |   in|   13|     ap_none|                     pre_id|        scalar|
+|params_a_minus_val                  |   in|   16|     ap_none|         params_a_minus_val|        scalar|
+|params_learning_rate_val            |   in|   16|     ap_none|   params_learning_rate_val|        scalar|
+|learn_weight_ready                  |   in|    1|     ap_none|         learn_weight_ready|        scalar|
+|pre_traces_address0                 |  out|   13|   ap_memory|                 pre_traces|         array|
+|pre_traces_ce0                      |  out|    1|   ap_memory|                 pre_traces|         array|
+|pre_traces_q0                       |   in|    8|   ap_memory|                 pre_traces|         array|
+|pre_traces_address1                 |  out|   13|   ap_memory|                 pre_traces|         array|
+|pre_traces_ce1                      |  out|    1|   ap_memory|                 pre_traces|         array|
+|pre_traces_we1                      |  out|    1|   ap_memory|                 pre_traces|         array|
+|pre_traces_d1                       |  out|    8|   ap_memory|                 pre_traces|         array|
+|CONNECTION_TABLE_src_size_address0  |  out|    3|   ap_memory|  CONNECTION_TABLE_src_size|         array|
+|CONNECTION_TABLE_src_size_ce0       |  out|    1|   ap_memory|  CONNECTION_TABLE_src_size|         array|
+|CONNECTION_TABLE_src_size_q0        |   in|   11|   ap_memory|  CONNECTION_TABLE_src_size|         array|
+|post_traces_address0                |  out|   13|   ap_memory|                post_traces|         array|
+|post_traces_ce0                     |  out|    1|   ap_memory|                post_traces|         array|
+|post_traces_q0                      |   in|    8|   ap_memory|                post_traces|         array|
+|weight_memory_address0              |  out|   20|   ap_memory|              weight_memory|         array|
+|weight_memory_ce0                   |  out|    1|   ap_memory|              weight_memory|         array|
+|weight_memory_we0                   |  out|    1|   ap_memory|              weight_memory|         array|
+|weight_memory_d0                    |  out|    4|   ap_memory|              weight_memory|         array|
+|weight_memory_address1              |  out|   20|   ap_memory|              weight_memory|         array|
+|weight_memory_ce1                   |  out|    1|   ap_memory|              weight_memory|         array|
+|weight_memory_q1                    |   in|    4|   ap_memory|              weight_memory|         array|
+|learn_bridge_valid_i                |   in|    1|     ap_ovld|         learn_bridge_valid|       pointer|
+|learn_bridge_valid_o                |  out|    1|     ap_ovld|         learn_bridge_valid|       pointer|
+|learn_bridge_valid_o_ap_vld         |  out|    1|     ap_ovld|         learn_bridge_valid|       pointer|
+|learn_bridge_group                  |  out|    4|      ap_vld|         learn_bridge_group|       pointer|
+|learn_bridge_group_ap_vld           |  out|    1|      ap_vld|         learn_bridge_group|       pointer|
+|learn_bridge_src                    |  out|    7|      ap_vld|           learn_bridge_src|       pointer|
+|learn_bridge_src_ap_vld             |  out|    1|      ap_vld|           learn_bridge_src|       pointer|
+|learn_bridge_dst                    |  out|    7|      ap_vld|           learn_bridge_dst|       pointer|
+|learn_bridge_dst_ap_vld             |  out|    1|      ap_vld|           learn_bridge_dst|       pointer|
+|learn_bridge_data                   |  out|    4|      ap_vld|          learn_bridge_data|       pointer|
+|learn_bridge_data_ap_vld            |  out|    1|      ap_vld|          learn_bridge_data|       pointer|
+|learn_bridge_exc                    |  out|    1|      ap_vld|           learn_bridge_exc|       pointer|
+|learn_bridge_exc_ap_vld             |  out|    1|      ap_vld|           learn_bridge_exc|       pointer|
+|learn_bridge_is_inter               |  out|    1|      ap_vld|      learn_bridge_is_inter|       pointer|
+|learn_bridge_is_inter_ap_vld        |  out|    1|      ap_vld|      learn_bridge_is_inter|       pointer|
+|learn_bridge_dst_group              |  out|    4|      ap_vld|     learn_bridge_dst_group|       pointer|
+|learn_bridge_dst_group_ap_vld       |  out|    1|      ap_vld|     learn_bridge_dst_group|       pointer|
++------------------------------------+-----+-----+------------+---------------------------+--------------+
+

@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenRun Id="impl_1" LaunchPart="xc7z020clg400-1" LaunchTime="1787569126">
+  <File Type="POSTROUTE-PHYSOPT-RQS-RPT" Name="postroute_physopt_report_qor_suggestions_0.rpt"/>
+  <File Type="ROUTE-RQS-RPT" Name="route_report_qor_suggestions_0.rpt"/>
+  <File Type="POSTROUTE-PHYSOPT-RQS" Name="snn_integrated_top_postroute_physopted.rqs"/>
+  <File Type="ROUTE-RQS" Name="snn_integrated_top_routed.rqs"/>
+  <File Type="WBT-USG" Name="usage_statistics_webtalk.html"/>
+  <File Type="RDI-RDI" Name="snn_integrated_top.vdi"/>
+  <File Type="BG-DRC" Name="snn_integrated_top.drc"/>
+  <File Type="BG-BGN" Name="snn_integrated_top.bgn"/>
+  <File Type="BITSTR-SYSDEF" Name="snn_integrated_top.sysdef"/>
+  <File Type="BITSTR-LTX" Name="debug_nets.ltx"/>
+  <File Type="BITSTR-LTX" Name="snn_integrated_top.ltx"/>
+  <File Type="PL-LTX-FILE" Name="snn_integrated_top_pld.ltx"/>
+  <File Type="BOOT-LTX-FILE" Name="snn_integrated_top_boot.ltx"/>
+  <File Type="LTX-FILE" Name="snn_integrated_top.ltx"/>
+  <File Type="PL-BIF-FILE" Name="snn_integrated_top_pld.bif"/>
+  <File Type="BOOT-BIF-FILE" Name="snn_integrated_top_boot.bif"/>
+  <File Type="BIF-FILE" Name="snn_integrated_top.bif"/>
+  <File Type="MMI-FILE" Name="snn_integrated_top.mmi"/>
+  <File Type="RBD_FILE" Name="snn_integrated_top.rbd"/>
+  <File Type="NPI_FILE" Name="snn_integrated_top.npi"/>
+  <File Type="PL_UNMASK_RCDO_FILE" Name="snn_integrated_top_pld_unmask.rcdo"/>
+  <File Type="PL_UNMASK_MARKER_RCDO_FILE" Name="snn_integrated_top_pld_unmask_markers.rcdo"/>
+  <File Type="PL_MASK_RCDO_FILE" Name="snn_integrated_top_pld_mask.rcdo"/>
+  <File Type="PL_MARKER_RCDO_FILE" Name="snn_integrated_top_pld_markers.rcdo"/>
+  <File Type="PL-CLEAR-RCDO-FILE" Name="snn_integrated_top_pld_clear.rcdo"/>
+  <File Type="PL-RCDO-FILE" Name="snn_integrated_top_pld.rcdo"/>
+  <File Type="PL_UNMASK_RNPI_FILE" Name="snn_integrated_top_pld_unmask.rnpi"/>
+  <File Type="PL_SHUTDOWN_RNPI_FILE" Name="snn_integrated_top_pld_shutdown.rnpi"/>
+  <File Type="PL_MASK_RNPI_FILE" Name="snn_integrated_top_pld_mask.rnpi"/>
+  <File Type="PL_MARKER_RNPI_FILE" Name="snn_integrated_top_pld_markers.rnpi"/>
+  <File Type="PL_RNPI_FILE" Name="snn_integrated_top_pld.rnpi"/>
+  <File Type="BOOT_MARKER_RNPI_FILE" Name="snn_integrated_top_boot_markers.rnpi"/>
+  <File Type="BOOT_RNPI_FILE" Name="snn_integrated_top_boot.rnpi"/>
+  <File Type="MARKER-RCDO-FILE" Name="snn_integrated_top_markers.rcdo"/>
+  <File Type="ROUTE-BLACKBOX-DCP" Name="snn_integrated_top_routed_bb.dcp"/>
+  <File Type="ROUTE-DCP" Name="snn_integrated_top_routed.dcp"/>
+  <File Type="ROUTE-DRC-RPX" Name="snn_integrated_top_drc_routed.rpx"/>
+  <File Type="ROUTE-ERROR-DCP" Name="snn_integrated_top_routed_error.dcp"/>
+  <File Type="MARKER-RNPI-FILE" Name="snn_integrated_top_markers.rnpi"/>
+  <File Type="PHYSOPT-TIMING" Name="snn_integrated_top_timing_summary_physopted.rpt"/>
+  <File Type="PHYSOPT-DRC" Name="snn_integrated_top_drc_physopted.rpt"/>
+  <File Type="PHYSOPT-DCP" Name="snn_integrated_top_physopt.dcp"/>
+  <File Type="POSTPLACE-PWROPT-DCP" Name="snn_integrated_top_postplace_pwropt.dcp"/>
+  <File Type="NOC_SOLUTION_FILE" Name="snn_integrated_top.ncr"/>
+  <File Type="ROUTE-DRC-PB" Name="snn_integrated_top_drc_routed.pb"/>
+  <File Type="ROUTE-UTIL-PB" Name="snn_integrated_top_utilization_routed.pb"/>
+  <File Type="PLACE-UTIL-PB" Name="snn_integrated_top_utilization_placed.pb"/>
+  <File Type="PLACE-TIMING" Name="snn_integrated_top_timing_summary_placed.rpt"/>
+  <File Type="PLACE-CTRL" Name="snn_integrated_top_control_sets_placed.rpt"/>
+  <File Type="OPT-UTIL-PB" Name="snn_integrated_top_utilization_opted.pb"/>
+  <File Type="PLACE-UTIL" Name="snn_integrated_top_utilization_placed.rpt"/>
+  <File Type="OPT-UTIL" Name="snn_integrated_top_utilization_opted.rpt"/>
+  <File Type="PA-TCL" Name="snn_integrated_top.tcl"/>
+  <File Type="ROUTE-BUS-SKEW-PB" Name="snn_integrated_top_bus_skew_routed.pb"/>
+  <File Type="OPT-DRC" Name="snn_integrated_top_drc_opted.rpt"/>
+  <File Type="POSTPLACE-PWROPT-TIMING" Name="snn_integrated_top_timing_summary_postplace_pwropted.rpt"/>
+  <File Type="OPT-DCP" Name="snn_integrated_top_opt.dcp"/>
+  <File Type="ROUTE-DRC" Name="snn_integrated_top_drc_routed.rpt"/>
+  <File Type="PWROPT-TIMING" Name="snn_integrated_top_timing_summary_pwropted.rpt"/>
+  <File Type="REPORTS-TCL" Name="snn_integrated_top_reports.tcl"/>
+  <File Type="ROUTE-BUS-SKEW-RPX" Name="snn_integrated_top_bus_skew_routed.rpx"/>
+  <File Type="PWROPT-DRC" Name="snn_integrated_top_drc_pwropted.rpt"/>
+  <File Type="PLACE-SIMILARITY" Name="snn_integrated_top_incremental_reuse_placed.rpt"/>
+  <File Type="INIT-TIMING" Name="snn_integrated_top_timing_summary_init.rpt"/>
+  <File Type="OPT-METHODOLOGY-DRC" Name="snn_integrated_top_methodology_drc_opted.rpt"/>
+  <File Type="OPT-HWDEF" Name="snn_integrated_top.hwdef"/>
+  <File Type="ROUTE-UTIL" Name="snn_integrated_top_utilization_routed.rpt"/>
+  <File Type="PLACE-CLK" Name="snn_integrated_top_clock_utilization_placed.rpt"/>
+  <File Type="PLACE-PRE-SIMILARITY" Name="snn_integrated_top_incremental_reuse_pre_placed.rpt"/>
+  <File Type="OPT-TIMING" Name="snn_integrated_top_timing_summary_opted.rpt"/>
+  <File Type="PWROPT-DCP" Name="snn_integrated_top_pwropt.dcp"/>
+  <File Type="NOC_TRAFFIC_SPEC_FILE" Name="snn_integrated_top.nts"/>
+  <File Type="PLACE-DCP" Name="snn_integrated_top_placed.dcp"/>
+  <File Type="OPT-RQA-PB" Name="snn_integrated_top_rqa_opted.pb"/>
+  <File Type="PLACE-IO" Name="snn_integrated_top_io_placed.rpt"/>
+  <File Type="PLACE-RQA-PB" Name="snn_integrated_top_rqa_placed.pb"/>
+  <File Type="ROUTE-METHODOLOGY-DRC" Name="snn_integrated_top_methodology_drc_routed.rpt"/>
+  <File Type="ROUTE-METHODOLOGY-DRC-RPX" Name="snn_integrated_top_methodology_drc_routed.rpx"/>
+  <File Type="ROUTE-METHODOLOGY-DRC-PB" Name="snn_integrated_top_methodology_drc_routed.pb"/>
+  <File Type="ROUTE-PWR" Name="snn_integrated_top_power_routed.rpt"/>
+  <File Type="ROUTE-PWR-SUM" Name="snn_integrated_top_power_summary_routed.pb"/>
+  <File Type="ROUTE-PWR-RPX" Name="snn_integrated_top_power_routed.rpx"/>
+  <File Type="ROUTE-STATUS" Name="snn_integrated_top_route_status.rpt"/>
+  <File Type="RCDO-FILE" Name="snn_integrated_top.rcdo"/>
+  <File Type="ROUTE-STATUS-PB" Name="snn_integrated_top_route_status.pb"/>
+  <File Type="ROUTE-TIMINGSUMMARY" Name="snn_integrated_top_timing_summary_routed.rpt"/>
+  <File Type="ROUTE-TIMING-PB" Name="snn_integrated_top_timing_summary_routed.pb"/>
+  <File Type="ROUTE-TIMING-RPX" Name="snn_integrated_top_timing_summary_routed.rpx"/>
+  <File Type="ROUTE-SIMILARITY" Name="snn_integrated_top_incremental_reuse_routed.rpt"/>
+  <File Type="ROUTE-CLK" Name="snn_integrated_top_clock_utilization_routed.rpt"/>
+  <File Type="ROUTE-BUS-SKEW" Name="snn_integrated_top_bus_skew_routed.rpt"/>
+  <File Type="ROUTE-RQS-PB" Name="snn_integrated_top_rqs_routed.pb"/>
+  <File Type="POSTROUTE-PHYSOPT-DCP" Name="snn_integrated_top_postroute_physopt.dcp"/>
+  <File Type="POSTROUTE-PHYSOPT-BLACKBOX-DCP" Name="snn_integrated_top_postroute_physopt_bb.dcp"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING" Name="snn_integrated_top_timing_summary_postroute_physopted.rpt"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING-PB" Name="snn_integrated_top_timing_summary_postroute_physopted.pb"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING-RPX" Name="snn_integrated_top_timing_summary_postroute_physopted.rpx"/>
+  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW" Name="snn_integrated_top_bus_skew_postroute_physopted.rpt"/>
+  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-PB" Name="snn_integrated_top_bus_skew_postroute_physopted.pb"/>
+  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-RPX" Name="snn_integrated_top_bus_skew_postroute_physopted.rpx"/>
+  <File Type="BG-BIT" Name="snn_integrated_top.bit"/>
+  <File Type="PDI-FILE" Name="snn_integrated_top.pdi"/>
+  <File Type="BG-BIN" Name="snn_integrated_top.bin"/>
+  <File Type="CFI_FILE" Name="snn_integrated_top.cfi"/>
+  <File Type="BITSTR-MSK" Name="snn_integrated_top.msk"/>
+  <File Type="RNPI_FILE" Name="snn_integrated_top.rnpi"/>
+  <File Type="BITSTR-RBT" Name="snn_integrated_top.rbt"/>
+  <File Type="BITSTR-NKY" Name="snn_integrated_top.nky"/>
+  <File Type="BITSTR-BMM" Name="snn_integrated_top_bd.bmm"/>
+  <File Type="BITSTR-MMI" Name="snn_integrated_top.mmi"/>
+  <File Type="BOOT-PDI-FILE" Name="snn_integrated_top_boot.pdi"/>
+  <File Type="PL-PDI-FILE" Name="snn_integrated_top_pld.pdi"/>
+  <File Type="RCFI_FILE" Name="snn_integrated_top.rcfi"/>
+  <FileSet Name="sources" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1" RelGenDir="$PGENDIR/sources_1">
+    <Filter Type="Srcs"/>
+    <File Path="$PPRDIR/../../hdl/rtl/common/snn_config_regs.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/bd/design_1/design_1.bd">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PGENDIR/sources_1/bd/design_1/hdl/design_1_wrapper.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../hdl/rtl/common/fifo.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../hdl/rtl/neurons/lif_neuron_array.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../hdl/rtl/router/spike_router.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../hdl/rtl/top/snn_integrated_top.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="DesignMode" Val="RTL"/>
+      <Option Name="TopModule" Val="snn_integrated_top"/>
+    </Config>
+  </FileSet>
+  <FileSet Name="constrs_in" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1" RelGenDir="$PGENDIR/constrs_1">
+    <Filter Type="Constrs"/>
+    <Config>
+      <Option Name="ConstrsType" Val="XDC"/>
+    </Config>
+  </FileSet>
+  <FileSet Name="utils" Type="Utils" RelSrcDir="$PSRCDIR/utils_1" RelGenDir="$PGENDIR/utils_1">
+    <Filter Type="Utils"/>
+    <Config>
+      <Option Name="TopAutoSet" Val="TRUE"/>
+    </Config>
+  </FileSet>
+  <Strategy Version="1" Minor="2">
+    <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2025">
+      <Desc>Default settings for Implementation.</Desc>
+    </StratHandle>
+    <Step Id="init_design"/>
+    <Step Id="opt_design"/>
+    <Step Id="power_opt_design"/>
+    <Step Id="place_design"/>
+    <Step Id="post_place_power_opt_design"/>
+    <Step Id="phys_opt_design"/>
+    <Step Id="route_design"/>
+    <Step Id="post_route_phys_opt_design"/>
+    <Step Id="write_bitstream"/>
+  </Strategy>
+  <BlockFileSet Type="BlockSrcs" Name="design_1_proc_sys_reset_0_0"/>
+  <BlockFileSet Type="BlockSrcs" Name="design_1_axi_dma_0_0"/>
+  <BlockFileSet Type="BlockSrcs" Name="design_1_axi_interconnect_hp0_imp_auto_us_2"/>
+  <BlockFileSet Type="BlockSrcs" Name="design_1_axi_dma_1_0"/>
+  <BlockFileSet Type="BlockSrcs" Name="design_1_axi_interconnect_hp0_imp_auto_us_0"/>
+  <BlockFileSet Type="BlockSrcs" Name="design_1_axi_interconnect_hp0_imp_auto_us_3"/>
+  <BlockFileSet Type="BlockSrcs" Name="design_1_axi_interconnect_hp0_imp_auto_pc_2"/>
+  <BlockFileSet Type="BlockSrcs" Name="design_1_axi_interconnect_hp0_imp_auto_pc_3"/>
+  <BlockFileSet Type="BlockSrcs" Name="design_1_axi_interconnect_0_imp_xbar_0"/>
+  <BlockFileSet Type="BlockSrcs" Name="design_1_snn_top_hls_0_0"/>
+  <BlockFileSet Type="BlockSrcs" Name="design_1_snn_config_regs_0_0"/>
+  <BlockFileSet Type="BlockSrcs" Name="design_1_axi_interconnect_hp0_imp_auto_pc_1"/>
+  <BlockFileSet Type="BlockSrcs" Name="design_1_axi_interconnect_hp0_imp_auto_pc_0"/>
+  <BlockFileSet Type="BlockSrcs" Name="design_1_axi_interconnect_hp0_imp_auto_us_1"/>
+  <BlockFileSet Type="BlockSrcs" Name="design_1_processing_system7_0_0"/>
+  <BlockFileSet Type="BlockSrcs" Name="design_1_axi_interconnect_hp0_imp_xbar_0"/>
+  <BlockFileSet Type="BlockSrcs" Name="design_1_axi_interconnect_0_imp_auto_pc_0"/>
+</GenRun>

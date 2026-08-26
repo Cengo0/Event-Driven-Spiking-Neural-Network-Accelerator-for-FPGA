@@ -1,0 +1,364 @@
+#-----------------------------------------------------------
+# Vivado v2025.2 (64-bit)
+# SW Build 6299465 on Fri Nov 14 12:34:56 MST 2025
+# IP Build 6300035 on Fri Nov 14 10:48:45 MST 2025
+# SharedData Build 6298862 on Thu Nov 13 04:50:51 MST 2025
+# Start of session at: Mon Aug 24 12:52:47 2026
+# Process ID         : 2547280
+# Current directory  : /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.runs/design_1_axi_interconnect_hp0_imp_auto_pc_2_synth_1
+# Command line       : vivado -log design_1_axi_interconnect_hp0_imp_auto_pc_2.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source design_1_axi_interconnect_hp0_imp_auto_pc_2.tcl
+# Log file           : /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.runs/design_1_axi_interconnect_hp0_imp_auto_pc_2_synth_1/design_1_axi_interconnect_hp0_imp_auto_pc_2.vds
+# Journal file       : /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.runs/design_1_axi_interconnect_hp0_imp_auto_pc_2_synth_1/vivado.jou
+# Running On         : Mariana
+# Platform           : Ubuntu
+# Operating System   : Ubuntu 22.04.5 LTS
+# Processor Detail   : Intel(R) Xeon(R) CPU E5-2620 v4 @ 2.10GHz
+# CPU Frequency      : 1235.310 MHz
+# CPU Physical cores : 8
+# CPU Logical cores  : 16
+# Host memory        : 67332 MB
+# Swap memory        : 2147 MB
+# Total Virtual      : 69479 MB
+# Available Virtual  : 57633 MB
+#-----------------------------------------------------------
+source design_1_axi_interconnect_hp0_imp_auto_pc_2.tcl -notrace
+create_project: Time (s): cpu = 00:00:26 ; elapsed = 00:00:07 . Memory (MB): peak = 1614.555 ; gain = 64.055 ; free physical = 463 ; free virtual = 53350
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1700] Loaded user IP repository '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_output/hls/impl/ip'.
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/home/chipwisperer/AMD/2025.2/data/ip'.
+Command: synth_design -top design_1_axi_interconnect_hp0_imp_auto_pc_2 -part xc7z020clg400-1 -incremental_mode off -mode out_of_context
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7z020'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7z020'
+INFO: [Device 21-403] Loading part xc7z020clg400-1
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 7 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 2547543
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:09 ; elapsed = 00:00:10 . Memory (MB): peak = 2241.320 ; gain = 481.875 ; free physical = 430 ; free virtual = 49817
+---------------------------------------------------------------------------------
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_2' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.gen/sources_1/bd/design_1/ip/design_1_axi_interconnect_hp0_imp_auto_pc_2/synth/design_1_axi_interconnect_hp0_imp_auto_pc_2.v:53]
+INFO: [Synth 8-6157] synthesizing module 'axi_protocol_converter_v2_1_37_axi_protocol_converter' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.gen/sources_1/bd/design_1/ipshared/d98a/hdl/axi_protocol_converter_v2_1_vl_rfs.v:5285]
+INFO: [Synth 8-6157] synthesizing module 'axi_protocol_converter_v2_1_37_axi3_conv' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.gen/sources_1/bd/design_1/ipshared/d98a/hdl/axi_protocol_converter_v2_1_vl_rfs.v:951]
+INFO: [Synth 8-6157] synthesizing module 'axi_protocol_converter_v2_1_37_a_axi3_conv' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.gen/sources_1/bd/design_1/ipshared/d98a/hdl/axi_protocol_converter_v2_1_vl_rfs.v:60]
+INFO: [Synth 8-6157] synthesizing module 'axi_data_fifo_v2_1_36_axic_fifo' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.gen/sources_1/bd/design_1/ipshared/fb46/hdl/axi_data_fifo_v2_1_vl_rfs.v:62]
+INFO: [Synth 8-6157] synthesizing module 'axi_data_fifo_v2_1_36_fifo_gen' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.gen/sources_1/bd/design_1/ipshared/fb46/hdl/axi_data_fifo_v2_1_vl_rfs.v:165]
+INFO: [Synth 8-6157] synthesizing module 'xpm_cdc_async_rst' [/home/chipwisperer/AMD/2025.2/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv:1175]
+INFO: [Synth 8-6155] done synthesizing module 'xpm_cdc_async_rst' (0#1) [/home/chipwisperer/AMD/2025.2/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv:1175]
+INFO: [Synth 8-6155] done synthesizing module 'axi_data_fifo_v2_1_36_fifo_gen' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.gen/sources_1/bd/design_1/ipshared/fb46/hdl/axi_data_fifo_v2_1_vl_rfs.v:165]
+INFO: [Synth 8-6155] done synthesizing module 'axi_data_fifo_v2_1_36_axic_fifo' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.gen/sources_1/bd/design_1/ipshared/fb46/hdl/axi_data_fifo_v2_1_vl_rfs.v:62]
+INFO: [Synth 8-6155] done synthesizing module 'axi_protocol_converter_v2_1_37_a_axi3_conv' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.gen/sources_1/bd/design_1/ipshared/d98a/hdl/axi_protocol_converter_v2_1_vl_rfs.v:60]
+INFO: [Synth 8-6157] synthesizing module 'axi_protocol_converter_v2_1_37_r_axi3_conv' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.gen/sources_1/bd/design_1/ipshared/d98a/hdl/axi_protocol_converter_v2_1_vl_rfs.v:1784]
+INFO: [Synth 8-6155] done synthesizing module 'axi_protocol_converter_v2_1_37_r_axi3_conv' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.gen/sources_1/bd/design_1/ipshared/d98a/hdl/axi_protocol_converter_v2_1_vl_rfs.v:1784]
+INFO: [Synth 8-6155] done synthesizing module 'axi_protocol_converter_v2_1_37_axi3_conv' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.gen/sources_1/bd/design_1/ipshared/d98a/hdl/axi_protocol_converter_v2_1_vl_rfs.v:951]
+INFO: [Synth 8-6155] done synthesizing module 'axi_protocol_converter_v2_1_37_axi_protocol_converter' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.gen/sources_1/bd/design_1/ipshared/d98a/hdl/axi_protocol_converter_v2_1_vl_rfs.v:5285]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_2' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.gen/sources_1/bd/design_1/ip/design_1_axi_interconnect_hp0_imp_auto_pc_2/synth/design_1_axi_interconnect_hp0_imp_auto_pc_2.v:53]
+INFO: [Synth 8-6014] Unused sequential element NO_B_CHANNEL.cmd_b_depth_reg was removed.  [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.gen/sources_1/bd/design_1/ipshared/d98a/hdl/axi_protocol_converter_v2_1_vl_rfs.v:852]
+INFO: [Synth 8-6014] Unused sequential element S_AXI_AUSER_Q_reg was removed.  [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.gen/sources_1/bd/design_1/ipshared/d98a/hdl/axi_protocol_converter_v2_1_vl_rfs.v:280]
+INFO: [Synth 8-6014] Unused sequential element cmd_b_push_block_reg was removed.  [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.gen/sources_1/bd/design_1/ipshared/d98a/hdl/axi_protocol_converter_v2_1_vl_rfs.v:636]
+INFO: [Synth 8-3848] Net M_AXI_WID in module/entity axi_protocol_converter_v2_1_37_axi3_conv does not have driver. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.gen/sources_1/bd/design_1/ipshared/d98a/hdl/axi_protocol_converter_v2_1_vl_rfs.v:1054]
+INFO: [Synth 8-7129] Port ACLK in module axi_protocol_converter_v2_1_37_r_axi3_conv is either unconnected or has no load
+INFO: [Synth 8-7129] Port ARESET in module axi_protocol_converter_v2_1_37_r_axi3_conv is either unconnected or has no load
+INFO: [Synth 8-7129] Port ALMOST_FULL_I in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_FULL_I in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port ALMOST_EMPTY_I in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_EMPTY_I in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_ACK_I in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port VALID_I in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port OVERFLOW_I in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port UNDERFLOW_I in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port DATA_COUNT_I[5] in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port DATA_COUNT_I[4] in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port DATA_COUNT_I[3] in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port DATA_COUNT_I[2] in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port DATA_COUNT_I[1] in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port DATA_COUNT_I[0] in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_DATA_COUNT_I[5] in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_DATA_COUNT_I[4] in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_DATA_COUNT_I[3] in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_DATA_COUNT_I[2] in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_DATA_COUNT_I[1] in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_DATA_COUNT_I[0] in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port RD_DATA_COUNT_I[5] in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port RD_DATA_COUNT_I[4] in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port RD_DATA_COUNT_I[3] in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port RD_DATA_COUNT_I[2] in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port RD_DATA_COUNT_I[1] in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port RD_DATA_COUNT_I[0] in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port SBITERR_I in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port DBITERR_I in module output_blk is either unconnected or has no load
+INFO: [Synth 8-7129] Port SRST_FULL_FF in module wr_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_RST in module wr_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port SRST in module wr_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port SAFETY_CKT_WR_RST in module wr_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_PNTR_PLUS2[4] in module wr_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_PNTR_PLUS2[3] in module wr_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_PNTR_PLUS2[2] in module wr_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_PNTR_PLUS2[1] in module wr_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_PNTR_PLUS2[0] in module wr_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_PNTR_PLUS3[4] in module wr_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_PNTR_PLUS3[3] in module wr_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_PNTR_PLUS3[2] in module wr_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_PNTR_PLUS3[1] in module wr_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_PNTR_PLUS3[0] in module wr_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port SRST in module wr_bin_cntr is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_EN_INTO_LOGIC in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_RST_INTO_LOGIC in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port RD_EN in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_RST_BUSY in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port EMPTY in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port ALMOST_EMPTY in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_FULL_THRESH[4] in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_FULL_THRESH[3] in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_FULL_THRESH[2] in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_FULL_THRESH[1] in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_FULL_THRESH[0] in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_FULL_THRESH_ASSERT[4] in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_FULL_THRESH_ASSERT[3] in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_FULL_THRESH_ASSERT[2] in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_FULL_THRESH_ASSERT[1] in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_FULL_THRESH_ASSERT[0] in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_FULL_THRESH_NEGATE[4] in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_FULL_THRESH_NEGATE[3] in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_FULL_THRESH_NEGATE[2] in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_FULL_THRESH_NEGATE[1] in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_FULL_THRESH_NEGATE[0] in module wr_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port SRST in module rd_fwft is either unconnected or has no load
+INFO: [Synth 8-7129] Port SAFETY_CKT_RD_RST in module rd_fwft is either unconnected or has no load
+INFO: [Synth 8-7129] Port RAM_ALMOST_EMPTY in module rd_fwft is either unconnected or has no load
+INFO: [Synth 8-7129] Port SRST in module rd_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port SAFETY_CKT_RD_RST in module rd_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port RD_PNTR_PLUS2[4] in module rd_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port RD_PNTR_PLUS2[3] in module rd_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port RD_PNTR_PLUS2[2] in module rd_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port RD_PNTR_PLUS2[1] in module rd_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port RD_PNTR_PLUS2[0] in module rd_status_flags_ss is either unconnected or has no load
+INFO: [Synth 8-7129] Port SRST in module rd_bin_cntr is either unconnected or has no load
+INFO: [Synth 8-7129] Port RD_EN_INTO_LOGIC in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port RD_RST_INTO_LOGIC in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port RD_RST_BUSY in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port RST_FULL_FF in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port ALMOST_FULL_FB in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port FULL in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_PNTR_PLUS1_RD[4] in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_PNTR_PLUS1_RD[3] in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_PNTR_PLUS1_RD[2] in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_PNTR_PLUS1_RD[1] in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port WR_PNTR_PLUS1_RD[0] in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_EMPTY_THRESH[4] in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_EMPTY_THRESH[3] in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_EMPTY_THRESH[2] in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_EMPTY_THRESH[1] in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_EMPTY_THRESH[0] in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_EMPTY_THRESH_ASSERT[4] in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_EMPTY_THRESH_ASSERT[3] in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_EMPTY_THRESH_ASSERT[2] in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_EMPTY_THRESH_ASSERT[1] in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_EMPTY_THRESH_ASSERT[0] in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_EMPTY_THRESH_NEGATE[4] in module rd_logic is either unconnected or has no load
+INFO: [Synth 8-7129] Port PROG_EMPTY_THRESH_NEGATE[3] in module rd_logic is either unconnected or has no load
+INFO: [Common 17-14] Message 'Synth 8-7129' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:17 ; elapsed = 00:00:18 . Memory (MB): peak = 2451.258 ; gain = 691.812 ; free physical = 410 ; free virtual = 49026
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:17 ; elapsed = 00:00:18 . Memory (MB): peak = 2451.258 ; gain = 691.812 ; free physical = 410 ; free virtual = 49029
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:17 ; elapsed = 00:00:18 . Memory (MB): peak = 2451.258 ; gain = 691.812 ; free physical = 410 ; free virtual = 49029
+---------------------------------------------------------------------------------
+Netlist sorting complete. Time (s): cpu = 00:00:00.02 ; elapsed = 00:00:00.02 . Memory (MB): peak = 2451.258 ; gain = 0.000 ; free physical = 411 ; free virtual = 49029
+INFO: [Project 1-570] Preparing netlist for logic optimization
+
+Processing XDC Constraints
+Initializing timing engine
+Parsing XDC File [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.gen/sources_1/bd/design_1/ip/design_1_axi_interconnect_hp0_imp_auto_pc_2/design_1_axi_interconnect_hp0_imp_auto_pc_2_ooc.xdc] for cell 'inst'
+Finished Parsing XDC File [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.gen/sources_1/bd/design_1/ip/design_1_axi_interconnect_hp0_imp_auto_pc_2/design_1_axi_interconnect_hp0_imp_auto_pc_2_ooc.xdc] for cell 'inst'
+Parsing XDC File [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.runs/design_1_axi_interconnect_hp0_imp_auto_pc_2_synth_1/dont_touch.xdc]
+Finished Parsing XDC File [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.runs/design_1_axi_interconnect_hp0_imp_auto_pc_2_synth_1/dont_touch.xdc]
+INFO: [Project 1-1714] 1 XPM XDC files have been applied to the design.
+Completed Processing XDC Constraints
+
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2497.215 ; gain = 0.000 ; free physical = 411 ; free virtual = 49029
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Constraint Validation Runtime : Time (s): cpu = 00:00:00.03 ; elapsed = 00:00:00.02 . Memory (MB): peak = 2497.250 ; gain = 0.000 ; free physical = 412 ; free virtual = 49030
+INFO: [Designutils 20-5008] Incremental synthesis strategy off
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:28 ; elapsed = 00:00:30 . Memory (MB): peak = 2497.250 ; gain = 737.805 ; free physical = 409 ; free virtual = 49028
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xc7z020clg400-1
+---------------------------------------------------------------------------------
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:28 ; elapsed = 00:00:30 . Memory (MB): peak = 2505.219 ; gain = 745.773 ; free physical = 408 ; free virtual = 49027
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying 'set_property' XDC Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:28 ; elapsed = 00:00:30 . Memory (MB): peak = 2505.219 ; gain = 745.773 ; free physical = 406 ; free virtual = 49028
+---------------------------------------------------------------------------------
+INFO: [Synth 8-802] inferred FSM for state register 'gpregsm1.curr_fwft_state_reg' in module 'rd_fwft'
+INFO: [Synth 8-6159] Found Keep on FSM register 'gpregsm1.curr_fwft_state_reg' in module 'rd_fwft', re-encoding will not be performed
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                 invalid |                               00 |                               00
+            stage1_valid |                               10 |                               10
+       both_stages_valid |                               11 |                               11
+            stage2_valid |                               01 |                               01
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:29 ; elapsed = 00:00:31 . Memory (MB): peak = 2505.219 ; gain = 745.773 ; free physical = 543 ; free virtual = 49021
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 220 (col length:60)
+BRAMs: 280 (col length: RAMB18 60 RAMB36 30)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:32 ; elapsed = 00:00:33 . Memory (MB): peak = 2505.219 ; gain = 745.773 ; free physical = 573 ; free virtual = 49003
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying XDC Timing Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:40 ; elapsed = 00:00:42 . Memory (MB): peak = 2519.219 ; gain = 759.773 ; free physical = 493 ; free virtual = 48931
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:00:40 ; elapsed = 00:00:42 . Memory (MB): peak = 2541.250 ; gain = 781.805 ; free physical = 477 ; free virtual = 48915
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:00:41 ; elapsed = 00:00:42 . Memory (MB): peak = 2549.258 ; gain = 789.812 ; free physical = 462 ; free virtual = 48900
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:00:46 ; elapsed = 00:00:48 . Memory (MB): peak = 2720.070 ; gain = 960.625 ; free physical = 479 ; free virtual = 48516
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:00:46 ; elapsed = 00:00:48 . Memory (MB): peak = 2720.070 ; gain = 960.625 ; free physical = 479 ; free virtual = 48516
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:46 ; elapsed = 00:00:48 . Memory (MB): peak = 2720.070 ; gain = 960.625 ; free physical = 479 ; free virtual = 48516
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:00:46 ; elapsed = 00:00:48 . Memory (MB): peak = 2720.070 ; gain = 960.625 ; free physical = 479 ; free virtual = 48516
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:46 ; elapsed = 00:00:48 . Memory (MB): peak = 2720.070 ; gain = 960.625 ; free physical = 479 ; free virtual = 48516
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:00:46 ; elapsed = 00:00:48 . Memory (MB): peak = 2720.070 ; gain = 960.625 ; free physical = 479 ; free virtual = 48516
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++-+--------------+----------+
+| |BlackBox name |Instances |
++-+--------------+----------+
++-+--------------+----------+
+
+Report Cell Usage: 
++------+---------+------+
+|      |Cell     |Count |
++------+---------+------+
+|1     |CARRY4   |     8|
+|2     |LUT1     |    16|
+|3     |LUT2     |    20|
+|4     |LUT3     |    21|
+|5     |LUT4     |    22|
+|6     |LUT5     |    67|
+|7     |LUT6     |    25|
+|8     |RAM32X1D |     1|
+|9     |FDCE     |    23|
+|10    |FDPE     |    11|
+|11    |FDRE     |   132|
++------+---------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:00:46 ; elapsed = 00:00:48 . Memory (MB): peak = 2720.070 ; gain = 960.625 ; free physical = 479 ; free virtual = 48516
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 0 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:43 ; elapsed = 00:00:45 . Memory (MB): peak = 2720.070 ; gain = 914.633 ; free physical = 463 ; free virtual = 48500
+Synthesis Optimization Complete : Time (s): cpu = 00:00:46 ; elapsed = 00:00:48 . Memory (MB): peak = 2720.078 ; gain = 960.625 ; free physical = 463 ; free virtual = 48500
+INFO: [Project 1-571] Translating synthesized netlist
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.01 . Memory (MB): peak = 2720.078 ; gain = 0.000 ; free physical = 463 ; free virtual = 48500
+INFO: [Netlist 29-17] Analyzing 9 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2776.098 ; gain = 0.000 ; free physical = 723 ; free virtual = 48760
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 1 instances were transformed.
+  RAM32X1D => RAM32X1D (RAMD32(x2)): 1 instance 
+
+Synth Design complete | Checksum: 56d8a7e9
+INFO: [Common 17-83] Releasing license: Synthesis
+142 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:00:58 ; elapsed = 00:00:55 . Memory (MB): peak = 2776.133 ; gain = 1161.578 ; free physical = 722 ; free virtual = 48759
+INFO: [Common 17-2834] synth_design peak Physical Memory [PSS] (MB): overall = 1652.562; main = 1652.562; forked = 202.254
+INFO: [Common 17-2834] synth_design peak Virtual Memory [VSS] (MB): overall = 3491.535; main = 2776.102; forked = 986.312
+Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2800.109 ; gain = 0.000 ; free physical = 722 ; free virtual = 48759
+INFO: [Common 17-1381] The checkpoint '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.runs/design_1_axi_interconnect_hp0_imp_auto_pc_2_synth_1/design_1_axi_interconnect_hp0_imp_auto_pc_2.dcp' has been generated.
+INFO: [Coretcl 2-1648] Added synthesis output to IP cache for IP design_1_axi_interconnect_hp0_imp_auto_pc_2, cache-ID = 944efda6f15b3120
+INFO: [Coretcl 2-1174] Renamed 21 cell refs.
+Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2800.109 ; gain = 0.000 ; free physical = 824 ; free virtual = 48862
+INFO: [Common 17-1381] The checkpoint '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.runs/design_1_axi_interconnect_hp0_imp_auto_pc_2_synth_1/design_1_axi_interconnect_hp0_imp_auto_pc_2.dcp' has been generated.
+INFO: [Vivado 12-24828] Executing command : report_utilization -file design_1_axi_interconnect_hp0_imp_auto_pc_2_utilization_synth.rpt -pb design_1_axi_interconnect_hp0_imp_auto_pc_2_utilization_synth.pb
+INFO: [Common 17-206] Exiting Vivado at Mon Aug 24 12:53:57 2026...

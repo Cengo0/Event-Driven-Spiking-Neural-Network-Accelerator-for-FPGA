@@ -1,0 +1,152 @@
+
+
+================================================================
+== Vitis HLS Report for 'decay_all_traces'
+================================================================
+* Date:           Mon Aug 24 12:06:03 2026
+
+* Version:        2025.2 (Build 6295257 on Nov 14 2025)
+* Project:        hls_output
+* Solution:       hls (Vivado IP Flow Target)
+* Product family: zynq
+* Target device:  xc7z020-clg400-1
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+----------+----------+------------+
+    |  Clock |  Target  | Estimated| Uncertainty|
+    +--------+----------+----------+------------+
+    |ap_clk  |  10.00 ns|  7.173 ns|     2.70 ns|
+    +--------+----------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+-----------+-----------+------+------+---------+
+    |  Latency (cycles) |   Latency (absolute)  |   Interval  | Pipeline|
+    |   min   |   max   |    min    |    max    |  min |  max |   Type  |
+    +---------+---------+-----------+-----------+------+------+---------+
+    |     4895|     4895|  48.950 us|  48.950 us|  4895|  4895|       no|
+    +---------+---------+-----------+-----------+------+------+---------+
+
+    + Detail: 
+        * Instance: 
+        +------------------------------------------------------+--------------------------------------------+---------+---------+-----------+-----------+-----+-----+-------------------+
+        |                                                      |                                            |  Latency (cycles) |   Latency (absolute)  |  Interval |      Pipeline     |
+        |                       Instance                       |                   Module                   |   min   |   max   |    min    |    max    | min | max |        Type       |
+        +------------------------------------------------------+--------------------------------------------+---------+---------+-----------+-----------+-----+-----+-------------------+
+        |grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28   |decay_all_traces_Pipeline_DECAY_PRE_TRACE   |     4894|     4894|  48.940 us|  48.940 us|    0|    0|  loop pipeline stp|
+        |grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36  |decay_all_traces_Pipeline_DECAY_POST_TRACE  |     4894|     4894|  48.940 us|  48.940 us|    0|    0|  loop pipeline stp|
+        +------------------------------------------------------+--------------------------------------------+---------+---------+-----------+-----------+-----+-----+-------------------+
+
+        * Loop: 
+        N/A
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++-----------------+---------+-----+--------+-------+-----+
+|       Name      | BRAM_18K| DSP |   FF   |  LUT  | URAM|
++-----------------+---------+-----+--------+-------+-----+
+|DSP              |        -|    -|       -|      -|    -|
+|Expression       |        -|    -|       0|      2|    -|
+|FIFO             |        -|    -|       -|      -|    -|
+|Instance         |        -|    2|     242|    226|    -|
+|Memory           |        -|    -|       -|      -|    -|
+|Multiplexer      |        -|    -|       0|     14|    -|
+|Register         |        -|    -|       4|      -|    -|
++-----------------+---------+-----+--------+-------+-----+
+|Total            |        0|    2|     246|    242|    0|
++-----------------+---------+-----+--------+-------+-----+
+|Available        |      280|  220|  106400|  53200|    0|
++-----------------+---------+-----+--------+-------+-----+
+|Utilization (%)  |        0|   ~0|      ~0|     ~0|    0|
++-----------------+---------+-----+--------+-------+-----+
+
++ Detail: 
+    * Instance: 
+    +------------------------------------------------------+--------------------------------------------+---------+----+-----+-----+-----+
+    |                       Instance                       |                   Module                   | BRAM_18K| DSP|  FF | LUT | URAM|
+    +------------------------------------------------------+--------------------------------------------+---------+----+-----+-----+-----+
+    |grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36  |decay_all_traces_Pipeline_DECAY_POST_TRACE  |        0|   1|  121|  113|    0|
+    |grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28   |decay_all_traces_Pipeline_DECAY_PRE_TRACE   |        0|   1|  121|  113|    0|
+    +------------------------------------------------------+--------------------------------------------+---------+----+-----+-----+-----+
+    |Total                                                 |                                            |        0|   2|  242|  226|    0|
+    +------------------------------------------------------+--------------------------------------------+---------+----+-----+-----+-----+
+
+    * DSP: 
+    N/A
+
+    * Memory: 
+    N/A
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +---------------------------------+----------+----+---+----+------------+------------+
+    |          Variable Name          | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +---------------------------------+----------+----+---+----+------------+------------+
+    |ap_block_state2_on_subcall_done  |        or|   0|  0|   2|           1|           1|
+    +---------------------------------+----------+----+---+----+------------+------------+
+    |Total                            |          |   0|  0|   2|           1|           1|
+    +---------------------------------+----------+----+---+----+------------+------------+
+
+    * Multiplexer: 
+    +-----------+----+-----------+-----+-----------+
+    |    Name   | LUT| Input Size| Bits| Total Bits|
+    +-----------+----+-----------+-----+-----------+
+    |ap_NS_fsm  |  14|          3|    1|          3|
+    +-----------+----+-----------+-----+-----------+
+    |Total      |  14|          3|    1|          3|
+    +-----------+----+-----------+-----+-----------+
+
+    * Register: 
+    +-------------------------------------------------------------------+---+----+-----+-----------+
+    |                                Name                               | FF| LUT| Bits| Const Bits|
+    +-------------------------------------------------------------------+---+----+-----+-----------+
+    |ap_CS_fsm                                                          |  2|   0|    2|          0|
+    |grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36_ap_start_reg  |  1|   0|    1|          0|
+    |grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28_ap_start_reg   |  1|   0|    1|          0|
+    +-------------------------------------------------------------------+---+----+-----+-----------+
+    |Total                                                              |  4|   0|    4|          0|
+    +-------------------------------------------------------------------+---+----+-----+-----------+
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++------------------------+-----+-----+------------+------------------------+--------------+
+|        RTL Ports       | Dir | Bits|  Protocol  |      Source Object     |    C Type    |
++------------------------+-----+-----+------------+------------------------+--------------+
+|ap_clk                  |   in|    1|  ap_ctrl_hs|        decay_all_traces|  return value|
+|ap_rst                  |   in|    1|  ap_ctrl_hs|        decay_all_traces|  return value|
+|ap_start                |   in|    1|  ap_ctrl_hs|        decay_all_traces|  return value|
+|ap_done                 |  out|    1|  ap_ctrl_hs|        decay_all_traces|  return value|
+|ap_idle                 |  out|    1|  ap_ctrl_hs|        decay_all_traces|  return value|
+|ap_ready                |  out|    1|  ap_ctrl_hs|        decay_all_traces|  return value|
+|params_trace_decay_val  |   in|    8|     ap_none|  params_trace_decay_val|        scalar|
+|pre_traces_address0     |  out|   13|   ap_memory|              pre_traces|         array|
+|pre_traces_ce0          |  out|    1|   ap_memory|              pre_traces|         array|
+|pre_traces_q0           |   in|    8|   ap_memory|              pre_traces|         array|
+|pre_traces_address1     |  out|   13|   ap_memory|              pre_traces|         array|
+|pre_traces_ce1          |  out|    1|   ap_memory|              pre_traces|         array|
+|pre_traces_we1          |  out|    1|   ap_memory|              pre_traces|         array|
+|pre_traces_d1           |  out|    8|   ap_memory|              pre_traces|         array|
+|post_traces_address0    |  out|   13|   ap_memory|             post_traces|         array|
+|post_traces_ce0         |  out|    1|   ap_memory|             post_traces|         array|
+|post_traces_q0          |   in|    8|   ap_memory|             post_traces|         array|
+|post_traces_address1    |  out|   13|   ap_memory|             post_traces|         array|
+|post_traces_ce1         |  out|    1|   ap_memory|             post_traces|         array|
+|post_traces_we1         |  out|    1|   ap_memory|             post_traces|         array|
+|post_traces_d1          |  out|    8|   ap_memory|             post_traces|         array|
++------------------------+-----+-----+------------+------------------------+--------------+
+

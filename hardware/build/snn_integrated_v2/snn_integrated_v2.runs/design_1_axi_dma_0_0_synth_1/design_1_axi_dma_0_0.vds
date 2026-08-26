@@ -1,0 +1,29 @@
+#-----------------------------------------------------------
+# Vivado v2025.2 (64-bit)
+# SW Build 6299465 on Fri Nov 14 12:34:56 MST 2025
+# IP Build 6300035 on Fri Nov 14 10:48:45 MST 2025
+# SharedData Build 6298862 on Thu Nov 13 04:50:51 MST 2025
+# Start of session at: Mon Aug 24 12:57:10 2026
+# Process ID         : 2551630
+# Current directory  : /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.runs/design_1_axi_dma_0_0_synth_1
+# Command line       : vivado -log design_1_axi_dma_0_0.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source design_1_axi_dma_0_0.tcl
+# Log file           : /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.runs/design_1_axi_dma_0_0_synth_1/design_1_axi_dma_0_0.vds
+# Journal file       : /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_integrated_v2/snn_integrated_v2.runs/design_1_axi_dma_0_0_synth_1/vivado.jou
+# Running On         : Mariana
+# Platform           : Ubuntu
+# Operating System   : Ubuntu 22.04.5 LTS
+# Processor Detail   : Intel(R) Xeon(R) CPU E5-2620 v4 @ 2.10GHz
+# CPU Frequency      : 1199.597 MHz
+# CPU Physical cores : 8
+# CPU Logical cores  : 16
+# Host memory        : 67332 MB
+# Swap memory        : 2147 MB
+# Total Virtual      : 69479 MB
+# Available Virtual  : 57975 MB
+#-----------------------------------------------------------
+source design_1_axi_dma_0_0.tcl -notrace
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1700] Loaded user IP repository '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_output/hls/impl/ip'.
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/home/chipwisperer/AMD/2025.2/data/ip'.
+INFO: [IP_Flow 19-4838] Using cached IP synthesis design for IP design_1_axi_dma_0_0, cache-ID = 20569d71deebacc3.
+INFO: [Common 17-206] Exiting Vivado at Mon Aug 24 12:57:18 2026...
