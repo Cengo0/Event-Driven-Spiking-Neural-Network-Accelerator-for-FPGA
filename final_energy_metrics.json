@@ -8,7 +8,7 @@
     "board_dynamic_w": null,
     "source": "xadc",
     "uncertainty_frac": 0.2,
-    "xpa_dynamic_w": 1.74
+    "xpa_dynamic_w": 0.198
   },
   "latency": {
     "system_ms_per_img": 4.323300766944886,
@@ -28,14 +28,14 @@
     "board_first_spike_window": 0.00012702,
     "board_service_window": 0.000116435,
     "board_dynamic_service_window": null,
-    "pl_dynamic_first_spike_window": 0.000261,
-    "pl_dynamic_service_window": 0.00023925000000000001
+    "pl_dynamic_first_spike_window": 2.97e-05,
+    "pl_dynamic_service_window": 2.7225000000000004e-05
   },
   "energy_uj_per_event": {
     "board_e2e_per_input_spike": 24.40647392965953,
     "board_e2e_per_router_spike": 24.40647392965953,
     "board_e2e_per_neuron_spike": 24.40647392965953,
     "board_service_per_input_spike": 0.0007762333333333334,
-    "pl_dynamic_service_per_input_spike": 0.001595
+    "pl_dynamic_service_per_input_spike": 0.00018150000000000005
   }
 }
