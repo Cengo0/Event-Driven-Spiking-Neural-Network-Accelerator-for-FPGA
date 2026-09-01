@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 def main():
     print("Reading simulation output...")
     # Read the CSV-style output from Verilog
-    df = pd.read_csv('hardware/sim/sim_output_spikes.txt')
+    df = pd.read_csv('physical_output_spikes.txt')
     
     # Save directly to parquet (Standard format for MIA / TVLA side-channel tools)
-    parquet_filename = 'data/cache/batch=00000.parquet'
+    parquet_filename = 'data/cache/batch=00001.parquet'
     df.to_parquet(parquet_filename, engine='pyarrow')
     print(f"Saved temporal data to {parquet_filename}")
     
@@ -20,7 +20,7 @@ def main():
     plt.ylabel('Firing Neuron ID')
     plt.grid(True, linestyle='--', alpha=0.6)
     plt.tight_layout()
-    plt.savefig('temporal_cycle_plot.png', dpi=150)
+    plt.savefig('physical_temporal_cycle_plot.png', dpi=150)
     
     # --- Plot 2: Image-by-Image Cross-Sectional Plot ---
     activity_counts = df.groupby('Image_ID').size()
@@ -32,7 +32,7 @@ def main():
     plt.xticks(rotation=0)
     plt.grid(True, axis='y', linestyle='--', alpha=0.6)
     plt.tight_layout()
-    plt.savefig('image_cross_sectional_plot.png', dpi=150)
+    plt.savefig('physical_image_cross_sectional_plot.png', dpi=150)
     
     print("Plots generated: temporal_cycle_plot.png and image_cross_sectional_plot.png")
 
