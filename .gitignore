@@ -43,7 +43,7 @@ env/
 # Vivado project artifacts
 #*.str
 #*.wdb
-#*.vcd
+*.vcd
 #.Xil/
 #*.sim/
 #*.cache/
