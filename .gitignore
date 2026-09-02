@@ -102,7 +102,7 @@ hardware/hls/**/*.db
 # ============================================================
 
 # Keep directory structure with .gitkeep
-data/*
+#data/*
 !data/.gitkeep
 models/*
 !models/.gitkeep
