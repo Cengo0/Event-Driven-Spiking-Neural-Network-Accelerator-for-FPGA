@@ -17,6 +17,3 @@ The final step standardizes the data for Test Vector Leakage Assessment (TVLA) t
 *   **Generate Analytics:** Execute `python plot_leakage.py`, ensuring the read path points to either your simulated or physical text log.
 *   **Parquet Packaging:** The script compresses the raw log into `batch=00000.parquet`, the optimized columnar format required for efficient side-channel data processing.
 *   **Leakage Visualization:** Two plots are generated: `temporal_cycle_plot.png` (revealing internal burst activity and 80-microsecond DMA delays) and `image_cross_sectional_plot.png` (proving data-dependent dynamic power consumption).
-
-## Strategic Security Implications
-With the temporal logging pipeline completely verified, the discrepancies between the raw event-stream simulation and the highly-optimized physical TTFS execution are fully mapped. This provides the exact cycle-by-cycle templates needed to correlate power signatures in the laboratory environment in Nijmegen.
