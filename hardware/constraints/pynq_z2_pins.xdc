@@ -24,3 +24,5 @@
 ## 1. Pins with different names than in the base file
 ## 2. Custom timing constraints
 ## 3. Pin configuration changes
+
+set_property -dict { PACKAGE_PIN Y18 IOSTANDARD LVCMOS33 } [get_ports { snn_busy }];

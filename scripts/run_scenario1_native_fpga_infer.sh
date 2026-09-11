@@ -43,6 +43,7 @@ cmd=(
   --strict-identical
   --pl-clock-hz "$PL_CLOCK_HZ"
   --output "$OUTPUT_JSON"
+  --capture-all-spikes
 )
 
 if [[ "$BENCHMARK_FAST" == "1" ]]; then
