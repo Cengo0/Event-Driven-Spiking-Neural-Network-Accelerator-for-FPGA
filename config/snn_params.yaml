@@ -79,52 +79,25 @@ architecture:
 # Total weights = 4×(196×1024) + 4×(1024×10) = 802,816 + 40,960 = 843,776
 #
 neuron_groups:
-  - name: "input_0"       # MNIST rows 0-6   (pixels 0-195)
-    size: 196
-  - name: "input_1"       # MNIST rows 7-13  (pixels 196-391)
-    size: 196
-  - name: "input_2"       # MNIST rows 14-20 (pixels 392-587)
-    size: 196
-  - name: "input_3"       # MNIST rows 21-27 (pixels 588-783)
-    size: 196
-  - name: "hidden_0"      # Processes top stripe features
-    size: 1024
-  - name: "hidden_1"      # Processes upper-middle stripe features
-    size: 1024
-  - name: "hidden_2"      # Processes lower-middle stripe features
-    size: 1024
-  - name: "hidden_3"      # Processes bottom stripe features
-    size: 1024
-  - name: "output"        # Classification layer (10 digits)
+  - name: "input_0"
+    size: 784
+  - name: "hidden_0"
+    size: 256
+  - name: "hidden_1"
+    size: 256
+  - name: "output"
     size: 10
 
 connections:
-  # Block-sparse input→hidden (each input stripe → dedicated hidden block)
-  - name: "in0_to_hid0"
-    src_group: 0          # input_0
-    dst_group: 4          # hidden_0
-  - name: "in1_to_hid1"
-    src_group: 1          # input_1
-    dst_group: 5          # hidden_1
-  - name: "in2_to_hid2"
-    src_group: 2          # input_2
-    dst_group: 6          # hidden_2
-  - name: "in3_to_hid3"
-    src_group: 3          # input_3
-    dst_group: 7          # hidden_3
-  # Fully-connected hidden→output (all hidden blocks converge)
-  - name: "hid0_to_output"
-    src_group: 4          # hidden_0
-    dst_group: 8          # output
-  - name: "hid1_to_output"
-    src_group: 5          # hidden_1
-    dst_group: 8          # output
-  - name: "hid2_to_output"
-    src_group: 6          # hidden_2
-    dst_group: 8          # output
-  - name: "hid3_to_output"
-    src_group: 7          # hidden_3
-    dst_group: 8          # output
+  - name: "in_to_hid0"
+    src_group: 0
+    dst_group: 1
+  - name: "hid0_to_hid1"
+    src_group: 1
+    dst_group: 2
+  - name: "hid1_to_out"
+    src_group: 2
+    dst_group: 3
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Weight Memory Optimization (Loihi / TrueNorth / KIST-inspired, ALL on-chip)

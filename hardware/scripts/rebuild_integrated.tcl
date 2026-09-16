@@ -6,10 +6,10 @@
 #-----------------------------------------------------------------------------
 
 set project_dir "/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA"
-set build_dir   "${project_dir}/hardware/build/snn_integrated_v2"
+set build_dir   "${project_dir}/hardware/build/snn_core_group_v2"
 set rtl_dir     "${project_dir}/hardware/hdl/rtl"
 set ip_repo     "${project_dir}/hardware/ip_repo"
-set output_dir  "${project_dir}/outputs"
+set output_dir  "${project_dir}/outputs_v2"
 set part        "xc7z020clg400-1"
 # Integrated default clock for generated bitstream.
 # Override with SNN_PL_CLK_MHZ when sweeping lower/higher operating points.
@@ -23,7 +23,7 @@ puts "Using processing_system7_0/FCLK_CLK0 frequency: ${pl_clk_mhz} MHz"
 file delete -force $build_dir
 
 # Create project
-create_project snn_integrated_v2 $build_dir -part $part -force
+create_project snn_core_group_v2 $build_dir -part $part -force
 set_property target_language Verilog [current_project]
 # Use automatic source management so module-reference BD cells resolve correctly.
 set_property source_mgmt_mode All [current_project]
@@ -431,25 +431,29 @@ validate_bd_design
 save_bd_design
 
 # Generate BD wrapper
-make_wrapper -files [get_files ${build_dir}/snn_integrated_v2.srcs/sources_1/bd/design_1/design_1.bd] -top
-add_files -norecurse ${build_dir}/snn_integrated_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v
+make_wrapper -files [get_files ${build_dir}/snn_core_group_v2.srcs/sources_1/bd/design_1/design_1.bd] -top
+add_files -norecurse ${build_dir}/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v
 
 # =============================================================================
 # Add RTL Sources (spike_router, lif_neuron_array, snn_integrated_top with fixes)
 # =============================================================================
-add_files -norecurse ${rtl_dir}/router/spike_router.v
-add_files -norecurse ${rtl_dir}/neurons/lif_neuron_array.v
 add_files -norecurse ${rtl_dir}/common/fifo.v
-add_files -norecurse ${rtl_dir}/top/snn_integrated_top.v
+add_files -norecurse ${rtl_dir}/neurons/lif_neuron_array.v
+add_files -norecurse ${rtl_dir}/core/core_group.v
+add_files -norecurse ${rtl_dir}/core/event_router_ng.v
+add_files -norecurse ${rtl_dir}/core/synaptic_connectivity_table.v
+add_files -norecurse ${rtl_dir}/top/snn_core_group_top.v
 
-# Set snn_integrated_top as the real top module
-set_property top snn_integrated_top [get_filesets sources_1]
+# Set snn_core_group_top as the real top module
+set_property top snn_core_group_top [get_filesets sources_1]
 update_compile_order -fileset sources_1
 
 # Add PYNQ-Z2 constraints
-if {[file exists ${project_dir}/hardware/constraints/pynq_z2.xdc]} {
-    add_files -fileset constrs_1 -norecurse ${project_dir}/hardware/constraints/pynq_z2.xdc
-}
+# Add PYNQ-Z2 constraints
+add_files -fileset constrs_1 -norecurse ${project_dir}/hardware/constraints/pynq_z2_v1.0.xdc
+add_files -fileset constrs_1 -norecurse ${project_dir}/hardware/constraints/pynq_z2_pins.xdc
+add_files -fileset constrs_1 -norecurse ${project_dir}/hardware/constraints/snn_pl_wrapper.xdc
+add_files -fileset constrs_1 -norecurse ${project_dir}/hardware/constraints/bitstream.xdc
 
 # =============================================================================
 # Synthesis
@@ -480,25 +484,25 @@ puts "===== Implementation Complete ====="
 # =============================================================================
 # Copy Outputs
 # =============================================================================
-set bit_file [glob -nocomplain ${build_dir}/snn_integrated_v2.runs/impl_1/*.bit]
-set hwh_file [glob -nocomplain ${build_dir}/snn_integrated_v2.gen/sources_1/bd/design_1/hw_handoff/*.hwh]
+set bit_file [glob -nocomplain ${build_dir}/snn_core_group_v2.runs/impl_1/*.bit]
+set hwh_file [glob -nocomplain ${build_dir}/snn_core_group_v2.gen/sources_1/bd/design_1/hw_handoff/*.hwh]
 
 if {$bit_file ne ""} {
-    file copy -force $bit_file ${output_dir}/snn_integrated_v2.bit
-    puts "Bitstream: ${output_dir}/snn_integrated_v2.bit"
+    file copy -force $bit_file ${output_dir}/snn_core_group_v2.bit
+    puts "Bitstream: ${output_dir}/snn_core_group_v2.bit"
 }
 if {$hwh_file ne ""} {
-    file copy -force $hwh_file ${output_dir}/snn_integrated_v2.hwh
-    puts "HWH: ${output_dir}/snn_integrated_v2.hwh"
+    file copy -force $hwh_file ${output_dir}/snn_core_group_v2.hwh
+    puts "HWH: ${output_dir}/snn_core_group_v2.hwh"
 }
 
 # Reports
 if {[catch {open_run impl_1} open_err]} {
     puts "WARNING: Could not open impl_1 for report generation: $open_err"
 } else {
-    report_utilization -file ${output_dir}/snn_integrated_v2_utilization.rpt
-    report_timing_summary -file ${output_dir}/snn_integrated_v2_timing.rpt
-    report_power -file ${output_dir}/snn_integrated_v2_power.rpt
+    report_utilization -file ${output_dir}/snn_core_group_v2_utilization.rpt
+    report_timing_summary -file ${output_dir}/snn_core_group_v2_timing.rpt
+    report_power -file ${output_dir}/snn_core_group_v2_power.rpt
 }
 
 puts "===== ALL DONE ====="
