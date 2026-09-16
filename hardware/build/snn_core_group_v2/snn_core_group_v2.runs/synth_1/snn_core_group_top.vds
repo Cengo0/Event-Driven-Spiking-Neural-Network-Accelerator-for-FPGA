@@ -1,0 +1,414 @@
+#-----------------------------------------------------------
+# Vivado v2025.2 (64-bit)
+# SW Build 6299465 on Fri Nov 14 12:34:56 MST 2025
+# IP Build 6300035 on Fri Nov 14 10:48:45 MST 2025
+# SharedData Build 6298862 on Thu Nov 13 04:50:51 MST 2025
+# Start of session at: Wed Sep 16 16:05:40 2026
+# Process ID         : 2305649
+# Current directory  : /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1
+# Command line       : vivado -log snn_core_group_top.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source snn_core_group_top.tcl
+# Log file           : /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/snn_core_group_top.vds
+# Journal file       : /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/vivado.jou
+# Running On         : Mariana
+# Platform           : Ubuntu
+# Operating System   : Ubuntu 22.04.5 LTS
+# Processor Detail   : Intel(R) Xeon(R) CPU E5-2620 v4 @ 2.10GHz
+# CPU Frequency      : 2352.769 MHz
+# CPU Physical cores : 8
+# CPU Logical cores  : 16
+# Host memory        : 67332 MB
+# Swap memory        : 2147 MB
+# Total Virtual      : 69479 MB
+# Available Virtual  : 56137 MB
+#-----------------------------------------------------------
+source snn_core_group_top.tcl -notrace
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1700] Loaded user IP repository '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_output/hls/impl/ip'.
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/home/chipwisperer/AMD/2025.2/data/ip'.
+INFO: [Project 1-5698] Found the below utility IPs instantiated in block design /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.srcs/sources_1/bd/design_1/design_1.bd which have equivalent inline hdl with improved performance and reduced diskspace.
+It is recommended to migrate these utility IPs to inline hdl  using the command upgrade_project -migrate_to_inline_hdl.  The utility IPs may be deprecated in future releases.
+More information on inline hdl is available in UG994.
+Utility IP Component Instances:
+ design_1_const_zero_1bit_0
+design_1_const_zero_32bit_0
+design_1_const_zero_4bit_0
+Command: synth_design -top snn_core_group_top -part xc7z020clg400-1
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7z020'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7z020'
+INFO: [Device 21-403] Loading part xc7z020clg400-1
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 7 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 2306128
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:06 ; elapsed = 00:00:07 . Memory (MB): peak = 2268.488 ; gain = 455.672 ; free physical = 30540 ; free virtual = 52231
+---------------------------------------------------------------------------------
+INFO: [Synth 8-6157] synthesizing module 'snn_core_group_top' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:74]
+INFO: [Synth 8-6157] synthesizing module 'core_group' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+	Parameter GROUP_ID bound to: 0 - type: integer 
+	Parameter NEURONS_PER_GROUP bound to: 128 - type: integer 
+	Parameter DATA_WIDTH bound to: 16 - type: integer 
+	Parameter WEIGHT_WIDTH bound to: 8 - type: integer 
+	Parameter THRESHOLD_WIDTH bound to: 16 - type: integer 
+	Parameter LEAK_WIDTH bound to: 8 - type: integer 
+	Parameter REFRAC_WIDTH bound to: 8 - type: integer 
+	Parameter SPIKE_BUFFER_DEPTH bound to: 64 - type: integer 
+	Parameter LOCAL_ID_WIDTH bound to: 7 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'core_group' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+INFO: [Synth 8-6157] synthesizing module 'core_group__parameterized0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+	Parameter GROUP_ID bound to: 1 - type: integer 
+	Parameter NEURONS_PER_GROUP bound to: 128 - type: integer 
+	Parameter DATA_WIDTH bound to: 16 - type: integer 
+	Parameter WEIGHT_WIDTH bound to: 8 - type: integer 
+	Parameter THRESHOLD_WIDTH bound to: 16 - type: integer 
+	Parameter LEAK_WIDTH bound to: 8 - type: integer 
+	Parameter REFRAC_WIDTH bound to: 8 - type: integer 
+	Parameter SPIKE_BUFFER_DEPTH bound to: 64 - type: integer 
+	Parameter LOCAL_ID_WIDTH bound to: 7 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'core_group__parameterized0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+INFO: [Synth 8-6157] synthesizing module 'core_group__parameterized1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+	Parameter GROUP_ID bound to: 2 - type: integer 
+	Parameter NEURONS_PER_GROUP bound to: 128 - type: integer 
+	Parameter DATA_WIDTH bound to: 16 - type: integer 
+	Parameter WEIGHT_WIDTH bound to: 8 - type: integer 
+	Parameter THRESHOLD_WIDTH bound to: 16 - type: integer 
+	Parameter LEAK_WIDTH bound to: 8 - type: integer 
+	Parameter REFRAC_WIDTH bound to: 8 - type: integer 
+	Parameter SPIKE_BUFFER_DEPTH bound to: 64 - type: integer 
+	Parameter LOCAL_ID_WIDTH bound to: 7 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'core_group__parameterized1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+INFO: [Synth 8-6157] synthesizing module 'core_group__parameterized2' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+	Parameter GROUP_ID bound to: 3 - type: integer 
+	Parameter NEURONS_PER_GROUP bound to: 128 - type: integer 
+	Parameter DATA_WIDTH bound to: 16 - type: integer 
+	Parameter WEIGHT_WIDTH bound to: 8 - type: integer 
+	Parameter THRESHOLD_WIDTH bound to: 16 - type: integer 
+	Parameter LEAK_WIDTH bound to: 8 - type: integer 
+	Parameter REFRAC_WIDTH bound to: 8 - type: integer 
+	Parameter SPIKE_BUFFER_DEPTH bound to: 64 - type: integer 
+	Parameter LOCAL_ID_WIDTH bound to: 7 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'core_group__parameterized2' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+INFO: [Synth 8-6157] synthesizing module 'core_group__parameterized3' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+	Parameter GROUP_ID bound to: 4 - type: integer 
+	Parameter NEURONS_PER_GROUP bound to: 128 - type: integer 
+	Parameter DATA_WIDTH bound to: 16 - type: integer 
+	Parameter WEIGHT_WIDTH bound to: 8 - type: integer 
+	Parameter THRESHOLD_WIDTH bound to: 16 - type: integer 
+	Parameter LEAK_WIDTH bound to: 8 - type: integer 
+	Parameter REFRAC_WIDTH bound to: 8 - type: integer 
+	Parameter SPIKE_BUFFER_DEPTH bound to: 64 - type: integer 
+	Parameter LOCAL_ID_WIDTH bound to: 7 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'core_group__parameterized3' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+INFO: [Synth 8-6157] synthesizing module 'core_group__parameterized4' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+	Parameter GROUP_ID bound to: 5 - type: integer 
+	Parameter NEURONS_PER_GROUP bound to: 128 - type: integer 
+	Parameter DATA_WIDTH bound to: 16 - type: integer 
+	Parameter WEIGHT_WIDTH bound to: 8 - type: integer 
+	Parameter THRESHOLD_WIDTH bound to: 16 - type: integer 
+	Parameter LEAK_WIDTH bound to: 8 - type: integer 
+	Parameter REFRAC_WIDTH bound to: 8 - type: integer 
+	Parameter SPIKE_BUFFER_DEPTH bound to: 64 - type: integer 
+	Parameter LOCAL_ID_WIDTH bound to: 7 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'core_group__parameterized4' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+INFO: [Synth 8-6157] synthesizing module 'core_group__parameterized5' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+	Parameter GROUP_ID bound to: 6 - type: integer 
+	Parameter NEURONS_PER_GROUP bound to: 128 - type: integer 
+	Parameter DATA_WIDTH bound to: 16 - type: integer 
+	Parameter WEIGHT_WIDTH bound to: 8 - type: integer 
+	Parameter THRESHOLD_WIDTH bound to: 16 - type: integer 
+	Parameter LEAK_WIDTH bound to: 8 - type: integer 
+	Parameter REFRAC_WIDTH bound to: 8 - type: integer 
+	Parameter SPIKE_BUFFER_DEPTH bound to: 64 - type: integer 
+	Parameter LOCAL_ID_WIDTH bound to: 7 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'core_group__parameterized5' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+INFO: [Synth 8-6157] synthesizing module 'core_group__parameterized6' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+	Parameter GROUP_ID bound to: 7 - type: integer 
+	Parameter NEURONS_PER_GROUP bound to: 128 - type: integer 
+	Parameter DATA_WIDTH bound to: 16 - type: integer 
+	Parameter WEIGHT_WIDTH bound to: 8 - type: integer 
+	Parameter THRESHOLD_WIDTH bound to: 16 - type: integer 
+	Parameter LEAK_WIDTH bound to: 8 - type: integer 
+	Parameter REFRAC_WIDTH bound to: 8 - type: integer 
+	Parameter SPIKE_BUFFER_DEPTH bound to: 64 - type: integer 
+	Parameter LOCAL_ID_WIDTH bound to: 7 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'core_group__parameterized6' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+INFO: [Synth 8-6157] synthesizing module 'core_group__parameterized7' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+	Parameter GROUP_ID bound to: 8 - type: integer 
+	Parameter NEURONS_PER_GROUP bound to: 128 - type: integer 
+	Parameter DATA_WIDTH bound to: 16 - type: integer 
+	Parameter WEIGHT_WIDTH bound to: 8 - type: integer 
+	Parameter THRESHOLD_WIDTH bound to: 16 - type: integer 
+	Parameter LEAK_WIDTH bound to: 8 - type: integer 
+	Parameter REFRAC_WIDTH bound to: 8 - type: integer 
+	Parameter SPIKE_BUFFER_DEPTH bound to: 64 - type: integer 
+	Parameter LOCAL_ID_WIDTH bound to: 7 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'core_group__parameterized7' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+INFO: [Synth 8-6157] synthesizing module 'core_group__parameterized8' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+	Parameter GROUP_ID bound to: 9 - type: integer 
+	Parameter NEURONS_PER_GROUP bound to: 128 - type: integer 
+	Parameter DATA_WIDTH bound to: 16 - type: integer 
+	Parameter WEIGHT_WIDTH bound to: 8 - type: integer 
+	Parameter THRESHOLD_WIDTH bound to: 16 - type: integer 
+	Parameter LEAK_WIDTH bound to: 8 - type: integer 
+	Parameter REFRAC_WIDTH bound to: 8 - type: integer 
+	Parameter SPIKE_BUFFER_DEPTH bound to: 64 - type: integer 
+	Parameter LOCAL_ID_WIDTH bound to: 7 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'core_group__parameterized8' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+INFO: [Synth 8-6157] synthesizing module 'core_group__parameterized9' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+	Parameter GROUP_ID bound to: 10 - type: integer 
+	Parameter NEURONS_PER_GROUP bound to: 128 - type: integer 
+	Parameter DATA_WIDTH bound to: 16 - type: integer 
+	Parameter WEIGHT_WIDTH bound to: 8 - type: integer 
+	Parameter THRESHOLD_WIDTH bound to: 16 - type: integer 
+	Parameter LEAK_WIDTH bound to: 8 - type: integer 
+	Parameter REFRAC_WIDTH bound to: 8 - type: integer 
+	Parameter SPIKE_BUFFER_DEPTH bound to: 64 - type: integer 
+	Parameter LOCAL_ID_WIDTH bound to: 7 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'core_group__parameterized9' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+INFO: [Synth 8-6157] synthesizing module 'core_group__parameterized10' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+	Parameter GROUP_ID bound to: 11 - type: integer 
+	Parameter NEURONS_PER_GROUP bound to: 128 - type: integer 
+	Parameter DATA_WIDTH bound to: 16 - type: integer 
+	Parameter WEIGHT_WIDTH bound to: 8 - type: integer 
+	Parameter THRESHOLD_WIDTH bound to: 16 - type: integer 
+	Parameter LEAK_WIDTH bound to: 8 - type: integer 
+	Parameter REFRAC_WIDTH bound to: 8 - type: integer 
+	Parameter SPIKE_BUFFER_DEPTH bound to: 64 - type: integer 
+	Parameter LOCAL_ID_WIDTH bound to: 7 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'core_group__parameterized10' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+INFO: [Synth 8-6157] synthesizing module 'core_group__parameterized11' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+	Parameter GROUP_ID bound to: 12 - type: integer 
+	Parameter NEURONS_PER_GROUP bound to: 128 - type: integer 
+	Parameter DATA_WIDTH bound to: 16 - type: integer 
+	Parameter WEIGHT_WIDTH bound to: 8 - type: integer 
+	Parameter THRESHOLD_WIDTH bound to: 16 - type: integer 
+	Parameter LEAK_WIDTH bound to: 8 - type: integer 
+	Parameter REFRAC_WIDTH bound to: 8 - type: integer 
+	Parameter SPIKE_BUFFER_DEPTH bound to: 64 - type: integer 
+	Parameter LOCAL_ID_WIDTH bound to: 7 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'core_group__parameterized11' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+INFO: [Synth 8-6157] synthesizing module 'core_group__parameterized12' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+	Parameter GROUP_ID bound to: 13 - type: integer 
+	Parameter NEURONS_PER_GROUP bound to: 128 - type: integer 
+	Parameter DATA_WIDTH bound to: 16 - type: integer 
+	Parameter WEIGHT_WIDTH bound to: 8 - type: integer 
+	Parameter THRESHOLD_WIDTH bound to: 16 - type: integer 
+	Parameter LEAK_WIDTH bound to: 8 - type: integer 
+	Parameter REFRAC_WIDTH bound to: 8 - type: integer 
+	Parameter SPIKE_BUFFER_DEPTH bound to: 64 - type: integer 
+	Parameter LOCAL_ID_WIDTH bound to: 7 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'core_group__parameterized12' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+INFO: [Synth 8-6157] synthesizing module 'core_group__parameterized13' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+	Parameter GROUP_ID bound to: 14 - type: integer 
+	Parameter NEURONS_PER_GROUP bound to: 128 - type: integer 
+	Parameter DATA_WIDTH bound to: 16 - type: integer 
+	Parameter WEIGHT_WIDTH bound to: 8 - type: integer 
+	Parameter THRESHOLD_WIDTH bound to: 16 - type: integer 
+	Parameter LEAK_WIDTH bound to: 8 - type: integer 
+	Parameter REFRAC_WIDTH bound to: 8 - type: integer 
+	Parameter SPIKE_BUFFER_DEPTH bound to: 64 - type: integer 
+	Parameter LOCAL_ID_WIDTH bound to: 7 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'core_group__parameterized13' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+INFO: [Synth 8-6157] synthesizing module 'core_group__parameterized14' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+	Parameter GROUP_ID bound to: 15 - type: integer 
+	Parameter NEURONS_PER_GROUP bound to: 128 - type: integer 
+	Parameter DATA_WIDTH bound to: 16 - type: integer 
+	Parameter WEIGHT_WIDTH bound to: 8 - type: integer 
+	Parameter THRESHOLD_WIDTH bound to: 16 - type: integer 
+	Parameter LEAK_WIDTH bound to: 8 - type: integer 
+	Parameter REFRAC_WIDTH bound to: 8 - type: integer 
+	Parameter SPIKE_BUFFER_DEPTH bound to: 64 - type: integer 
+	Parameter LOCAL_ID_WIDTH bound to: 7 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'core_group__parameterized14' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
+INFO: [Synth 8-6157] synthesizing module 'design_1_wrapper' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13]
+INFO: [Synth 8-6157] synthesizing module 'design_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:13]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_dma_0_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_dma_0_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_dma_0_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_dma_0_0_stub.v:6]
+WARNING: [Synth 8-7071] port 'mm2s_prmry_reset_out_n' of module 'design_1_axi_dma_0_0' is unconnected for instance 'axi_dma_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:435]
+WARNING: [Synth 8-7071] port 's2mm_prmry_reset_out_n' of module 'design_1_axi_dma_0_0' is unconnected for instance 'axi_dma_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:435]
+WARNING: [Synth 8-7071] port 's2mm_introut' of module 'design_1_axi_dma_0_0' is unconnected for instance 'axi_dma_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:435]
+WARNING: [Synth 8-7071] port 'axi_dma_tstvec' of module 'design_1_axi_dma_0_0' is unconnected for instance 'axi_dma_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:435]
+WARNING: [Synth 8-7023] instance 'axi_dma_0' of module 'design_1_axi_dma_0_0' has 64 connections declared, but only 60 given [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:435]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_dma_1_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_dma_1_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_dma_1_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_dma_1_0_stub.v:6]
+WARNING: [Synth 8-7071] port 'mm2s_prmry_reset_out_n' of module 'design_1_axi_dma_1_0' is unconnected for instance 'axi_dma_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:496]
+WARNING: [Synth 8-7071] port 's2mm_prmry_reset_out_n' of module 'design_1_axi_dma_1_0' is unconnected for instance 'axi_dma_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:496]
+WARNING: [Synth 8-7071] port 'mm2s_introut' of module 'design_1_axi_dma_1_0' is unconnected for instance 'axi_dma_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:496]
+WARNING: [Synth 8-7071] port 's2mm_introut' of module 'design_1_axi_dma_1_0' is unconnected for instance 'axi_dma_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:496]
+WARNING: [Synth 8-7071] port 'axi_dma_tstvec' of module 'design_1_axi_dma_1_0' is unconnected for instance 'axi_dma_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:496]
+WARNING: [Synth 8-7023] instance 'axi_dma_1' of module 'design_1_axi_dma_1_0' has 64 connections declared, but only 59 given [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:496]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_0_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:1032]
+INFO: [Synth 8-6157] synthesizing module 'm00_couplers_imp_1CA5Z32' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:2704]
+INFO: [Synth 8-6155] done synthesizing module 'm00_couplers_imp_1CA5Z32' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:2704]
+INFO: [Synth 8-6157] synthesizing module 'm01_couplers_imp_I4GRPB' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:2819]
+INFO: [Synth 8-6155] done synthesizing module 'm01_couplers_imp_I4GRPB' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:2819]
+INFO: [Synth 8-6157] synthesizing module 'm02_couplers_imp_1BOGR4T' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:2946]
+INFO: [Synth 8-6155] done synthesizing module 'm02_couplers_imp_1BOGR4T' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:2946]
+INFO: [Synth 8-6157] synthesizing module 'm03_couplers_imp_J0G1J0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:3055]
+INFO: [Synth 8-6155] done synthesizing module 'm03_couplers_imp_J0G1J0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:3055]
+INFO: [Synth 8-6157] synthesizing module 's00_couplers_imp_O7FAN0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:3164]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_0_imp_auto_pc_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_0_imp_auto_pc_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_0_imp_auto_pc_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_0_imp_auto_pc_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 's00_couplers_imp_O7FAN0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:3164]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_0_imp_xbar_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_0_imp_xbar_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_0_imp_xbar_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_0_imp_xbar_0_stub.v:6]
+WARNING: [Synth 8-689] width (6) of port connection 'm_axi_arprot' does not match port width (12) of module 'design_1_axi_interconnect_0_imp_xbar_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:1690]
+WARNING: [Synth 8-689] width (6) of port connection 'm_axi_awprot' does not match port width (12) of module 'design_1_axi_interconnect_0_imp_xbar_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:1694]
+WARNING: [Synth 8-689] width (8) of port connection 'm_axi_wstrb' does not match port width (16) of module 'design_1_axi_interconnect_0_imp_xbar_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:1706]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_0_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:1032]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:1729]
+INFO: [Synth 8-6157] synthesizing module 'm00_couplers_imp_17E8JHA' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:2463]
+INFO: [Synth 8-6155] done synthesizing module 'm00_couplers_imp_17E8JHA' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:2463]
+INFO: [Synth 8-6157] synthesizing module 's00_couplers_imp_S4BDUK' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:3410]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_0_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 's00_couplers_imp_S4BDUK' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:3410]
+INFO: [Synth 8-6157] synthesizing module 's01_couplers_imp_12AUBLP' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:3591]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_1_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_1_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_1_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_1_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 's01_couplers_imp_12AUBLP' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:3591]
+INFO: [Synth 8-6157] synthesizing module 's02_couplers_imp_QSEXJZ' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:3805]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_2' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_2_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_2' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_2_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_2' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_2_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_2' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_2_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 's02_couplers_imp_QSEXJZ' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:3805]
+INFO: [Synth 8-6157] synthesizing module 's03_couplers_imp_13X28CE' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:3986]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_3' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_3_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_3' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_3_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_3' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_3_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_3' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_3_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 's03_couplers_imp_13X28CE' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:3986]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_xbar_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_hp0_imp_xbar_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_xbar_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_axi_interconnect_hp0_imp_xbar_0_stub.v:6]
+WARNING: [Synth 8-689] width (3) of port connection 's_axi_arready' does not match port width (4) of module 'design_1_axi_interconnect_hp0_imp_xbar_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:2433]
+WARNING: [Synth 8-689] width (192) of port connection 's_axi_rdata' does not match port width (256) of module 'design_1_axi_interconnect_hp0_imp_xbar_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:2450]
+WARNING: [Synth 8-689] width (3) of port connection 's_axi_rlast' does not match port width (4) of module 'design_1_axi_interconnect_hp0_imp_xbar_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:2451]
+WARNING: [Synth 8-689] width (6) of port connection 's_axi_rresp' does not match port width (8) of module 'design_1_axi_interconnect_hp0_imp_xbar_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:2453]
+WARNING: [Synth 8-689] width (3) of port connection 's_axi_rvalid' does not match port width (4) of module 'design_1_axi_interconnect_hp0_imp_xbar_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:2454]
+WARNING: [Synth 8-7071] port 's_axi_bid' of module 'design_1_axi_interconnect_hp0_imp_xbar_0' is unconnected for instance 'xbar' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:2384]
+WARNING: [Synth 8-7071] port 's_axi_rid' of module 'design_1_axi_interconnect_hp0_imp_xbar_0' is unconnected for instance 'xbar' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:2384]
+WARNING: [Synth 8-7023] instance 'xbar' of module 'design_1_axi_interconnect_hp0_imp_xbar_0' has 78 connections declared, but only 76 given [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:2384]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:1729]
+INFO: [Synth 8-6157] synthesizing module 'design_1_const_zero_1bit_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ip/design_1_const_zero_1bit_0/synth/design_1_const_zero_1bit_0.v:53]
+INFO: [Synth 8-6157] synthesizing module 'xlconstant_v1_1_10_xlconstant' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/a165/hdl/xlconstant_v1_1_vl_rfs.v:68]
+INFO: [Synth 8-6155] done synthesizing module 'xlconstant_v1_1_10_xlconstant' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/a165/hdl/xlconstant_v1_1_vl_rfs.v:68]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_const_zero_1bit_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ip/design_1_const_zero_1bit_0/synth/design_1_const_zero_1bit_0.v:53]
+INFO: [Synth 8-6157] synthesizing module 'design_1_const_zero_32bit_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ip/design_1_const_zero_32bit_0/synth/design_1_const_zero_32bit_0.v:53]
+INFO: [Synth 8-6157] synthesizing module 'xlconstant_v1_1_10_xlconstant__parameterized0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/a165/hdl/xlconstant_v1_1_vl_rfs.v:68]
+INFO: [Synth 8-6155] done synthesizing module 'xlconstant_v1_1_10_xlconstant__parameterized0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/a165/hdl/xlconstant_v1_1_vl_rfs.v:68]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_const_zero_32bit_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ip/design_1_const_zero_32bit_0/synth/design_1_const_zero_32bit_0.v:53]
+INFO: [Synth 8-6157] synthesizing module 'design_1_const_zero_4bit_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ip/design_1_const_zero_4bit_0/synth/design_1_const_zero_4bit_0.v:53]
+INFO: [Synth 8-6157] synthesizing module 'xlconstant_v1_1_10_xlconstant__parameterized1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/a165/hdl/xlconstant_v1_1_vl_rfs.v:68]
+INFO: [Synth 8-6155] done synthesizing module 'xlconstant_v1_1_10_xlconstant__parameterized1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/a165/hdl/xlconstant_v1_1_vl_rfs.v:68]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_const_zero_4bit_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ip/design_1_const_zero_4bit_0/synth/design_1_const_zero_4bit_0.v:53]
+INFO: [Synth 8-6157] synthesizing module 'design_1_proc_sys_reset_0_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_proc_sys_reset_0_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_proc_sys_reset_0_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_proc_sys_reset_0_0_stub.v:6]
+WARNING: [Synth 8-7071] port 'mb_reset' of module 'design_1_proc_sys_reset_0_0' is unconnected for instance 'proc_sys_reset_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:790]
+WARNING: [Synth 8-7071] port 'bus_struct_reset' of module 'design_1_proc_sys_reset_0_0' is unconnected for instance 'proc_sys_reset_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:790]
+WARNING: [Synth 8-7071] port 'peripheral_reset' of module 'design_1_proc_sys_reset_0_0' is unconnected for instance 'proc_sys_reset_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:790]
+WARNING: [Synth 8-7071] port 'interconnect_aresetn' of module 'design_1_proc_sys_reset_0_0' is unconnected for instance 'proc_sys_reset_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:790]
+WARNING: [Synth 8-7023] instance 'proc_sys_reset_0' of module 'design_1_proc_sys_reset_0_0' has 10 connections declared, but only 6 given [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:790]
+INFO: [Synth 8-6157] synthesizing module 'design_1_processing_system7_0_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_processing_system7_0_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_processing_system7_0_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_processing_system7_0_0_stub.v:6]
+WARNING: [Synth 8-7071] port 'ENET0_GMII_TX_EN' of module 'design_1_processing_system7_0_0' is unconnected for instance 'processing_system7_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:797]
+WARNING: [Synth 8-7071] port 'ENET0_GMII_TX_ER' of module 'design_1_processing_system7_0_0' is unconnected for instance 'processing_system7_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:797]
+WARNING: [Synth 8-7071] port 'ENET0_GMII_TXD' of module 'design_1_processing_system7_0_0' is unconnected for instance 'processing_system7_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:797]
+WARNING: [Synth 8-7071] port 'UART0_TX' of module 'design_1_processing_system7_0_0' is unconnected for instance 'processing_system7_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:797]
+WARNING: [Synth 8-7071] port 'USB0_PORT_INDCTL' of module 'design_1_processing_system7_0_0' is unconnected for instance 'processing_system7_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:797]
+WARNING: [Synth 8-7071] port 'USB0_VBUS_PWRSELECT' of module 'design_1_processing_system7_0_0' is unconnected for instance 'processing_system7_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:797]
+WARNING: [Synth 8-7071] port 'S_AXI_HP0_RCOUNT' of module 'design_1_processing_system7_0_0' is unconnected for instance 'processing_system7_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:797]
+WARNING: [Synth 8-7071] port 'S_AXI_HP0_WCOUNT' of module 'design_1_processing_system7_0_0' is unconnected for instance 'processing_system7_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:797]
+WARNING: [Synth 8-7071] port 'S_AXI_HP0_RACOUNT' of module 'design_1_processing_system7_0_0' is unconnected for instance 'processing_system7_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:797]
+WARNING: [Synth 8-7071] port 'S_AXI_HP0_WACOUNT' of module 'design_1_processing_system7_0_0' is unconnected for instance 'processing_system7_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:797]
+WARNING: [Synth 8-7023] instance 'processing_system7_0' of module 'design_1_processing_system7_0_0' has 124 connections declared, but only 114 given [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:797]
+INFO: [Synth 8-6157] synthesizing module 'design_1_snn_config_regs_0_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_snn_config_regs_0_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_snn_config_regs_0_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_snn_config_regs_0_0_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_snn_top_hls_0_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_snn_top_hls_0_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_snn_top_hls_0_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/synth_1/.Xil/Vivado-2305649-Mariana/realtime/design_1_snn_top_hls_0_0_stub.v:6]
+WARNING: [Synth 8-7071] port 'interrupt' of module 'design_1_snn_top_hls_0_0' is unconnected for instance 'snn_top_hls_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:950]
+WARNING: [Synth 8-7071] port 's_axis_data_TREADY' of module 'design_1_snn_top_hls_0_0' is unconnected for instance 'snn_top_hls_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:950]
+WARNING: [Synth 8-7071] port 'm_axis_spikes_TDEST' of module 'design_1_snn_top_hls_0_0' is unconnected for instance 'snn_top_hls_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:950]
+WARNING: [Synth 8-7071] port 'm_axis_spikes_TID' of module 'design_1_snn_top_hls_0_0' is unconnected for instance 'snn_top_hls_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:950]
+WARNING: [Synth 8-7071] port 'm_axis_spikes_TSTRB' of module 'design_1_snn_top_hls_0_0' is unconnected for instance 'snn_top_hls_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:950]
+WARNING: [Synth 8-7071] port 'm_axis_spikes_TUSER' of module 'design_1_snn_top_hls_0_0' is unconnected for instance 'snn_top_hls_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:950]
+WARNING: [Synth 8-7071] port 'm_axis_weights_TDEST' of module 'design_1_snn_top_hls_0_0' is unconnected for instance 'snn_top_hls_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:950]
+WARNING: [Synth 8-7071] port 'm_axis_weights_TID' of module 'design_1_snn_top_hls_0_0' is unconnected for instance 'snn_top_hls_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:950]
+WARNING: [Synth 8-7071] port 'm_axis_weights_TSTRB' of module 'design_1_snn_top_hls_0_0' is unconnected for instance 'snn_top_hls_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:950]
+WARNING: [Synth 8-7071] port 'm_axis_weights_TUSER' of module 'design_1_snn_top_hls_0_0' is unconnected for instance 'snn_top_hls_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:950]
+WARNING: [Synth 8-7023] instance 'snn_top_hls_0' of module 'design_1_snn_top_hls_0_0' has 89 connections declared, but only 79 given [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:950]
+INFO: [Synth 8-6155] done synthesizing module 'design_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/synth/design_1.v:13]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_wrapper' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'hls_spike_out_valid' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:417]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'hls_spike_out_neuron_id' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:418]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'hls_spike_out_weight' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:419]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'rtl_spike_in_ready' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:420]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'rtl_spike_out_valid' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:423]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'rtl_spike_out_neuron_id' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:424]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'rtl_spike_out_weight' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:425]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'hls_spike_in_ready' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:426]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'hls_learn_weight_valid' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:429]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'hls_learn_weight_group' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:430]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'hls_learn_weight_src' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:431]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'hls_learn_weight_dst' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:432]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'hls_learn_weight_data' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:433]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'hls_learn_weight_exc' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:434]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'hls_learn_weight_is_inter' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:435]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'hls_learn_weight_dst_group' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:436]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'hls_learn_weight_fanout_idx' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:437]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'rtl_learn_weight_ready' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:438]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'hls_snn_enable' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:441]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'hls_snn_reset' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:442]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'rtl_snn_ready' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:443]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'rtl_snn_busy' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:444]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'hls_threshold_out' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:447]
+ERROR: [Synth 8-11365] for the instance 'u_block_design' of module 'design_1_wrapper' declared at '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13', named port connection 'hls_leak_rate_out' does not exist [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:448]
+WARNING: [Synth 8-7071] port 'cfg_service_cycles_counter' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'leak_rate_out' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'learn_weight_data' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'learn_weight_dst' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'learn_weight_dst_group' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'learn_weight_exc' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'learn_weight_fanout_idx' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'learn_weight_group' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'learn_weight_is_inter' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'learn_weight_ready' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'learn_weight_src' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'learn_weight_valid' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'snn_busy' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'snn_enable' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'snn_ready' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'snn_reset' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'spike_in_neuron_id' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'spike_in_ready' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'spike_in_valid' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'spike_in_weight' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'spike_out_neuron_id' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'spike_out_ready' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'spike_out_valid' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'spike_out_weight' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7071] port 'threshold_out' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+WARNING: [Synth 8-7023] instance 'u_block_design' of module 'design_1_wrapper' has 64 connections declared, but only 39 given [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:383]
+INFO: [Synth 8-6157] synthesizing module 'synaptic_connectivity_table' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/synaptic_connectivity_table.v:35]
+	Parameter NUM_GROUPS bound to: 16 - type: integer 
+	Parameter NEURONS_PER_GROUP bound to: 128 - type: integer 
+	Parameter WEIGHT_WIDTH bound to: 8 - type: integer 
+	Parameter MAX_FANOUT_INTER bound to: 16 - type: integer 
+ERROR: [Synth 8-6156] failed synthesizing module 'synaptic_connectivity_table' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/synaptic_connectivity_table.v:35]
+ERROR: [Synth 8-6156] failed synthesizing module 'snn_core_group_top' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:74]
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:23 ; elapsed = 00:00:23 . Memory (MB): peak = 2540.168 ; gain = 727.352 ; free physical = 30369 ; free virtual = 52063
+---------------------------------------------------------------------------------
+RTL Elaboration failed
+INFO: [Common 17-83] Releasing license: Synthesis
+118 Infos, 75 Warnings, 0 Critical Warnings and 27 Errors encountered.
+synth_design failed
+synth_design: Time (s): cpu = 00:00:32 ; elapsed = 00:00:33 . Memory (MB): peak = 2540.176 ; gain = 919.453 ; free physical = 30370 ; free virtual = 52064
+INFO: [Common 17-2834] synth_design peak Physical Memory [PSS] (MB): overall = 1876.502; main = 1613.500; forked = 263.002
+INFO: [Common 17-2834] synth_design peak Virtual Memory [VSS] (MB): overall = 3526.461; main = 2540.172; forked = 986.312
+ERROR: [Common 17-69] Command failed: Synthesis failed - please see the console or run log file for details
+INFO: [Common 17-206] Exiting Vivado at Wed Sep 16 16:06:23 2026...
