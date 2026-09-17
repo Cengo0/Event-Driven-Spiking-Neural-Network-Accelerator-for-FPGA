@@ -31,10 +31,10 @@ input   ap_start;
 output   ap_done;
 output   ap_idle;
 output   ap_ready;
-output  [12:0] post_eligibility_address0;
+output  [10:0] post_eligibility_address0;
 output   post_eligibility_ce0;
 input  [7:0] post_eligibility_q0;
-output  [12:0] post_eligibility_address1;
+output  [10:0] post_eligibility_address1;
 output   post_eligibility_ce1;
 output   post_eligibility_we1;
 output  [7:0] post_eligibility_d1;
@@ -51,14 +51,14 @@ wire   [0:0] icmp_ln516_fu_73_p2;
 reg    ap_condition_exit_pp0_iter0_stage0;
 wire    ap_loop_exit_ready;
 reg    ap_ready_int;
-reg   [12:0] post_eligibility_addr_reg_126;
+reg   [10:0] post_eligibility_addr_reg_126;
 wire    ap_block_pp0_stage0_11001;
 wire   [63:0] zext_ln516_fu_85_p1;
 wire    ap_block_pp0_stage0;
-reg   [12:0] j_fu_44;
-wire   [12:0] add_ln516_fu_79_p2;
+reg   [10:0] j_fu_44;
+wire   [10:0] add_ln516_fu_79_p2;
 wire    ap_loop_init;
-reg   [12:0] ap_sig_allocacmp_j_1;
+reg   [10:0] ap_sig_allocacmp_j_1;
 reg    post_eligibility_ce0_local;
 reg    post_eligibility_we1_local;
 wire   [7:0] sub_ln521_fu_109_p2;
@@ -79,7 +79,7 @@ wire    ap_ce_reg;
 initial begin
 #0 ap_CS_fsm = 1'd1;
 #0 ap_enable_reg_pp0_iter1 = 1'b0;
-#0 j_fu_44 = 13'd0;
+#0 j_fu_44 = 11'd0;
 #0 ap_done_reg = 1'b0;
 end
 
@@ -135,7 +135,7 @@ always @ (posedge ap_clk) begin
         if (((icmp_ln516_fu_73_p2 == 1'd0) & (ap_enable_reg_pp0_iter0 == 1'b1))) begin
             j_fu_44 <= add_ln516_fu_79_p2;
         end else if ((ap_loop_init == 1'b1)) begin
-            j_fu_44 <= 13'd0;
+            j_fu_44 <= 11'd0;
         end
     end
 end
@@ -188,7 +188,7 @@ end
 
 always @ (*) begin
     if (((ap_loop_init == 1'b1) & (1'b0 == ap_block_pp0_stage0) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
-        ap_sig_allocacmp_j_1 = 13'd0;
+        ap_sig_allocacmp_j_1 = 11'd0;
     end else begin
         ap_sig_allocacmp_j_1 = j_fu_44;
     end
@@ -229,7 +229,7 @@ always @ (*) begin
     endcase
 end
 
-assign add_ln516_fu_79_p2 = (ap_sig_allocacmp_j_1 + 13'd1);
+assign add_ln516_fu_79_p2 = (ap_sig_allocacmp_j_1 + 11'd1);
 
 assign ap_CS_fsm_pp0_stage0 = ap_CS_fsm[32'd0];
 
@@ -249,7 +249,7 @@ assign ap_loop_exit_ready = ap_condition_exit_pp0_iter0_stage0;
 
 assign ap_ready = ap_ready_sig;
 
-assign icmp_ln516_fu_73_p2 = ((ap_sig_allocacmp_j_1 == 13'd4890) ? 1'b1 : 1'b0);
+assign icmp_ln516_fu_73_p2 = ((ap_sig_allocacmp_j_1 == 11'd1306) ? 1'b1 : 1'b0);
 
 assign post_eligibility_address0 = zext_ln516_fu_85_p1;
 

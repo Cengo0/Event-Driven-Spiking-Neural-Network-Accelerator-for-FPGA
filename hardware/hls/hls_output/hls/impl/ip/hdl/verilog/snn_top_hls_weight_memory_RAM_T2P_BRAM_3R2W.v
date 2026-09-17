@@ -13,8 +13,8 @@
     reset, clk);
 
 parameter DataWidth = 4;
-parameter AddressWidth = 20;
-parameter AddressRange = 843776;
+parameter AddressWidth = 19;
+parameter AddressRange = 268800;
 
 input [AddressWidth-1:0] address0;
 input ce0;

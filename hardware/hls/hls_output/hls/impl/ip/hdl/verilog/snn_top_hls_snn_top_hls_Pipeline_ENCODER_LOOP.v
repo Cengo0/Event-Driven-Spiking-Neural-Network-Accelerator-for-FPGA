@@ -68,7 +68,7 @@ input  [3:0] empty;
 input  [15:0] encoder_config_num_channels;
 input  [15:0] encoder_config_delta_threshold;
 input  [15:0] encoder_config_delta_decay;
-input  [10:0] time_r;
+input  [12:0] time_r;
 input  [7:0] encoder_config_default_weight;
 output  [0:0] encoder_spike_counter_flag_3_out;
 output   encoder_spike_counter_flag_3_out_ap_vld;
@@ -115,7 +115,7 @@ reg   [0:0] icmp_ln95_reg_409;
 reg   [0:0] icmp_ln95_reg_409_pp0_iter1_reg;
 reg   [0:0] icmp_ln99_reg_395;
 reg   [0:0] icmp_ln77_reg_446;
-reg   [0:0] tmp_1_reg_450;
+reg   [0:0] tmp_5_reg_450;
 reg    ap_predicate_op71_write_state4;
 reg    ap_block_state4_pp0_stage1_iter1_grp1;
 reg    ap_block_pp0_stage1_subdone;
@@ -176,7 +176,7 @@ wire   [15:0] select_ln69_fu_279_p3;
 wire   [15:0] zext_ln68_fu_275_p1;
 wire   [0:0] icmp_ln72_fu_293_p2;
 wire   [15:0] sub_ln73_fu_297_p2;
-wire   [12:0] zext_ln48_fu_324_p1;
+wire   [10:0] zext_ln48_fu_324_p1;
 wire   [32:0] or_ln54_3_fu_327_p5;
 reg    ap_done_reg;
 wire    ap_continue_int;
@@ -301,7 +301,7 @@ always @ (posedge ap_clk) begin
         p_ZL17encoder_phase_acc_1_addr_reg_429 <= zext_ln93_1_fu_245_p1;
         p_ZL17encoder_phase_acc_1_addr_reg_429_pp0_iter1_reg <= p_ZL17encoder_phase_acc_1_addr_reg_429;
         sub_ln79_reg_454 <= sub_ln79_fu_315_p2;
-        tmp_1_reg_450 <= encoder_spikes_full_n;
+        tmp_5_reg_450 <= encoder_spikes_full_n;
     end
 end
 
@@ -362,7 +362,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((1'b0 == ap_block_pp0_stage1_subdone_grp0_done_reg) & (1'b0 == ap_block_pp0_stage1_11001_grp0) & (tmp_1_reg_450 == 1'd1) & (icmp_ln77_reg_446 == 1'd0) & (icmp_ln99_reg_395 == 1'd1) & (icmp_ln95_reg_409_pp0_iter1_reg == 1'd1) & (ap_enable_reg_pp0_iter1 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage1))) begin
+    if (((1'b0 == ap_block_pp0_stage1_subdone_grp0_done_reg) & (1'b0 == ap_block_pp0_stage1_11001_grp0) & (tmp_5_reg_450 == 1'd1) & (icmp_ln77_reg_446 == 1'd0) & (icmp_ln99_reg_395 == 1'd1) & (icmp_ln95_reg_409_pp0_iter1_reg == 1'd1) & (ap_enable_reg_pp0_iter1 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage1))) begin
         encoder_spike_counter_flag_3_out_ap_vld = 1'b1;
     end else begin
         encoder_spike_counter_flag_3_out_ap_vld = 1'b0;
@@ -370,7 +370,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((1'b0 == ap_block_pp0_stage1_grp0) & (tmp_1_reg_450 == 1'd1) & (icmp_ln77_reg_446 == 1'd0) & (icmp_ln99_reg_395 == 1'd1) & (icmp_ln95_reg_409_pp0_iter1_reg == 1'd1) & (ap_enable_reg_pp0_iter1 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage1))) begin
+    if (((1'b0 == ap_block_pp0_stage1_grp0) & (tmp_5_reg_450 == 1'd1) & (icmp_ln77_reg_446 == 1'd0) & (icmp_ln99_reg_395 == 1'd1) & (icmp_ln95_reg_409_pp0_iter1_reg == 1'd1) & (ap_enable_reg_pp0_iter1 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage1))) begin
         encoder_spike_counter_loc_3_out_o = add_ln55_fu_342_p2;
     end else begin
         encoder_spike_counter_loc_3_out_o = encoder_spike_counter_loc_3_out_i;
@@ -378,7 +378,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((1'b0 == ap_block_pp0_stage1_subdone_grp0_done_reg) & (1'b0 == ap_block_pp0_stage1_11001_grp0) & (tmp_1_reg_450 == 1'd1) & (icmp_ln77_reg_446 == 1'd0) & (icmp_ln99_reg_395 == 1'd1) & (icmp_ln95_reg_409_pp0_iter1_reg == 1'd1) & (ap_enable_reg_pp0_iter1 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage1))) begin
+    if (((1'b0 == ap_block_pp0_stage1_subdone_grp0_done_reg) & (1'b0 == ap_block_pp0_stage1_11001_grp0) & (tmp_5_reg_450 == 1'd1) & (icmp_ln77_reg_446 == 1'd0) & (icmp_ln99_reg_395 == 1'd1) & (icmp_ln95_reg_409_pp0_iter1_reg == 1'd1) & (ap_enable_reg_pp0_iter1 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage1))) begin
         encoder_spike_counter_loc_3_out_o_ap_vld = 1'b1;
     end else begin
         encoder_spike_counter_loc_3_out_o_ap_vld = 1'b0;
@@ -386,7 +386,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((1'b0 == ap_block_pp0_stage1_subdone_grp0_done_reg) & (1'b0 == ap_block_pp0_stage1_11001_grp0) & (tmp_1_reg_450 == 1'd1) & (icmp_ln77_reg_446 == 1'd0) & (icmp_ln99_reg_395 == 1'd1) & (icmp_ln95_reg_409_pp0_iter1_reg == 1'd1) & (ap_enable_reg_pp0_iter1 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage1))) begin
+    if (((1'b0 == ap_block_pp0_stage1_subdone_grp0_done_reg) & (1'b0 == ap_block_pp0_stage1_11001_grp0) & (tmp_5_reg_450 == 1'd1) & (icmp_ln77_reg_446 == 1'd0) & (icmp_ln99_reg_395 == 1'd1) & (icmp_ln95_reg_409_pp0_iter1_reg == 1'd1) & (ap_enable_reg_pp0_iter1 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage1))) begin
         encoder_spike_counter_new_3_out_ap_vld = 1'b1;
     end else begin
         encoder_spike_counter_new_3_out_ap_vld = 1'b0;
@@ -596,7 +596,7 @@ assign ap_enable_pp0 = (ap_idle_pp0 ^ 1'b1);
 assign ap_loop_exit_ready = ap_condition_exit_pp0_iter0_stage1;
 
 always @ (*) begin
-    ap_predicate_op71_write_state4 = ((tmp_1_reg_450 == 1'd1) & (icmp_ln77_reg_446 == 1'd0) & (icmp_ln99_reg_395 == 1'd1) & (icmp_ln95_reg_409_pp0_iter1_reg == 1'd1));
+    ap_predicate_op71_write_state4 = ((tmp_5_reg_450 == 1'd1) & (icmp_ln77_reg_446 == 1'd0) & (icmp_ln99_reg_395 == 1'd1) & (icmp_ln95_reg_409_pp0_iter1_reg == 1'd1));
 end
 
 assign ap_ready = ap_ready_sig;

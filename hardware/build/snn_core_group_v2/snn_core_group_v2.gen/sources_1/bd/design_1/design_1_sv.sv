@@ -96,53 +96,53 @@ module design_1_sv (
   (* X_INTERFACE_IGNORE = "true" *)
   inout wire FIXED_IO_ps_porb,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [0:0] spike_in_valid,
+  output wire [0:0] hls_spike_out_valid,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [10:0] spike_in_neuron_id,
+  output wire [9:0] hls_spike_out_neuron_id,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [7:0] spike_in_weight,
+  output wire [7:0] hls_spike_out_weight,
   (* X_INTERFACE_IGNORE = "true" *)
-  input wire spike_in_ready,
+  input wire rtl_spike_in_ready,
   (* X_INTERFACE_IGNORE = "true" *)
-  input wire spike_out_valid,
+  input wire rtl_spike_out_valid,
   (* X_INTERFACE_IGNORE = "true" *)
-  input wire [10:0] spike_out_neuron_id,
+  input wire [9:0] rtl_spike_out_neuron_id,
   (* X_INTERFACE_IGNORE = "true" *)
-  input wire [7:0] spike_out_weight,
+  input wire [7:0] rtl_spike_out_weight,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [0:0] spike_out_ready,
+  output wire [0:0] hls_spike_in_ready,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [0:0] learn_weight_valid,
+  output wire [0:0] hls_learn_weight_valid,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [3:0] learn_weight_group,
+  output wire [2:0] hls_learn_weight_group,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [6:0] learn_weight_src,
+  output wire [6:0] hls_learn_weight_src,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [6:0] learn_weight_dst,
+  output wire [6:0] hls_learn_weight_dst,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [7:0] learn_weight_data,
+  output wire [7:0] hls_learn_weight_data,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [0:0] learn_weight_exc,
+  output wire [0:0] hls_learn_weight_exc,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [0:0] learn_weight_is_inter,
+  output wire [0:0] hls_learn_weight_is_inter,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [3:0] learn_weight_dst_group,
+  output wire [2:0] hls_learn_weight_dst_group,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [3:0] learn_weight_fanout_idx,
+  output wire [3:0] hls_learn_weight_fanout_idx,
   (* X_INTERFACE_IGNORE = "true" *)
-  input wire learn_weight_ready,
+  input wire rtl_learn_weight_ready,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [0:0] snn_enable,
+  output wire [0:0] hls_snn_enable,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [0:0] snn_reset,
+  output wire [0:0] hls_snn_reset,
   (* X_INTERFACE_IGNORE = "true" *)
-  input wire snn_ready,
+  input wire rtl_snn_ready,
   (* X_INTERFACE_IGNORE = "true" *)
-  input wire snn_busy,
+  input wire rtl_snn_busy,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [15:0] threshold_out,
+  output wire [15:0] hls_threshold_out,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [15:0] leak_rate_out,
+  output wire [15:0] hls_leak_rate_out,
   (* X_INTERFACE_IGNORE = "true" *)
   output wire cfg_router_config_we,
   (* X_INTERFACE_IGNORE = "true" *)
@@ -205,30 +205,30 @@ module design_1_sv (
     .FIXED_IO_ps_srstb(FIXED_IO_ps_srstb),
     .FIXED_IO_ps_clk(FIXED_IO_ps_clk),
     .FIXED_IO_ps_porb(FIXED_IO_ps_porb),
-    .spike_in_valid(spike_in_valid),
-    .spike_in_neuron_id(spike_in_neuron_id),
-    .spike_in_weight(spike_in_weight),
-    .spike_in_ready(spike_in_ready),
-    .spike_out_valid(spike_out_valid),
-    .spike_out_neuron_id(spike_out_neuron_id),
-    .spike_out_weight(spike_out_weight),
-    .spike_out_ready(spike_out_ready),
-    .learn_weight_valid(learn_weight_valid),
-    .learn_weight_group(learn_weight_group),
-    .learn_weight_src(learn_weight_src),
-    .learn_weight_dst(learn_weight_dst),
-    .learn_weight_data(learn_weight_data),
-    .learn_weight_exc(learn_weight_exc),
-    .learn_weight_is_inter(learn_weight_is_inter),
-    .learn_weight_dst_group(learn_weight_dst_group),
-    .learn_weight_fanout_idx(learn_weight_fanout_idx),
-    .learn_weight_ready(learn_weight_ready),
-    .snn_enable(snn_enable),
-    .snn_reset(snn_reset),
-    .snn_ready(snn_ready),
-    .snn_busy(snn_busy),
-    .threshold_out(threshold_out),
-    .leak_rate_out(leak_rate_out),
+    .hls_spike_out_valid(hls_spike_out_valid),
+    .hls_spike_out_neuron_id(hls_spike_out_neuron_id),
+    .hls_spike_out_weight(hls_spike_out_weight),
+    .rtl_spike_in_ready(rtl_spike_in_ready),
+    .rtl_spike_out_valid(rtl_spike_out_valid),
+    .rtl_spike_out_neuron_id(rtl_spike_out_neuron_id),
+    .rtl_spike_out_weight(rtl_spike_out_weight),
+    .hls_spike_in_ready(hls_spike_in_ready),
+    .hls_learn_weight_valid(hls_learn_weight_valid),
+    .hls_learn_weight_group(hls_learn_weight_group),
+    .hls_learn_weight_src(hls_learn_weight_src),
+    .hls_learn_weight_dst(hls_learn_weight_dst),
+    .hls_learn_weight_data(hls_learn_weight_data),
+    .hls_learn_weight_exc(hls_learn_weight_exc),
+    .hls_learn_weight_is_inter(hls_learn_weight_is_inter),
+    .hls_learn_weight_dst_group(hls_learn_weight_dst_group),
+    .hls_learn_weight_fanout_idx(hls_learn_weight_fanout_idx),
+    .rtl_learn_weight_ready(rtl_learn_weight_ready),
+    .hls_snn_enable(hls_snn_enable),
+    .hls_snn_reset(hls_snn_reset),
+    .rtl_snn_ready(rtl_snn_ready),
+    .rtl_snn_busy(rtl_snn_busy),
+    .hls_threshold_out(hls_threshold_out),
+    .hls_leak_rate_out(hls_leak_rate_out),
     .cfg_router_config_we(cfg_router_config_we),
     .cfg_router_config_addr(cfg_router_config_addr),
     .cfg_router_config_wdata(cfg_router_config_wdata),

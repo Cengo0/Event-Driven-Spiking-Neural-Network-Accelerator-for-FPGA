@@ -2,7 +2,7 @@
 //Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 //--------------------------------------------------------------------------------
 //Tool Version: Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
-//Date        : Wed Sep 16 16:00:36 2026
+//Date        : Thu Sep 17 15:53:59 2026
 //Host        : Mariana running 64-bit Ubuntu 22.04.5 LTS
 //Command     : generate_target design_1.bd
 //Design      : design_1
@@ -51,31 +51,31 @@ module design_1
     cfg_throughput_counter,
     clk_100mhz,
     debug_learning_active,
-    leak_rate_out,
-    learn_weight_data,
-    learn_weight_dst,
-    learn_weight_dst_group,
-    learn_weight_exc,
-    learn_weight_fanout_idx,
-    learn_weight_group,
-    learn_weight_is_inter,
-    learn_weight_ready,
-    learn_weight_src,
-    learn_weight_valid,
+    hls_leak_rate_out,
+    hls_learn_weight_data,
+    hls_learn_weight_dst,
+    hls_learn_weight_dst_group,
+    hls_learn_weight_exc,
+    hls_learn_weight_fanout_idx,
+    hls_learn_weight_group,
+    hls_learn_weight_is_inter,
+    hls_learn_weight_src,
+    hls_learn_weight_valid,
+    hls_snn_enable,
+    hls_snn_reset,
+    hls_spike_in_ready,
+    hls_spike_out_neuron_id,
+    hls_spike_out_valid,
+    hls_spike_out_weight,
+    hls_threshold_out,
     rst_n_sync,
-    snn_busy,
-    snn_enable,
-    snn_ready,
-    snn_reset,
-    spike_in_neuron_id,
-    spike_in_ready,
-    spike_in_valid,
-    spike_in_weight,
-    spike_out_neuron_id,
-    spike_out_ready,
-    spike_out_valid,
-    spike_out_weight,
-    threshold_out);
+    rtl_learn_weight_ready,
+    rtl_snn_busy,
+    rtl_snn_ready,
+    rtl_spike_in_ready,
+    rtl_spike_out_neuron_id,
+    rtl_spike_out_valid,
+    rtl_spike_out_weight);
   (* X_INTERFACE_INFO = "xilinx.com:interface:ddrx:1.0 DDR ADDR" *) (* X_INTERFACE_MODE = "Master" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DDR, AXI_ARBITRATION_SCHEME TDM, BURST_LENGTH 8, CAN_DEBUG false, CAS_LATENCY 11, CAS_WRITE_LATENCY 11, CS_ENABLED true, DATA_MASK_ENABLED true, DATA_WIDTH 8, MEMORY_TYPE COMPONENTS, MEM_ADDR_MAP ROW_COLUMN_BANK, SLOT Single, TIMEPERIOD_PS 1250" *) inout [14:0]DDR_addr;
   (* X_INTERFACE_INFO = "xilinx.com:interface:ddrx:1.0 DDR BA" *) inout [2:0]DDR_ba;
   (* X_INTERFACE_INFO = "xilinx.com:interface:ddrx:1.0 DDR CAS_N" *) inout DDR_cas_n;
@@ -115,31 +115,31 @@ module design_1
   (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.CFG_THROUGHPUT_COUNTER DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.CFG_THROUGHPUT_COUNTER, LAYERED_METADATA undef" *) input [31:0]cfg_throughput_counter;
   (* X_INTERFACE_INFO = "xilinx.com:signal:clock:1.0 CLK.CLK_100MHZ CLK" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME CLK.CLK_100MHZ, CLK_DOMAIN design_1_processing_system7_0_0_FCLK_CLK0, FREQ_HZ 100000000, FREQ_TOLERANCE_HZ 0, INSERT_VIP 0, PHASE 0.0" *) output clk_100mhz;
   (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.DEBUG_LEARNING_ACTIVE DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.DEBUG_LEARNING_ACTIVE, LAYERED_METADATA undef" *) output [0:0]debug_learning_active;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.LEAK_RATE_OUT DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.LEAK_RATE_OUT, LAYERED_METADATA undef" *) output [15:0]leak_rate_out;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.LEARN_WEIGHT_DATA DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.LEARN_WEIGHT_DATA, LAYERED_METADATA undef" *) output [7:0]learn_weight_data;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.LEARN_WEIGHT_DST DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.LEARN_WEIGHT_DST, LAYERED_METADATA undef" *) output [6:0]learn_weight_dst;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.LEARN_WEIGHT_DST_GROUP DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.LEARN_WEIGHT_DST_GROUP, LAYERED_METADATA undef" *) output [3:0]learn_weight_dst_group;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.LEARN_WEIGHT_EXC DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.LEARN_WEIGHT_EXC, LAYERED_METADATA undef" *) output [0:0]learn_weight_exc;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.LEARN_WEIGHT_FANOUT_IDX DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.LEARN_WEIGHT_FANOUT_IDX, LAYERED_METADATA undef" *) output [3:0]learn_weight_fanout_idx;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.LEARN_WEIGHT_GROUP DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.LEARN_WEIGHT_GROUP, LAYERED_METADATA undef" *) output [3:0]learn_weight_group;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.LEARN_WEIGHT_IS_INTER DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.LEARN_WEIGHT_IS_INTER, LAYERED_METADATA undef" *) output [0:0]learn_weight_is_inter;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.LEARN_WEIGHT_READY DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.LEARN_WEIGHT_READY, LAYERED_METADATA undef" *) input learn_weight_ready;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.LEARN_WEIGHT_SRC DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.LEARN_WEIGHT_SRC, LAYERED_METADATA undef" *) output [6:0]learn_weight_src;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.LEARN_WEIGHT_VALID DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.LEARN_WEIGHT_VALID, LAYERED_METADATA undef" *) output [0:0]learn_weight_valid;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEAK_RATE_OUT DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEAK_RATE_OUT, LAYERED_METADATA undef" *) output [15:0]hls_leak_rate_out;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_DATA DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_DATA, LAYERED_METADATA undef" *) output [7:0]hls_learn_weight_data;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_DST DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_DST, LAYERED_METADATA undef" *) output [6:0]hls_learn_weight_dst;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_DST_GROUP DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_DST_GROUP, LAYERED_METADATA undef" *) output [2:0]hls_learn_weight_dst_group;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_EXC DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_EXC, LAYERED_METADATA undef" *) output [0:0]hls_learn_weight_exc;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_FANOUT_IDX DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_FANOUT_IDX, LAYERED_METADATA undef" *) output [3:0]hls_learn_weight_fanout_idx;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_GROUP DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_GROUP, LAYERED_METADATA undef" *) output [2:0]hls_learn_weight_group;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_IS_INTER DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_IS_INTER, LAYERED_METADATA undef" *) output [0:0]hls_learn_weight_is_inter;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_SRC DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_SRC, LAYERED_METADATA undef" *) output [6:0]hls_learn_weight_src;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_VALID DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_VALID, LAYERED_METADATA undef" *) output [0:0]hls_learn_weight_valid;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_SNN_ENABLE DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_SNN_ENABLE, LAYERED_METADATA undef" *) output [0:0]hls_snn_enable;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_SNN_RESET DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_SNN_RESET, LAYERED_METADATA undef" *) output [0:0]hls_snn_reset;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_SPIKE_IN_READY DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_SPIKE_IN_READY, LAYERED_METADATA undef" *) output [0:0]hls_spike_in_ready;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_SPIKE_OUT_NEURON_ID DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_SPIKE_OUT_NEURON_ID, LAYERED_METADATA undef" *) output [9:0]hls_spike_out_neuron_id;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_SPIKE_OUT_VALID DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_SPIKE_OUT_VALID, LAYERED_METADATA undef" *) output [0:0]hls_spike_out_valid;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_SPIKE_OUT_WEIGHT DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_SPIKE_OUT_WEIGHT, LAYERED_METADATA undef" *) output [7:0]hls_spike_out_weight;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_THRESHOLD_OUT DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_THRESHOLD_OUT, LAYERED_METADATA undef" *) output [15:0]hls_threshold_out;
   (* X_INTERFACE_INFO = "xilinx.com:signal:reset:1.0 RST.RST_N_SYNC RST" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME RST.RST_N_SYNC, INSERT_VIP 0, POLARITY ACTIVE_LOW" *) output [0:0]rst_n_sync;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.SNN_BUSY DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.SNN_BUSY, LAYERED_METADATA undef" *) input snn_busy;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.SNN_ENABLE DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.SNN_ENABLE, LAYERED_METADATA undef" *) output [0:0]snn_enable;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.SNN_READY DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.SNN_READY, LAYERED_METADATA undef" *) input snn_ready;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.SNN_RESET DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.SNN_RESET, LAYERED_METADATA undef" *) output [0:0]snn_reset;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.SPIKE_IN_NEURON_ID DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.SPIKE_IN_NEURON_ID, LAYERED_METADATA undef" *) output [10:0]spike_in_neuron_id;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.SPIKE_IN_READY DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.SPIKE_IN_READY, LAYERED_METADATA undef" *) input spike_in_ready;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.SPIKE_IN_VALID DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.SPIKE_IN_VALID, LAYERED_METADATA undef" *) output [0:0]spike_in_valid;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.SPIKE_IN_WEIGHT DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.SPIKE_IN_WEIGHT, LAYERED_METADATA undef" *) output [7:0]spike_in_weight;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.SPIKE_OUT_NEURON_ID DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.SPIKE_OUT_NEURON_ID, LAYERED_METADATA undef" *) input [10:0]spike_out_neuron_id;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.SPIKE_OUT_READY DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.SPIKE_OUT_READY, LAYERED_METADATA undef" *) output [0:0]spike_out_ready;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.SPIKE_OUT_VALID DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.SPIKE_OUT_VALID, LAYERED_METADATA undef" *) input spike_out_valid;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.SPIKE_OUT_WEIGHT DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.SPIKE_OUT_WEIGHT, LAYERED_METADATA undef" *) input [7:0]spike_out_weight;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.THRESHOLD_OUT DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.THRESHOLD_OUT, LAYERED_METADATA undef" *) output [15:0]threshold_out;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.RTL_LEARN_WEIGHT_READY DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.RTL_LEARN_WEIGHT_READY, LAYERED_METADATA undef" *) input rtl_learn_weight_ready;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.RTL_SNN_BUSY DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.RTL_SNN_BUSY, LAYERED_METADATA undef" *) input rtl_snn_busy;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.RTL_SNN_READY DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.RTL_SNN_READY, LAYERED_METADATA undef" *) input rtl_snn_ready;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.RTL_SPIKE_IN_READY DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.RTL_SPIKE_IN_READY, LAYERED_METADATA undef" *) input rtl_spike_in_ready;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.RTL_SPIKE_OUT_NEURON_ID DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.RTL_SPIKE_OUT_NEURON_ID, LAYERED_METADATA undef" *) input [9:0]rtl_spike_out_neuron_id;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.RTL_SPIKE_OUT_VALID DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.RTL_SPIKE_OUT_VALID, LAYERED_METADATA undef" *) input rtl_spike_out_valid;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.RTL_SPIKE_OUT_WEIGHT DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.RTL_SPIKE_OUT_WEIGHT, LAYERED_METADATA undef" *) input [7:0]rtl_spike_out_weight;
 
   wire [14:0]DDR_addr;
   wire [2:0]DDR_ba;
@@ -357,17 +357,23 @@ module design_1
   wire [31:0]const_zero_32bit_dout;
   wire [3:0]const_zero_4bit_dout;
   wire [0:0]debug_learning_active;
-  wire [15:0]leak_rate_out;
-  wire [7:0]learn_weight_data;
-  wire [6:0]learn_weight_dst;
-  wire [3:0]learn_weight_dst_group;
-  wire [0:0]learn_weight_exc;
-  wire [3:0]learn_weight_fanout_idx;
-  wire [3:0]learn_weight_group;
-  wire [0:0]learn_weight_is_inter;
-  wire learn_weight_ready;
-  wire [6:0]learn_weight_src;
-  wire [0:0]learn_weight_valid;
+  wire [15:0]hls_leak_rate_out;
+  wire [7:0]hls_learn_weight_data;
+  wire [6:0]hls_learn_weight_dst;
+  wire [2:0]hls_learn_weight_dst_group;
+  wire [0:0]hls_learn_weight_exc;
+  wire [3:0]hls_learn_weight_fanout_idx;
+  wire [2:0]hls_learn_weight_group;
+  wire [0:0]hls_learn_weight_is_inter;
+  wire [6:0]hls_learn_weight_src;
+  wire [0:0]hls_learn_weight_valid;
+  wire [0:0]hls_snn_enable;
+  wire [0:0]hls_snn_reset;
+  wire [0:0]hls_spike_in_ready;
+  wire [9:0]hls_spike_out_neuron_id;
+  wire [0:0]hls_spike_out_valid;
+  wire [7:0]hls_spike_out_weight;
+  wire [15:0]hls_threshold_out;
   wire processing_system7_0_FCLK_RESET0_N;
   wire [31:0]processing_system7_0_M_AXI_GP0_ARADDR;
   wire [1:0]processing_system7_0_M_AXI_GP0_ARBURST;
@@ -408,10 +414,13 @@ module design_1
   wire [3:0]processing_system7_0_M_AXI_GP0_WSTRB;
   wire processing_system7_0_M_AXI_GP0_WVALID;
   wire [0:0]rst_n_sync;
-  wire snn_busy;
-  wire [0:0]snn_enable;
-  wire snn_ready;
-  wire [0:0]snn_reset;
+  wire rtl_learn_weight_ready;
+  wire rtl_snn_busy;
+  wire rtl_snn_ready;
+  wire rtl_spike_in_ready;
+  wire [9:0]rtl_spike_out_neuron_id;
+  wire rtl_spike_out_valid;
+  wire [7:0]rtl_spike_out_weight;
   wire [31:0]snn_top_hls_0_m_axis_spikes_TDATA;
   wire [3:0]snn_top_hls_0_m_axis_spikes_TKEEP;
   wire [0:0]snn_top_hls_0_m_axis_spikes_TLAST;
@@ -422,15 +431,6 @@ module design_1
   wire [0:0]snn_top_hls_0_m_axis_weights_TLAST;
   wire snn_top_hls_0_m_axis_weights_TREADY;
   wire snn_top_hls_0_m_axis_weights_TVALID;
-  wire [10:0]spike_in_neuron_id;
-  wire spike_in_ready;
-  wire [0:0]spike_in_valid;
-  wire [7:0]spike_in_weight;
-  wire [10:0]spike_out_neuron_id;
-  wire [0:0]spike_out_ready;
-  wire spike_out_valid;
-  wire [7:0]spike_out_weight;
-  wire [15:0]threshold_out;
 
   design_1_axi_dma_0_0 axi_dma_0
        (.axi_resetn(rst_n_sync),
@@ -950,17 +950,17 @@ module design_1
   design_1_snn_top_hls_0_0 snn_top_hls_0
        (.ap_clk(clk_100mhz),
         .ap_rst_n(rst_n_sync),
-        .leak_rate_out(leak_rate_out),
-        .learn_weight_data(learn_weight_data),
-        .learn_weight_dst(learn_weight_dst),
-        .learn_weight_dst_group(learn_weight_dst_group),
-        .learn_weight_exc(learn_weight_exc),
-        .learn_weight_fanout_idx(learn_weight_fanout_idx),
-        .learn_weight_group(learn_weight_group),
-        .learn_weight_is_inter(learn_weight_is_inter),
-        .learn_weight_ready(learn_weight_ready),
-        .learn_weight_src(learn_weight_src),
-        .learn_weight_valid(learn_weight_valid),
+        .leak_rate_out(hls_leak_rate_out),
+        .learn_weight_data(hls_learn_weight_data),
+        .learn_weight_dst(hls_learn_weight_dst),
+        .learn_weight_dst_group(hls_learn_weight_dst_group),
+        .learn_weight_exc(hls_learn_weight_exc),
+        .learn_weight_fanout_idx(hls_learn_weight_fanout_idx),
+        .learn_weight_group(hls_learn_weight_group),
+        .learn_weight_is_inter(hls_learn_weight_is_inter),
+        .learn_weight_ready(rtl_learn_weight_ready),
+        .learn_weight_src(hls_learn_weight_src),
+        .learn_weight_valid(hls_learn_weight_valid),
         .m_axis_spikes_TDATA(snn_top_hls_0_m_axis_spikes_TDATA),
         .m_axis_spikes_TKEEP(snn_top_hls_0_m_axis_spikes_TKEEP),
         .m_axis_spikes_TLAST(snn_top_hls_0_m_axis_spikes_TLAST),
@@ -1014,19 +1014,19 @@ module design_1
         .s_axis_weights_TSTRB({1'b1,1'b1,1'b1,1'b1}),
         .s_axis_weights_TUSER(1'b0),
         .s_axis_weights_TVALID(axi_dma_1_M_AXIS_MM2S_TVALID),
-        .snn_busy(snn_busy),
-        .snn_enable(snn_enable),
-        .snn_ready(snn_ready),
-        .snn_reset(snn_reset),
-        .spike_in_neuron_id(spike_in_neuron_id),
-        .spike_in_ready(spike_in_ready),
-        .spike_in_valid(spike_in_valid),
-        .spike_in_weight(spike_in_weight),
-        .spike_out_neuron_id(spike_out_neuron_id),
-        .spike_out_ready(spike_out_ready),
-        .spike_out_valid(spike_out_valid),
-        .spike_out_weight(spike_out_weight),
-        .threshold_out(threshold_out));
+        .snn_busy(rtl_snn_busy),
+        .snn_enable(hls_snn_enable),
+        .snn_ready(rtl_snn_ready),
+        .snn_reset(hls_snn_reset),
+        .spike_in_neuron_id(hls_spike_out_neuron_id),
+        .spike_in_ready(rtl_spike_in_ready),
+        .spike_in_valid(hls_spike_out_valid),
+        .spike_in_weight(hls_spike_out_weight),
+        .spike_out_neuron_id(rtl_spike_out_neuron_id),
+        .spike_out_ready(hls_spike_in_ready),
+        .spike_out_valid(rtl_spike_out_valid),
+        .spike_out_weight(rtl_spike_out_weight),
+        .threshold_out(hls_threshold_out));
 endmodule
 
 module design_1_axi_interconnect_0_0

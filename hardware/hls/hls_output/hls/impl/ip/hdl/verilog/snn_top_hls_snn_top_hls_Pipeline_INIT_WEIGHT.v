@@ -28,7 +28,7 @@ input   ap_start;
 output   ap_done;
 output   ap_idle;
 output   ap_ready;
-output  [19:0] weight_memory_address0;
+output  [18:0] weight_memory_address0;
 output   weight_memory_ce0;
 output   weight_memory_we0;
 output  [3:0] weight_memory_d0;
@@ -48,10 +48,10 @@ reg    ap_ready_int;
 wire    ap_block_pp0_stage0_11001;
 wire   [63:0] zext_ln804_fu_78_p1;
 wire    ap_block_pp0_stage0;
-reg   [19:0] k_fu_40;
-wire   [19:0] add_ln804_fu_72_p2;
+reg   [18:0] k_fu_40;
+wire   [18:0] add_ln804_fu_72_p2;
 wire    ap_loop_init;
-reg   [19:0] ap_sig_allocacmp_k_1;
+reg   [18:0] ap_sig_allocacmp_k_1;
 reg    weight_memory_we0_local;
 reg    weight_memory_ce0_local;
 reg    ap_done_reg;
@@ -68,7 +68,7 @@ wire    ap_ce_reg;
 initial begin
 #0 ap_CS_fsm = 1'd1;
 #0 ap_enable_reg_pp0_iter1 = 1'b0;
-#0 k_fu_40 = 20'd0;
+#0 k_fu_40 = 19'd0;
 #0 ap_done_reg = 1'b0;
 end
 
@@ -124,7 +124,7 @@ always @ (posedge ap_clk) begin
         if (((icmp_ln804_fu_66_p2 == 1'd0) & (ap_enable_reg_pp0_iter0 == 1'b1))) begin
             k_fu_40 <= add_ln804_fu_72_p2;
         end else if ((ap_loop_init == 1'b1)) begin
-            k_fu_40 <= 20'd0;
+            k_fu_40 <= 19'd0;
         end
     end
 end
@@ -171,7 +171,7 @@ end
 
 always @ (*) begin
     if (((ap_loop_init == 1'b1) & (1'b0 == ap_block_pp0_stage0) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
-        ap_sig_allocacmp_k_1 = 20'd0;
+        ap_sig_allocacmp_k_1 = 19'd0;
     end else begin
         ap_sig_allocacmp_k_1 = k_fu_40;
     end
@@ -204,7 +204,7 @@ always @ (*) begin
     endcase
 end
 
-assign add_ln804_fu_72_p2 = (ap_sig_allocacmp_k_1 + 20'd1);
+assign add_ln804_fu_72_p2 = (ap_sig_allocacmp_k_1 + 19'd1);
 
 assign ap_CS_fsm_pp0_stage0 = ap_CS_fsm[32'd0];
 
@@ -224,7 +224,7 @@ assign ap_loop_exit_ready = ap_condition_exit_pp0_iter0_stage0;
 
 assign ap_ready = ap_ready_sig;
 
-assign icmp_ln804_fu_66_p2 = ((ap_sig_allocacmp_k_1 == 20'd843776) ? 1'b1 : 1'b0);
+assign icmp_ln804_fu_66_p2 = ((ap_sig_allocacmp_k_1 == 19'd268800) ? 1'b1 : 1'b0);
 
 assign weight_memory_address0 = zext_ln804_fu_78_p1;
 

@@ -2,7 +2,7 @@
 //Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 //--------------------------------------------------------------------------------
 //Tool Version: Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
-//Date        : Wed Sep 16 16:00:37 2026
+//Date        : Thu Sep 17 15:53:59 2026
 //Host        : Mariana running 64-bit Ubuntu 22.04.5 LTS
 //Command     : generate_target design_1_wrapper.bd
 //Design      : design_1_wrapper
@@ -50,31 +50,31 @@ module design_1_wrapper
     cfg_throughput_counter,
     clk_100mhz,
     debug_learning_active,
-    leak_rate_out,
-    learn_weight_data,
-    learn_weight_dst,
-    learn_weight_dst_group,
-    learn_weight_exc,
-    learn_weight_fanout_idx,
-    learn_weight_group,
-    learn_weight_is_inter,
-    learn_weight_ready,
-    learn_weight_src,
-    learn_weight_valid,
+    hls_leak_rate_out,
+    hls_learn_weight_data,
+    hls_learn_weight_dst,
+    hls_learn_weight_dst_group,
+    hls_learn_weight_exc,
+    hls_learn_weight_fanout_idx,
+    hls_learn_weight_group,
+    hls_learn_weight_is_inter,
+    hls_learn_weight_src,
+    hls_learn_weight_valid,
+    hls_snn_enable,
+    hls_snn_reset,
+    hls_spike_in_ready,
+    hls_spike_out_neuron_id,
+    hls_spike_out_valid,
+    hls_spike_out_weight,
+    hls_threshold_out,
     rst_n_sync,
-    snn_busy,
-    snn_enable,
-    snn_ready,
-    snn_reset,
-    spike_in_neuron_id,
-    spike_in_ready,
-    spike_in_valid,
-    spike_in_weight,
-    spike_out_neuron_id,
-    spike_out_ready,
-    spike_out_valid,
-    spike_out_weight,
-    threshold_out);
+    rtl_learn_weight_ready,
+    rtl_snn_busy,
+    rtl_snn_ready,
+    rtl_spike_in_ready,
+    rtl_spike_out_neuron_id,
+    rtl_spike_out_valid,
+    rtl_spike_out_weight);
   inout [14:0]DDR_addr;
   inout [2:0]DDR_ba;
   inout DDR_cas_n;
@@ -114,31 +114,31 @@ module design_1_wrapper
   input [31:0]cfg_throughput_counter;
   output clk_100mhz;
   output [0:0]debug_learning_active;
-  output [15:0]leak_rate_out;
-  output [7:0]learn_weight_data;
-  output [6:0]learn_weight_dst;
-  output [3:0]learn_weight_dst_group;
-  output [0:0]learn_weight_exc;
-  output [3:0]learn_weight_fanout_idx;
-  output [3:0]learn_weight_group;
-  output [0:0]learn_weight_is_inter;
-  input learn_weight_ready;
-  output [6:0]learn_weight_src;
-  output [0:0]learn_weight_valid;
+  output [15:0]hls_leak_rate_out;
+  output [7:0]hls_learn_weight_data;
+  output [6:0]hls_learn_weight_dst;
+  output [2:0]hls_learn_weight_dst_group;
+  output [0:0]hls_learn_weight_exc;
+  output [3:0]hls_learn_weight_fanout_idx;
+  output [2:0]hls_learn_weight_group;
+  output [0:0]hls_learn_weight_is_inter;
+  output [6:0]hls_learn_weight_src;
+  output [0:0]hls_learn_weight_valid;
+  output [0:0]hls_snn_enable;
+  output [0:0]hls_snn_reset;
+  output [0:0]hls_spike_in_ready;
+  output [9:0]hls_spike_out_neuron_id;
+  output [0:0]hls_spike_out_valid;
+  output [7:0]hls_spike_out_weight;
+  output [15:0]hls_threshold_out;
   output [0:0]rst_n_sync;
-  input snn_busy;
-  output [0:0]snn_enable;
-  input snn_ready;
-  output [0:0]snn_reset;
-  output [10:0]spike_in_neuron_id;
-  input spike_in_ready;
-  output [0:0]spike_in_valid;
-  output [7:0]spike_in_weight;
-  input [10:0]spike_out_neuron_id;
-  output [0:0]spike_out_ready;
-  input spike_out_valid;
-  input [7:0]spike_out_weight;
-  output [15:0]threshold_out;
+  input rtl_learn_weight_ready;
+  input rtl_snn_busy;
+  input rtl_snn_ready;
+  input rtl_spike_in_ready;
+  input [9:0]rtl_spike_out_neuron_id;
+  input rtl_spike_out_valid;
+  input [7:0]rtl_spike_out_weight;
 
   wire [14:0]DDR_addr;
   wire [2:0]DDR_ba;
@@ -179,31 +179,31 @@ module design_1_wrapper
   wire [31:0]cfg_throughput_counter;
   wire clk_100mhz;
   wire [0:0]debug_learning_active;
-  wire [15:0]leak_rate_out;
-  wire [7:0]learn_weight_data;
-  wire [6:0]learn_weight_dst;
-  wire [3:0]learn_weight_dst_group;
-  wire [0:0]learn_weight_exc;
-  wire [3:0]learn_weight_fanout_idx;
-  wire [3:0]learn_weight_group;
-  wire [0:0]learn_weight_is_inter;
-  wire learn_weight_ready;
-  wire [6:0]learn_weight_src;
-  wire [0:0]learn_weight_valid;
+  wire [15:0]hls_leak_rate_out;
+  wire [7:0]hls_learn_weight_data;
+  wire [6:0]hls_learn_weight_dst;
+  wire [2:0]hls_learn_weight_dst_group;
+  wire [0:0]hls_learn_weight_exc;
+  wire [3:0]hls_learn_weight_fanout_idx;
+  wire [2:0]hls_learn_weight_group;
+  wire [0:0]hls_learn_weight_is_inter;
+  wire [6:0]hls_learn_weight_src;
+  wire [0:0]hls_learn_weight_valid;
+  wire [0:0]hls_snn_enable;
+  wire [0:0]hls_snn_reset;
+  wire [0:0]hls_spike_in_ready;
+  wire [9:0]hls_spike_out_neuron_id;
+  wire [0:0]hls_spike_out_valid;
+  wire [7:0]hls_spike_out_weight;
+  wire [15:0]hls_threshold_out;
   wire [0:0]rst_n_sync;
-  wire snn_busy;
-  wire [0:0]snn_enable;
-  wire snn_ready;
-  wire [0:0]snn_reset;
-  wire [10:0]spike_in_neuron_id;
-  wire spike_in_ready;
-  wire [0:0]spike_in_valid;
-  wire [7:0]spike_in_weight;
-  wire [10:0]spike_out_neuron_id;
-  wire [0:0]spike_out_ready;
-  wire spike_out_valid;
-  wire [7:0]spike_out_weight;
-  wire [15:0]threshold_out;
+  wire rtl_learn_weight_ready;
+  wire rtl_snn_busy;
+  wire rtl_snn_ready;
+  wire rtl_spike_in_ready;
+  wire [9:0]rtl_spike_out_neuron_id;
+  wire rtl_spike_out_valid;
+  wire [7:0]rtl_spike_out_weight;
 
   design_1 design_1_i
        (.DDR_addr(DDR_addr),
@@ -245,29 +245,29 @@ module design_1_wrapper
         .cfg_throughput_counter(cfg_throughput_counter),
         .clk_100mhz(clk_100mhz),
         .debug_learning_active(debug_learning_active),
-        .leak_rate_out(leak_rate_out),
-        .learn_weight_data(learn_weight_data),
-        .learn_weight_dst(learn_weight_dst),
-        .learn_weight_dst_group(learn_weight_dst_group),
-        .learn_weight_exc(learn_weight_exc),
-        .learn_weight_fanout_idx(learn_weight_fanout_idx),
-        .learn_weight_group(learn_weight_group),
-        .learn_weight_is_inter(learn_weight_is_inter),
-        .learn_weight_ready(learn_weight_ready),
-        .learn_weight_src(learn_weight_src),
-        .learn_weight_valid(learn_weight_valid),
+        .hls_leak_rate_out(hls_leak_rate_out),
+        .hls_learn_weight_data(hls_learn_weight_data),
+        .hls_learn_weight_dst(hls_learn_weight_dst),
+        .hls_learn_weight_dst_group(hls_learn_weight_dst_group),
+        .hls_learn_weight_exc(hls_learn_weight_exc),
+        .hls_learn_weight_fanout_idx(hls_learn_weight_fanout_idx),
+        .hls_learn_weight_group(hls_learn_weight_group),
+        .hls_learn_weight_is_inter(hls_learn_weight_is_inter),
+        .hls_learn_weight_src(hls_learn_weight_src),
+        .hls_learn_weight_valid(hls_learn_weight_valid),
+        .hls_snn_enable(hls_snn_enable),
+        .hls_snn_reset(hls_snn_reset),
+        .hls_spike_in_ready(hls_spike_in_ready),
+        .hls_spike_out_neuron_id(hls_spike_out_neuron_id),
+        .hls_spike_out_valid(hls_spike_out_valid),
+        .hls_spike_out_weight(hls_spike_out_weight),
+        .hls_threshold_out(hls_threshold_out),
         .rst_n_sync(rst_n_sync),
-        .snn_busy(snn_busy),
-        .snn_enable(snn_enable),
-        .snn_ready(snn_ready),
-        .snn_reset(snn_reset),
-        .spike_in_neuron_id(spike_in_neuron_id),
-        .spike_in_ready(spike_in_ready),
-        .spike_in_valid(spike_in_valid),
-        .spike_in_weight(spike_in_weight),
-        .spike_out_neuron_id(spike_out_neuron_id),
-        .spike_out_ready(spike_out_ready),
-        .spike_out_valid(spike_out_valid),
-        .spike_out_weight(spike_out_weight),
-        .threshold_out(threshold_out));
+        .rtl_learn_weight_ready(rtl_learn_weight_ready),
+        .rtl_snn_busy(rtl_snn_busy),
+        .rtl_snn_ready(rtl_snn_ready),
+        .rtl_spike_in_ready(rtl_spike_in_ready),
+        .rtl_spike_out_neuron_id(rtl_spike_out_neuron_id),
+        .rtl_spike_out_valid(rtl_spike_out_valid),
+        .rtl_spike_out_weight(rtl_spike_out_weight));
 endmodule

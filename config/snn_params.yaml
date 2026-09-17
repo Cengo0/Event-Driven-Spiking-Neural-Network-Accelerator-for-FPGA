@@ -39,17 +39,6 @@ architecture:
     - 128
     - 128
     - 128
-    - 128
-    - 128
-    - 128
-    - 128
-    - 128
-    - 128
-    - 128
-    - 128
-    - 128
-    - 128
-    - 128
   max_fanout_inter: 16      # Max inter-group fanout entries per neuron
   spike_buffer_depth: 64    # Input FIFO depth per core group (entries)
 

@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'decay_all_traces'
 ================================================================
-* Date:           Mon Aug 24 12:06:03 2026
+* Date:           Thu Sep 17 15:27:04 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -29,7 +29,7 @@
     |  Latency (cycles) |   Latency (absolute)  |   Interval  | Pipeline|
     |   min   |   max   |    min    |    max    |  min |  max |   Type  |
     +---------+---------+-----------+-----------+------+------+---------+
-    |     4895|     4895|  48.950 us|  48.950 us|  4895|  4895|       no|
+    |     1311|     1311|  13.110 us|  13.110 us|  1311|  1311|       no|
     +---------+---------+-----------+-----------+------+------+---------+
 
     + Detail: 
@@ -38,8 +38,8 @@
         |                                                      |                                            |  Latency (cycles) |   Latency (absolute)  |  Interval |      Pipeline     |
         |                       Instance                       |                   Module                   |   min   |   max   |    min    |    max    | min | max |        Type       |
         +------------------------------------------------------+--------------------------------------------+---------+---------+-----------+-----------+-----+-----+-------------------+
-        |grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28   |decay_all_traces_Pipeline_DECAY_PRE_TRACE   |     4894|     4894|  48.940 us|  48.940 us|    0|    0|  loop pipeline stp|
-        |grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36  |decay_all_traces_Pipeline_DECAY_POST_TRACE  |     4894|     4894|  48.940 us|  48.940 us|    0|    0|  loop pipeline stp|
+        |grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28   |decay_all_traces_Pipeline_DECAY_PRE_TRACE   |     1310|     1310|  13.100 us|  13.100 us|    0|    0|  loop pipeline stp|
+        |grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36  |decay_all_traces_Pipeline_DECAY_POST_TRACE  |     1310|     1310|  13.100 us|  13.100 us|    0|    0|  loop pipeline stp|
         +------------------------------------------------------+--------------------------------------------+---------+---------+-----------+-----------+-----+-----+-------------------+
 
         * Loop: 
@@ -57,12 +57,12 @@
 |DSP              |        -|    -|       -|      -|    -|
 |Expression       |        -|    -|       0|      2|    -|
 |FIFO             |        -|    -|       -|      -|    -|
-|Instance         |        -|    2|     242|    226|    -|
+|Instance         |        -|    2|     234|    218|    -|
 |Memory           |        -|    -|       -|      -|    -|
 |Multiplexer      |        -|    -|       0|     14|    -|
 |Register         |        -|    -|       4|      -|    -|
 +-----------------+---------+-----+--------+-------+-----+
-|Total            |        0|    2|     246|    242|    0|
+|Total            |        0|    2|     238|    234|    0|
 +-----------------+---------+-----+--------+-------+-----+
 |Available        |      280|  220|  106400|  53200|    0|
 +-----------------+---------+-----+--------+-------+-----+
@@ -74,10 +74,10 @@
     +------------------------------------------------------+--------------------------------------------+---------+----+-----+-----+-----+
     |                       Instance                       |                   Module                   | BRAM_18K| DSP|  FF | LUT | URAM|
     +------------------------------------------------------+--------------------------------------------+---------+----+-----+-----+-----+
-    |grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36  |decay_all_traces_Pipeline_DECAY_POST_TRACE  |        0|   1|  121|  113|    0|
-    |grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28   |decay_all_traces_Pipeline_DECAY_PRE_TRACE   |        0|   1|  121|  113|    0|
+    |grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36  |decay_all_traces_Pipeline_DECAY_POST_TRACE  |        0|   1|  117|  109|    0|
+    |grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28   |decay_all_traces_Pipeline_DECAY_PRE_TRACE   |        0|   1|  117|  109|    0|
     +------------------------------------------------------+--------------------------------------------+---------+----+-----+-----+-----+
-    |Total                                                 |                                            |        0|   2|  242|  226|    0|
+    |Total                                                 |                                            |        0|   2|  234|  218|    0|
     +------------------------------------------------------+--------------------------------------------+---------+----+-----+-----+-----+
 
     * DSP: 
@@ -134,17 +134,17 @@
 |ap_idle                 |  out|    1|  ap_ctrl_hs|        decay_all_traces|  return value|
 |ap_ready                |  out|    1|  ap_ctrl_hs|        decay_all_traces|  return value|
 |params_trace_decay_val  |   in|    8|     ap_none|  params_trace_decay_val|        scalar|
-|pre_traces_address0     |  out|   13|   ap_memory|              pre_traces|         array|
+|pre_traces_address0     |  out|   11|   ap_memory|              pre_traces|         array|
 |pre_traces_ce0          |  out|    1|   ap_memory|              pre_traces|         array|
 |pre_traces_q0           |   in|    8|   ap_memory|              pre_traces|         array|
-|pre_traces_address1     |  out|   13|   ap_memory|              pre_traces|         array|
+|pre_traces_address1     |  out|   11|   ap_memory|              pre_traces|         array|
 |pre_traces_ce1          |  out|    1|   ap_memory|              pre_traces|         array|
 |pre_traces_we1          |  out|    1|   ap_memory|              pre_traces|         array|
 |pre_traces_d1           |  out|    8|   ap_memory|              pre_traces|         array|
-|post_traces_address0    |  out|   13|   ap_memory|             post_traces|         array|
+|post_traces_address0    |  out|   11|   ap_memory|             post_traces|         array|
 |post_traces_ce0         |  out|    1|   ap_memory|             post_traces|         array|
 |post_traces_q0          |   in|    8|   ap_memory|             post_traces|         array|
-|post_traces_address1    |  out|   13|   ap_memory|             post_traces|         array|
+|post_traces_address1    |  out|   11|   ap_memory|             post_traces|         array|
 |post_traces_ce1         |  out|    1|   ap_memory|             post_traces|         array|
 |post_traces_we1         |  out|    1|   ap_memory|             post_traces|         array|
 |post_traces_d1          |  out|    8|   ap_memory|             post_traces|         array|

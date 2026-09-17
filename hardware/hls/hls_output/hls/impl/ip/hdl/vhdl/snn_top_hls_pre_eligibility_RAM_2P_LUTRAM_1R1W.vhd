@@ -12,8 +12,8 @@ entity snn_top_hls_pre_eligibility_RAM_2P_LUTRAM_1R1W is
     generic(
         MEM_TYPE        : string    := "distributed";
         DataWidth       : integer   := 8;
-        AddressWidth    : integer   := 13;
-        AddressRange    : integer   := 4890
+        AddressWidth    : integer   := 11;
+        AddressRange    : integer   := 1306
     );
     port (
         address0    : in std_logic_vector(AddressWidth-1 downto 0);

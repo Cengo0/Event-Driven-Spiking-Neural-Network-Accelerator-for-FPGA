@@ -80,9 +80,9 @@ reg s_axis_data_TREADY;
 
 (* fsm_encoding = "none" *) reg   [0:0] ap_CS_fsm;
 wire    ap_CS_fsm_state1;
-wire   [0:0] tmp_5_nbreadreq_fu_78_p9;
+wire   [0:0] tmp_9_nbreadreq_fu_78_p9;
 reg    ap_block_state1_pp0_stage0_iter0;
-wire   [0:0] or_cond75_fu_260_p2;
+wire   [0:0] or_cond60_fu_260_p2;
 reg    ap_condition_exit_pp0_iter0_stage0;
 wire    ap_loop_exit_ready;
 reg    ap_ready_int;
@@ -160,7 +160,7 @@ end
 
 always @ (posedge ap_clk) begin
     if (((1'b0 == ap_block_state1_pp0_stage0_iter0) & (1'b1 == ap_CS_fsm_state1))) begin
-        if ((tmp_5_nbreadreq_fu_78_p9 == 1'd1)) begin
+        if ((tmp_9_nbreadreq_fu_78_p9 == 1'd1)) begin
             i_3_fu_74 <= add_ln858_fu_174_p2;
         end else if ((ap_loop_init == 1'b1)) begin
             i_3_fu_74 <= 8'd0;
@@ -177,7 +177,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((1'b0 == ap_block_state1_pp0_stage0_iter0) & (1'b1 == ap_CS_fsm_state1) & ((or_cond75_fu_260_p2 == 1'd0) | (tmp_5_nbreadreq_fu_78_p9 == 1'd0)))) begin
+    if (((1'b0 == ap_block_state1_pp0_stage0_iter0) & (1'b1 == ap_CS_fsm_state1) & ((or_cond60_fu_260_p2 == 1'd0) | (tmp_9_nbreadreq_fu_78_p9 == 1'd0)))) begin
         ap_condition_exit_pp0_iter0_stage0 = 1'b1;
     end else begin
         ap_condition_exit_pp0_iter0_stage0 = 1'b0;
@@ -233,7 +233,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((1'b0 == ap_block_state1_pp0_stage0_iter0) & (tmp_5_nbreadreq_fu_78_p9 == 1'd1) & (1'b1 == ap_CS_fsm_state1))) begin
+    if (((1'b0 == ap_block_state1_pp0_stage0_iter0) & (tmp_9_nbreadreq_fu_78_p9 == 1'd1) & (1'b1 == ap_CS_fsm_state1))) begin
         p_ZL13encoder_frame_0_we0_local = 1'b1;
     end else begin
         p_ZL13encoder_frame_0_we0_local = 1'b0;
@@ -241,7 +241,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((1'b0 == ap_block_state1_pp0_stage0_iter0) & (tmp_5_nbreadreq_fu_78_p9 == 1'd1) & (1'b1 == ap_CS_fsm_state1))) begin
+    if (((1'b0 == ap_block_state1_pp0_stage0_iter0) & (tmp_9_nbreadreq_fu_78_p9 == 1'd1) & (1'b1 == ap_CS_fsm_state1))) begin
         p_ZL13encoder_frame_0_we1_local = 1'b1;
     end else begin
         p_ZL13encoder_frame_0_we1_local = 1'b0;
@@ -265,7 +265,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((1'b0 == ap_block_state1_pp0_stage0_iter0) & (tmp_5_nbreadreq_fu_78_p9 == 1'd1) & (1'b1 == ap_CS_fsm_state1))) begin
+    if (((1'b0 == ap_block_state1_pp0_stage0_iter0) & (tmp_9_nbreadreq_fu_78_p9 == 1'd1) & (1'b1 == ap_CS_fsm_state1))) begin
         p_ZL13encoder_frame_1_we0_local = 1'b1;
     end else begin
         p_ZL13encoder_frame_1_we0_local = 1'b0;
@@ -273,7 +273,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((1'b0 == ap_block_state1_pp0_stage0_iter0) & (tmp_5_nbreadreq_fu_78_p9 == 1'd1) & (1'b1 == ap_CS_fsm_state1))) begin
+    if (((1'b0 == ap_block_state1_pp0_stage0_iter0) & (tmp_9_nbreadreq_fu_78_p9 == 1'd1) & (1'b1 == ap_CS_fsm_state1))) begin
         p_ZL13encoder_frame_1_we1_local = 1'b1;
     end else begin
         p_ZL13encoder_frame_1_we1_local = 1'b0;
@@ -281,7 +281,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((tmp_5_nbreadreq_fu_78_p9 == 1'd1) & (ap_start_int == 1'b1) & (1'b1 == ap_CS_fsm_state1))) begin
+    if (((tmp_9_nbreadreq_fu_78_p9 == 1'd1) & (ap_start_int == 1'b1) & (1'b1 == ap_CS_fsm_state1))) begin
         s_axis_data_TDATA_blk_n = s_axis_data_TVALID;
     end else begin
         s_axis_data_TDATA_blk_n = 1'b1;
@@ -289,7 +289,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((1'b0 == ap_block_state1_pp0_stage0_iter0) & (tmp_5_nbreadreq_fu_78_p9 == 1'd1) & (1'b1 == ap_CS_fsm_state1))) begin
+    if (((1'b0 == ap_block_state1_pp0_stage0_iter0) & (tmp_9_nbreadreq_fu_78_p9 == 1'd1) & (1'b1 == ap_CS_fsm_state1))) begin
         s_axis_data_TREADY = 1'b1;
     end else begin
         s_axis_data_TREADY = 1'b0;
@@ -312,7 +312,7 @@ assign add_ln858_fu_174_p2 = (ap_sig_allocacmp_i + 8'd1);
 assign ap_CS_fsm_state1 = ap_CS_fsm[32'd0];
 
 always @ (*) begin
-    ap_block_state1_pp0_stage0_iter0 = ((ap_start_int == 1'b0) | ((tmp_5_nbreadreq_fu_78_p9 == 1'd1) & (s_axis_data_TVALID == 1'b0)));
+    ap_block_state1_pp0_stage0_iter0 = ((ap_start_int == 1'b0) | ((tmp_9_nbreadreq_fu_78_p9 == 1'd1) & (s_axis_data_TVALID == 1'b0)));
 end
 
 assign ap_done = ap_done_sig;
@@ -323,7 +323,7 @@ assign ap_ready = ap_ready_sig;
 
 assign icmp_ln858_fu_254_p2 = ((add_ln858_fu_174_p2 < 8'd196) ? 1'b1 : 1'b0);
 
-assign or_cond75_fu_260_p2 = (xor_ln867_fu_248_p2 & icmp_ln858_fu_254_p2);
+assign or_cond60_fu_260_p2 = (xor_ln867_fu_248_p2 & icmp_ln858_fu_254_p2);
 
 assign or_ln_fu_216_p3 = {{ap_sig_allocacmp_i}, {1'd1}};
 
@@ -361,7 +361,7 @@ assign p_ZL13encoder_frame_1_we1 = p_ZL13encoder_frame_1_we1_local;
 
 assign shl_ln_fu_188_p3 = {{ap_sig_allocacmp_i}, {1'd0}};
 
-assign tmp_5_nbreadreq_fu_78_p9 = s_axis_data_TVALID;
+assign tmp_9_nbreadreq_fu_78_p9 = s_axis_data_TVALID;
 
 assign trunc_ln863_fu_202_p1 = s_axis_data_TDATA[7:0];
 

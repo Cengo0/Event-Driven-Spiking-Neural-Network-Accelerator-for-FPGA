@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'snn_top_hls_Pipeline_ENCODER_LOOP'
 ================================================================
-* Date:           Mon Aug 24 12:06:03 2026
+* Date:           Thu Sep 17 15:27:05 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -149,7 +149,7 @@
     |p_ZL17encoder_phase_acc_1_addr_reg_429                |   9|   0|    9|          0|
     |p_ZL17encoder_phase_acc_1_addr_reg_429_pp0_iter1_reg  |   9|   0|    9|          0|
     |sub_ln79_reg_454                                      |  16|   0|   16|          0|
-    |tmp_1_reg_450                                         |   1|   0|    1|          0|
+    |tmp_5_reg_450                                         |   1|   0|    1|          0|
     |trunc_ln93_reg_435                                    |   1|   0|    1|          0|
     +------------------------------------------------------+----+----+-----+-----------+
     |Total                                                 | 111|   0|  111|          0|
@@ -177,7 +177,7 @@
 |encoder_config_num_channels               |   in|   16|     ap_none|        encoder_config_num_channels|        scalar|
 |encoder_config_delta_threshold            |   in|   16|     ap_none|     encoder_config_delta_threshold|        scalar|
 |encoder_config_delta_decay                |   in|   16|     ap_none|         encoder_config_delta_decay|        scalar|
-|time_r                                    |   in|   11|     ap_none|                             time_r|        scalar|
+|time_r                                    |   in|   13|     ap_none|                             time_r|        scalar|
 |encoder_config_default_weight             |   in|    8|     ap_none|      encoder_config_default_weight|        scalar|
 |encoder_spike_counter_flag_3_out          |  out|    1|      ap_vld|   encoder_spike_counter_flag_3_out|       pointer|
 |encoder_spike_counter_flag_3_out_ap_vld   |  out|    1|      ap_vld|   encoder_spike_counter_flag_3_out|       pointer|

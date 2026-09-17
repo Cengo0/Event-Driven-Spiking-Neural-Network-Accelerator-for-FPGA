@@ -22,37 +22,37 @@
 </SummaryOfTimingAnalysis>
 <SummaryOfOverallLatency>
 <unit>clock cycles</unit>
-<Best-caseLatency>27</Best-caseLatency>
+<Best-caseLatency>9</Best-caseLatency>
 <Average-caseLatency>undef</Average-caseLatency>
-<Worst-caseLatency>98371</Worst-caseLatency>
-<Best-caseRealTimeLatency>0.270 us</Best-caseRealTimeLatency>
+<Worst-caseLatency>28245</Worst-caseLatency>
+<Best-caseRealTimeLatency>90.000 ns</Best-caseRealTimeLatency>
 <Average-caseRealTimeLatency>undef</Average-caseRealTimeLatency>
-<Worst-caseRealTimeLatency>0.984 ms</Worst-caseRealTimeLatency>
-<Interval-min>27</Interval-min>
-<Interval-max>98371</Interval-max>
+<Worst-caseRealTimeLatency>0.282 ms</Worst-caseRealTimeLatency>
+<Interval-min>9</Interval-min>
+<Interval-max>28245</Interval-max>
 <PerformancePragma>-</PerformancePragma>
 </SummaryOfOverallLatency>
 <SummaryOfLoopLatency>
 <LTP_CONN_LOOP>
 <Slack>7.30</Slack>
-<TripCount>8</TripCount>
+<TripCount>3</TripCount>
 <isPerfectNested>0</isPerfectNested>
 <Latency>
 <range>
-<min>24</min>
-<max>98368</max>
+<min>6</min>
+<max>28242</max>
 </range>
 </Latency>
 <AbsoluteTimeLatency>
 <range>
-<min>240</min>
-<max>983680</max>
+<min>60</min>
+<max>282420</max>
 </range>
 </AbsoluteTimeLatency>
 <IterationLatency>
 <range>
-<min>3</min>
-<max>12296</max>
+<min>2</min>
+<max>9414</max>
 </range>
 </IterationLatency>
 <PerformancePragma>-</PerformancePragma>
@@ -77,10 +77,10 @@
 
 <AreaEstimates>
 <Resources>
-<BRAM_18K>0</BRAM_18K>
 <DSP>3</DSP>
-<FF>393</FF>
-<LUT>641</LUT>
+<FF>299</FF>
+<LUT>664</LUT>
+<BRAM_18K>0</BRAM_18K>
 <URAM>0</URAM>
 </Resources>
 <AvailableResources>
@@ -167,7 +167,7 @@
 <IOProtocol>ap_none</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>in</Dir>
-<Bits>11</Bits>
+<Bits>10</Bits>
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -211,7 +211,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>13</Bits>
+<Bits>11</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -244,7 +244,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>13</Bits>
+<Bits>11</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -281,39 +281,6 @@
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
-<name>CONNECTION_TABLE_src_size_address0</name>
-<Object>CONNECTION_TABLE_src_size</Object>
-<Type>array</Type>
-<Scope>global</Scope>
-<IOProtocol>ap_memory</IOProtocol>
-<IOConfig></IOConfig>
-<Dir>out</Dir>
-<Bits>3</Bits>
-<Attribute>address</Attribute>
-</RtlPorts>
-<RtlPorts>
-<name>CONNECTION_TABLE_src_size_ce0</name>
-<Object>CONNECTION_TABLE_src_size</Object>
-<Type>array</Type>
-<Scope>global</Scope>
-<IOProtocol>ap_memory</IOProtocol>
-<IOConfig></IOConfig>
-<Dir>out</Dir>
-<Bits>1</Bits>
-<Attribute>control</Attribute>
-</RtlPorts>
-<RtlPorts>
-<name>CONNECTION_TABLE_src_size_q0</name>
-<Object>CONNECTION_TABLE_src_size</Object>
-<Type>array</Type>
-<Scope>global</Scope>
-<IOProtocol>ap_memory</IOProtocol>
-<IOConfig></IOConfig>
-<Dir>in</Dir>
-<Bits>11</Bits>
-<Attribute>data</Attribute>
-</RtlPorts>
-<RtlPorts>
 <name>pre_traces_address0</name>
 <Object>pre_traces</Object>
 <Type>array</Type>
@@ -321,7 +288,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>13</Bits>
+<Bits>11</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -354,7 +321,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>20</Bits>
+<Bits>19</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -442,7 +409,7 @@
 <IOProtocol>ap_vld</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>4</Bits>
+<Bits>3</Bits>
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -574,7 +541,7 @@
 <IOProtocol>ap_vld</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>4</Bits>
+<Bits>3</Bits>
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>

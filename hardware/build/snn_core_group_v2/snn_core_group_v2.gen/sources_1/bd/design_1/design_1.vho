@@ -74,30 +74,30 @@ COMPONENT design_1
     FIXED_IO_ps_srstb : INOUT STD_LOGIC;
     FIXED_IO_ps_clk : INOUT STD_LOGIC;
     FIXED_IO_ps_porb : INOUT STD_LOGIC;
-    spike_in_valid : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-    spike_in_neuron_id : OUT STD_LOGIC_VECTOR(10 DOWNTO 0);
-    spike_in_weight : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-    spike_in_ready : IN STD_LOGIC;
-    spike_out_valid : IN STD_LOGIC;
-    spike_out_neuron_id : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
-    spike_out_weight : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-    spike_out_ready : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-    learn_weight_valid : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-    learn_weight_group : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-    learn_weight_src : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
-    learn_weight_dst : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
-    learn_weight_data : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-    learn_weight_exc : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-    learn_weight_is_inter : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-    learn_weight_dst_group : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-    learn_weight_fanout_idx : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-    learn_weight_ready : IN STD_LOGIC;
-    snn_enable : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-    snn_reset : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-    snn_ready : IN STD_LOGIC;
-    snn_busy : IN STD_LOGIC;
-    threshold_out : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-    leak_rate_out : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+    hls_spike_out_valid : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    hls_spike_out_neuron_id : OUT STD_LOGIC_VECTOR(9 DOWNTO 0);
+    hls_spike_out_weight : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+    rtl_spike_in_ready : IN STD_LOGIC;
+    rtl_spike_out_valid : IN STD_LOGIC;
+    rtl_spike_out_neuron_id : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
+    rtl_spike_out_weight : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+    hls_spike_in_ready : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    hls_learn_weight_valid : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    hls_learn_weight_group : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+    hls_learn_weight_src : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+    hls_learn_weight_dst : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+    hls_learn_weight_data : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+    hls_learn_weight_exc : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    hls_learn_weight_is_inter : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    hls_learn_weight_dst_group : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+    hls_learn_weight_fanout_idx : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+    rtl_learn_weight_ready : IN STD_LOGIC;
+    hls_snn_enable : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    hls_snn_reset : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    rtl_snn_ready : IN STD_LOGIC;
+    rtl_snn_busy : IN STD_LOGIC;
+    hls_threshold_out : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+    hls_leak_rate_out : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
     cfg_router_config_we : OUT STD_LOGIC;
     cfg_router_config_addr : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     cfg_router_config_wdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -148,30 +148,30 @@ your_instance_name : design_1
     FIXED_IO_ps_srstb => FIXED_IO_ps_srstb,
     FIXED_IO_ps_clk => FIXED_IO_ps_clk,
     FIXED_IO_ps_porb => FIXED_IO_ps_porb,
-    spike_in_valid => spike_in_valid,
-    spike_in_neuron_id => spike_in_neuron_id,
-    spike_in_weight => spike_in_weight,
-    spike_in_ready => spike_in_ready,
-    spike_out_valid => spike_out_valid,
-    spike_out_neuron_id => spike_out_neuron_id,
-    spike_out_weight => spike_out_weight,
-    spike_out_ready => spike_out_ready,
-    learn_weight_valid => learn_weight_valid,
-    learn_weight_group => learn_weight_group,
-    learn_weight_src => learn_weight_src,
-    learn_weight_dst => learn_weight_dst,
-    learn_weight_data => learn_weight_data,
-    learn_weight_exc => learn_weight_exc,
-    learn_weight_is_inter => learn_weight_is_inter,
-    learn_weight_dst_group => learn_weight_dst_group,
-    learn_weight_fanout_idx => learn_weight_fanout_idx,
-    learn_weight_ready => learn_weight_ready,
-    snn_enable => snn_enable,
-    snn_reset => snn_reset,
-    snn_ready => snn_ready,
-    snn_busy => snn_busy,
-    threshold_out => threshold_out,
-    leak_rate_out => leak_rate_out,
+    hls_spike_out_valid => hls_spike_out_valid,
+    hls_spike_out_neuron_id => hls_spike_out_neuron_id,
+    hls_spike_out_weight => hls_spike_out_weight,
+    rtl_spike_in_ready => rtl_spike_in_ready,
+    rtl_spike_out_valid => rtl_spike_out_valid,
+    rtl_spike_out_neuron_id => rtl_spike_out_neuron_id,
+    rtl_spike_out_weight => rtl_spike_out_weight,
+    hls_spike_in_ready => hls_spike_in_ready,
+    hls_learn_weight_valid => hls_learn_weight_valid,
+    hls_learn_weight_group => hls_learn_weight_group,
+    hls_learn_weight_src => hls_learn_weight_src,
+    hls_learn_weight_dst => hls_learn_weight_dst,
+    hls_learn_weight_data => hls_learn_weight_data,
+    hls_learn_weight_exc => hls_learn_weight_exc,
+    hls_learn_weight_is_inter => hls_learn_weight_is_inter,
+    hls_learn_weight_dst_group => hls_learn_weight_dst_group,
+    hls_learn_weight_fanout_idx => hls_learn_weight_fanout_idx,
+    rtl_learn_weight_ready => rtl_learn_weight_ready,
+    hls_snn_enable => hls_snn_enable,
+    hls_snn_reset => hls_snn_reset,
+    rtl_snn_ready => rtl_snn_ready,
+    rtl_snn_busy => rtl_snn_busy,
+    hls_threshold_out => hls_threshold_out,
+    hls_leak_rate_out => hls_leak_rate_out,
     cfg_router_config_we => cfg_router_config_we,
     cfg_router_config_addr => cfg_router_config_addr,
     cfg_router_config_wdata => cfg_router_config_wdata,

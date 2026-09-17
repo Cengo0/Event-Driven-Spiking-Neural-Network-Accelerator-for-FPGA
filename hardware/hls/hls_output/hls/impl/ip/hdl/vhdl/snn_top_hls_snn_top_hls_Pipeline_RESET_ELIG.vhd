@@ -16,11 +16,11 @@ port (
     ap_done : OUT STD_LOGIC;
     ap_idle : OUT STD_LOGIC;
     ap_ready : OUT STD_LOGIC;
-    pre_eligibility_address1 : OUT STD_LOGIC_VECTOR (12 downto 0);
+    pre_eligibility_address1 : OUT STD_LOGIC_VECTOR (10 downto 0);
     pre_eligibility_ce1 : OUT STD_LOGIC;
     pre_eligibility_we1 : OUT STD_LOGIC;
     pre_eligibility_d1 : OUT STD_LOGIC_VECTOR (7 downto 0);
-    post_eligibility_address1 : OUT STD_LOGIC_VECTOR (12 downto 0);
+    post_eligibility_address1 : OUT STD_LOGIC_VECTOR (10 downto 0);
     post_eligibility_ce1 : OUT STD_LOGIC;
     post_eligibility_we1 : OUT STD_LOGIC;
     post_eligibility_d1 : OUT STD_LOGIC_VECTOR (7 downto 0) );
@@ -38,10 +38,10 @@ architecture behav of snn_top_hls_snn_top_hls_Pipeline_RESET_ELIG is
     constant ap_const_boolean_0 : BOOLEAN := false;
     constant ap_const_lv1_1 : STD_LOGIC_VECTOR (0 downto 0) := "1";
     constant ap_const_lv1_0 : STD_LOGIC_VECTOR (0 downto 0) := "0";
-    constant ap_const_lv13_0 : STD_LOGIC_VECTOR (12 downto 0) := "0000000000000";
+    constant ap_const_lv11_0 : STD_LOGIC_VECTOR (10 downto 0) := "00000000000";
     constant ap_const_lv8_0 : STD_LOGIC_VECTOR (7 downto 0) := "00000000";
-    constant ap_const_lv13_131A : STD_LOGIC_VECTOR (12 downto 0) := "1001100011010";
-    constant ap_const_lv13_1 : STD_LOGIC_VECTOR (12 downto 0) := "0000000000001";
+    constant ap_const_lv11_51A : STD_LOGIC_VECTOR (10 downto 0) := "10100011010";
+    constant ap_const_lv11_1 : STD_LOGIC_VECTOR (10 downto 0) := "00000000001";
 
 attribute shreg_extract : string;
     signal ap_CS_fsm : STD_LOGIC_VECTOR (0 downto 0) := "1";
@@ -55,10 +55,10 @@ attribute shreg_extract : string;
     signal ap_loop_exit_ready : STD_LOGIC;
     signal ap_ready_int : STD_LOGIC;
     signal zext_ln782_fu_102_p1 : STD_LOGIC_VECTOR (63 downto 0);
-    signal i_fu_42 : STD_LOGIC_VECTOR (12 downto 0) := "0000000000000";
-    signal add_ln782_fu_96_p2 : STD_LOGIC_VECTOR (12 downto 0);
+    signal i_fu_42 : STD_LOGIC_VECTOR (10 downto 0) := "00000000000";
+    signal add_ln782_fu_96_p2 : STD_LOGIC_VECTOR (10 downto 0);
     signal ap_loop_init : STD_LOGIC;
-    signal ap_sig_allocacmp_i_3 : STD_LOGIC_VECTOR (12 downto 0);
+    signal ap_sig_allocacmp_i_3 : STD_LOGIC_VECTOR (10 downto 0);
     signal pre_eligibility_we1_local : STD_LOGIC;
     signal pre_eligibility_ce1_local : STD_LOGIC;
     signal post_eligibility_we1_local : STD_LOGIC;
@@ -146,7 +146,7 @@ begin
                 if ((icmp_ln782_fu_90_p2 = ap_const_lv1_0)) then 
                     i_fu_42 <= add_ln782_fu_96_p2;
                 elsif ((ap_loop_init = ap_const_logic_1)) then 
-                    i_fu_42 <= ap_const_lv13_0;
+                    i_fu_42 <= ap_const_lv11_0;
                 end if;
             end if; 
         end if;
@@ -161,7 +161,7 @@ begin
                 ap_NS_fsm <= "X";
         end case;
     end process;
-    add_ln782_fu_96_p2 <= std_logic_vector(unsigned(ap_sig_allocacmp_i_3) + unsigned(ap_const_lv13_1));
+    add_ln782_fu_96_p2 <= std_logic_vector(unsigned(ap_sig_allocacmp_i_3) + unsigned(ap_const_lv11_1));
     ap_CS_fsm_state1 <= ap_CS_fsm(0);
 
     ap_ST_fsm_state1_blk_assign_proc : process(ap_block_state1_pp0_stage0_iter0)
@@ -226,14 +226,14 @@ begin
     ap_sig_allocacmp_i_3_assign_proc : process(ap_CS_fsm_state1, i_fu_42, ap_loop_init)
     begin
         if (((ap_loop_init = ap_const_logic_1) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
-            ap_sig_allocacmp_i_3 <= ap_const_lv13_0;
+            ap_sig_allocacmp_i_3 <= ap_const_lv11_0;
         else 
             ap_sig_allocacmp_i_3 <= i_fu_42;
         end if; 
     end process;
 
-    icmp_ln782_fu_90_p2 <= "1" when (ap_sig_allocacmp_i_3 = ap_const_lv13_131A) else "0";
-    post_eligibility_address1 <= zext_ln782_fu_102_p1(13 - 1 downto 0);
+    icmp_ln782_fu_90_p2 <= "1" when (ap_sig_allocacmp_i_3 = ap_const_lv11_51A) else "0";
+    post_eligibility_address1 <= zext_ln782_fu_102_p1(11 - 1 downto 0);
     post_eligibility_ce1 <= post_eligibility_ce1_local;
 
     post_eligibility_ce1_local_assign_proc : process(ap_CS_fsm_state1, ap_block_state1_pp0_stage0_iter0)
@@ -257,7 +257,7 @@ begin
         end if; 
     end process;
 
-    pre_eligibility_address1 <= zext_ln782_fu_102_p1(13 - 1 downto 0);
+    pre_eligibility_address1 <= zext_ln782_fu_102_p1(11 - 1 downto 0);
     pre_eligibility_ce1 <= pre_eligibility_ce1_local;
 
     pre_eligibility_ce1_local_assign_proc : process(ap_CS_fsm_state1, ap_block_state1_pp0_stage0_iter0)

@@ -23,7 +23,7 @@ port (
     encoder_config_num_channels : IN STD_LOGIC_VECTOR (15 downto 0);
     encoder_config_delta_threshold : IN STD_LOGIC_VECTOR (15 downto 0);
     encoder_config_delta_decay : IN STD_LOGIC_VECTOR (15 downto 0);
-    time_r : IN STD_LOGIC_VECTOR (10 downto 0);
+    time_r : IN STD_LOGIC_VECTOR (12 downto 0);
     encoder_config_default_weight : IN STD_LOGIC_VECTOR (7 downto 0);
     encoder_spike_counter_flag_3_out : OUT STD_LOGIC_VECTOR (0 downto 0);
     encoder_spike_counter_flag_3_out_ap_vld : OUT STD_LOGIC;
@@ -89,7 +89,7 @@ attribute shreg_extract : string;
     signal icmp_ln95_reg_409_pp0_iter1_reg : STD_LOGIC_VECTOR (0 downto 0);
     signal icmp_ln99_reg_395 : STD_LOGIC_VECTOR (0 downto 0);
     signal icmp_ln77_reg_446 : STD_LOGIC_VECTOR (0 downto 0);
-    signal tmp_1_reg_450 : STD_LOGIC_VECTOR (0 downto 0);
+    signal tmp_5_reg_450 : STD_LOGIC_VECTOR (0 downto 0);
     signal ap_predicate_op71_write_state4 : BOOLEAN;
     signal ap_block_state4_pp0_stage1_iter1_grp1 : BOOLEAN;
     signal ap_block_pp0_stage1_subdone : BOOLEAN;
@@ -150,7 +150,7 @@ attribute shreg_extract : string;
     signal zext_ln68_fu_275_p1 : STD_LOGIC_VECTOR (15 downto 0);
     signal icmp_ln72_fu_293_p2 : STD_LOGIC_VECTOR (0 downto 0);
     signal sub_ln73_fu_297_p2 : STD_LOGIC_VECTOR (15 downto 0);
-    signal zext_ln48_fu_324_p1 : STD_LOGIC_VECTOR (12 downto 0);
+    signal zext_ln48_fu_324_p1 : STD_LOGIC_VECTOR (10 downto 0);
     signal or_ln54_3_fu_327_p5 : STD_LOGIC_VECTOR (32 downto 0);
     signal ap_done_reg : STD_LOGIC := '0';
     signal ap_continue_int : STD_LOGIC;
@@ -314,7 +314,7 @@ begin
                 p_ZL17encoder_phase_acc_1_addr_reg_429 <= zext_ln93_1_fu_245_p1(9 - 1 downto 0);
                 p_ZL17encoder_phase_acc_1_addr_reg_429_pp0_iter1_reg <= p_ZL17encoder_phase_acc_1_addr_reg_429;
                 sub_ln79_reg_454 <= sub_ln79_fu_315_p2;
-                tmp_1_reg_450 <= (0=>encoder_spikes_full_n, others=>'-');
+                tmp_5_reg_450 <= (0=>encoder_spikes_full_n, others=>'-');
             end if;
         end if;
     end process;
@@ -427,9 +427,9 @@ begin
 
     ap_loop_exit_ready <= ap_condition_exit_pp0_iter0_stage1;
 
-    ap_predicate_op71_write_state4_assign_proc : process(icmp_ln95_reg_409_pp0_iter1_reg, icmp_ln99_reg_395, icmp_ln77_reg_446, tmp_1_reg_450)
+    ap_predicate_op71_write_state4_assign_proc : process(icmp_ln95_reg_409_pp0_iter1_reg, icmp_ln99_reg_395, icmp_ln77_reg_446, tmp_5_reg_450)
     begin
-                ap_predicate_op71_write_state4 <= ((tmp_1_reg_450 = ap_const_lv1_1) and (icmp_ln77_reg_446 = ap_const_lv1_0) and (icmp_ln99_reg_395 = ap_const_lv1_1) and (icmp_ln95_reg_409_pp0_iter1_reg = ap_const_lv1_1));
+                ap_predicate_op71_write_state4 <= ((tmp_5_reg_450 = ap_const_lv1_1) and (icmp_ln77_reg_446 = ap_const_lv1_0) and (icmp_ln99_reg_395 = ap_const_lv1_1) and (icmp_ln95_reg_409_pp0_iter1_reg = ap_const_lv1_1));
     end process;
 
     ap_ready <= ap_ready_sig;
@@ -456,9 +456,9 @@ begin
     ch_2_fu_225_p2 <= std_logic_vector(unsigned(ap_sig_allocacmp_ch_1) + unsigned(ap_const_lv10_1));
     encoder_spike_counter_flag_3_out <= ap_const_lv1_1;
 
-    encoder_spike_counter_flag_3_out_ap_vld_assign_proc : process(ap_enable_reg_pp0_iter1, ap_CS_fsm_pp0_stage1, icmp_ln95_reg_409_pp0_iter1_reg, icmp_ln99_reg_395, icmp_ln77_reg_446, tmp_1_reg_450, ap_block_pp0_stage1_11001_grp0, ap_block_pp0_stage1_subdone_grp0_done_reg)
+    encoder_spike_counter_flag_3_out_ap_vld_assign_proc : process(ap_enable_reg_pp0_iter1, ap_CS_fsm_pp0_stage1, icmp_ln95_reg_409_pp0_iter1_reg, icmp_ln99_reg_395, icmp_ln77_reg_446, tmp_5_reg_450, ap_block_pp0_stage1_11001_grp0, ap_block_pp0_stage1_subdone_grp0_done_reg)
     begin
-        if (((ap_const_boolean_0 = ap_block_pp0_stage1_subdone_grp0_done_reg) and (ap_const_boolean_0 = ap_block_pp0_stage1_11001_grp0) and (tmp_1_reg_450 = ap_const_lv1_1) and (icmp_ln77_reg_446 = ap_const_lv1_0) and (icmp_ln99_reg_395 = ap_const_lv1_1) and (icmp_ln95_reg_409_pp0_iter1_reg = ap_const_lv1_1) and (ap_enable_reg_pp0_iter1 = ap_const_logic_1) and (ap_const_logic_1 = ap_CS_fsm_pp0_stage1))) then 
+        if (((ap_const_boolean_0 = ap_block_pp0_stage1_subdone_grp0_done_reg) and (ap_const_boolean_0 = ap_block_pp0_stage1_11001_grp0) and (tmp_5_reg_450 = ap_const_lv1_1) and (icmp_ln77_reg_446 = ap_const_lv1_0) and (icmp_ln99_reg_395 = ap_const_lv1_1) and (icmp_ln95_reg_409_pp0_iter1_reg = ap_const_lv1_1) and (ap_enable_reg_pp0_iter1 = ap_const_logic_1) and (ap_const_logic_1 = ap_CS_fsm_pp0_stage1))) then 
             encoder_spike_counter_flag_3_out_ap_vld <= ap_const_logic_1;
         else 
             encoder_spike_counter_flag_3_out_ap_vld <= ap_const_logic_0;
@@ -466,9 +466,9 @@ begin
     end process;
 
 
-    encoder_spike_counter_loc_3_out_o_assign_proc : process(ap_enable_reg_pp0_iter1, ap_CS_fsm_pp0_stage1, icmp_ln95_reg_409_pp0_iter1_reg, icmp_ln99_reg_395, icmp_ln77_reg_446, tmp_1_reg_450, encoder_spike_counter_loc_3_out_i, ap_block_pp0_stage1_grp0, add_ln55_fu_342_p2)
+    encoder_spike_counter_loc_3_out_o_assign_proc : process(ap_enable_reg_pp0_iter1, ap_CS_fsm_pp0_stage1, icmp_ln95_reg_409_pp0_iter1_reg, icmp_ln99_reg_395, icmp_ln77_reg_446, tmp_5_reg_450, encoder_spike_counter_loc_3_out_i, ap_block_pp0_stage1_grp0, add_ln55_fu_342_p2)
     begin
-        if (((ap_const_boolean_0 = ap_block_pp0_stage1_grp0) and (tmp_1_reg_450 = ap_const_lv1_1) and (icmp_ln77_reg_446 = ap_const_lv1_0) and (icmp_ln99_reg_395 = ap_const_lv1_1) and (icmp_ln95_reg_409_pp0_iter1_reg = ap_const_lv1_1) and (ap_enable_reg_pp0_iter1 = ap_const_logic_1) and (ap_const_logic_1 = ap_CS_fsm_pp0_stage1))) then 
+        if (((ap_const_boolean_0 = ap_block_pp0_stage1_grp0) and (tmp_5_reg_450 = ap_const_lv1_1) and (icmp_ln77_reg_446 = ap_const_lv1_0) and (icmp_ln99_reg_395 = ap_const_lv1_1) and (icmp_ln95_reg_409_pp0_iter1_reg = ap_const_lv1_1) and (ap_enable_reg_pp0_iter1 = ap_const_logic_1) and (ap_const_logic_1 = ap_CS_fsm_pp0_stage1))) then 
             encoder_spike_counter_loc_3_out_o <= add_ln55_fu_342_p2;
         else 
             encoder_spike_counter_loc_3_out_o <= encoder_spike_counter_loc_3_out_i;
@@ -476,9 +476,9 @@ begin
     end process;
 
 
-    encoder_spike_counter_loc_3_out_o_ap_vld_assign_proc : process(ap_enable_reg_pp0_iter1, ap_CS_fsm_pp0_stage1, icmp_ln95_reg_409_pp0_iter1_reg, icmp_ln99_reg_395, icmp_ln77_reg_446, tmp_1_reg_450, ap_block_pp0_stage1_11001_grp0, ap_block_pp0_stage1_subdone_grp0_done_reg)
+    encoder_spike_counter_loc_3_out_o_ap_vld_assign_proc : process(ap_enable_reg_pp0_iter1, ap_CS_fsm_pp0_stage1, icmp_ln95_reg_409_pp0_iter1_reg, icmp_ln99_reg_395, icmp_ln77_reg_446, tmp_5_reg_450, ap_block_pp0_stage1_11001_grp0, ap_block_pp0_stage1_subdone_grp0_done_reg)
     begin
-        if (((ap_const_boolean_0 = ap_block_pp0_stage1_subdone_grp0_done_reg) and (ap_const_boolean_0 = ap_block_pp0_stage1_11001_grp0) and (tmp_1_reg_450 = ap_const_lv1_1) and (icmp_ln77_reg_446 = ap_const_lv1_0) and (icmp_ln99_reg_395 = ap_const_lv1_1) and (icmp_ln95_reg_409_pp0_iter1_reg = ap_const_lv1_1) and (ap_enable_reg_pp0_iter1 = ap_const_logic_1) and (ap_const_logic_1 = ap_CS_fsm_pp0_stage1))) then 
+        if (((ap_const_boolean_0 = ap_block_pp0_stage1_subdone_grp0_done_reg) and (ap_const_boolean_0 = ap_block_pp0_stage1_11001_grp0) and (tmp_5_reg_450 = ap_const_lv1_1) and (icmp_ln77_reg_446 = ap_const_lv1_0) and (icmp_ln99_reg_395 = ap_const_lv1_1) and (icmp_ln95_reg_409_pp0_iter1_reg = ap_const_lv1_1) and (ap_enable_reg_pp0_iter1 = ap_const_logic_1) and (ap_const_logic_1 = ap_CS_fsm_pp0_stage1))) then 
             encoder_spike_counter_loc_3_out_o_ap_vld <= ap_const_logic_1;
         else 
             encoder_spike_counter_loc_3_out_o_ap_vld <= ap_const_logic_0;
@@ -487,9 +487,9 @@ begin
 
     encoder_spike_counter_new_3_out <= std_logic_vector(unsigned(encoder_spike_counter_loc_3_out_i) + unsigned(ap_const_lv32_1));
 
-    encoder_spike_counter_new_3_out_ap_vld_assign_proc : process(ap_enable_reg_pp0_iter1, ap_CS_fsm_pp0_stage1, icmp_ln95_reg_409_pp0_iter1_reg, icmp_ln99_reg_395, icmp_ln77_reg_446, tmp_1_reg_450, ap_block_pp0_stage1_11001_grp0, ap_block_pp0_stage1_subdone_grp0_done_reg)
+    encoder_spike_counter_new_3_out_ap_vld_assign_proc : process(ap_enable_reg_pp0_iter1, ap_CS_fsm_pp0_stage1, icmp_ln95_reg_409_pp0_iter1_reg, icmp_ln99_reg_395, icmp_ln77_reg_446, tmp_5_reg_450, ap_block_pp0_stage1_11001_grp0, ap_block_pp0_stage1_subdone_grp0_done_reg)
     begin
-        if (((ap_const_boolean_0 = ap_block_pp0_stage1_subdone_grp0_done_reg) and (ap_const_boolean_0 = ap_block_pp0_stage1_11001_grp0) and (tmp_1_reg_450 = ap_const_lv1_1) and (icmp_ln77_reg_446 = ap_const_lv1_0) and (icmp_ln99_reg_395 = ap_const_lv1_1) and (icmp_ln95_reg_409_pp0_iter1_reg = ap_const_lv1_1) and (ap_enable_reg_pp0_iter1 = ap_const_logic_1) and (ap_const_logic_1 = ap_CS_fsm_pp0_stage1))) then 
+        if (((ap_const_boolean_0 = ap_block_pp0_stage1_subdone_grp0_done_reg) and (ap_const_boolean_0 = ap_block_pp0_stage1_11001_grp0) and (tmp_5_reg_450 = ap_const_lv1_1) and (icmp_ln77_reg_446 = ap_const_lv1_0) and (icmp_ln99_reg_395 = ap_const_lv1_1) and (icmp_ln95_reg_409_pp0_iter1_reg = ap_const_lv1_1) and (ap_enable_reg_pp0_iter1 = ap_const_logic_1) and (ap_const_logic_1 = ap_CS_fsm_pp0_stage1))) then 
             encoder_spike_counter_new_3_out_ap_vld <= ap_const_logic_1;
         else 
             encoder_spike_counter_new_3_out_ap_vld <= ap_const_logic_0;
@@ -697,7 +697,7 @@ begin
     value_fu_267_p3 <= 
         p_ZL13encoder_frame_1_q0 when (trunc_ln93_fu_264_p1(0) = '1') else 
         p_ZL13encoder_frame_0_q0;
-    zext_ln48_fu_324_p1 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(ch_1_reg_399_pp0_iter1_reg),13));
+    zext_ln48_fu_324_p1 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(ch_1_reg_399_pp0_iter1_reg),11));
     zext_ln68_fu_275_p1 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(value_fu_267_p3),16));
     zext_ln93_1_fu_245_p1 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(lshr_ln1_fu_235_p4),64));
     zext_ln93_fu_231_p1 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(ap_sig_allocacmp_ch_1),16));

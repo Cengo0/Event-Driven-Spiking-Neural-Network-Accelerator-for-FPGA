@@ -1,7 +1,7 @@
 {
   "design": {
     "design_info": {
-      "boundary_crc": "0x388FF0F4968B0589",
+      "boundary_crc": "0x414EED529B9A1673",
       "device": "xc7z020clg400-1",
       "gen_directory": "../../../../snn_core_group_v2.gen/sources_1/bd/design_1",
       "name": "design_1",
@@ -234,7 +234,7 @@
       }
     },
     "ports": {
-      "spike_in_valid": {
+      "hls_spike_out_valid": {
         "type": "data",
         "direction": "O",
         "left": "0",
@@ -246,10 +246,10 @@
           }
         }
       },
-      "spike_in_neuron_id": {
+      "hls_spike_out_neuron_id": {
         "type": "data",
         "direction": "O",
-        "left": "10",
+        "left": "9",
         "right": "0",
         "parameters": {
           "LAYERED_METADATA": {
@@ -258,7 +258,7 @@
           }
         }
       },
-      "spike_in_weight": {
+      "hls_spike_out_weight": {
         "type": "data",
         "direction": "O",
         "left": "7",
@@ -270,7 +270,7 @@
           }
         }
       },
-      "spike_in_ready": {
+      "rtl_spike_in_ready": {
         "type": "data",
         "direction": "I",
         "parameters": {
@@ -280,7 +280,7 @@
           }
         }
       },
-      "spike_out_valid": {
+      "rtl_spike_out_valid": {
         "type": "data",
         "direction": "I",
         "parameters": {
@@ -290,10 +290,10 @@
           }
         }
       },
-      "spike_out_neuron_id": {
+      "rtl_spike_out_neuron_id": {
         "type": "data",
         "direction": "I",
-        "left": "10",
+        "left": "9",
         "right": "0",
         "parameters": {
           "LAYERED_METADATA": {
@@ -302,7 +302,7 @@
           }
         }
       },
-      "spike_out_weight": {
+      "rtl_spike_out_weight": {
         "type": "data",
         "direction": "I",
         "left": "7",
@@ -314,7 +314,7 @@
           }
         }
       },
-      "spike_out_ready": {
+      "hls_spike_in_ready": {
         "type": "data",
         "direction": "O",
         "left": "0",
@@ -326,7 +326,7 @@
           }
         }
       },
-      "learn_weight_valid": {
+      "hls_learn_weight_valid": {
         "type": "data",
         "direction": "O",
         "left": "0",
@@ -338,10 +338,10 @@
           }
         }
       },
-      "learn_weight_group": {
+      "hls_learn_weight_group": {
         "type": "data",
         "direction": "O",
-        "left": "3",
+        "left": "2",
         "right": "0",
         "parameters": {
           "LAYERED_METADATA": {
@@ -350,7 +350,7 @@
           }
         }
       },
-      "learn_weight_src": {
+      "hls_learn_weight_src": {
         "type": "data",
         "direction": "O",
         "left": "6",
@@ -362,7 +362,7 @@
           }
         }
       },
-      "learn_weight_dst": {
+      "hls_learn_weight_dst": {
         "type": "data",
         "direction": "O",
         "left": "6",
@@ -374,7 +374,7 @@
           }
         }
       },
-      "learn_weight_data": {
+      "hls_learn_weight_data": {
         "type": "data",
         "direction": "O",
         "left": "7",
@@ -386,7 +386,7 @@
           }
         }
       },
-      "learn_weight_exc": {
+      "hls_learn_weight_exc": {
         "type": "data",
         "direction": "O",
         "left": "0",
@@ -398,7 +398,7 @@
           }
         }
       },
-      "learn_weight_is_inter": {
+      "hls_learn_weight_is_inter": {
         "type": "data",
         "direction": "O",
         "left": "0",
@@ -410,7 +410,19 @@
           }
         }
       },
-      "learn_weight_dst_group": {
+      "hls_learn_weight_dst_group": {
+        "type": "data",
+        "direction": "O",
+        "left": "2",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "undef",
+            "value_src": "default"
+          }
+        }
+      },
+      "hls_learn_weight_fanout_idx": {
         "type": "data",
         "direction": "O",
         "left": "3",
@@ -422,19 +434,7 @@
           }
         }
       },
-      "learn_weight_fanout_idx": {
-        "type": "data",
-        "direction": "O",
-        "left": "3",
-        "right": "0",
-        "parameters": {
-          "LAYERED_METADATA": {
-            "value": "undef",
-            "value_src": "default"
-          }
-        }
-      },
-      "learn_weight_ready": {
+      "rtl_learn_weight_ready": {
         "type": "data",
         "direction": "I",
         "parameters": {
@@ -444,7 +444,7 @@
           }
         }
       },
-      "snn_enable": {
+      "hls_snn_enable": {
         "type": "data",
         "direction": "O",
         "left": "0",
@@ -456,7 +456,7 @@
           }
         }
       },
-      "snn_reset": {
+      "hls_snn_reset": {
         "type": "data",
         "direction": "O",
         "left": "0",
@@ -468,7 +468,7 @@
           }
         }
       },
-      "snn_ready": {
+      "rtl_snn_ready": {
         "type": "data",
         "direction": "I",
         "parameters": {
@@ -478,7 +478,7 @@
           }
         }
       },
-      "snn_busy": {
+      "rtl_snn_busy": {
         "type": "data",
         "direction": "I",
         "parameters": {
@@ -488,7 +488,7 @@
           }
         }
       },
-      "threshold_out": {
+      "hls_threshold_out": {
         "type": "data",
         "direction": "O",
         "left": "15",
@@ -500,7 +500,7 @@
           }
         }
       },
-      "leak_rate_out": {
+      "hls_leak_rate_out": {
         "type": "data",
         "direction": "O",
         "left": "15",
@@ -1790,7 +1790,7 @@
       },
       "snn_top_hls_0": {
         "vlnv": "xilinx.com:hls:snn_top_hls:1.0",
-        "ip_revision": "2114755266",
+        "ip_revision": "2114790027",
         "xci_name": "design_1_snn_top_hls_0_0",
         "xci_path": "ip/design_1_snn_top_hls_0_0/design_1_snn_top_hls_0_0.xci",
         "inst_hier_path": "snn_top_hls_0",
@@ -4270,12 +4270,6 @@
           "snn_top_hls_0/s_axis_data_TSTRB"
         ]
       },
-      "learn_weight_ready_1": {
-        "ports": [
-          "learn_weight_ready",
-          "snn_top_hls_0/learn_weight_ready"
-        ]
-      },
       "proc_sys_reset_0_peripheral_aresetn": {
         "ports": [
           "proc_sys_reset_0/peripheral_aresetn",
@@ -4333,10 +4327,46 @@
           "proc_sys_reset_0/ext_reset_in"
         ]
       },
-      "snn_busy_1": {
+      "rtl_learn_weight_ready_1": {
         "ports": [
-          "snn_busy",
+          "rtl_learn_weight_ready",
+          "snn_top_hls_0/learn_weight_ready"
+        ]
+      },
+      "rtl_snn_busy_1": {
+        "ports": [
+          "rtl_snn_busy",
           "snn_top_hls_0/snn_busy"
+        ]
+      },
+      "rtl_snn_ready_1": {
+        "ports": [
+          "rtl_snn_ready",
+          "snn_top_hls_0/snn_ready"
+        ]
+      },
+      "rtl_spike_in_ready_1": {
+        "ports": [
+          "rtl_spike_in_ready",
+          "snn_top_hls_0/spike_in_ready"
+        ]
+      },
+      "rtl_spike_out_neuron_id_1": {
+        "ports": [
+          "rtl_spike_out_neuron_id",
+          "snn_top_hls_0/spike_out_neuron_id"
+        ]
+      },
+      "rtl_spike_out_valid_1": {
+        "ports": [
+          "rtl_spike_out_valid",
+          "snn_top_hls_0/spike_out_valid"
+        ]
+      },
+      "rtl_spike_out_weight_1": {
+        "ports": [
+          "rtl_spike_out_weight",
+          "snn_top_hls_0/spike_out_weight"
         ]
       },
       "snn_config_regs_0_global_leak_rate": {
@@ -4393,136 +4423,106 @@
           "cfg_router_config_we"
         ]
       },
-      "snn_ready_1": {
-        "ports": [
-          "snn_ready",
-          "snn_top_hls_0/snn_ready"
-        ]
-      },
       "snn_top_hls_0_leak_rate_out": {
         "ports": [
           "snn_top_hls_0/leak_rate_out",
-          "leak_rate_out"
+          "hls_leak_rate_out"
         ]
       },
       "snn_top_hls_0_learn_weight_data": {
         "ports": [
           "snn_top_hls_0/learn_weight_data",
-          "learn_weight_data"
+          "hls_learn_weight_data"
         ]
       },
       "snn_top_hls_0_learn_weight_dst": {
         "ports": [
           "snn_top_hls_0/learn_weight_dst",
-          "learn_weight_dst"
+          "hls_learn_weight_dst"
         ]
       },
       "snn_top_hls_0_learn_weight_dst_group": {
         "ports": [
           "snn_top_hls_0/learn_weight_dst_group",
-          "learn_weight_dst_group"
+          "hls_learn_weight_dst_group"
         ]
       },
       "snn_top_hls_0_learn_weight_exc": {
         "ports": [
           "snn_top_hls_0/learn_weight_exc",
-          "learn_weight_exc"
+          "hls_learn_weight_exc"
         ]
       },
       "snn_top_hls_0_learn_weight_fanout_idx": {
         "ports": [
           "snn_top_hls_0/learn_weight_fanout_idx",
-          "learn_weight_fanout_idx"
+          "hls_learn_weight_fanout_idx"
         ]
       },
       "snn_top_hls_0_learn_weight_group": {
         "ports": [
           "snn_top_hls_0/learn_weight_group",
-          "learn_weight_group"
+          "hls_learn_weight_group"
         ]
       },
       "snn_top_hls_0_learn_weight_is_inter": {
         "ports": [
           "snn_top_hls_0/learn_weight_is_inter",
-          "learn_weight_is_inter"
+          "hls_learn_weight_is_inter"
         ]
       },
       "snn_top_hls_0_learn_weight_src": {
         "ports": [
           "snn_top_hls_0/learn_weight_src",
-          "learn_weight_src"
+          "hls_learn_weight_src"
         ]
       },
       "snn_top_hls_0_learn_weight_valid": {
         "ports": [
           "snn_top_hls_0/learn_weight_valid",
-          "learn_weight_valid"
+          "hls_learn_weight_valid"
         ]
       },
       "snn_top_hls_0_snn_enable": {
         "ports": [
           "snn_top_hls_0/snn_enable",
-          "snn_enable"
+          "hls_snn_enable"
         ]
       },
       "snn_top_hls_0_snn_reset": {
         "ports": [
           "snn_top_hls_0/snn_reset",
-          "snn_reset"
+          "hls_snn_reset"
         ]
       },
       "snn_top_hls_0_spike_in_neuron_id": {
         "ports": [
           "snn_top_hls_0/spike_in_neuron_id",
-          "spike_in_neuron_id"
+          "hls_spike_out_neuron_id"
         ]
       },
       "snn_top_hls_0_spike_in_valid": {
         "ports": [
           "snn_top_hls_0/spike_in_valid",
-          "spike_in_valid"
+          "hls_spike_out_valid"
         ]
       },
       "snn_top_hls_0_spike_in_weight": {
         "ports": [
           "snn_top_hls_0/spike_in_weight",
-          "spike_in_weight"
+          "hls_spike_out_weight"
         ]
       },
       "snn_top_hls_0_spike_out_ready": {
         "ports": [
           "snn_top_hls_0/spike_out_ready",
-          "spike_out_ready"
+          "hls_spike_in_ready"
         ]
       },
       "snn_top_hls_0_threshold_out": {
         "ports": [
           "snn_top_hls_0/threshold_out",
-          "threshold_out"
-        ]
-      },
-      "spike_in_ready_1": {
-        "ports": [
-          "spike_in_ready",
-          "snn_top_hls_0/spike_in_ready"
-        ]
-      },
-      "spike_out_neuron_id_1": {
-        "ports": [
-          "spike_out_neuron_id",
-          "snn_top_hls_0/spike_out_neuron_id"
-        ]
-      },
-      "spike_out_valid_1": {
-        "ports": [
-          "spike_out_valid",
-          "snn_top_hls_0/spike_out_valid"
-        ]
-      },
-      "spike_out_weight_1": {
-        "ports": [
-          "spike_out_weight",
-          "snn_top_hls_0/spike_out_weight"
+          "hls_threshold_out"
         ]
       }
     },

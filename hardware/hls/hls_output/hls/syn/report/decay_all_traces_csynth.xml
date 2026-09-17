@@ -22,14 +22,14 @@
 </SummaryOfTimingAnalysis>
 <SummaryOfOverallLatency>
 <unit>clock cycles</unit>
-<Best-caseLatency>4895</Best-caseLatency>
-<Average-caseLatency>4895</Average-caseLatency>
-<Worst-caseLatency>4895</Worst-caseLatency>
-<Best-caseRealTimeLatency>48.950 us</Best-caseRealTimeLatency>
-<Average-caseRealTimeLatency>48.950 us</Average-caseRealTimeLatency>
-<Worst-caseRealTimeLatency>48.950 us</Worst-caseRealTimeLatency>
-<Interval-min>4895</Interval-min>
-<Interval-max>4895</Interval-max>
+<Best-caseLatency>1311</Best-caseLatency>
+<Average-caseLatency>1311</Average-caseLatency>
+<Worst-caseLatency>1311</Worst-caseLatency>
+<Best-caseRealTimeLatency>13.110 us</Best-caseRealTimeLatency>
+<Average-caseRealTimeLatency>13.110 us</Average-caseRealTimeLatency>
+<Worst-caseRealTimeLatency>13.110 us</Worst-caseRealTimeLatency>
+<Interval-min>1311</Interval-min>
+<Interval-max>1311</Interval-max>
 <PerformancePragma>-</PerformancePragma>
 </SummaryOfOverallLatency>
 <SummaryOfViolations>
@@ -42,8 +42,8 @@
 <AreaEstimates>
 <Resources>
 <DSP>2</DSP>
-<FF>246</FF>
-<LUT>242</LUT>
+<FF>238</FF>
+<LUT>234</LUT>
 <BRAM_18K>0</BRAM_18K>
 <URAM>0</URAM>
 </Resources>
@@ -142,7 +142,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>13</Bits>
+<Bits>11</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -175,7 +175,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>13</Bits>
+<Bits>11</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -219,7 +219,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>13</Bits>
+<Bits>11</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -252,7 +252,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>13</Bits>
+<Bits>11</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>

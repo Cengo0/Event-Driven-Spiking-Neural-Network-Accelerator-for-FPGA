@@ -12,8 +12,8 @@ entity snn_top_hls_weight_memory_RAM_T2P_BRAM_3R2W is
     generic(
         MEM_TYPE        : string    := "block";
         DataWidth       : integer   := 4;
-        AddressWidth    : integer   := 20;
-        AddressRange    : integer   := 843776
+        AddressWidth    : integer   := 19;
+        AddressRange    : integer   := 268800
     );
     port (
         address0    : in std_logic_vector(AddressWidth-1 downto 0);

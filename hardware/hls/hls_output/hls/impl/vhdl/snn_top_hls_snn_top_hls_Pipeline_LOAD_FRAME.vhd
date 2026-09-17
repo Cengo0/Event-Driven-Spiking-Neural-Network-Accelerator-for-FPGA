@@ -68,9 +68,9 @@ attribute shreg_extract : string;
     attribute fsm_encoding of ap_CS_fsm : signal is "none";
     signal ap_CS_fsm_state1 : STD_LOGIC;
     attribute fsm_encoding of ap_CS_fsm_state1 : signal is "none";
-    signal tmp_5_nbreadreq_fu_78_p9 : STD_LOGIC_VECTOR (0 downto 0);
+    signal tmp_9_nbreadreq_fu_78_p9 : STD_LOGIC_VECTOR (0 downto 0);
     signal ap_block_state1_pp0_stage0_iter0 : BOOLEAN;
-    signal or_cond75_fu_260_p2 : STD_LOGIC_VECTOR (0 downto 0);
+    signal or_cond60_fu_260_p2 : STD_LOGIC_VECTOR (0 downto 0);
     signal ap_condition_exit_pp0_iter0_stage0 : STD_LOGIC;
     signal ap_loop_exit_ready : STD_LOGIC;
     signal ap_ready_int : STD_LOGIC;
@@ -174,7 +174,7 @@ begin
     begin
         if (ap_clk'event and ap_clk = '1') then
             if (((ap_const_boolean_0 = ap_block_state1_pp0_stage0_iter0) and (ap_const_logic_1 = ap_CS_fsm_state1))) then
-                if ((tmp_5_nbreadreq_fu_78_p9 = ap_const_lv1_1)) then 
+                if ((tmp_9_nbreadreq_fu_78_p9 = ap_const_lv1_1)) then 
                     i_3_fu_74 <= add_ln858_fu_174_p2;
                 elsif ((ap_loop_init = ap_const_logic_1)) then 
                     i_3_fu_74 <= ap_const_lv8_0;
@@ -205,15 +205,15 @@ begin
     end process;
 
 
-    ap_block_state1_pp0_stage0_iter0_assign_proc : process(s_axis_data_TVALID, tmp_5_nbreadreq_fu_78_p9, ap_start_int)
+    ap_block_state1_pp0_stage0_iter0_assign_proc : process(s_axis_data_TVALID, tmp_9_nbreadreq_fu_78_p9, ap_start_int)
     begin
-                ap_block_state1_pp0_stage0_iter0 <= ((ap_start_int = ap_const_logic_0) or ((tmp_5_nbreadreq_fu_78_p9 = ap_const_lv1_1) and (s_axis_data_TVALID = ap_const_logic_0)));
+                ap_block_state1_pp0_stage0_iter0 <= ((ap_start_int = ap_const_logic_0) or ((tmp_9_nbreadreq_fu_78_p9 = ap_const_lv1_1) and (s_axis_data_TVALID = ap_const_logic_0)));
     end process;
 
 
-    ap_condition_exit_pp0_iter0_stage0_assign_proc : process(ap_CS_fsm_state1, tmp_5_nbreadreq_fu_78_p9, ap_block_state1_pp0_stage0_iter0, or_cond75_fu_260_p2)
+    ap_condition_exit_pp0_iter0_stage0_assign_proc : process(ap_CS_fsm_state1, tmp_9_nbreadreq_fu_78_p9, ap_block_state1_pp0_stage0_iter0, or_cond60_fu_260_p2)
     begin
-        if (((ap_const_boolean_0 = ap_block_state1_pp0_stage0_iter0) and (ap_const_logic_1 = ap_CS_fsm_state1) and ((or_cond75_fu_260_p2 = ap_const_lv1_0) or (tmp_5_nbreadreq_fu_78_p9 = ap_const_lv1_0)))) then 
+        if (((ap_const_boolean_0 = ap_block_state1_pp0_stage0_iter0) and (ap_const_logic_1 = ap_CS_fsm_state1) and ((or_cond60_fu_260_p2 = ap_const_lv1_0) or (tmp_9_nbreadreq_fu_78_p9 = ap_const_lv1_0)))) then 
             ap_condition_exit_pp0_iter0_stage0 <= ap_const_logic_1;
         else 
             ap_condition_exit_pp0_iter0_stage0 <= ap_const_logic_0;
@@ -264,7 +264,7 @@ begin
     end process;
 
     icmp_ln858_fu_254_p2 <= "1" when (unsigned(add_ln858_fu_174_p2) < unsigned(ap_const_lv8_C4)) else "0";
-    or_cond75_fu_260_p2 <= (xor_ln867_fu_248_p2 and icmp_ln858_fu_254_p2);
+    or_cond60_fu_260_p2 <= (xor_ln867_fu_248_p2 and icmp_ln858_fu_254_p2);
     or_ln_fu_216_p3 <= (ap_sig_allocacmp_i & ap_const_lv1_1);
     p_ZL13encoder_frame_0_address0 <= zext_ln865_fu_224_p1(9 - 1 downto 0);
     p_ZL13encoder_frame_0_address1 <= zext_ln863_fu_196_p1(9 - 1 downto 0);
@@ -294,9 +294,9 @@ begin
     p_ZL13encoder_frame_0_d1 <= trunc_ln863_fu_202_p1;
     p_ZL13encoder_frame_0_we0 <= p_ZL13encoder_frame_0_we0_local;
 
-    p_ZL13encoder_frame_0_we0_local_assign_proc : process(ap_CS_fsm_state1, tmp_5_nbreadreq_fu_78_p9, ap_block_state1_pp0_stage0_iter0)
+    p_ZL13encoder_frame_0_we0_local_assign_proc : process(ap_CS_fsm_state1, tmp_9_nbreadreq_fu_78_p9, ap_block_state1_pp0_stage0_iter0)
     begin
-        if (((ap_const_boolean_0 = ap_block_state1_pp0_stage0_iter0) and (tmp_5_nbreadreq_fu_78_p9 = ap_const_lv1_1) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
+        if (((ap_const_boolean_0 = ap_block_state1_pp0_stage0_iter0) and (tmp_9_nbreadreq_fu_78_p9 = ap_const_lv1_1) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
             p_ZL13encoder_frame_0_we0_local <= ap_const_logic_1;
         else 
             p_ZL13encoder_frame_0_we0_local <= ap_const_logic_0;
@@ -305,9 +305,9 @@ begin
 
     p_ZL13encoder_frame_0_we1 <= p_ZL13encoder_frame_0_we1_local;
 
-    p_ZL13encoder_frame_0_we1_local_assign_proc : process(ap_CS_fsm_state1, tmp_5_nbreadreq_fu_78_p9, ap_block_state1_pp0_stage0_iter0)
+    p_ZL13encoder_frame_0_we1_local_assign_proc : process(ap_CS_fsm_state1, tmp_9_nbreadreq_fu_78_p9, ap_block_state1_pp0_stage0_iter0)
     begin
-        if (((ap_const_boolean_0 = ap_block_state1_pp0_stage0_iter0) and (tmp_5_nbreadreq_fu_78_p9 = ap_const_lv1_1) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
+        if (((ap_const_boolean_0 = ap_block_state1_pp0_stage0_iter0) and (tmp_9_nbreadreq_fu_78_p9 = ap_const_lv1_1) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
             p_ZL13encoder_frame_0_we1_local <= ap_const_logic_1;
         else 
             p_ZL13encoder_frame_0_we1_local <= ap_const_logic_0;
@@ -342,9 +342,9 @@ begin
     p_ZL13encoder_frame_1_d1 <= s_axis_data_TDATA(15 downto 8);
     p_ZL13encoder_frame_1_we0 <= p_ZL13encoder_frame_1_we0_local;
 
-    p_ZL13encoder_frame_1_we0_local_assign_proc : process(ap_CS_fsm_state1, tmp_5_nbreadreq_fu_78_p9, ap_block_state1_pp0_stage0_iter0)
+    p_ZL13encoder_frame_1_we0_local_assign_proc : process(ap_CS_fsm_state1, tmp_9_nbreadreq_fu_78_p9, ap_block_state1_pp0_stage0_iter0)
     begin
-        if (((ap_const_boolean_0 = ap_block_state1_pp0_stage0_iter0) and (tmp_5_nbreadreq_fu_78_p9 = ap_const_lv1_1) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
+        if (((ap_const_boolean_0 = ap_block_state1_pp0_stage0_iter0) and (tmp_9_nbreadreq_fu_78_p9 = ap_const_lv1_1) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
             p_ZL13encoder_frame_1_we0_local <= ap_const_logic_1;
         else 
             p_ZL13encoder_frame_1_we0_local <= ap_const_logic_0;
@@ -353,9 +353,9 @@ begin
 
     p_ZL13encoder_frame_1_we1 <= p_ZL13encoder_frame_1_we1_local;
 
-    p_ZL13encoder_frame_1_we1_local_assign_proc : process(ap_CS_fsm_state1, tmp_5_nbreadreq_fu_78_p9, ap_block_state1_pp0_stage0_iter0)
+    p_ZL13encoder_frame_1_we1_local_assign_proc : process(ap_CS_fsm_state1, tmp_9_nbreadreq_fu_78_p9, ap_block_state1_pp0_stage0_iter0)
     begin
-        if (((ap_const_boolean_0 = ap_block_state1_pp0_stage0_iter0) and (tmp_5_nbreadreq_fu_78_p9 = ap_const_lv1_1) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
+        if (((ap_const_boolean_0 = ap_block_state1_pp0_stage0_iter0) and (tmp_9_nbreadreq_fu_78_p9 = ap_const_lv1_1) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
             p_ZL13encoder_frame_1_we1_local <= ap_const_logic_1;
         else 
             p_ZL13encoder_frame_1_we1_local <= ap_const_logic_0;
@@ -363,9 +363,9 @@ begin
     end process;
 
 
-    s_axis_data_TDATA_blk_n_assign_proc : process(ap_CS_fsm_state1, s_axis_data_TVALID, tmp_5_nbreadreq_fu_78_p9, ap_start_int)
+    s_axis_data_TDATA_blk_n_assign_proc : process(ap_CS_fsm_state1, s_axis_data_TVALID, tmp_9_nbreadreq_fu_78_p9, ap_start_int)
     begin
-        if (((tmp_5_nbreadreq_fu_78_p9 = ap_const_lv1_1) and (ap_start_int = ap_const_logic_1) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
+        if (((tmp_9_nbreadreq_fu_78_p9 = ap_const_lv1_1) and (ap_start_int = ap_const_logic_1) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
             s_axis_data_TDATA_blk_n <= s_axis_data_TVALID;
         else 
             s_axis_data_TDATA_blk_n <= ap_const_logic_1;
@@ -373,9 +373,9 @@ begin
     end process;
 
 
-    s_axis_data_TREADY_assign_proc : process(ap_CS_fsm_state1, tmp_5_nbreadreq_fu_78_p9, ap_block_state1_pp0_stage0_iter0)
+    s_axis_data_TREADY_assign_proc : process(ap_CS_fsm_state1, tmp_9_nbreadreq_fu_78_p9, ap_block_state1_pp0_stage0_iter0)
     begin
-        if (((ap_const_boolean_0 = ap_block_state1_pp0_stage0_iter0) and (tmp_5_nbreadreq_fu_78_p9 = ap_const_lv1_1) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
+        if (((ap_const_boolean_0 = ap_block_state1_pp0_stage0_iter0) and (tmp_9_nbreadreq_fu_78_p9 = ap_const_lv1_1) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
             s_axis_data_TREADY <= ap_const_logic_1;
         else 
             s_axis_data_TREADY <= ap_const_logic_0;
@@ -383,7 +383,7 @@ begin
     end process;
 
     shl_ln_fu_188_p3 <= (ap_sig_allocacmp_i & ap_const_lv1_0);
-    tmp_5_nbreadreq_fu_78_p9 <= (0=>(s_axis_data_TVALID), others=>'-');
+    tmp_9_nbreadreq_fu_78_p9 <= (0=>(s_axis_data_TVALID), others=>'-');
     trunc_ln863_fu_202_p1 <= s_axis_data_TDATA(8 - 1 downto 0);
     xor_ln867_fu_248_p2 <= (s_axis_data_TLAST xor ap_const_lv1_1);
     zext_ln863_fu_196_p1 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(shl_ln_fu_188_p3),64));

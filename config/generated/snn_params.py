@@ -1,20 +1,20 @@
 """
 SNN Accelerator Parameters — AUTO-GENERATED from snn_params.yaml
 
-Generated: 2026-09-16 14:58:27
+Generated: 2026-09-17 15:23:36
 DO NOT EDIT — modify config/snn_params.yaml and run generate_params.py
 """
 
 # ─── Core Architecture ─────────────────────────────────────────────
-NUM_GROUPS          = 16
+NUM_GROUPS          = 5
 NEURONS_PER_GROUP   = 128   # max(GROUP_SIZES) — backward compat
 MAX_NEURONS_PER_GROUP = 128
 MAX_FANOUT_INTER    = 16
 SPIKE_BUFFER_DEPTH  = 64
 
 # ─── Per-Group Neuron Counts ────────────────────────────────────────
-GROUP_SIZES         = [128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128]
-TOTAL_NEURONS       = 2048
+GROUP_SIZES         = [128, 128, 128, 128, 128]
+TOTAL_NEURONS       = 640
 
 # ─── Data Widths ────────────────────────────────────────────────────
 DATA_WIDTH          = 16
@@ -24,14 +24,14 @@ LEAK_WIDTH          = 8
 REFRAC_WIDTH        = 8
 
 # ─── Derived Bit Widths ─────────────────────────────────────────────
-GROUP_ID_WIDTH      = 4   # clog2(16)
+GROUP_ID_WIDTH      = 3   # clog2(5)
 LOCAL_ID_WIDTH      = 7   # clog2(128)
-GLOBAL_ID_WIDTH     = 11  # GROUP_ID_WIDTH + LOCAL_ID_WIDTH
+GLOBAL_ID_WIDTH     = 10  # GROUP_ID_WIDTH + LOCAL_ID_WIDTH
 FANOUT_IDX_WIDTH    = 4   # clog2(16)
 
 # ─── Derived Counts ─────────────────────────────────────────────────
-MAX_NEURONS         = 2048  # sum(GROUP_SIZES)
-CT_DATA_WIDTH       = 21  # 1+GROUP_ID+LOCAL_ID+WEIGHT+1
+MAX_NEURONS         = 640  # sum(GROUP_SIZES)
+CT_DATA_WIDTH       = 20  # 1+GROUP_ID+LOCAL_ID+WEIGHT+1
 NEURON_STATE_WIDTH  = 24  # DATA_WIDTH + REFRAC_WIDTH
 
 # ─── Weight Representation ────────────────────────────────────────
@@ -42,7 +42,7 @@ MAX_WEIGHT_DELTA    = 255
 
 # ─── HLS Interface ────────────────────────────────────────────────
 HLS_NEURON_ID_WIDTH = 11
-HLS_MAX_NEURONS     = 2048
+HLS_MAX_NEURONS     = 640
 HLS_WEIGHT_WIDTH    = 8
 NEURON_ID_WIDTH     = GLOBAL_ID_WIDTH  # Alias
 
