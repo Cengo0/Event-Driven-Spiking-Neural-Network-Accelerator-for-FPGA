@@ -279,64 +279,64 @@ puts "Using HLS spike_in_neuron_id width  : [expr {$spike_in_id_left - $spike_in
 puts "Using HLS spike_out_neuron_id width : [expr {$spike_out_id_left - $spike_out_id_right + 1}] bits (${spike_out_id_left}:${spike_out_id_right})"
 
 # HLS → RTL: spike output to router
-create_bd_port -dir O spike_in_valid -type data
-create_bd_port -dir O -from $spike_in_id_left -to $spike_in_id_right spike_in_neuron_id -type data
-create_bd_port -dir O -from 7 -to 0 spike_in_weight -type data
-create_bd_port -dir I spike_in_ready -type data
+create_bd_port -dir O hls_spike_out_valid -type data
+create_bd_port -dir O -from $spike_in_id_left -to $spike_in_id_right hls_spike_out_neuron_id -type data
+create_bd_port -dir O -from 7 -to 0 hls_spike_out_weight -type data
+create_bd_port -dir I rtl_spike_in_ready -type data
 
-connect_bd_net [get_bd_pins snn_top_hls_0/spike_in_valid]       [get_bd_ports spike_in_valid]
-connect_bd_net [get_bd_pins snn_top_hls_0/spike_in_neuron_id]   [get_bd_ports spike_in_neuron_id]
-connect_bd_net [get_bd_pins snn_top_hls_0/spike_in_weight]      [get_bd_ports spike_in_weight]
-connect_bd_net [get_bd_ports spike_in_ready]                     [get_bd_pins snn_top_hls_0/spike_in_ready]
+connect_bd_net [get_bd_pins snn_top_hls_0/spike_in_valid]       [get_bd_ports hls_spike_out_valid]
+connect_bd_net [get_bd_pins snn_top_hls_0/spike_in_neuron_id]   [get_bd_ports hls_spike_out_neuron_id]
+connect_bd_net [get_bd_pins snn_top_hls_0/spike_in_weight]      [get_bd_ports hls_spike_out_weight]
+connect_bd_net [get_bd_ports rtl_spike_in_ready]                [get_bd_pins snn_top_hls_0/spike_in_ready]
 
 # RTL → HLS: spike from neurons
-create_bd_port -dir I spike_out_valid -type data
-create_bd_port -dir I -from $spike_out_id_left -to $spike_out_id_right spike_out_neuron_id -type data
-create_bd_port -dir I -from 7 -to 0 spike_out_weight -type data
-create_bd_port -dir O spike_out_ready -type data
+create_bd_port -dir I rtl_spike_out_valid -type data
+create_bd_port -dir I -from $spike_out_id_left -to $spike_out_id_right rtl_spike_out_neuron_id -type data
+create_bd_port -dir I -from 7 -to 0 rtl_spike_out_weight -type data
+create_bd_port -dir O hls_spike_in_ready -type data
 
-connect_bd_net [get_bd_ports spike_out_valid]                    [get_bd_pins snn_top_hls_0/spike_out_valid]
-connect_bd_net [get_bd_ports spike_out_neuron_id]               [get_bd_pins snn_top_hls_0/spike_out_neuron_id]
-connect_bd_net [get_bd_ports spike_out_weight]                   [get_bd_pins snn_top_hls_0/spike_out_weight]
-connect_bd_net [get_bd_pins snn_top_hls_0/spike_out_ready]      [get_bd_ports spike_out_ready]
+connect_bd_net [get_bd_ports rtl_spike_out_valid]               [get_bd_pins snn_top_hls_0/spike_out_valid]
+connect_bd_net [get_bd_ports rtl_spike_out_neuron_id]           [get_bd_pins snn_top_hls_0/spike_out_neuron_id]
+connect_bd_net [get_bd_ports rtl_spike_out_weight]              [get_bd_pins snn_top_hls_0/spike_out_weight]
+connect_bd_net [get_bd_pins snn_top_hls_0/spike_out_ready]      [get_bd_ports hls_spike_in_ready]
 
 # HLS -> RTL: learned weight update channel
-create_bd_port -dir O learn_weight_valid -type data
-create_bd_port -dir O -from 3 -to 0 learn_weight_group -type data
-create_bd_port -dir O -from 6 -to 0 learn_weight_src -type data
-create_bd_port -dir O -from 6 -to 0 learn_weight_dst -type data
-create_bd_port -dir O -from 7 -to 0 learn_weight_data -type data
-create_bd_port -dir O learn_weight_exc -type data
-create_bd_port -dir O learn_weight_is_inter -type data
-create_bd_port -dir O -from 3 -to 0 learn_weight_dst_group -type data
-create_bd_port -dir O -from 3 -to 0 learn_weight_fanout_idx -type data
-create_bd_port -dir I learn_weight_ready -type data
+create_bd_port -dir O hls_learn_weight_valid -type data
+create_bd_port -dir O -from 3 -to 0 hls_learn_weight_group -type data
+create_bd_port -dir O -from 6 -to 0 hls_learn_weight_src -type data
+create_bd_port -dir O -from 6 -to 0 hls_learn_weight_dst -type data
+create_bd_port -dir O -from 7 -to 0 hls_learn_weight_data -type data
+create_bd_port -dir O hls_learn_weight_exc -type data
+create_bd_port -dir O hls_learn_weight_is_inter -type data
+create_bd_port -dir O -from 3 -to 0 hls_learn_weight_dst_group -type data
+create_bd_port -dir O -from 3 -to 0 hls_learn_weight_fanout_idx -type data
+create_bd_port -dir I rtl_learn_weight_ready -type data
 
-connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_valid]      [get_bd_ports learn_weight_valid]
-connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_group]      [get_bd_ports learn_weight_group]
-connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_src]        [get_bd_ports learn_weight_src]
-connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_dst]        [get_bd_ports learn_weight_dst]
-connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_data]       [get_bd_ports learn_weight_data]
-connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_exc]        [get_bd_ports learn_weight_exc]
-connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_is_inter]   [get_bd_ports learn_weight_is_inter]
-connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_dst_group]  [get_bd_ports learn_weight_dst_group]
-connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_fanout_idx] [get_bd_ports learn_weight_fanout_idx]
-connect_bd_net [get_bd_ports learn_weight_ready]                    [get_bd_pins snn_top_hls_0/learn_weight_ready]
+connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_valid]      [get_bd_ports hls_learn_weight_valid]
+connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_group]      [get_bd_ports hls_learn_weight_group]
+connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_src]        [get_bd_ports hls_learn_weight_src]
+connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_dst]        [get_bd_ports hls_learn_weight_dst]
+connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_data]       [get_bd_ports hls_learn_weight_data]
+connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_exc]        [get_bd_ports hls_learn_weight_exc]
+connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_is_inter]   [get_bd_ports hls_learn_weight_is_inter]
+connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_dst_group]  [get_bd_ports hls_learn_weight_dst_group]
+connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_fanout_idx] [get_bd_ports hls_learn_weight_fanout_idx]
+connect_bd_net [get_bd_ports rtl_learn_weight_ready]               [get_bd_pins snn_top_hls_0/learn_weight_ready]
 
 # SNN Control
-create_bd_port -dir O snn_enable -type data
-create_bd_port -dir O snn_reset -type data
-create_bd_port -dir I snn_ready -type data
-create_bd_port -dir I snn_busy -type data
-create_bd_port -dir O -from 15 -to 0 threshold_out -type data
-create_bd_port -dir O -from 15 -to 0 leak_rate_out -type data
+create_bd_port -dir O hls_snn_enable -type data
+create_bd_port -dir O hls_snn_reset -type data
+create_bd_port -dir I rtl_snn_ready -type data
+create_bd_port -dir I rtl_snn_busy -type data
+create_bd_port -dir O -from 15 -to 0 hls_threshold_out -type data
+create_bd_port -dir O -from 15 -to 0 hls_leak_rate_out -type data
 
-connect_bd_net [get_bd_pins snn_top_hls_0/snn_enable]           [get_bd_ports snn_enable]
-connect_bd_net [get_bd_pins snn_top_hls_0/snn_reset]            [get_bd_ports snn_reset]
-connect_bd_net [get_bd_ports snn_ready]                          [get_bd_pins snn_top_hls_0/snn_ready]
-connect_bd_net [get_bd_ports snn_busy]                           [get_bd_pins snn_top_hls_0/snn_busy]
-connect_bd_net [get_bd_pins snn_top_hls_0/threshold_out]        [get_bd_ports threshold_out]
-connect_bd_net [get_bd_pins snn_top_hls_0/leak_rate_out]        [get_bd_ports leak_rate_out]
+connect_bd_net [get_bd_pins snn_top_hls_0/snn_enable]           [get_bd_ports hls_snn_enable]
+connect_bd_net [get_bd_pins snn_top_hls_0/snn_reset]            [get_bd_ports hls_snn_reset]
+connect_bd_net [get_bd_ports rtl_snn_ready]                     [get_bd_pins snn_top_hls_0/snn_ready]
+connect_bd_net [get_bd_ports rtl_snn_busy]                      [get_bd_pins snn_top_hls_0/snn_busy]
+connect_bd_net [get_bd_pins snn_top_hls_0/threshold_out]        [get_bd_ports hls_threshold_out]
+connect_bd_net [get_bd_pins snn_top_hls_0/leak_rate_out]        [get_bd_ports hls_leak_rate_out]
 
 # Config regs ↔ External ports for router/neuron config
 create_bd_port -dir O cfg_router_config_we -type data
