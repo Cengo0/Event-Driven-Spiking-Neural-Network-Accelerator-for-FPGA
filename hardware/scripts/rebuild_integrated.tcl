@@ -446,14 +446,16 @@ add_files -norecurse ${rtl_dir}/top/snn_core_group_top.v
 
 # Set snn_core_group_top as the real top module
 set_property top snn_core_group_top [get_filesets sources_1]
+# FIX: Tell Vivado where to find the generated snn_params.vh header
+set_property include_dirs [list "${project_dir}/config/generated"] [get_filesets sources_1]
 update_compile_order -fileset sources_1
 
 # Add PYNQ-Z2 constraints
 # Add PYNQ-Z2 constraints
-add_files -fileset constrs_1 -norecurse ${project_dir}/hardware/constraints/pynq_z2_v1.0.xdc
+#add_files -fileset constrs_1 -norecurse ${project_dir}/hardware/constraints/pynq_z2_v1.0.xdc
 add_files -fileset constrs_1 -norecurse ${project_dir}/hardware/constraints/pynq_z2_pins.xdc
-add_files -fileset constrs_1 -norecurse ${project_dir}/hardware/constraints/snn_pl_wrapper.xdc
-add_files -fileset constrs_1 -norecurse ${project_dir}/hardware/constraints/bitstream.xdc
+#add_files -fileset constrs_1 -norecurse ${project_dir}/hardware/constraints/snn_pl_wrapper.xdc
+#add_files -fileset constrs_1 -norecurse ${project_dir}/hardware/constraints/bitstream.xdc
 
 # =============================================================================
 # Synthesis
