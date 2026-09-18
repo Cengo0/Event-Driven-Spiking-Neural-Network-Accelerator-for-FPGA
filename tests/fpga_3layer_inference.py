@@ -46,7 +46,7 @@ def main():
     parser = argparse.ArgumentParser(description="3-Layer SNN FPGA Inference")
     parser.add_argument('--bitstream', default='snn_core_group_v2.bit', help='Path to bitstream')
     parser.add_argument('--data', default='mnist_3layer_deployment.npz', help='Deployment payload')
-    parser.add_argument('--samples', type=int, default=1000, help='Images to test')
+    parser.add_argument('--samples', type=int, default=10, help='Images to test')
     parser.add_argument('--skip-bitstream', action='store_true', help='Skip PL programming')
     parser.add_argument('--output-json', default='inference_results.json', help='Output results file')
     args = parser.parse_args()
@@ -89,6 +89,7 @@ def main():
     start_time = time.time()
 
     for i in range(n_test):
+        print("testing image", i)
         img = test_imgs[i].flatten()
         lbl = int(test_lbls[i])
         
@@ -97,6 +98,7 @@ def main():
         out_spikes = np.zeros(10, dtype=np.int32)
         
         for t in range(4): # TIMESTEPS = 4
+            print(f"Processing timestep {t}")
             # ─────────────────────────────────────────────────────────
             # CPU STAGE: Layer 1 Float32 Evaluation
             # ─────────────────────────────────────────────────────────
@@ -135,8 +137,8 @@ def main():
         if np.argmax(out_spikes) == lbl:
             correct += 1
             
-        if (i + 1) % 100 == 0:
-            print(f"Processed {i+1}/{n_test} | Current Acc: {(correct/(i+1))*100:.1f}%")
+        # if (i + 1) % 1 == 0:
+        print(f"Processed {i+1}/{n_test} | Current Acc: {(correct/(i+1))*100:.1f}%")
 
     end_time = time.time()
     accuracy = (correct / n_test) * 100
