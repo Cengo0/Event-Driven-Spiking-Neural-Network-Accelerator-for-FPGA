@@ -71,6 +71,10 @@ def main():
 
     dma = overlay.axi_dma_0
     mmio = overlay.snn_config_regs_0.mmio
+    hls_ctrl = overlay.snn_top_hls_0.mmio
+
+    # Wake up the HLS block (Bit 0 = Start, Bit 7 = Auto-Restart)
+    hls_ctrl.write(0x00, 0x81)
     
     # Set Global Hardware Threshold (Register 0x10)
     mmio.write(0x10, hw_threshold)
