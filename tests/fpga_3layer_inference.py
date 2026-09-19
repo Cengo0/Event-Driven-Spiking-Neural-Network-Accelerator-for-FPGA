@@ -8,10 +8,8 @@ from datetime import datetime
 from pynq import Overlay, allocate
 
 def encode_conn(src: int, fanout: int, dest: int, weight: int, exc: bool = True) -> tuple:
-    """Encode one spike_router connection entry matching the hardware's 32-bit structure."""
     flat = src * 32 + fanout 
     addr = (0x00 << 24) | (flat & 0x00_FFFF)
-
     w7 = ((weight & 0xFE) >> 1) & 0x7F
     data = 0
     data |= (dest & 0x7FF)
@@ -23,14 +21,10 @@ def encode_conn(src: int, fanout: int, dest: int, weight: int, exc: bool = True)
     return addr, data
 
 def upload_weights_to_fpga(mmio, w2_aug):
-    """
-    Programs Layer 2 using Virtual Source Expansion and dynamic sparsity 
-    to fit perfectly within the FPGA's fragmented BRAM limits.
-    """
     print("Preparing Layer 2 weights for FPGA BRAM...")
+    original_sum = float(np.sum(np.abs(w2_aug)))
     
-    # --- DYNAMIC SPARSITY: Simulate packing to fit 1792 virtual sources ---
-    MAX_VIRTUAL_SOURCES = 2048 - 256 # 1792
+    MAX_VIRTUAL_SOURCES = 2048 - 256 # 1792 slots available
     prune_threshold = -1
     
     while True:
@@ -41,7 +35,6 @@ def upload_weights_to_fpga(mmio, w2_aug):
         required_v_sources = 0
         for real_src in range(w2_aug.shape[1]):
             non_zeros = np.count_nonzero(w2_aug[:, real_src])
-            # Ceiling division by 32 (MAX_FANOUT)
             required_v_sources += (non_zeros + 31) // 32
             
         if required_v_sources <= MAX_VIRTUAL_SOURCES:
@@ -50,26 +43,25 @@ def upload_weights_to_fpga(mmio, w2_aug):
     total_conns = np.count_nonzero(w2_aug)
     print(f"Applied Sparsity: Dropped weights |w| <= {prune_threshold}.")
     print(f"Total active connections to route: {total_conns}")
-    print(f"Required virtual sources: {required_v_sources} / {MAX_VIRTUAL_SOURCES}")
+    
+    # EXACT VOLTAGE SCALING: Calculate what the hardware physically sees
+    hw_w2_aug = ((np.abs(w2_aug).astype(int) & 0xFE) >> 1)
+    hw_sum = float(np.sum(hw_w2_aug))
+    scale_factor = hw_sum / original_sum if original_sum > 0 else 0.1
+    print(f"Mathematical Threshold Scale Factor: {scale_factor:.4f}")
 
-    CONFIG_CTRL_OFFSET  = 0x00
-    CONFIG_ADDR_OFFSET  = 0x04
-    CONFIG_WDATA_OFFSET = 0x08
+    mmio.write(0x00, 0) # Target Router
     
-    mmio.write(CONFIG_CTRL_OFFSET, 0) 
-    
-    # Zero out old connection counts
     for v in range(2048):
         cnt_addr = (0x01 << 24) | (v & 0x00_FFFF)
-        mmio.write(CONFIG_ADDR_OFFSET, cnt_addr)
-        mmio.write(CONFIG_WDATA_OFFSET, 0)
+        mmio.write(0x04, cnt_addr)
+        mmio.write(0x08, 0)
         
     real_to_virtual = {}
     virtual_src_id = 256 
     
     for real_src in range(w2_aug.shape[1]): 
         real_to_virtual[real_src] = []
-        
         non_zero_dests = []
         for dest in range(w2_aug.shape[0]):
             w = int(w2_aug[dest, real_src])
@@ -83,21 +75,17 @@ def upload_weights_to_fpga(mmio, w2_aug):
             
             for fanout, (dest, w) in enumerate(chunk):
                 exc = (w > 0)
-                abs_w = abs(w)
-                ca, cd = encode_conn(v_src, fanout, dest, abs_w, exc=exc)
-                mmio.write(CONFIG_ADDR_OFFSET, ca)
-                mmio.write(CONFIG_WDATA_OFFSET, cd)
+                ca, cd = encode_conn(v_src, fanout, dest, abs(w), exc=exc)
+                mmio.write(0x04, ca)
+                mmio.write(0x08, cd)
             
             cnt_addr = (0x01 << 24) | (v_src & 0x00_FFFF)
-            mmio.write(CONFIG_ADDR_OFFSET, cnt_addr)
-            mmio.write(CONFIG_WDATA_OFFSET, len(chunk))
-            
+            mmio.write(0x04, cnt_addr)
+            mmio.write(0x08, len(chunk))
             virtual_src_id += 1
-            if virtual_src_id >= 2048:
-                raise RuntimeError("Hardware router memory full despite sparsity.")
                 
     print(f"Mapped {w2_aug.shape[1]} real sources to {virtual_src_id - 256} virtual sources.")
-    return real_to_virtual
+    return real_to_virtual, scale_factor
 
 def main():
     parser = argparse.ArgumentParser(description="3-Layer SNN FPGA Inference")
@@ -111,11 +99,11 @@ def main():
     payload = np.load(args.data)
     w1_f = payload['w1_f']
     b1_f = payload['b1_f']
-    q_w2_aug = payload['q_w2_aug'].copy() # Copy to allow pruning modification
+    q_w2_aug = payload['q_w2_aug'].copy() 
     q_w3_aug = payload['q_w3_aug']
     test_imgs = payload['test_imgs']
     test_lbls = payload['test_lbls']
-    hw_threshold = int(payload['hw_threshold'])
+    original_threshold = int(payload['hw_threshold'])
 
     print("Initializing PYNQ Overlay...")
     if not args.skip_bitstream and os.path.exists(args.bitstream):
@@ -126,25 +114,22 @@ def main():
     dma_mmio = overlay.axi_dma_0.mmio              
     mmio = overlay.snn_config_regs_0.mmio
     hls_ctrl = overlay.snn_top_hls_0.mmio
-
-    # 1. Halve the threshold to counteract the encode_conn bit-shift,
-    # then scale by 85% to compensate for the sparsity pruning.
-    hw_threshold = int((hw_threshold / 2.0) * 0.85)
-
-    # 2. Initialize Hardware Registers
+    
+    src_map, scale_factor = upload_weights_to_fpga(mmio, q_w2_aug)
+    
+    # Scale threshold perfectly to the physical hardware voltage limits
+    hw_threshold = max(1, int(original_threshold * scale_factor))
+    print(f"Hardware-Aligned Threshold set to: {hw_threshold}")
+    
     mmio.write(0x10, hw_threshold)
-    mmio.write(0x14, 0) # CRITICAL: Force Leak=0 and Refrac=0
-
-    # 3. HLS Warmup (Required on first boot to clear internal BRAM)
-    print("Warming up HLS Block...")
+    mmio.write(0x14, 0) # Force Leak=0 and Refrac=0
+    
     hls_ctrl.write(0x10, 0x01) 
     hls_ctrl.write(0x00, 0x01) 
     time.sleep(0.05)           
     hls_ctrl.write(0x00, 0x00) 
     hls_ctrl.write(0x10, 0x00) 
     time.sleep(0.01)
-
-    src_map = upload_weights_to_fpga(mmio, q_w2_aug)
 
     in_buffer = allocate(shape=(2048,), dtype=np.uint32)
     out_buffer = allocate(shape=(1024,), dtype=np.uint32) 
@@ -157,16 +142,24 @@ def main():
     start_time = time.time()
 
     for i in range(n_test):
-        img = test_imgs[i].flatten()
+        img = test_imgs[i].flatten().astype(np.float32)
+        # Z-Score Normalization: Shift raw pixels to the [-0.42, 2.82] range expected by Layer 1
+        if img.max() <= 1.0:
+            img = (img - 0.1307) / 0.3081
+        else:
+            img = (img / 255.0 - 0.1307) / 0.3081
         lbl = int(test_lbls[i])
         
         mem1 = np.zeros(256, dtype=np.float32)
         mem3 = np.zeros(10, dtype=np.int32)
         
+        dma_mmio.write(0x00, 0x04) 
+        dma_mmio.write(0x30, 0x04) 
+        time.sleep(0.002)
+
         hls_ctrl.write(0x10, 0x04) 
         hls_ctrl.write(0x00, 0x01) 
-        while (hls_ctrl.read(0x00) & 0x06) == 0:
-            pass 
+        while (hls_ctrl.read(0x00) & 0x06) == 0: pass 
         hls_ctrl.write(0x00, 0x00)
         
         hls_ctrl.write(0x10, 0x01)             
@@ -191,17 +184,11 @@ def main():
             packet_len = len(virtual_spikes)
             for idx in range(packet_len):
                 in_buffer[idx] = (virtual_spikes[idx] & 0x1FFF) | (1 << 13)
-
-            # FLUSH CACHE: Push CPU inputs to physical DDR for the FPGA DMA
-            in_buffer.flush()
                 
+            in_buffer.flush() 
             spike2 = np.zeros(256, dtype=np.int32)
                 
             if packet_len > 0:
-                dma_mmio.write(0x00, 0x04) 
-                dma_mmio.write(0x30, 0x04) 
-                time.sleep(0.002)
-                
                 dest_ptr = out_buffer.device_address
                 dma_mmio.write(0x34, 0x1000) 
                 dma_mmio.write(0x30, 0x01)   
@@ -237,12 +224,9 @@ def main():
                 
                 timeout = time.time() + 0.1
                 while not mm2s_done and time.time() < timeout:
-                    if dma_mmio.read(0x04) & 0x0002:
-                        break
-
-                # INVALIDATE CACHE: Pull physical DDR outputs back into CPU cache
-                out_buffer.invalidate()
+                    if dma_mmio.read(0x04) & 0x0002: break
                         
+                out_buffer.invalidate() 
                 for s in range(spikes_received):
                     out_val = out_buffer[s]
                     if out_val > 0:
@@ -254,6 +238,8 @@ def main():
 
             spike2_aug = np.append(spike2, 1)
             mem3 += np.dot(q_w3_aug, spike2_aug) 
+
+        hls_ctrl.write(0x00, 0x00)
 
         prediction = int(np.argmax(mem3))
         if prediction == lbl:
@@ -272,11 +258,23 @@ def main():
     accuracy = (correct / n_test) * 100
     print(f"\n===== Inference Complete =====")
     print(f"Total Accuracy: {accuracy:.1f}%")
+    
+    # Verify RTL hardware diagnostic counters
+    final_router_spikes = mmio.read(0x18)
+    final_neuron_spikes = mmio.read(0x1C)
+    print(f"\n--- HARDWARE DIAGNOSTICS ---")
+    print(f"Total Router Spikes Processed : {final_router_spikes}")
+    print(f"Total Output Neurons Fired    : {final_neuron_spikes}")
+    print(f"----------------------------\n")
 
     results = {
         "metrics": {
             "accuracy_percent": round(accuracy, 2),
-            "average_latency_ms": round(((end_time - start_time) / n_test) * 1000, 2)
+            "average_latency_ms": round(((end_time - start_time) / n_test) * 1000, 2),
+            "hardware_diagnostics": {
+                "router_spikes": final_router_spikes,
+                "neuron_spikes": final_neuron_spikes
+            }
         },
         "predictions": detailed_log
     }

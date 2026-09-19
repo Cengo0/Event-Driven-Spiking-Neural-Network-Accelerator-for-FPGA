@@ -1,7 +1,11 @@
 {
     "metrics": {
         "accuracy_percent": 8.9,
-        "average_latency_ms": 329.34
+        "average_latency_ms": 238.39,
+        "hardware_diagnostics": {
+            "router_spikes": 36115,
+            "neuron_spikes": 1002
+        }
     },
     "predictions": [
         {
