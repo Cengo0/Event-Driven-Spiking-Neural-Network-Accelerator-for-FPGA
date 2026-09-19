@@ -126,8 +126,23 @@ def main():
     dma_mmio = overlay.axi_dma_0.mmio              
     mmio = overlay.snn_config_regs_0.mmio
     hls_ctrl = overlay.snn_top_hls_0.mmio
-    
+
+    # 1. Scale threshold down by 15% to account for dropped sparse connections
+    hw_threshold = int(hw_threshold * 0.85)
+
+    # 2. Initialize Hardware Registers
     mmio.write(0x10, hw_threshold)
+    mmio.write(0x14, 0) # CRITICAL: Force Leak=0 and Refrac=0
+
+    # 3. HLS Warmup (Required on first boot to clear internal BRAM)
+    print("Warming up HLS Block...")
+    hls_ctrl.write(0x10, 0x01) 
+    hls_ctrl.write(0x00, 0x01) 
+    time.sleep(0.05)           
+    hls_ctrl.write(0x00, 0x00) 
+    hls_ctrl.write(0x10, 0x00) 
+    time.sleep(0.01)
+
     src_map = upload_weights_to_fpga(mmio, q_w2_aug)
 
     in_buffer = allocate(shape=(2048,), dtype=np.uint32)
@@ -175,6 +190,9 @@ def main():
             packet_len = len(virtual_spikes)
             for idx in range(packet_len):
                 in_buffer[idx] = (virtual_spikes[idx] & 0x1FFF) | (127 << 13)
+
+            # FLUSH CACHE: Push CPU inputs to physical DDR for the FPGA DMA
+            in_buffer.flush()
                 
             spike2 = np.zeros(256, dtype=np.int32)
                 
@@ -220,6 +238,9 @@ def main():
                 while not mm2s_done and time.time() < timeout:
                     if dma_mmio.read(0x04) & 0x0002:
                         break
+                    
+                # INVALIDATE CACHE: Pull physical DDR outputs back into CPU cache
+                out_buffer.invalidate()
                         
                 for s in range(spikes_received):
                     out_val = out_buffer[s]
