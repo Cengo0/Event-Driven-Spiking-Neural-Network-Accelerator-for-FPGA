@@ -70,6 +70,7 @@ def main():
         overlay = Overlay(args.bitstream, download=False)
 
     dma = overlay.axi_dma_0
+    dma_mmio = dma.mmio              # ADD THIS: Raw DMA register access
     mmio = overlay.snn_config_regs_0.mmio
     hls_ctrl = overlay.snn_top_hls_0.mmio
     
@@ -106,7 +107,21 @@ def main():
         # CPU Memory for Layer 1
         mem1 = np.zeros(256, dtype=np.float32)
         out_spikes = np.zeros(10, dtype=np.int32)
-        
+
+        # --- HARDWARE RESET: Clear neuron potentials from previous image ---
+        hls_ctrl.write(0x10, 0x04) # CTRL_CLEAR
+        hls_ctrl.write(0x00, 0x01) # Start
+        while (hls_ctrl.read(0x00) & 0x06) == 0:
+            pass # Wait for done
+        hls_ctrl.write(0x00, 0x00)
+
+        # --- START HLS FOR CURRENT IMAGE ---
+        hls_ctrl.write(0x10, 0x01)             # Enable
+        hls_ctrl.write(0x20, 0x00)             # Mode: Inference
+        hls_ctrl.write(0x28, 1)                # Timesteps: 1 per stream
+        hls_ctrl.write(0x18, hw_threshold)
+        hls_ctrl.write(0x00, 0x81)             # Auto-Restart
+
         for t in range(4): # TIMESTEPS = 4
             print(f"Processing timestep {t}")
             # ─────────────────────────────────────────────────────────
@@ -127,41 +142,63 @@ def main():
                 in_buffer[idx] = (spike_ids[idx] << 16)
                 
             # ─────────────────────────────────────────────────────────
-            # FPGA STAGE: DMA Stream and Polled Receive
+            # FPGA STAGE: Pure MMIO DMA Stream and Polled Receive
             # ─────────────────────────────────────────────────────────
             if packet_len > 0:
-                # 1. Fire the Send Channel using standard PYNQ
-                dma.sendchannel.transfer(in_buffer, nbytes=packet_len * 4)
+                # 1. Hard Reset DMA Channels
+                dma_mmio.write(0x00, 0x04) # MM2S Reset
+                dma_mmio.write(0x30, 0x04) # S2MM Reset
+                time.sleep(0.002)
                 
-                # 2. Poll Receive Channel using low-level registers (like original script)
+                # 2. Arm First Receive Transfer (4 bytes)
                 dest_ptr = out_buffer.device_address
-                max_spikes_to_read = 1024
-                spikes_received = 0
+                dma_mmio.write(0x34, 0x1000) # Clear IOC_Irq
+                dma_mmio.write(0x30, 0x01)   # Run
+                dma_mmio.write(0x48, dest_ptr)
+                dma_mmio.write(0x58, 4)      # Length triggers transfer
                 
-                for _ in range(max_spikes_to_read):
-                    # Arm S2MM for exactly 4 bytes (1 spike word)
-                    dma.write(0x34, 0x1000) # S2MM_DMASR: Clear IOC_Irq
-                    dma.write(0x30, 0x01)   # S2MM_DMACR: Run
-                    dma.write(0x48, dest_ptr + (spikes_received * 4)) # S2MM_DA
-                    dma.write(0x58, 4)      # S2MM_LENGTH: 4 bytes triggers transfer
-                    
-                    # Poll for completion with a 5ms timeout per spike
-                    timeout = time.time() + 0.005 
+                # 3. Fire Send Channel
+                src_ptr = in_buffer.device_address
+                dma_mmio.write(0x00, 0x01)   # Run
+                dma_mmio.write(0x18, src_ptr)
+                dma_mmio.write(0x28, packet_len * 4) # Length triggers transfer
+                
+                # 4. Concurrently Poll Receive and Send
+                spikes_received = 0
+                max_spikes = 1024
+                
+                mm2s_done = False
+                while spikes_received < max_spikes:
+                    timeout = time.time() + 0.005 # 5ms timeout per spike
                     got_spike = False
+                    
                     while time.time() < timeout:
-                        if dma.read(0x34) & 0x1000: # Check IOC_Irq bit
+                        sr = dma_mmio.read(0x34)
+                        if sr & 0x1000: # S2MM IOC_Irq (transfer complete)
                             got_spike = True
                             break
-                    
+                        
+                        if not mm2s_done and (dma_mmio.read(0x04) & 0x0002):
+                            mm2s_done = True
+                            
                     if got_spike:
                         spikes_received += 1
+                        # Re-arm immediately for the next spike
+                        next_dest = dest_ptr + (spikes_received * 4)
+                        dma_mmio.write(0x34, 0x1000)
+                        dma_mmio.write(0x30, 0x01)
+                        dma_mmio.write(0x48, next_dest)
+                        dma_mmio.write(0x58, 4)
                     else:
-                        break # Timeout hit; no more spikes for this timestep
+                        break # No more spikes arriving
                 
-                # Wait for send channel to safely finish
-                dma.sendchannel.wait()
-                
-                # 3. Decode received spikes from the physical buffer
+                # 5. Wait for MM2S (Send) to finish if it hasn't already
+                timeout = time.time() + 0.1
+                while not mm2s_done and time.time() < timeout:
+                    if dma_mmio.read(0x04) & 0x0002:
+                        break
+                        
+                # 6. Decode Spikes
                 for s in range(spikes_received):
                     out_val = out_buffer[s]
                     if out_val > 0:
@@ -169,7 +206,6 @@ def main():
                         if neuron_id < 10:
                             out_spikes[neuron_id] += 1
                             
-                # Clear buffer for next timestep
                 out_buffer[:] = 0
 
         # Prediction

@@ -1,0 +1,16 @@
+{
+    "timestamp": "2026-09-19T09:17:36.733623",
+    "configuration": {
+        "bitstream": "snn_core_group_v2.bit",
+        "payload_file": "mnist_3layer_deployment.npz",
+        "hardware_threshold": 291,
+        "timesteps": 4
+    },
+    "metrics": {
+        "total_samples": 10,
+        "correct_predictions": 1,
+        "accuracy_percent": 10.0,
+        "total_inference_time_sec": 0.4467,
+        "average_latency_ms": 44.67
+    }
+}
