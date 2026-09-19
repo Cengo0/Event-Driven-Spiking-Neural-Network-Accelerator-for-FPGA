@@ -7,29 +7,97 @@ import numpy as np
 from datetime import datetime
 from pynq import Overlay, allocate
 
-def upload_weights_to_fpga(mmio, w2):
+def encode_conn(src: int, fanout: int, dest: int, weight: int, exc: bool = True) -> tuple:
+    """Encode one spike_router connection entry matching the hardware's 32-bit structure."""
+    flat = src * 32 + fanout 
+    addr = (0x00 << 24) | (flat & 0x00_FFFF)
+
+    w7 = ((weight & 0xFE) >> 1) & 0x7F
+    data = 0
+    data |= (dest & 0x7FF)
+    data |= (w7 << 19)
+    if exc:
+        data |= (1 << 26)
+    data |= (1 << 27) 
+    data |= (1 << 28) 
+    return addr, data
+
+def upload_weights_to_fpga(mmio, w2_aug):
     """
-    Programs ONLY Layer 2 into the synaptic_connectivity_table.
-    Layer 3 stays on the CPU.
+    Programs Layer 2 using Virtual Source Expansion and dynamic sparsity 
+    to fit perfectly within the FPGA's fragmented BRAM limits.
     """
-    print("Uploading Layer 2 weights to FPGA BRAM...")
+    print("Preparing Layer 2 weights for FPGA BRAM...")
     
+    # --- DYNAMIC SPARSITY: Simulate packing to fit 1792 virtual sources ---
+    MAX_VIRTUAL_SOURCES = 2048 - 256 # 1792
+    prune_threshold = -1
+    
+    while True:
+        prune_threshold += 1
+        if prune_threshold > 0:
+            w2_aug[np.abs(w2_aug) <= prune_threshold] = 0
+            
+        required_v_sources = 0
+        for real_src in range(w2_aug.shape[1]):
+            non_zeros = np.count_nonzero(w2_aug[:, real_src])
+            # Ceiling division by 32 (MAX_FANOUT)
+            required_v_sources += (non_zeros + 31) // 32
+            
+        if required_v_sources <= MAX_VIRTUAL_SOURCES:
+            break
+            
+    total_conns = np.count_nonzero(w2_aug)
+    print(f"Applied Sparsity: Dropped weights |w| <= {prune_threshold}.")
+    print(f"Total active connections to route: {total_conns}")
+    print(f"Required virtual sources: {required_v_sources} / {MAX_VIRTUAL_SOURCES}")
+
     CONFIG_CTRL_OFFSET  = 0x00
     CONFIG_ADDR_OFFSET  = 0x04
     CONFIG_WDATA_OFFSET = 0x08
     
-    # Target the Synaptic Connectivity Table
     mmio.write(CONFIG_CTRL_OFFSET, 0) 
     
-    current_addr = 0
-    for row in w2:
-        for weight in row:
-            mmio.write(CONFIG_ADDR_OFFSET, current_addr)
-            val = int(weight) & 0xFF 
-            mmio.write(CONFIG_WDATA_OFFSET, val)
-            current_addr += 1
+    # Zero out old connection counts
+    for v in range(2048):
+        cnt_addr = (0x01 << 24) | (v & 0x00_FFFF)
+        mmio.write(CONFIG_ADDR_OFFSET, cnt_addr)
+        mmio.write(CONFIG_WDATA_OFFSET, 0)
+        
+    real_to_virtual = {}
+    virtual_src_id = 256 
+    
+    for real_src in range(w2_aug.shape[1]): 
+        real_to_virtual[real_src] = []
+        
+        non_zero_dests = []
+        for dest in range(w2_aug.shape[0]):
+            w = int(w2_aug[dest, real_src])
+            if w != 0:
+                non_zero_dests.append((dest, w))
+                
+        for i in range(0, len(non_zero_dests), 32):
+            chunk = non_zero_dests[i:i+32]
+            v_src = virtual_src_id
+            real_to_virtual[real_src].append(v_src)
             
-    print(f"Weight upload complete. Total synaptic connections mapped: {current_addr}")
+            for fanout, (dest, w) in enumerate(chunk):
+                exc = (w > 0)
+                abs_w = abs(w)
+                ca, cd = encode_conn(v_src, fanout, dest, abs_w, exc=exc)
+                mmio.write(CONFIG_ADDR_OFFSET, ca)
+                mmio.write(CONFIG_WDATA_OFFSET, cd)
+            
+            cnt_addr = (0x01 << 24) | (v_src & 0x00_FFFF)
+            mmio.write(CONFIG_ADDR_OFFSET, cnt_addr)
+            mmio.write(CONFIG_WDATA_OFFSET, len(chunk))
+            
+            virtual_src_id += 1
+            if virtual_src_id >= 2048:
+                raise RuntimeError("Hardware router memory full despite sparsity.")
+                
+    print(f"Mapped {w2_aug.shape[1]} real sources to {virtual_src_id - 256} virtual sources.")
+    return real_to_virtual
 
 def main():
     parser = argparse.ArgumentParser(description="3-Layer SNN FPGA Inference")
@@ -40,11 +108,10 @@ def main():
     parser.add_argument('--output-json', default='inference_results.json', help='Output results file')
     args = parser.parse_args()
 
-    print(f"Loading payload: {args.data}")
     payload = np.load(args.data)
     w1_f = payload['w1_f']
     b1_f = payload['b1_f']
-    q_w2_aug = payload['q_w2_aug']
+    q_w2_aug = payload['q_w2_aug'].copy() # Copy to allow pruning modification
     q_w3_aug = payload['q_w3_aug']
     test_imgs = payload['test_imgs']
     test_lbls = payload['test_lbls']
@@ -56,21 +123,19 @@ def main():
     else:
         overlay = Overlay(args.bitstream, download=False)
 
-    dma = overlay.axi_dma_0
-    dma_mmio = dma.mmio              
+    dma_mmio = overlay.axi_dma_0.mmio              
     mmio = overlay.snn_config_regs_0.mmio
     hls_ctrl = overlay.snn_top_hls_0.mmio
     
     mmio.write(0x10, hw_threshold)
+    src_map = upload_weights_to_fpga(mmio, q_w2_aug)
 
-    # Upload ONLY Layer 2 to the FPGA
-    upload_weights_to_fpga(mmio, q_w2_aug)
-
-    in_buffer = allocate(shape=(257,), dtype=np.uint32)
+    in_buffer = allocate(shape=(2048,), dtype=np.uint32)
     out_buffer = allocate(shape=(1024,), dtype=np.uint32) 
 
     correct = 0
     n_test = min(args.samples, len(test_imgs))
+    detailed_log = []
     
     print(f"\nStarting Co-Processing Inference for {n_test} images...")
     start_time = time.time()
@@ -80,43 +145,39 @@ def main():
         lbl = int(test_lbls[i])
         
         mem1 = np.zeros(256, dtype=np.float32)
-        mem3 = np.zeros(10, dtype=np.int32) # Layer 3 Voltage Accumulator (CPU)
+        mem3 = np.zeros(10, dtype=np.int32)
         
-        # --- HARDWARE RESET: Clear FPGA potentials between images ---
-        hls_ctrl.write(0x10, 0x04) # CTRL_CLEAR
-        hls_ctrl.write(0x00, 0x01) # Start
+        hls_ctrl.write(0x10, 0x04) 
+        hls_ctrl.write(0x00, 0x01) 
         while (hls_ctrl.read(0x00) & 0x06) == 0:
             pass 
         hls_ctrl.write(0x00, 0x00)
         
-        # --- START HLS FOR CURRENT IMAGE ---
-        hls_ctrl.write(0x10, 0x01)             # Enable
-        hls_ctrl.write(0x20, 0x00)             # Mode: Inference
-        hls_ctrl.write(0x28, 1)                # Timesteps: 1 per stream
+        hls_ctrl.write(0x10, 0x01)             
+        hls_ctrl.write(0x20, 0x00)             
+        hls_ctrl.write(0x28, 1)                
         hls_ctrl.write(0x18, hw_threshold)
-        hls_ctrl.write(0x00, 0x81)             # Auto-Restart
+        hls_ctrl.write(0x00, 0x81)             
         
         for t in range(4): 
-            # ─────────────────────────────────────────────────────────
-            # CPU STAGE 1: Layer 1 Float32 Evaluation
-            # ─────────────────────────────────────────────────────────
             mem1 += np.dot(w1_f, img) + b1_f
             mem1 = np.maximum(mem1, 0)
             spike1 = (mem1 >= 1.0).astype(np.uint32)
             mem1[spike1 > 0] = 0.0 
             
-            spike_ids = np.nonzero(spike1)[0].astype(np.uint32)
-            spike_ids = np.append(spike_ids, 256) 
+            spike_ids = np.nonzero(spike1)[0].tolist()
+            spike_ids.append(256) 
             
-            packet_len = len(spike_ids)
+            virtual_spikes = []
+            for real_id in spike_ids:
+                virtual_spikes.extend(src_map.get(real_id, []))
+                
+            packet_len = len(virtual_spikes)
             for idx in range(packet_len):
-                in_buffer[idx] = (spike_ids[idx] << 16)
+                in_buffer[idx] = (virtual_spikes[idx] & 0x1FFF) | (127 << 13)
                 
             spike2 = np.zeros(256, dtype=np.int32)
                 
-            # ─────────────────────────────────────────────────────────
-            # FPGA STAGE: Pure MMIO DMA Stream and Polled Receive
-            # ─────────────────────────────────────────────────────────
             if packet_len > 0:
                 dma_mmio.write(0x00, 0x04) 
                 dma_mmio.write(0x30, 0x04) 
@@ -134,16 +195,13 @@ def main():
                 dma_mmio.write(0x28, packet_len * 4) 
                 
                 spikes_received = 0
-                max_spikes = 1024
-                
                 mm2s_done = False
-                while spikes_received < max_spikes:
+                while spikes_received < 1024:
                     timeout = time.time() + 0.005 
                     got_spike = False
                     
                     while time.time() < timeout:
-                        sr = dma_mmio.read(0x34)
-                        if sr & 0x1000: 
+                        if dma_mmio.read(0x34) & 0x1000: 
                             got_spike = True
                             break
                         if not mm2s_done and (dma_mmio.read(0x04) & 0x0002):
@@ -151,10 +209,9 @@ def main():
                             
                     if got_spike:
                         spikes_received += 1
-                        next_dest = dest_ptr + (spikes_received * 4)
                         dma_mmio.write(0x34, 0x1000)
                         dma_mmio.write(0x30, 0x01)
-                        dma_mmio.write(0x48, next_dest)
+                        dma_mmio.write(0x48, dest_ptr + (spikes_received * 4))
                         dma_mmio.write(0x58, 4)
                     else:
                         break 
@@ -167,56 +224,42 @@ def main():
                 for s in range(spikes_received):
                     out_val = out_buffer[s]
                     if out_val > 0:
-                        neuron_id = (out_val >> 16) & 0xFFFF
+                        neuron_id = out_val & 0x1FFF
                         if neuron_id < 256:
-                            spike2[neuron_id] = 1 # Log Layer 2 Spike
+                            spike2[neuron_id] = 1 
                             
                 out_buffer[:] = 0
 
-            # ─────────────────────────────────────────────────────────
-            # CPU STAGE 2: Layer 3 Voltage Accumulation
-            # ─────────────────────────────────────────────────────────
             spike2_aug = np.append(spike2, 1)
-            mem3 += np.dot(q_w3_aug, spike2_aug) # Accumulate raw voltage
+            mem3 += np.dot(q_w3_aug, spike2_aug) 
 
-        # Prediction: argmax of final voltage
-        if np.argmax(mem3) == lbl:
+        prediction = int(np.argmax(mem3))
+        if prediction == lbl:
             correct += 1
+            
+        detailed_log.append({
+            "image_index": i,
+            "true_label": lbl,
+            "predicted_label": prediction
+        })
             
         if (i + 1) % 100 == 0:
             print(f"Processed {i+1}/{n_test} | Current Acc: {(correct/(i+1))*100:.1f}%")
 
     end_time = time.time()
     accuracy = (correct / n_test) * 100
-    avg_latency = ((end_time - start_time) / n_test) * 1000
-
     print(f"\n===== Inference Complete =====")
     print(f"Total Accuracy: {accuracy:.1f}%")
-    print(f"Average Speed:  {avg_latency:.2f} ms/image")
 
     results = {
-        "timestamp": datetime.now().isoformat(),
-        "configuration": {
-            "bitstream": args.bitstream,
-            "payload_file": args.data,
-            "hardware_threshold": hw_threshold,
-            "timesteps": 4
-        },
         "metrics": {
-            "total_samples": n_test,
-            "correct_predictions": correct,
             "accuracy_percent": round(accuracy, 2),
-            "total_inference_time_sec": round(end_time - start_time, 4),
-            "average_latency_ms": round(avg_latency, 2)
-        }
+            "average_latency_ms": round(((end_time - start_time) / n_test) * 1000, 2)
+        },
+        "predictions": detailed_log
     }
-    
     with open(args.output_json, 'w') as f:
         json.dump(results, f, indent=4)
-    print(f"Detailed results logged to {args.output_json}")
-
-    in_buffer.freebuffer()
-    out_buffer.freebuffer()
 
 if __name__ == '__main__':
     main()
