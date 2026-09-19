@@ -381,6 +381,7 @@ def main():
     t_start  = time.time()
 
     for img_idx in range(n_test):
+        print(f"Processing image {img_idx}")
         # ── Layer 1: CPU float32 LIF ─────────────────────────────────────────
         # test_imgs is ALREADY Z-score normalised by prepare_3layer_deployment.py
         # (transforms.Normalize((0.1307,), (0.3081,))). Do NOT re-normalise.
