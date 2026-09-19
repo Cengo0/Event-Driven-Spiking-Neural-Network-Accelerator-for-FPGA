@@ -1,10 +1,21 @@
 {
+    "metadata": {
+        "timestamp": "2026-09-19T20:41:31.832225",
+        "bitstream": "snn_core_group_v2.bit",
+        "data_file": "mnist_3layer_deployment.npz",
+        "samples": 1000,
+        "timesteps": 4,
+        "hw_threshold": 291,
+        "prune_th": 80
+    },
     "metrics": {
         "accuracy_percent": 8.9,
-        "average_latency_ms": 238.39,
+        "correct": 89,
+        "total": 1000,
+        "average_latency_ms": 4016.52,
         "hardware_diagnostics": {
-            "router_spikes": 36115,
-            "neuron_spikes": 1002
+            "router_spikes": 0,
+            "neuron_spikes": 0
         }
     },
     "predictions": [
