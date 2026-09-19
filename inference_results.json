@@ -1,5 +1,5 @@
 {
-    "timestamp": "2026-09-19T09:17:36.733623",
+    "timestamp": "2026-09-19T09:29:27.194846",
     "configuration": {
         "bitstream": "snn_core_group_v2.bit",
         "payload_file": "mnist_3layer_deployment.npz",
@@ -7,10 +7,10 @@
         "timesteps": 4
     },
     "metrics": {
-        "total_samples": 10,
-        "correct_predictions": 1,
-        "accuracy_percent": 10.0,
-        "total_inference_time_sec": 0.4467,
-        "average_latency_ms": 44.67
+        "total_samples": 1000,
+        "correct_predictions": 89,
+        "accuracy_percent": 8.9,
+        "total_inference_time_sec": 41.9279,
+        "average_latency_ms": 41.93
     }
 }
