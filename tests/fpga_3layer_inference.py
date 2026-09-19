@@ -72,11 +72,17 @@ def main():
     dma = overlay.axi_dma_0
     mmio = overlay.snn_config_regs_0.mmio
     hls_ctrl = overlay.snn_top_hls_0.mmio
-
-    # Wake up the HLS block (Bit 0 = Start, Bit 7 = Auto-Restart)
-    hls_ctrl.write(0x00, 0x81)
     
-    # Set Global Hardware Threshold (Register 0x10)
+    # ─────────────────────────────────────────────────────────
+    # HLS WAKEUP SEQUENCE (Adapted from original script)
+    # ─────────────────────────────────────────────────────────
+    hls_ctrl.write(0x10, 0x01)             # HLS_CTRL_REG: Enable
+    hls_ctrl.write(0x20, 0x00)             # HLS_MODE_REG: Inference mode
+    hls_ctrl.write(0x28, 0x01)             # HLS_TIME_STEPS: 1 (Required for streaming)
+    hls_ctrl.write(0x18, hw_threshold)     # HLS_CONFIG_REG: Threshold
+    hls_ctrl.write(0x00, 0x81)             # HLS_AP_CTRL: Auto-Restart | Start
+    
+    # Set Global Hardware Threshold (Register 0x10 in Config RTL)
     mmio.write(0x10, hw_threshold)
 
     # 3. Upload FPGA Weights
@@ -84,7 +90,7 @@ def main():
 
     # 4. Allocate DMA Buffers (Max spikes per timestep = 256 L1 neurons + 1 Bias)
     in_buffer = allocate(shape=(257,), dtype=np.uint32)
-    out_buffer = allocate(shape=(10,), dtype=np.uint32)
+    out_buffer = allocate(shape=(1024,), dtype=np.uint32)
 
     correct = 0
     n_test = min(args.samples, len(test_imgs))
@@ -121,21 +127,50 @@ def main():
                 in_buffer[idx] = (spike_ids[idx] << 16)
                 
             # ─────────────────────────────────────────────────────────
-            # FPGA STAGE: DMA Stream and Receive
+            # FPGA STAGE: DMA Stream and Polled Receive
             # ─────────────────────────────────────────────────────────
             if packet_len > 0:
+                # 1. Fire the Send Channel using standard PYNQ
                 dma.sendchannel.transfer(in_buffer, nbytes=packet_len * 4)
-                dma.recvchannel.transfer(out_buffer)
                 
+                # 2. Poll Receive Channel using low-level registers (like original script)
+                dest_ptr = out_buffer.device_address
+                max_spikes_to_read = 1024
+                spikes_received = 0
+                
+                for _ in range(max_spikes_to_read):
+                    # Arm S2MM for exactly 4 bytes (1 spike word)
+                    dma.write(0x34, 0x1000) # S2MM_DMASR: Clear IOC_Irq
+                    dma.write(0x30, 0x01)   # S2MM_DMACR: Run
+                    dma.write(0x48, dest_ptr + (spikes_received * 4)) # S2MM_DA
+                    dma.write(0x58, 4)      # S2MM_LENGTH: 4 bytes triggers transfer
+                    
+                    # Poll for completion with a 5ms timeout per spike
+                    timeout = time.time() + 0.005 
+                    got_spike = False
+                    while time.time() < timeout:
+                        if dma.read(0x34) & 0x1000: # Check IOC_Irq bit
+                            got_spike = True
+                            break
+                    
+                    if got_spike:
+                        spikes_received += 1
+                    else:
+                        break # Timeout hit; no more spikes for this timestep
+                
+                # Wait for send channel to safely finish
                 dma.sendchannel.wait()
-                dma.recvchannel.wait()
                 
-                # Decode received 10-neuron output spikes
-                for out_val in out_buffer:
+                # 3. Decode received spikes from the physical buffer
+                for s in range(spikes_received):
+                    out_val = out_buffer[s]
                     if out_val > 0:
                         neuron_id = (out_val >> 16) & 0xFFFF
                         if neuron_id < 10:
                             out_spikes[neuron_id] += 1
+                            
+                # Clear buffer for next timestep
+                out_buffer[:] = 0
 
         # Prediction
         if np.argmax(out_spikes) == lbl:
