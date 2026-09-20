@@ -308,15 +308,22 @@ connect_bd_net [get_bd_ports rtl_spike_out_weight]              [get_bd_pins snn
 connect_bd_net [get_bd_pins snn_top_hls_0/spike_out_ready]      [get_bd_ports hls_spike_in_ready]
 
 # HLS -> RTL: learned weight update channel
+set lw_grp_pin  [get_bd_pins snn_top_hls_0/learn_weight_group]
+set lw_src_pin  [get_bd_pins snn_top_hls_0/learn_weight_src]
+set lw_dst_pin  [get_bd_pins snn_top_hls_0/learn_weight_dst]
+set lw_data_pin [get_bd_pins snn_top_hls_0/learn_weight_data]
+set lw_dg_pin   [get_bd_pins snn_top_hls_0/learn_weight_dst_group]
+set lw_fo_pin   [get_bd_pins snn_top_hls_0/learn_weight_fanout_idx]
+
 create_bd_port -dir O hls_learn_weight_valid -type data
-create_bd_port -dir O -from 3 -to 0 hls_learn_weight_group -type data
-create_bd_port -dir O -from 6 -to 0 hls_learn_weight_src -type data
-create_bd_port -dir O -from 6 -to 0 hls_learn_weight_dst -type data
-create_bd_port -dir O -from 7 -to 0 hls_learn_weight_data -type data
+create_bd_port -dir O -from [get_property LEFT $lw_grp_pin]  -to [get_property RIGHT $lw_grp_pin]  hls_learn_weight_group -type data
+create_bd_port -dir O -from [get_property LEFT $lw_src_pin]  -to [get_property RIGHT $lw_src_pin]  hls_learn_weight_src -type data
+create_bd_port -dir O -from [get_property LEFT $lw_dst_pin]  -to [get_property RIGHT $lw_dst_pin]  hls_learn_weight_dst -type data
+create_bd_port -dir O -from [get_property LEFT $lw_data_pin] -to [get_property RIGHT $lw_data_pin] hls_learn_weight_data -type data
 create_bd_port -dir O hls_learn_weight_exc -type data
 create_bd_port -dir O hls_learn_weight_is_inter -type data
-create_bd_port -dir O -from 3 -to 0 hls_learn_weight_dst_group -type data
-create_bd_port -dir O -from 3 -to 0 hls_learn_weight_fanout_idx -type data
+create_bd_port -dir O -from [get_property LEFT $lw_dg_pin]   -to [get_property RIGHT $lw_dg_pin]   hls_learn_weight_dst_group -type data
+create_bd_port -dir O -from [get_property LEFT $lw_fo_pin]   -to [get_property RIGHT $lw_fo_pin]   hls_learn_weight_fanout_idx -type data
 create_bd_port -dir I rtl_learn_weight_ready -type data
 
 connect_bd_net [get_bd_pins snn_top_hls_0/learn_weight_valid]      [get_bd_ports hls_learn_weight_valid]
