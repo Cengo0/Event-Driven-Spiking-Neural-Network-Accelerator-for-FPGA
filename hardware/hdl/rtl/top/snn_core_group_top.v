@@ -481,30 +481,111 @@ module snn_core_group_top #(
     // HLS ↔ Event Router Bridge
     //=========================================================================
 
-    // HLS spike output → Event Router external input
-    // Convert HLS neuron ID to global format {group_id[3:0], local_id[6:0]}
+    // 1. External Spike Input: HLS ap_none "new spike" detector
+    // HLS keeps spike_in_valid HIGH across cycles.
+    // Generate a single-cycle pulse into event_router_ng when:
+    //   (a) valid rises, or
+    //   (b) valid is HIGH and payload (neuron_id or weight) changes.
+    reg                             hls_spike_valid_d;
+    reg [HLS_NEURON_ID_WIDTH-1:0]  hls_spike_nid_d;
+    reg [HLS_WEIGHT_WIDTH-1:0]     hls_spike_wt_d;
+    wire                            hls_spike_payload_changed;
+    wire                            hls_spike_event;
+
+    always @(posedge clk_100mhz) begin
+        if (!rst_n_sync || hls_snn_reset || !hls_snn_enable) begin
+            hls_spike_valid_d <= 1'b0;
+            hls_spike_nid_d   <= {HLS_NEURON_ID_WIDTH{1'b0}};
+            hls_spike_wt_d    <= {HLS_WEIGHT_WIDTH{1'b0}};
+        end else begin
+            hls_spike_valid_d <= hls_spike_out_valid;
+            if (hls_spike_out_valid) begin
+                hls_spike_nid_d <= hls_spike_out_neuron_id;
+                hls_spike_wt_d  <= hls_spike_out_weight;
+            end
+        end
+    end
+
+    assign hls_spike_payload_changed =
+        (hls_spike_out_neuron_id != hls_spike_nid_d) ||
+        (hls_spike_out_weight    != hls_spike_wt_d);
+
+    assign hls_spike_event = hls_spike_out_valid &
+                             (~hls_spike_valid_d | hls_spike_payload_changed);
+
     wire [GLOBAL_ID_WIDTH-1:0]   hls_global_id;
     wire [WEIGHT_WIDTH-1:0]      hls_weight_truncated;
 
     assign hls_global_id       = hls_spike_out_neuron_id[GLOBAL_ID_WIDTH-1:0];
     assign hls_weight_truncated = hls_spike_out_weight[WEIGHT_WIDTH-1:0];
 
-    // Event Router → HLS learning observation
-    // All 2048 neurons are addressable
-    assign rtl_spike_out_valid     = learn_spike_valid;
-    assign rtl_spike_out_neuron_id = learn_spike_src_id;
+    // 2. Output Spike FIFO for Class Output Spikes (Group 2 -> HLS -> S2MM DMA)
+    // Group 2 is the output classification layer (digits 0..9).
+    // Spikes from Group 2 are buffered in a FIFO and held valid until HLS consumes
+    // them and toggles spike_out_ready (hls_spike_in_ready).
+    localparam OUTPUT_GROUP         = NUM_GROUPS - 1;  // Group 2 is output layer
+    localparam SPIKE_OUT_FIFO_DEPTH = 32;
+    localparam SPIKE_OUT_FIFO_AW    = $clog2(SPIKE_OUT_FIFO_DEPTH);
+    localparam SPIKE_OUT_FIFO_DW    = HLS_NEURON_ID_WIDTH + HLS_WEIGHT_WIDTH;
+    localparam [SPIKE_OUT_FIFO_AW-1:0] SPIKE_OUT_FIFO_LAST = {SPIKE_OUT_FIFO_AW{1'b1}};
+
+    reg [SPIKE_OUT_FIFO_DW-1:0] spike_out_fifo_mem [0:SPIKE_OUT_FIFO_DEPTH-1];
+    reg [SPIKE_OUT_FIFO_AW-1:0] spike_out_fifo_wr_ptr;
+    reg [SPIKE_OUT_FIFO_AW-1:0] spike_out_fifo_rd_ptr;
+    reg [SPIKE_OUT_FIFO_AW:0]   spike_out_fifo_count;
+    reg                         spike_out_ready_d;
+
+    wire spike_out_fifo_empty = (spike_out_fifo_count == 0);
+    wire spike_out_fifo_full  = (spike_out_fifo_count == SPIKE_OUT_FIFO_DEPTH);
+
+    // Only output class neurons (Group 2) are forwarded to HLS/DMA
+    wire is_output_spike     = (learn_spike_src_id[GLOBAL_ID_WIDTH-1 : LOCAL_ID_WIDTH] == OUTPUT_GROUP[GROUP_ID_WIDTH-1:0]);
+    wire spike_out_fifo_push = learn_spike_valid && is_output_spike && !spike_out_fifo_full;
+
+    // HLS drives spike_out_ready as a consume-ack toggle token
+    wire spike_out_ready_toggle = (hls_spike_in_ready ^ spike_out_ready_d);
+    wire spike_out_fifo_pop     = spike_out_ready_toggle && !spike_out_fifo_empty;
+
+    wire [SPIKE_OUT_FIFO_DW-1:0] spike_out_fifo_head = spike_out_fifo_mem[spike_out_fifo_rd_ptr];
+    wire [SPIKE_OUT_FIFO_AW-1:0] spike_out_fifo_wr_ptr_next =
+        (spike_out_fifo_wr_ptr == SPIKE_OUT_FIFO_LAST) ? {SPIKE_OUT_FIFO_AW{1'b0}} : (spike_out_fifo_wr_ptr + 1'b1);
+    wire [SPIKE_OUT_FIFO_AW-1:0] spike_out_fifo_rd_ptr_next =
+        (spike_out_fifo_rd_ptr == SPIKE_OUT_FIFO_LAST) ? {SPIKE_OUT_FIFO_AW{1'b0}} : (spike_out_fifo_rd_ptr + 1'b1);
+
+    always @(posedge clk_100mhz) begin
+        if (!rst_n_sync || hls_snn_reset || !hls_snn_enable) begin
+            spike_out_fifo_wr_ptr <= {SPIKE_OUT_FIFO_AW{1'b0}};
+            spike_out_fifo_rd_ptr <= {SPIKE_OUT_FIFO_AW{1'b0}};
+            spike_out_fifo_count  <= {(SPIKE_OUT_FIFO_AW+1){1'b0}};
+            spike_out_ready_d     <= 1'b0;
+        end else begin
+            spike_out_ready_d <= hls_spike_in_ready;
+
+            if (spike_out_fifo_push) begin
+                spike_out_fifo_mem[spike_out_fifo_wr_ptr] <= {
+                    {{(HLS_NEURON_ID_WIDTH-GLOBAL_ID_WIDTH){1'b0}}, learn_spike_src_id},
+                    {{(HLS_WEIGHT_WIDTH-1){1'b0}}, 1'b1}
+                };
+                spike_out_fifo_wr_ptr <= spike_out_fifo_wr_ptr_next;
+            end
+
+            if (spike_out_fifo_pop) begin
+                spike_out_fifo_rd_ptr <= spike_out_fifo_rd_ptr_next;
+            end
+
+            case ({spike_out_fifo_push, spike_out_fifo_pop})
+                2'b10: spike_out_fifo_count <= spike_out_fifo_count + 1'b1;
+                2'b01: spike_out_fifo_count <= spike_out_fifo_count - 1'b1;
+                default: spike_out_fifo_count <= spike_out_fifo_count;
+            endcase
+        end
+    end
+
+    assign rtl_spike_out_valid     = !spike_out_fifo_empty;
+    assign rtl_spike_out_neuron_id = spike_out_fifo_head[SPIKE_OUT_FIFO_DW-1 : HLS_WEIGHT_WIDTH];
+    assign rtl_spike_out_weight    = spike_out_fifo_head[HLS_WEIGHT_WIDTH-1 : 0];
+    assign learn_spike_ready       = !spike_out_fifo_full;
     assign rtl_learn_weight_ready  = LEARN_WEIGHT_BRIDGE_ENABLE ? learn_weight_ready_br : 1'b0;
-
-    // Weight bridge: zero-extend if WEIGHT_WIDTH < HLS_WEIGHT_WIDTH, else direct
-    generate
-        if (HLS_WEIGHT_WIDTH > WEIGHT_WIDTH)
-            assign rtl_spike_out_weight = {{(HLS_WEIGHT_WIDTH-WEIGHT_WIDTH){1'b0}},
-                                            ct_result_weight};
-        else
-            assign rtl_spike_out_weight = ct_result_weight[HLS_WEIGHT_WIDTH-1:0];
-    endgenerate
-
-    assign learn_spike_ready       = hls_spike_in_ready;
 
     // HLS ready/busy
     assign rtl_spike_in_ready = !router_busy;
@@ -704,7 +785,7 @@ module snn_core_group_top #(
         .grp_in_ready       (grp_in_ready),
 
         // External spike input (from HLS)
-        .ext_spike_valid    (hls_spike_out_valid),
+        .ext_spike_valid    (hls_spike_event),
         .ext_spike_neuron_id(hls_global_id),
         .ext_spike_weight   (hls_weight_truncated),
         .ext_spike_exc      (1'b1),  // HLS spikes default excitatory

@@ -224,7 +224,7 @@ module event_router_ng #(
                             state         <= ST_EXT_ROUTE;
                         end
                         // Check group spikes via round-robin
-                        else begin
+                        else if (|grp_spike_valid) begin
                             state <= ST_ARB_SELECT;
                         end
                     end

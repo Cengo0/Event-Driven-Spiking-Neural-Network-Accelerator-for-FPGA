@@ -88,13 +88,17 @@ module synaptic_connectivity_table #(
     // Address construction (layered compact mapping)
     // Group 0 (L2): 256 src x 256 fanout = addrs 0..65535
     // Group 1 (L3): 256 src x 16 fanout  = addrs 65536..69631
-    // Unmapped/invalid queries map to 73727 (unwritten zero entry, yielding valid=0)
-    wire [TABLE_ADDR_WIDTH-1:0] wr_addr = (cfg_src_group == 0) ? {1'b0, cfg_src_neuron[7:0], cfg_fanout_idx[7:0]} :
-                                          (cfg_src_group == 1) ? (cfg_fanout_idx < 16 ? (17'd65536 + {5'd0, cfg_src_neuron[7:0], cfg_fanout_idx[3:0]}) : 17'd73727) :
+    wire [7:0] cfg_src_neuron_8b    = cfg_src_neuron;
+    wire [7:0] cfg_fanout_idx_8b    = cfg_fanout_idx;
+    wire [7:0] lookup_src_neuron_8b = lookup_src_neuron;
+    wire [7:0] lookup_fanout_idx_8b = lookup_fanout_idx;
+
+    wire [TABLE_ADDR_WIDTH-1:0] wr_addr = (cfg_src_group == 0) ? {1'b0, cfg_src_neuron_8b, cfg_fanout_idx_8b} :
+                                          (cfg_src_group == 1) ? (cfg_fanout_idx_8b < 16 ? (17'd65536 + {5'd0, cfg_src_neuron_8b, cfg_fanout_idx_8b[3:0]}) : 17'd73727) :
                                           17'd73727;
 
-    wire [TABLE_ADDR_WIDTH-1:0] rd_addr = (lookup_src_group == 0) ? {1'b0, lookup_src_neuron[7:0], lookup_fanout_idx[7:0]} :
-                                          (lookup_src_group == 1) ? (lookup_fanout_idx < 16 ? (17'd65536 + {5'd0, lookup_src_neuron[7:0], lookup_fanout_idx[3:0]}) : 17'd73727) :
+    wire [TABLE_ADDR_WIDTH-1:0] rd_addr = (lookup_src_group == 0) ? {1'b0, lookup_src_neuron_8b, lookup_fanout_idx_8b} :
+                                          (lookup_src_group == 1) ? (lookup_fanout_idx_8b < 16 ? (17'd65536 + {5'd0, lookup_src_neuron_8b, lookup_fanout_idx_8b[3:0]}) : 17'd73727) :
                                           17'd73727;
 
     // Data packing

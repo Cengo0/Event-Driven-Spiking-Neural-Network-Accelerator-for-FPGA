@@ -305,7 +305,7 @@ module core_group #(
                             fifo_rd_ptr  <= fifo_rd_ptr + 1;
                             fifo_pop     <= 1;
                             state        <= ST_SPIKE_RD;
-                        end else if (!leak_cycle_done) begin
+                        end else if (!leak_cycle_done && (global_leak_rate != 0 || global_refrac_period != 0)) begin
                             ns_rd_addr   <= leak_idx;
                             state        <= ST_LEAK_RD;
                         end

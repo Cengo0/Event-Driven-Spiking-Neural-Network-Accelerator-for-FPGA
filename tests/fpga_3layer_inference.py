@@ -201,8 +201,8 @@ def main():
     # ── Configure HLS Core ────────────────────────────────────────────────────
     hls_ctrl.write(0x10, 0x01)              # mode: inference
     hls_ctrl.write(0x18, hw_threshold)
-    hls_ctrl.write(0x28, args.timesteps)
-    hls_ctrl.write(0x00, 0x81)              # ap_start | ap_continue
+    hls_ctrl.write(0x20, 0x00)
+    hls_ctrl.write(0x28, 1)                 # time_steps = 1 (kernel processes per-batch)
 
     # ── Allocate DMA Buffers ──────────────────────────────────────────────────
     in_buffer  = allocate(shape=(512,), dtype=np.uint32)
@@ -234,13 +234,18 @@ def main():
             pkt_len      = len(l1_spike_ids)
 
             if pkt_len > 0:
-                # ── Pack Input Spikes: [9:0]=global_id(0, id), [20:13]=weight ─
+                # ── Pack Input Spikes: [9:0]=global_id(0, id), [17:10]=weight ─
                 for k, sid in enumerate(l1_spike_ids):
                     gid = global_id(0, sid) & 0x3FF
                     weight_val = 127
-                    in_buffer[k] = gid | ((weight_val & 0xFF) << 13)
+                    in_buffer[k] = gid | ((weight_val & 0xFF) << 10)
 
                 in_buffer.flush()
+
+                # ── Reset DMA Channels for Clean State ───────────────────────
+                dma_mmio.write(0x00, 0x04)                 # MM2S reset
+                dma_mmio.write(0x30, 0x04)                 # S2MM reset
+                time.sleep(0.0001)
 
                 # ── Arm S2MM DMA (FPGA -> ARM) ───────────────────────────────
                 dest_ptr = out_buffer.device_address
@@ -256,10 +261,13 @@ def main():
                 dma_mmio.write(0x18, src_ptr)
                 dma_mmio.write(0x28, pkt_len * 4)
 
+                # ── Start HLS Kernel with Auto-Restart ───────────────────────
+                hls_ctrl.write(0x00, 0x81)
+
                 # ── Poll for output spikes from Group 2 (Classes 0..9) ────────
                 spikes_received = 0
                 while spikes_received < 128:
-                    timeout = time.time() + 0.002          # 2 ms tight timeout
+                    timeout = time.time() + 0.003          # 3 ms tight timeout
                     got_spike = False
 
                     while time.time() < timeout:
@@ -275,6 +283,10 @@ def main():
                         dma_mmio.write(0x58, 4)
                     else:
                         break
+
+                # Stop HLS & S2MM channel for this timestep
+                hls_ctrl.write(0x00, 0x00)
+                dma_mmio.write(0x30, 0x00)
 
                 out_buffer.invalidate()
 

@@ -429,7 +429,7 @@ module tb_integration;
         host_weight_exc    <= 0;
         global_threshold   <= 16'd10;
         global_leak_rate   <= 8'd0;     // No leak for deterministic testing
-        global_refrac_period <= 8'd3;
+        global_refrac_period <= 8'd0;
 
         repeat (30) @(posedge clk);
         rst_n <= 1;
