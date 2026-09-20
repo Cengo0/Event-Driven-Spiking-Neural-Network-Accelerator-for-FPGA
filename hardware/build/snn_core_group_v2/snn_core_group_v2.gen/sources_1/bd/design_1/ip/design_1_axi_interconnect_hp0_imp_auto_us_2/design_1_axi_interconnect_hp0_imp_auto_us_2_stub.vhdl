@@ -2,11 +2,11 @@
 -- Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
--- Date        : Thu Sep 17 15:56:29 2026
+-- Date        : Sun Sep 20 02:31:40 2026
 -- Host        : Mariana running 64-bit Ubuntu 22.04.5 LTS
--- Command     : write_vhdl -force -mode synth_stub -rename_top design_1_axi_interconnect_hp0_imp_auto_us_2 -prefix
---               design_1_axi_interconnect_hp0_imp_auto_us_2_ design_1_axi_interconnect_hp0_imp_auto_us_0_stub.vhdl
--- Design      : design_1_axi_interconnect_hp0_imp_auto_us_0
+-- Command     : write_vhdl -force -mode synth_stub
+--               /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ip/design_1_axi_interconnect_hp0_imp_auto_us_2/design_1_axi_interconnect_hp0_imp_auto_us_2_stub.vhdl
+-- Design      : design_1_axi_interconnect_hp0_imp_auto_us_2
 -- Purpose     : Stub declaration of top-level module interface
 -- Device      : xc7z020clg400-1
 -- --------------------------------------------------------------------------------
@@ -50,9 +50,9 @@ entity design_1_axi_interconnect_hp0_imp_auto_us_2 is
   );
 
   attribute CHECK_LICENSE_TYPE : string;
-  attribute CHECK_LICENSE_TYPE of design_1_axi_interconnect_hp0_imp_auto_us_2 : entity is "design_1_axi_interconnect_hp0_imp_auto_us_0,axi_dwidth_converter_v2_1_37_top,{}";
+  attribute CHECK_LICENSE_TYPE of design_1_axi_interconnect_hp0_imp_auto_us_2 : entity is "design_1_axi_interconnect_hp0_imp_auto_us_2,axi_dwidth_converter_v2_1_37_top,{}";
   attribute CORE_GENERATION_INFO : string;
-  attribute CORE_GENERATION_INFO of design_1_axi_interconnect_hp0_imp_auto_us_2 : entity is "design_1_axi_interconnect_hp0_imp_auto_us_0,axi_dwidth_converter_v2_1_37_top,{x_ipProduct=Vivado 2025.2,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=axi_dwidth_converter,x_ipVersion=2.1,x_ipCoreRevision=37,x_ipLanguage=VERILOG,x_ipSimLanguage=MIXED,C_FAMILY=zynq,C_AXI_PROTOCOL=1,C_S_AXI_ID_WIDTH=1,C_SUPPORTS_ID=0,C_AXI_ADDR_WIDTH=32,C_S_AXI_DATA_WIDTH=32,C_M_AXI_DATA_WIDTH=64,C_AXI_SUPPORTS_WRITE=0,C_AXI_SUPPORTS_READ=1,C_FIFO_MODE=0,C_S_AXI_ACLK_RATIO=1,C_M_AXI_ACLK_RATIO=2,C_AXI_IS_ACLK_ASYNC=0,C_MAX_SPLIT_BEATS=16,C_PACKING_LEVEL=1,C_SYNCHRONIZER_STAGE=3}";
+  attribute CORE_GENERATION_INFO of design_1_axi_interconnect_hp0_imp_auto_us_2 : entity is "design_1_axi_interconnect_hp0_imp_auto_us_2,axi_dwidth_converter_v2_1_37_top,{x_ipProduct=Vivado 2025.2,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=axi_dwidth_converter,x_ipVersion=2.1,x_ipCoreRevision=37,x_ipLanguage=VERILOG,x_ipSimLanguage=MIXED,C_FAMILY=zynq,C_AXI_PROTOCOL=1,C_S_AXI_ID_WIDTH=1,C_SUPPORTS_ID=0,C_AXI_ADDR_WIDTH=32,C_S_AXI_DATA_WIDTH=32,C_M_AXI_DATA_WIDTH=64,C_AXI_SUPPORTS_WRITE=0,C_AXI_SUPPORTS_READ=1,C_FIFO_MODE=0,C_S_AXI_ACLK_RATIO=1,C_M_AXI_ACLK_RATIO=2,C_AXI_IS_ACLK_ASYNC=0,C_MAX_SPLIT_BEATS=16,C_PACKING_LEVEL=1,C_SYNCHRONIZER_STAGE=3}";
   attribute DowngradeIPIdentifiedWarnings : string;
   attribute DowngradeIPIdentifiedWarnings of design_1_axi_interconnect_hp0_imp_auto_us_2 : entity is "yes";
 end design_1_axi_interconnect_hp0_imp_auto_us_2;

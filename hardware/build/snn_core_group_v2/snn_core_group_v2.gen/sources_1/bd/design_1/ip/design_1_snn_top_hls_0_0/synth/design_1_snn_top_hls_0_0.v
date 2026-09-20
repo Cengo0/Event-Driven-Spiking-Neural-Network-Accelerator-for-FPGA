@@ -48,11 +48,11 @@
 
 
 // IP VLNV: xilinx.com:hls:snn_top_hls:1.0
-// IP Revision: 2114790027
+// IP Revision: 2114793565
 
 (* X_CORE_INFO = "snn_top_hls,Vivado 2025.2" *)
 (* CHECK_LICENSE_TYPE = "design_1_snn_top_hls_0_0,snn_top_hls,{}" *)
-(* CORE_GENERATION_INFO = "design_1_snn_top_hls_0_0,snn_top_hls,{x_ipProduct=Vivado 2025.2,x_ipVendor=xilinx.com,x_ipLibrary=hls,x_ipName=snn_top_hls,x_ipVersion=1.0,x_ipCoreRevision=2114790027,x_ipLanguage=VERILOG,x_ipSimLanguage=MIXED,C_S_AXI_CTRL_ADDR_WIDTH=8,C_S_AXI_CTRL_DATA_WIDTH=32}" *)
+(* CORE_GENERATION_INFO = "design_1_snn_top_hls_0_0,snn_top_hls,{x_ipProduct=Vivado 2025.2,x_ipVendor=xilinx.com,x_ipLibrary=hls,x_ipName=snn_top_hls,x_ipVersion=1.0,x_ipCoreRevision=2114793565,x_ipLanguage=VERILOG,x_ipSimLanguage=MIXED,C_S_AXI_CTRL_ADDR_WIDTH=8,C_S_AXI_CTRL_DATA_WIDTH=32}" *)
 (* IP_DEFINITION_SOURCE = "HLS" *)
 (* DowngradeIPIdentifiedWarnings = "yes" *)
 module design_1_snn_top_hls_0_0 (
@@ -335,15 +335,15 @@ output wire [0 : 0] learn_weight_valid;
 (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 learn_weight_group DATA" *)
 (* X_INTERFACE_MODE = "master" *)
 (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME learn_weight_group, LAYERED_METADATA undef" *)
-output wire [2 : 0] learn_weight_group;
+output wire [1 : 0] learn_weight_group;
 (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 learn_weight_src DATA" *)
 (* X_INTERFACE_MODE = "master" *)
 (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME learn_weight_src, LAYERED_METADATA undef" *)
-output wire [6 : 0] learn_weight_src;
+output wire [7 : 0] learn_weight_src;
 (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 learn_weight_dst DATA" *)
 (* X_INTERFACE_MODE = "master" *)
 (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME learn_weight_dst, LAYERED_METADATA undef" *)
-output wire [6 : 0] learn_weight_dst;
+output wire [7 : 0] learn_weight_dst;
 (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 learn_weight_data DATA" *)
 (* X_INTERFACE_MODE = "master" *)
 (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME learn_weight_data, LAYERED_METADATA undef" *)
@@ -359,11 +359,11 @@ output wire [0 : 0] learn_weight_is_inter;
 (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 learn_weight_dst_group DATA" *)
 (* X_INTERFACE_MODE = "master" *)
 (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME learn_weight_dst_group, LAYERED_METADATA undef" *)
-output wire [2 : 0] learn_weight_dst_group;
+output wire [1 : 0] learn_weight_dst_group;
 (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 learn_weight_fanout_idx DATA" *)
 (* X_INTERFACE_MODE = "master" *)
 (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME learn_weight_fanout_idx, LAYERED_METADATA undef" *)
-output wire [3 : 0] learn_weight_fanout_idx;
+output wire [7 : 0] learn_weight_fanout_idx;
 (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 learn_weight_ready DATA" *)
 (* X_INTERFACE_MODE = "slave" *)
 (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME learn_weight_ready, LAYERED_METADATA undef" *)

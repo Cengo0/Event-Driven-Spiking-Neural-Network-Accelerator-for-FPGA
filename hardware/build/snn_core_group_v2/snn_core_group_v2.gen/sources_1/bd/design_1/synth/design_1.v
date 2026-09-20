@@ -2,7 +2,7 @@
 //Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 //--------------------------------------------------------------------------------
 //Tool Version: Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
-//Date        : Thu Sep 17 15:53:59 2026
+//Date        : Sun Sep 20 02:28:28 2026
 //Host        : Mariana running 64-bit Ubuntu 22.04.5 LTS
 //Command     : generate_target design_1.bd
 //Design      : design_1
@@ -117,13 +117,13 @@ module design_1
   (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.DEBUG_LEARNING_ACTIVE DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.DEBUG_LEARNING_ACTIVE, LAYERED_METADATA undef" *) output [0:0]debug_learning_active;
   (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEAK_RATE_OUT DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEAK_RATE_OUT, LAYERED_METADATA undef" *) output [15:0]hls_leak_rate_out;
   (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_DATA DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_DATA, LAYERED_METADATA undef" *) output [7:0]hls_learn_weight_data;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_DST DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_DST, LAYERED_METADATA undef" *) output [6:0]hls_learn_weight_dst;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_DST_GROUP DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_DST_GROUP, LAYERED_METADATA undef" *) output [2:0]hls_learn_weight_dst_group;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_DST DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_DST, LAYERED_METADATA undef" *) output [7:0]hls_learn_weight_dst;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_DST_GROUP DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_DST_GROUP, LAYERED_METADATA undef" *) output [1:0]hls_learn_weight_dst_group;
   (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_EXC DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_EXC, LAYERED_METADATA undef" *) output [0:0]hls_learn_weight_exc;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_FANOUT_IDX DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_FANOUT_IDX, LAYERED_METADATA undef" *) output [3:0]hls_learn_weight_fanout_idx;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_GROUP DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_GROUP, LAYERED_METADATA undef" *) output [2:0]hls_learn_weight_group;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_FANOUT_IDX DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_FANOUT_IDX, LAYERED_METADATA undef" *) output [7:0]hls_learn_weight_fanout_idx;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_GROUP DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_GROUP, LAYERED_METADATA undef" *) output [1:0]hls_learn_weight_group;
   (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_IS_INTER DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_IS_INTER, LAYERED_METADATA undef" *) output [0:0]hls_learn_weight_is_inter;
-  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_SRC DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_SRC, LAYERED_METADATA undef" *) output [6:0]hls_learn_weight_src;
+  (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_SRC DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_SRC, LAYERED_METADATA undef" *) output [7:0]hls_learn_weight_src;
   (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_LEARN_WEIGHT_VALID DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_LEARN_WEIGHT_VALID, LAYERED_METADATA undef" *) output [0:0]hls_learn_weight_valid;
   (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_SNN_ENABLE DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_SNN_ENABLE, LAYERED_METADATA undef" *) output [0:0]hls_snn_enable;
   (* X_INTERFACE_INFO = "xilinx.com:signal:data:1.0 DATA.HLS_SNN_RESET DATA" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME DATA.HLS_SNN_RESET, LAYERED_METADATA undef" *) output [0:0]hls_snn_reset;
@@ -359,13 +359,13 @@ module design_1
   wire [0:0]debug_learning_active;
   wire [15:0]hls_leak_rate_out;
   wire [7:0]hls_learn_weight_data;
-  wire [6:0]hls_learn_weight_dst;
-  wire [2:0]hls_learn_weight_dst_group;
+  wire [7:0]hls_learn_weight_dst;
+  wire [1:0]hls_learn_weight_dst_group;
   wire [0:0]hls_learn_weight_exc;
-  wire [3:0]hls_learn_weight_fanout_idx;
-  wire [2:0]hls_learn_weight_group;
+  wire [7:0]hls_learn_weight_fanout_idx;
+  wire [1:0]hls_learn_weight_group;
   wire [0:0]hls_learn_weight_is_inter;
-  wire [6:0]hls_learn_weight_src;
+  wire [7:0]hls_learn_weight_src;
   wire [0:0]hls_learn_weight_valid;
   wire [0:0]hls_snn_enable;
   wire [0:0]hls_snn_reset;

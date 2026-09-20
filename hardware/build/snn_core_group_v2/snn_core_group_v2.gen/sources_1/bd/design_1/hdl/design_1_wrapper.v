@@ -2,7 +2,7 @@
 //Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 //--------------------------------------------------------------------------------
 //Tool Version: Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
-//Date        : Thu Sep 17 15:53:59 2026
+//Date        : Sun Sep 20 02:28:29 2026
 //Host        : Mariana running 64-bit Ubuntu 22.04.5 LTS
 //Command     : generate_target design_1_wrapper.bd
 //Design      : design_1_wrapper
@@ -116,13 +116,13 @@ module design_1_wrapper
   output [0:0]debug_learning_active;
   output [15:0]hls_leak_rate_out;
   output [7:0]hls_learn_weight_data;
-  output [6:0]hls_learn_weight_dst;
-  output [2:0]hls_learn_weight_dst_group;
+  output [7:0]hls_learn_weight_dst;
+  output [1:0]hls_learn_weight_dst_group;
   output [0:0]hls_learn_weight_exc;
-  output [3:0]hls_learn_weight_fanout_idx;
-  output [2:0]hls_learn_weight_group;
+  output [7:0]hls_learn_weight_fanout_idx;
+  output [1:0]hls_learn_weight_group;
   output [0:0]hls_learn_weight_is_inter;
-  output [6:0]hls_learn_weight_src;
+  output [7:0]hls_learn_weight_src;
   output [0:0]hls_learn_weight_valid;
   output [0:0]hls_snn_enable;
   output [0:0]hls_snn_reset;
@@ -181,13 +181,13 @@ module design_1_wrapper
   wire [0:0]debug_learning_active;
   wire [15:0]hls_leak_rate_out;
   wire [7:0]hls_learn_weight_data;
-  wire [6:0]hls_learn_weight_dst;
-  wire [2:0]hls_learn_weight_dst_group;
+  wire [7:0]hls_learn_weight_dst;
+  wire [1:0]hls_learn_weight_dst_group;
   wire [0:0]hls_learn_weight_exc;
-  wire [3:0]hls_learn_weight_fanout_idx;
-  wire [2:0]hls_learn_weight_group;
+  wire [7:0]hls_learn_weight_fanout_idx;
+  wire [1:0]hls_learn_weight_group;
   wire [0:0]hls_learn_weight_is_inter;
-  wire [6:0]hls_learn_weight_src;
+  wire [7:0]hls_learn_weight_src;
   wire [0:0]hls_learn_weight_valid;
   wire [0:0]hls_snn_enable;
   wire [0:0]hls_snn_reset;

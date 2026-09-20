@@ -96,14 +96,14 @@ design_1_sv your_instance_name (
   .rtl_spike_out_weight(rtl_spike_out_weight), // input wire [7:0] rtl_spike_out_weight
   .hls_spike_in_ready(hls_spike_in_ready), // output wire [0:0] hls_spike_in_ready
   .hls_learn_weight_valid(hls_learn_weight_valid), // output wire [0:0] hls_learn_weight_valid
-  .hls_learn_weight_group(hls_learn_weight_group), // output wire [2:0] hls_learn_weight_group
-  .hls_learn_weight_src(hls_learn_weight_src), // output wire [6:0] hls_learn_weight_src
-  .hls_learn_weight_dst(hls_learn_weight_dst), // output wire [6:0] hls_learn_weight_dst
+  .hls_learn_weight_group(hls_learn_weight_group), // output wire [1:0] hls_learn_weight_group
+  .hls_learn_weight_src(hls_learn_weight_src), // output wire [7:0] hls_learn_weight_src
+  .hls_learn_weight_dst(hls_learn_weight_dst), // output wire [7:0] hls_learn_weight_dst
   .hls_learn_weight_data(hls_learn_weight_data), // output wire [7:0] hls_learn_weight_data
   .hls_learn_weight_exc(hls_learn_weight_exc), // output wire [0:0] hls_learn_weight_exc
   .hls_learn_weight_is_inter(hls_learn_weight_is_inter), // output wire [0:0] hls_learn_weight_is_inter
-  .hls_learn_weight_dst_group(hls_learn_weight_dst_group), // output wire [2:0] hls_learn_weight_dst_group
-  .hls_learn_weight_fanout_idx(hls_learn_weight_fanout_idx), // output wire [3:0] hls_learn_weight_fanout_idx
+  .hls_learn_weight_dst_group(hls_learn_weight_dst_group), // output wire [1:0] hls_learn_weight_dst_group
+  .hls_learn_weight_fanout_idx(hls_learn_weight_fanout_idx), // output wire [7:0] hls_learn_weight_fanout_idx
   .rtl_learn_weight_ready(rtl_learn_weight_ready), // input wire rtl_learn_weight_ready
   .hls_snn_enable(hls_snn_enable), // output wire [0:0] hls_snn_enable
   .hls_snn_reset(hls_snn_reset), // output wire [0:0] hls_snn_reset

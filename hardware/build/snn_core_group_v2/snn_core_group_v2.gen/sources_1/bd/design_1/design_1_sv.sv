@@ -114,11 +114,11 @@ module design_1_sv (
   (* X_INTERFACE_IGNORE = "true" *)
   output wire [0:0] hls_learn_weight_valid,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [2:0] hls_learn_weight_group,
+  output wire [1:0] hls_learn_weight_group,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [6:0] hls_learn_weight_src,
+  output wire [7:0] hls_learn_weight_src,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [6:0] hls_learn_weight_dst,
+  output wire [7:0] hls_learn_weight_dst,
   (* X_INTERFACE_IGNORE = "true" *)
   output wire [7:0] hls_learn_weight_data,
   (* X_INTERFACE_IGNORE = "true" *)
@@ -126,9 +126,9 @@ module design_1_sv (
   (* X_INTERFACE_IGNORE = "true" *)
   output wire [0:0] hls_learn_weight_is_inter,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [2:0] hls_learn_weight_dst_group,
+  output wire [1:0] hls_learn_weight_dst_group,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire [3:0] hls_learn_weight_fanout_idx,
+  output wire [7:0] hls_learn_weight_fanout_idx,
   (* X_INTERFACE_IGNORE = "true" *)
   input wire rtl_learn_weight_ready,
   (* X_INTERFACE_IGNORE = "true" *)

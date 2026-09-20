@@ -2,7 +2,7 @@
 -- Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
--- Date        : Thu Sep 17 15:56:16 2026
+-- Date        : Sun Sep 20 02:30:45 2026
 -- Host        : Mariana running 64-bit Ubuntu 22.04.5 LTS
 -- Command     : write_vhdl -force -mode synth_stub
 --               /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ip/design_1_snn_top_hls_0_0/design_1_snn_top_hls_0_0_stub.vhdl
@@ -89,14 +89,14 @@ entity design_1_snn_top_hls_0_0 is
     spike_out_weight : in STD_LOGIC_VECTOR ( 7 downto 0 );
     spike_out_ready : out STD_LOGIC_VECTOR ( 0 to 0 );
     learn_weight_valid : out STD_LOGIC_VECTOR ( 0 to 0 );
-    learn_weight_group : out STD_LOGIC_VECTOR ( 2 downto 0 );
-    learn_weight_src : out STD_LOGIC_VECTOR ( 6 downto 0 );
-    learn_weight_dst : out STD_LOGIC_VECTOR ( 6 downto 0 );
+    learn_weight_group : out STD_LOGIC_VECTOR ( 1 downto 0 );
+    learn_weight_src : out STD_LOGIC_VECTOR ( 7 downto 0 );
+    learn_weight_dst : out STD_LOGIC_VECTOR ( 7 downto 0 );
     learn_weight_data : out STD_LOGIC_VECTOR ( 7 downto 0 );
     learn_weight_exc : out STD_LOGIC_VECTOR ( 0 to 0 );
     learn_weight_is_inter : out STD_LOGIC_VECTOR ( 0 to 0 );
-    learn_weight_dst_group : out STD_LOGIC_VECTOR ( 2 downto 0 );
-    learn_weight_fanout_idx : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    learn_weight_dst_group : out STD_LOGIC_VECTOR ( 1 downto 0 );
+    learn_weight_fanout_idx : out STD_LOGIC_VECTOR ( 7 downto 0 );
     learn_weight_ready : in STD_LOGIC_VECTOR ( 0 to 0 );
     snn_enable : out STD_LOGIC_VECTOR ( 0 to 0 );
     snn_reset : out STD_LOGIC_VECTOR ( 0 to 0 );
@@ -109,7 +109,7 @@ entity design_1_snn_top_hls_0_0 is
   attribute CHECK_LICENSE_TYPE : string;
   attribute CHECK_LICENSE_TYPE of design_1_snn_top_hls_0_0 : entity is "design_1_snn_top_hls_0_0,snn_top_hls,{}";
   attribute CORE_GENERATION_INFO : string;
-  attribute CORE_GENERATION_INFO of design_1_snn_top_hls_0_0 : entity is "design_1_snn_top_hls_0_0,snn_top_hls,{x_ipProduct=Vivado 2025.2,x_ipVendor=xilinx.com,x_ipLibrary=hls,x_ipName=snn_top_hls,x_ipVersion=1.0,x_ipCoreRevision=2114790027,x_ipLanguage=VERILOG,x_ipSimLanguage=MIXED,C_S_AXI_CTRL_ADDR_WIDTH=8,C_S_AXI_CTRL_DATA_WIDTH=32}";
+  attribute CORE_GENERATION_INFO of design_1_snn_top_hls_0_0 : entity is "design_1_snn_top_hls_0_0,snn_top_hls,{x_ipProduct=Vivado 2025.2,x_ipVendor=xilinx.com,x_ipLibrary=hls,x_ipName=snn_top_hls,x_ipVersion=1.0,x_ipCoreRevision=2114793565,x_ipLanguage=VERILOG,x_ipSimLanguage=MIXED,C_S_AXI_CTRL_ADDR_WIDTH=8,C_S_AXI_CTRL_DATA_WIDTH=32}";
   attribute DowngradeIPIdentifiedWarnings : string;
   attribute DowngradeIPIdentifiedWarnings of design_1_snn_top_hls_0_0 : entity is "yes";
   attribute IP_DEFINITION_SOURCE : string;
@@ -122,7 +122,7 @@ architecture stub of design_1_snn_top_hls_0_0 is
   attribute syn_black_box : boolean;
   attribute black_box_pad_pin : string;
   attribute syn_black_box of stub : architecture is true;
-  attribute black_box_pad_pin of stub : architecture is "s_axi_ctrl_ARADDR[7:0],s_axi_ctrl_ARREADY,s_axi_ctrl_ARVALID,s_axi_ctrl_AWADDR[7:0],s_axi_ctrl_AWREADY,s_axi_ctrl_AWVALID,s_axi_ctrl_BREADY,s_axi_ctrl_BRESP[1:0],s_axi_ctrl_BVALID,s_axi_ctrl_RDATA[31:0],s_axi_ctrl_RREADY,s_axi_ctrl_RRESP[1:0],s_axi_ctrl_RVALID,s_axi_ctrl_WDATA[31:0],s_axi_ctrl_WREADY,s_axi_ctrl_WSTRB[3:0],s_axi_ctrl_WVALID,ap_clk,ap_rst_n,interrupt,s_axis_spikes_TDATA[31:0],s_axis_spikes_TDEST[0:0],s_axis_spikes_TID[0:0],s_axis_spikes_TKEEP[3:0],s_axis_spikes_TLAST[0:0],s_axis_spikes_TREADY,s_axis_spikes_TSTRB[3:0],s_axis_spikes_TUSER[0:0],s_axis_spikes_TVALID,s_axis_data_TDATA[31:0],s_axis_data_TDEST[0:0],s_axis_data_TID[0:0],s_axis_data_TKEEP[3:0],s_axis_data_TLAST[0:0],s_axis_data_TREADY,s_axis_data_TSTRB[3:0],s_axis_data_TUSER[0:0],s_axis_data_TVALID,s_axis_weights_TDATA[31:0],s_axis_weights_TDEST[0:0],s_axis_weights_TID[0:0],s_axis_weights_TKEEP[3:0],s_axis_weights_TLAST[0:0],s_axis_weights_TREADY,s_axis_weights_TSTRB[3:0],s_axis_weights_TUSER[0:0],s_axis_weights_TVALID,m_axis_spikes_TDATA[31:0],m_axis_spikes_TDEST[0:0],m_axis_spikes_TID[0:0],m_axis_spikes_TKEEP[3:0],m_axis_spikes_TLAST[0:0],m_axis_spikes_TREADY,m_axis_spikes_TSTRB[3:0],m_axis_spikes_TUSER[0:0],m_axis_spikes_TVALID,m_axis_weights_TDATA[31:0],m_axis_weights_TDEST[0:0],m_axis_weights_TID[0:0],m_axis_weights_TKEEP[3:0],m_axis_weights_TLAST[0:0],m_axis_weights_TREADY,m_axis_weights_TSTRB[3:0],m_axis_weights_TUSER[0:0],m_axis_weights_TVALID,spike_in_valid[0:0],spike_in_neuron_id[9:0],spike_in_weight[7:0],spike_in_ready[0:0],spike_out_valid[0:0],spike_out_neuron_id[9:0],spike_out_weight[7:0],spike_out_ready[0:0],learn_weight_valid[0:0],learn_weight_group[2:0],learn_weight_src[6:0],learn_weight_dst[6:0],learn_weight_data[7:0],learn_weight_exc[0:0],learn_weight_is_inter[0:0],learn_weight_dst_group[2:0],learn_weight_fanout_idx[3:0],learn_weight_ready[0:0],snn_enable[0:0],snn_reset[0:0],threshold_out[15:0],leak_rate_out[15:0],snn_ready[0:0],snn_busy[0:0]";
+  attribute black_box_pad_pin of stub : architecture is "s_axi_ctrl_ARADDR[7:0],s_axi_ctrl_ARREADY,s_axi_ctrl_ARVALID,s_axi_ctrl_AWADDR[7:0],s_axi_ctrl_AWREADY,s_axi_ctrl_AWVALID,s_axi_ctrl_BREADY,s_axi_ctrl_BRESP[1:0],s_axi_ctrl_BVALID,s_axi_ctrl_RDATA[31:0],s_axi_ctrl_RREADY,s_axi_ctrl_RRESP[1:0],s_axi_ctrl_RVALID,s_axi_ctrl_WDATA[31:0],s_axi_ctrl_WREADY,s_axi_ctrl_WSTRB[3:0],s_axi_ctrl_WVALID,ap_clk,ap_rst_n,interrupt,s_axis_spikes_TDATA[31:0],s_axis_spikes_TDEST[0:0],s_axis_spikes_TID[0:0],s_axis_spikes_TKEEP[3:0],s_axis_spikes_TLAST[0:0],s_axis_spikes_TREADY,s_axis_spikes_TSTRB[3:0],s_axis_spikes_TUSER[0:0],s_axis_spikes_TVALID,s_axis_data_TDATA[31:0],s_axis_data_TDEST[0:0],s_axis_data_TID[0:0],s_axis_data_TKEEP[3:0],s_axis_data_TLAST[0:0],s_axis_data_TREADY,s_axis_data_TSTRB[3:0],s_axis_data_TUSER[0:0],s_axis_data_TVALID,s_axis_weights_TDATA[31:0],s_axis_weights_TDEST[0:0],s_axis_weights_TID[0:0],s_axis_weights_TKEEP[3:0],s_axis_weights_TLAST[0:0],s_axis_weights_TREADY,s_axis_weights_TSTRB[3:0],s_axis_weights_TUSER[0:0],s_axis_weights_TVALID,m_axis_spikes_TDATA[31:0],m_axis_spikes_TDEST[0:0],m_axis_spikes_TID[0:0],m_axis_spikes_TKEEP[3:0],m_axis_spikes_TLAST[0:0],m_axis_spikes_TREADY,m_axis_spikes_TSTRB[3:0],m_axis_spikes_TUSER[0:0],m_axis_spikes_TVALID,m_axis_weights_TDATA[31:0],m_axis_weights_TDEST[0:0],m_axis_weights_TID[0:0],m_axis_weights_TKEEP[3:0],m_axis_weights_TLAST[0:0],m_axis_weights_TREADY,m_axis_weights_TSTRB[3:0],m_axis_weights_TUSER[0:0],m_axis_weights_TVALID,spike_in_valid[0:0],spike_in_neuron_id[9:0],spike_in_weight[7:0],spike_in_ready[0:0],spike_out_valid[0:0],spike_out_neuron_id[9:0],spike_out_weight[7:0],spike_out_ready[0:0],learn_weight_valid[0:0],learn_weight_group[1:0],learn_weight_src[7:0],learn_weight_dst[7:0],learn_weight_data[7:0],learn_weight_exc[0:0],learn_weight_is_inter[0:0],learn_weight_dst_group[1:0],learn_weight_fanout_idx[7:0],learn_weight_ready[0:0],snn_enable[0:0],snn_reset[0:0],threshold_out[15:0],leak_rate_out[15:0],snn_ready[0:0],snn_busy[0:0]";
   attribute X_INTERFACE_INFO : string;
   attribute X_INTERFACE_INFO of s_axi_ctrl_ARADDR : signal is "xilinx.com:interface:aximm:1.0 s_axi_ctrl ARADDR";
   attribute X_INTERFACE_MODE : string;

@@ -1,7 +1,7 @@
 {
   "design": {
     "design_info": {
-      "boundary_crc": "0x414EED529B9A1673",
+      "boundary_crc": "0xA7A3F8D4D02D45AF",
       "device": "xc7z020clg400-1",
       "gen_directory": "../../../../snn_core_group_v2.gen/sources_1/bd/design_1",
       "name": "design_1",
@@ -341,7 +341,7 @@
       "hls_learn_weight_group": {
         "type": "data",
         "direction": "O",
-        "left": "2",
+        "left": "1",
         "right": "0",
         "parameters": {
           "LAYERED_METADATA": {
@@ -353,7 +353,7 @@
       "hls_learn_weight_src": {
         "type": "data",
         "direction": "O",
-        "left": "6",
+        "left": "7",
         "right": "0",
         "parameters": {
           "LAYERED_METADATA": {
@@ -365,7 +365,7 @@
       "hls_learn_weight_dst": {
         "type": "data",
         "direction": "O",
-        "left": "6",
+        "left": "7",
         "right": "0",
         "parameters": {
           "LAYERED_METADATA": {
@@ -413,7 +413,7 @@
       "hls_learn_weight_dst_group": {
         "type": "data",
         "direction": "O",
-        "left": "2",
+        "left": "1",
         "right": "0",
         "parameters": {
           "LAYERED_METADATA": {
@@ -425,7 +425,7 @@
       "hls_learn_weight_fanout_idx": {
         "type": "data",
         "direction": "O",
-        "left": "3",
+        "left": "7",
         "right": "0",
         "parameters": {
           "LAYERED_METADATA": {
@@ -1790,7 +1790,7 @@
       },
       "snn_top_hls_0": {
         "vlnv": "xilinx.com:hls:snn_top_hls:1.0",
-        "ip_revision": "2114790027",
+        "ip_revision": "2114793565",
         "xci_name": "design_1_snn_top_hls_0_0",
         "xci_path": "ip/design_1_snn_top_hls_0_0/design_1_snn_top_hls_0_0.xci",
         "inst_hier_path": "snn_top_hls_0",

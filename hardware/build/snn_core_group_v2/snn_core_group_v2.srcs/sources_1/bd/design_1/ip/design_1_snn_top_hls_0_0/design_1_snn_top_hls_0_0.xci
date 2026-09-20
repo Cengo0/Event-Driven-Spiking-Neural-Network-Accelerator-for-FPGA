@@ -4,7 +4,7 @@
     "xci_name": "design_1_snn_top_hls_0_0",
     "cell_name": "snn_top_hls_0",
     "component_reference": "xilinx.com:hls:snn_top_hls:1.0",
-    "ip_revision": "2114790027",
+    "ip_revision": "2114793565",
     "gen_directory": "../../../../../../snn_core_group_v2.gen/sources_1/bd/design_1/ip/design_1_snn_top_hls_0_0",
     "parameters": {
       "component_parameters": {
@@ -13,7 +13,7 @@
         "machine": [ { "value": "64", "enabled": false, "usage": "all" } ],
         "combinational": [ { "value": "0", "enabled": false, "usage": "all" } ],
         "latency": [ { "value": "5", "enabled": false, "usage": "all" } ],
-        "II": [ { "value": "6 ~ 44107946792", "enabled": false, "usage": "all" } ]
+        "II": [ { "value": "6 ~ 9606518675", "enabled": false, "usage": "all" } ]
       },
       "model_parameters": {
         "C_S_AXI_CTRL_ADDR_WIDTH": [ { "value": "8", "resolve_type": "generated", "format": "long", "usage": "all" } ],
@@ -34,7 +34,7 @@
       },
       "runtime_parameters": {
         "IPCONTEXT": [ { "value": "IP_Integrator" } ],
-        "IPREVISION": [ { "value": "2114790027" } ],
+        "IPREVISION": [ { "value": "2114793565" } ],
         "MANAGED": [ { "value": "TRUE" } ],
         "OUTPUTDIR": [ { "value": "../../../../../../snn_core_group_v2.gen/sources_1/bd/design_1/ip/design_1_snn_top_hls_0_0" } ],
         "SELECTEDSIMMODEL": [ { "value": "" } ],
@@ -119,14 +119,14 @@
         "spike_out_weight": [ { "direction": "in", "size_left": "7", "size_right": "0" } ],
         "spike_out_ready": [ { "direction": "out", "size_left": "0", "size_right": "0" } ],
         "learn_weight_valid": [ { "direction": "out", "size_left": "0", "size_right": "0" } ],
-        "learn_weight_group": [ { "direction": "out", "size_left": "2", "size_right": "0" } ],
-        "learn_weight_src": [ { "direction": "out", "size_left": "6", "size_right": "0" } ],
-        "learn_weight_dst": [ { "direction": "out", "size_left": "6", "size_right": "0" } ],
+        "learn_weight_group": [ { "direction": "out", "size_left": "1", "size_right": "0" } ],
+        "learn_weight_src": [ { "direction": "out", "size_left": "7", "size_right": "0" } ],
+        "learn_weight_dst": [ { "direction": "out", "size_left": "7", "size_right": "0" } ],
         "learn_weight_data": [ { "direction": "out", "size_left": "7", "size_right": "0" } ],
         "learn_weight_exc": [ { "direction": "out", "size_left": "0", "size_right": "0" } ],
         "learn_weight_is_inter": [ { "direction": "out", "size_left": "0", "size_right": "0" } ],
-        "learn_weight_dst_group": [ { "direction": "out", "size_left": "2", "size_right": "0" } ],
-        "learn_weight_fanout_idx": [ { "direction": "out", "size_left": "3", "size_right": "0" } ],
+        "learn_weight_dst_group": [ { "direction": "out", "size_left": "1", "size_right": "0" } ],
+        "learn_weight_fanout_idx": [ { "direction": "out", "size_left": "7", "size_right": "0" } ],
         "learn_weight_ready": [ { "direction": "in", "size_left": "0", "size_right": "0" } ],
         "snn_enable": [ { "direction": "out", "size_left": "0", "size_right": "0" } ],
         "snn_reset": [ { "direction": "out", "size_left": "0", "size_right": "0" } ],
@@ -1196,5 +1196,5 @@
       }
     }
   },
-  "checksum": "6faf4fa1"
+  "checksum": "594e3719"
 }
