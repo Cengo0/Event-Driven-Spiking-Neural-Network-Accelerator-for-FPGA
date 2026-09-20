@@ -18,7 +18,7 @@ port (
     ap_ready : OUT STD_LOGIC;
     weight_sum_out : OUT STD_LOGIC_VECTOR (9 downto 0);
     weight_sum_out_ap_vld : OUT STD_LOGIC;
-    weight_memory_address0 : OUT STD_LOGIC_VECTOR (18 downto 0);
+    weight_memory_address0 : OUT STD_LOGIC_VECTOR (16 downto 0);
     weight_memory_ce0 : OUT STD_LOGIC;
     weight_memory_q0 : IN STD_LOGIC_VECTOR (3 downto 0) );
 end;
@@ -312,7 +312,7 @@ begin
     icmp_ln1135_fu_85_p2 <= "1" when (ap_sig_allocacmp_i_1 = ap_const_lv7_40) else "0";
         sext_ln1137_fu_110_p1 <= std_logic_vector(IEEE.numeric_std.resize(signed(weight_memory_q0),10));
 
-    weight_memory_address0 <= zext_ln1135_fu_97_p1(19 - 1 downto 0);
+    weight_memory_address0 <= zext_ln1135_fu_97_p1(17 - 1 downto 0);
     weight_memory_ce0 <= weight_memory_ce0_local;
 
     weight_memory_ce0_local_assign_proc : process(ap_CS_fsm_pp0_stage0, ap_enable_reg_pp0_iter0, ap_enable_reg_pp0_iter1, ap_enable_reg_pp0_iter2, ap_block_pp0_stage0_11001)

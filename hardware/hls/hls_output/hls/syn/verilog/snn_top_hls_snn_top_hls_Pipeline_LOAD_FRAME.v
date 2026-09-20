@@ -82,7 +82,7 @@ reg s_axis_data_TREADY;
 wire    ap_CS_fsm_state1;
 wire   [0:0] tmp_9_nbreadreq_fu_78_p9;
 reg    ap_block_state1_pp0_stage0_iter0;
-wire   [0:0] or_cond60_fu_260_p2;
+wire   [0:0] or_cond56_fu_260_p2;
 reg    ap_condition_exit_pp0_iter0_stage0;
 wire    ap_loop_exit_ready;
 reg    ap_ready_int;
@@ -177,7 +177,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((1'b0 == ap_block_state1_pp0_stage0_iter0) & (1'b1 == ap_CS_fsm_state1) & ((or_cond60_fu_260_p2 == 1'd0) | (tmp_9_nbreadreq_fu_78_p9 == 1'd0)))) begin
+    if (((1'b0 == ap_block_state1_pp0_stage0_iter0) & (1'b1 == ap_CS_fsm_state1) & ((or_cond56_fu_260_p2 == 1'd0) | (tmp_9_nbreadreq_fu_78_p9 == 1'd0)))) begin
         ap_condition_exit_pp0_iter0_stage0 = 1'b1;
     end else begin
         ap_condition_exit_pp0_iter0_stage0 = 1'b0;
@@ -323,7 +323,7 @@ assign ap_ready = ap_ready_sig;
 
 assign icmp_ln858_fu_254_p2 = ((add_ln858_fu_174_p2 < 8'd196) ? 1'b1 : 1'b0);
 
-assign or_cond60_fu_260_p2 = (xor_ln867_fu_248_p2 & icmp_ln858_fu_254_p2);
+assign or_cond56_fu_260_p2 = (xor_ln867_fu_248_p2 & icmp_ln858_fu_254_p2);
 
 assign or_ln_fu_216_p3 = {{ap_sig_allocacmp_i}, {1'd1}};
 

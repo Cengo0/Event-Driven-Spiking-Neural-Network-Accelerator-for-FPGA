@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'snn_top_hls_Pipeline_LOAD_FRAME'
 ================================================================
-* Date:           Thu Sep 17 15:27:04 2026
+* Date:           Sun Sep 20 02:25:01 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -86,7 +86,7 @@
     |           Variable Name          | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
     +----------------------------------+----------+----+---+----+------------+------------+
     |add_ln858_fu_174_p2               |         +|   0|  0|  15|           8|           1|
-    |or_cond60_fu_260_p2               |       and|   0|  0|   2|           1|           1|
+    |or_cond56_fu_260_p2               |       and|   0|  0|   2|           1|           1|
     |tmp_9_nbreadreq_fu_78_p9          |       and|   0|  0|   2|           1|           0|
     |icmp_ln858_fu_254_p2              |      icmp|   0|  0|  15|           8|           7|
     |ap_block_state1_pp0_stage0_iter0  |        or|   0|  0|   2|           1|           1|

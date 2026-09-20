@@ -17,6 +17,7 @@ module snn_top_hls_apply_rstdp_reward (
         reward_signal,
         params_rstdp_enable_val,
         params_reward_scale_val,
+        learn_weight_ready,
         pre_eligibility_address0,
         pre_eligibility_ce0,
         pre_eligibility_q0,
@@ -29,18 +30,31 @@ module snn_top_hls_apply_rstdp_reward (
         weight_memory_d0,
         weight_memory_address1,
         weight_memory_ce1,
-        weight_memory_q1
+        weight_memory_q1,
+        learn_bridge_valid_i,
+        learn_bridge_valid_o,
+        learn_bridge_valid_o_ap_vld,
+        learn_bridge_group,
+        learn_bridge_group_ap_vld,
+        learn_bridge_src,
+        learn_bridge_src_ap_vld,
+        learn_bridge_dst,
+        learn_bridge_dst_ap_vld,
+        learn_bridge_data,
+        learn_bridge_data_ap_vld,
+        learn_bridge_exc,
+        learn_bridge_exc_ap_vld,
+        learn_bridge_is_inter,
+        learn_bridge_is_inter_ap_vld,
+        learn_bridge_dst_group,
+        learn_bridge_dst_group_ap_vld
 );
 
-parameter    ap_ST_fsm_state1 = 9'd1;
-parameter    ap_ST_fsm_state2 = 9'd2;
-parameter    ap_ST_fsm_state3 = 9'd4;
-parameter    ap_ST_fsm_state4 = 9'd8;
-parameter    ap_ST_fsm_state5 = 9'd16;
-parameter    ap_ST_fsm_state6 = 9'd32;
-parameter    ap_ST_fsm_state7 = 9'd64;
-parameter    ap_ST_fsm_state8 = 9'd128;
-parameter    ap_ST_fsm_state9 = 9'd256;
+parameter    ap_ST_fsm_state1 = 5'd1;
+parameter    ap_ST_fsm_state2 = 5'd2;
+parameter    ap_ST_fsm_state3 = 5'd4;
+parameter    ap_ST_fsm_state4 = 5'd8;
+parameter    ap_ST_fsm_state5 = 5'd16;
 
 input   ap_clk;
 input   ap_rst;
@@ -51,168 +65,216 @@ output   ap_ready;
 input  [7:0] reward_signal;
 input  [0:0] params_rstdp_enable_val;
 input  [15:0] params_reward_scale_val;
-output  [10:0] pre_eligibility_address0;
+input  [0:0] learn_weight_ready;
+output  [9:0] pre_eligibility_address0;
 output   pre_eligibility_ce0;
 input  [7:0] pre_eligibility_q0;
-output  [10:0] post_eligibility_address0;
+output  [9:0] post_eligibility_address0;
 output   post_eligibility_ce0;
 input  [7:0] post_eligibility_q0;
-output  [18:0] weight_memory_address0;
+output  [16:0] weight_memory_address0;
 output   weight_memory_ce0;
 output   weight_memory_we0;
 output  [3:0] weight_memory_d0;
-output  [18:0] weight_memory_address1;
+output  [16:0] weight_memory_address1;
 output   weight_memory_ce1;
 input  [3:0] weight_memory_q1;
+input  [0:0] learn_bridge_valid_i;
+output  [0:0] learn_bridge_valid_o;
+output   learn_bridge_valid_o_ap_vld;
+output  [0:0] learn_bridge_group;
+output   learn_bridge_group_ap_vld;
+output  [7:0] learn_bridge_src;
+output   learn_bridge_src_ap_vld;
+output  [7:0] learn_bridge_dst;
+output   learn_bridge_dst_ap_vld;
+output  [3:0] learn_bridge_data;
+output   learn_bridge_data_ap_vld;
+output  [0:0] learn_bridge_exc;
+output   learn_bridge_exc_ap_vld;
+output  [0:0] learn_bridge_is_inter;
+output   learn_bridge_is_inter_ap_vld;
+output  [1:0] learn_bridge_dst_group;
+output   learn_bridge_dst_group_ap_vld;
 
 reg ap_done;
 reg ap_idle;
 reg ap_ready;
+reg[0:0] learn_bridge_valid_o;
+reg[0:0] learn_bridge_group;
+reg[7:0] learn_bridge_src;
+reg[7:0] learn_bridge_dst;
+reg[3:0] learn_bridge_data;
+reg[0:0] learn_bridge_exc;
+reg[0:0] learn_bridge_is_inter;
+reg[1:0] learn_bridge_dst_group;
 
-(* fsm_encoding = "none" *) reg   [8:0] ap_CS_fsm;
+(* fsm_encoding = "none" *) reg   [4:0] ap_CS_fsm;
 wire    ap_CS_fsm_state1;
-wire   [0:0] and_ln419_fu_198_p2;
-reg   [0:0] and_ln419_reg_501;
-wire   [0:0] tmp_24_fu_204_p3;
-reg   [0:0] tmp_24_reg_512;
-wire   [1:0] shift_sel_fu_302_p9;
-reg   [1:0] shift_sel_reg_517;
-reg   [1:0] c_3_reg_522;
+wire   [0:0] and_ln419_fu_231_p2;
+reg   [0:0] and_ln419_reg_522;
+wire   [0:0] tmp_fu_237_p3;
+reg   [0:0] tmp_reg_533;
+wire   [1:0] shift_sel_fu_335_p9;
+reg   [1:0] shift_sel_reg_538;
+wire   [1:0] add_ln436_fu_369_p2;
+reg   [1:0] add_ln436_reg_546;
 wire    ap_CS_fsm_state2;
-wire   [1:0] add_ln436_fu_336_p2;
-reg   [1:0] add_ln436_reg_532;
-wire   [9:0] tmp_fu_342_p9;
-reg   [9:0] tmp_reg_537;
-wire   [10:0] tmp_s_fu_362_p9;
-reg   [10:0] tmp_s_reg_542;
-wire   [9:0] add_ln440_fu_387_p2;
-reg   [9:0] add_ln440_reg_550;
+wire   [0:0] icmp_ln444_fu_375_p2;
+reg   [0:0] icmp_ln444_reg_551;
+wire   [8:0] select_ln440_fu_381_p3;
+reg   [8:0] select_ln440_reg_556;
+wire   [16:0] select_ln448_fu_389_p3;
+reg   [16:0] select_ln448_reg_561;
+wire   [9:0] select_ln451_fu_397_p3;
+reg   [9:0] select_ln451_reg_566;
+wire   [17:0] select_ln440_1_fu_405_p3;
+reg   [17:0] select_ln440_1_reg_571;
+wire   [8:0] add_ln440_fu_419_p2;
+reg   [8:0] add_ln440_reg_579;
 wire    ap_CS_fsm_state3;
+wire   [7:0] trunc_ln440_fu_425_p1;
+reg   [7:0] trunc_ln440_reg_584;
+wire   [8:0] add_ln444_fu_429_p2;
+reg   [8:0] add_ln444_reg_590;
+wire   [7:0] trunc_ln445_fu_434_p1;
+reg   [7:0] trunc_ln445_reg_595;
+reg   [7:0] pre_elig_reg_605;
 wire    ap_CS_fsm_state4;
-reg   [7:0] pre_elig_reg_565;
-wire   [0:0] icmp_ln446_fu_415_p2;
-reg   [0:0] icmp_ln446_reg_570;
-wire   [18:0] zext_ln459_fu_440_p1;
-reg   [18:0] zext_ln459_reg_574;
-wire  signed [18:0] tmp_6_fu_444_p9;
-wire    ap_CS_fsm_state6;
-wire  signed [18:0] grp_fu_487_p3;
-reg   [18:0] add_ln451_reg_585;
-wire    ap_CS_fsm_state7;
-(* use_dsp = "no" *) wire   [18:0] add_ln451_2_fu_463_p2;
-reg   [18:0] add_ln451_2_reg_590;
-wire   [10:0] tmp_7_fu_467_p9;
-reg   [10:0] tmp_7_reg_595;
-wire    ap_CS_fsm_state8;
-wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_ap_start;
-wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_ap_done;
-wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_ap_idle;
-wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_ap_ready;
-wire   [10:0] grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_post_eligibility_address0;
-wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_post_eligibility_ce0;
-wire   [18:0] grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_weight_memory_address0;
-wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_weight_memory_ce0;
-wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_weight_memory_we0;
-wire   [3:0] grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_weight_memory_d0;
-wire   [18:0] grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_weight_memory_address1;
-wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_weight_memory_ce1;
-reg   [9:0] ii_reg_165;
-wire    ap_CS_fsm_state9;
-reg    ap_block_state9_on_subcall_done;
-wire   [0:0] icmp_ln436_fu_330_p2;
-reg    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_ap_start_reg;
-wire   [63:0] zext_ln445_fu_402_p1;
-wire   [0:0] icmp_ln440_fu_382_p2;
-reg   [1:0] c_fu_130;
+wire   [0:0] icmp_ln446_fu_447_p2;
+reg   [0:0] icmp_ln446_reg_610;
+reg   [0:0] tmp_37_reg_614;
+wire   [16:0] add_ln_fu_493_p3;
+reg   [16:0] add_ln_reg_619;
+wire   [17:0] add_ln451_fu_506_p2;
+reg   [17:0] add_ln451_reg_624;
+wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_ap_start;
+wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_ap_done;
+wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_ap_idle;
+wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_ap_ready;
+wire   [9:0] grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_post_eligibility_address0;
+wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_post_eligibility_ce0;
+wire   [16:0] grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_weight_memory_address0;
+wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_weight_memory_ce0;
+wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_weight_memory_we0;
+wire   [3:0] grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_weight_memory_d0;
+wire   [16:0] grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_weight_memory_address1;
+wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_weight_memory_ce1;
+wire   [0:0] grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_valid_o;
+wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_valid_o_ap_vld;
+wire   [0:0] grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_group;
+wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_group_ap_vld;
+wire   [7:0] grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_src;
+wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_src_ap_vld;
+wire   [7:0] grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_dst;
+wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_dst_ap_vld;
+wire   [3:0] grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_data;
+wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_data_ap_vld;
+wire   [0:0] grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_exc;
+wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_exc_ap_vld;
+wire   [0:0] grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_is_inter;
+wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_is_inter_ap_vld;
+wire   [1:0] grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_dst_group;
+wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_dst_group_ap_vld;
+reg   [8:0] ii_reg_179;
+wire    ap_CS_fsm_state5;
+reg    ap_block_state5_on_subcall_done;
+wire   [0:0] icmp_ln436_fu_363_p2;
+reg    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_ap_start_reg;
+reg   [0:0] learn_bridge_valid_o_reg;
+reg   [0:0] learn_bridge_group_reg;
+reg   [7:0] learn_bridge_src_reg;
+reg   [7:0] learn_bridge_dst_reg;
+reg   [3:0] learn_bridge_data_reg;
+reg   [0:0] learn_bridge_exc_reg;
+reg   [0:0] learn_bridge_is_inter_reg;
+reg   [1:0] learn_bridge_dst_group_reg;
+wire   [63:0] zext_ln445_fu_438_p1;
+wire   [0:0] icmp_ln440_fu_413_p2;
+reg   [1:0] c_fu_138;
 reg    pre_eligibility_ce0_local;
-wire   [0:0] icmp_ln419_fu_192_p2;
-wire   [7:0] reward_mag_fu_212_p2;
-wire   [7:0] reward_mag_1_fu_218_p3;
-wire   [1:0] tmp_25_fu_226_p4;
-wire   [2:0] tmp_26_fu_242_p4;
-wire   [3:0] tmp_27_fu_258_p4;
-wire   [0:0] icmp_ln428_fu_268_p2;
-wire   [0:0] icmp_ln426_fu_236_p2;
-wire   [0:0] icmp_ln427_fu_252_p2;
-wire   [0:0] xor_ln426_fu_282_p2;
-wire   [0:0] and_ln427_fu_288_p2;
-wire   [1:0] shift_sel_fu_302_p6;
-wire   [1:0] shift_sel_fu_302_p7;
-wire   [1:0] shift_sel_fu_302_p8;
-wire   [9:0] tmp_fu_342_p7;
-wire   [10:0] tmp_s_fu_362_p7;
-wire   [10:0] zext_ln440_1_fu_393_p1;
-wire   [10:0] add_ln444_fu_397_p2;
-wire   [8:0] zext_ln459_cast_fu_421_p7;
-wire   [8:0] zext_ln459_cast_fu_421_p9;
-wire   [18:0] tmp_6_fu_444_p7;
-wire   [18:0] add_ln451_2_fu_463_p1;
-wire   [10:0] tmp_7_fu_467_p7;
-wire   [9:0] grp_fu_487_p0;
-wire   [8:0] grp_fu_487_p1;
-reg   [8:0] ap_NS_fsm;
+wire   [0:0] icmp_ln419_fu_225_p2;
+wire   [7:0] reward_mag_fu_245_p2;
+wire   [7:0] reward_mag_1_fu_251_p3;
+wire   [1:0] tmp_34_fu_259_p4;
+wire   [2:0] tmp_35_fu_275_p4;
+wire   [3:0] tmp_36_fu_291_p4;
+wire   [0:0] icmp_ln428_fu_301_p2;
+wire   [0:0] icmp_ln426_fu_269_p2;
+wire   [0:0] icmp_ln427_fu_285_p2;
+wire   [0:0] xor_ln426_fu_315_p2;
+wire   [0:0] and_ln427_fu_321_p2;
+wire   [1:0] shift_sel_fu_335_p6;
+wire   [1:0] shift_sel_fu_335_p7;
+wire   [1:0] shift_sel_fu_335_p8;
+wire   [11:0] tmp_s_fu_461_p3;
+wire   [15:0] zext_ln451_fu_468_p1;
+wire   [15:0] sf2_fu_472_p3;
+wire   [0:0] tmp_38_fu_486_p3;
+wire   [15:0] select_ln451_1_fu_479_p3;
+wire   [17:0] zext_ln451_2_fu_502_p1;
+reg   [4:0] ap_NS_fsm;
 reg    ap_ST_fsm_state1_blk;
 wire    ap_ST_fsm_state2_blk;
 wire    ap_ST_fsm_state3_blk;
 wire    ap_ST_fsm_state4_blk;
-wire    ap_ST_fsm_state5_blk;
-wire    ap_ST_fsm_state6_blk;
-wire    ap_ST_fsm_state7_blk;
-wire    ap_ST_fsm_state8_blk;
-reg    ap_ST_fsm_state9_blk;
-wire   [18:0] grp_fu_487_p00;
-wire   [18:0] grp_fu_487_p10;
-wire  signed [1:0] shift_sel_fu_302_p1;
-wire   [1:0] shift_sel_fu_302_p3;
-wire   [1:0] shift_sel_fu_302_p5;
-wire   [1:0] tmp_fu_342_p1;
-wire   [1:0] tmp_fu_342_p3;
-wire  signed [1:0] tmp_fu_342_p5;
-wire   [1:0] tmp_s_fu_362_p1;
-wire   [1:0] tmp_s_fu_362_p3;
-wire  signed [1:0] tmp_s_fu_362_p5;
-wire   [1:0] zext_ln459_cast_fu_421_p1;
-wire   [1:0] zext_ln459_cast_fu_421_p3;
-wire  signed [1:0] zext_ln459_cast_fu_421_p5;
-wire   [1:0] tmp_6_fu_444_p1;
-wire   [1:0] tmp_6_fu_444_p3;
-wire  signed [1:0] tmp_6_fu_444_p5;
-wire   [1:0] tmp_7_fu_467_p1;
-wire   [1:0] tmp_7_fu_467_p3;
-wire  signed [1:0] tmp_7_fu_467_p5;
+reg    ap_ST_fsm_state5_blk;
+wire  signed [1:0] shift_sel_fu_335_p1;
+wire   [1:0] shift_sel_fu_335_p3;
+wire   [1:0] shift_sel_fu_335_p5;
 wire    ap_ce_reg;
 
 // power-on initialization
 initial begin
-#0 ap_CS_fsm = 9'd1;
-#0 grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_ap_start_reg = 1'b0;
-#0 c_fu_130 = 2'd0;
+#0 ap_CS_fsm = 5'd1;
+#0 grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_ap_start_reg = 1'b0;
+#0 c_fu_138 = 2'd0;
 end
 
-snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177(
+snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190(
     .ap_clk(ap_clk),
     .ap_rst(ap_rst),
-    .ap_start(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_ap_start),
-    .ap_done(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_ap_done),
-    .ap_idle(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_ap_idle),
-    .ap_ready(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_ap_ready),
-    .add_ln451(add_ln451_reg_585),
-    .add_ln451_2(add_ln451_2_reg_590),
-    .tmp_20(tmp_7_reg_595),
-    .sext_ln455(pre_elig_reg_565),
-    .shift_sel(shift_sel_reg_517),
+    .ap_start(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_ap_start),
+    .ap_done(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_ap_done),
+    .ap_idle(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_ap_idle),
+    .ap_ready(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_ap_ready),
+    .zext_ln451_1(add_ln_reg_619),
+    .add_ln451(add_ln451_reg_624),
+    .select_ln451(select_ln451_reg_566),
+    .sext_ln485(pre_elig_reg_605),
+    .shift_sel(shift_sel_reg_538),
     .sext_ln436(params_reward_scale_val),
-    .empty(tmp_24_reg_512),
-    .post_eligibility_address0(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_post_eligibility_address0),
-    .post_eligibility_ce0(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_post_eligibility_ce0),
+    .empty(tmp_reg_533),
+    .learn_weight_ready(learn_weight_ready),
+    .pre_id(trunc_ln445_reg_595),
+    .zext_ln176(tmp_37_reg_614),
+    .post_eligibility_address0(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_post_eligibility_address0),
+    .post_eligibility_ce0(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_post_eligibility_ce0),
     .post_eligibility_q0(post_eligibility_q0),
-    .weight_memory_address0(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_weight_memory_address0),
-    .weight_memory_ce0(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_weight_memory_ce0),
-    .weight_memory_we0(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_weight_memory_we0),
-    .weight_memory_d0(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_weight_memory_d0),
-    .weight_memory_address1(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_weight_memory_address1),
-    .weight_memory_ce1(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_weight_memory_ce1),
-    .weight_memory_q1(weight_memory_q1)
+    .weight_memory_address0(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_weight_memory_address0),
+    .weight_memory_ce0(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_weight_memory_ce0),
+    .weight_memory_we0(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_weight_memory_we0),
+    .weight_memory_d0(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_weight_memory_d0),
+    .weight_memory_address1(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_weight_memory_address1),
+    .weight_memory_ce1(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_weight_memory_ce1),
+    .weight_memory_q1(weight_memory_q1),
+    .learn_bridge_valid_i(learn_bridge_valid_i),
+    .learn_bridge_valid_o(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_valid_o),
+    .learn_bridge_valid_o_ap_vld(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_valid_o_ap_vld),
+    .learn_bridge_group(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_group),
+    .learn_bridge_group_ap_vld(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_group_ap_vld),
+    .learn_bridge_src(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_src),
+    .learn_bridge_src_ap_vld(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_src_ap_vld),
+    .learn_bridge_dst(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_dst),
+    .learn_bridge_dst_ap_vld(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_dst_ap_vld),
+    .learn_bridge_data(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_data),
+    .learn_bridge_data_ap_vld(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_data_ap_vld),
+    .learn_bridge_exc(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_exc),
+    .learn_bridge_exc_ap_vld(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_exc_ap_vld),
+    .learn_bridge_is_inter(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_is_inter),
+    .learn_bridge_is_inter_ap_vld(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_is_inter_ap_vld),
+    .learn_bridge_dst_group(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_dst_group),
+    .learn_bridge_dst_group_ap_vld(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_dst_group_ap_vld)
 );
 
 (* dissolve_hierarchy = "yes" *) snn_top_hls_sparsemux_7_2_2_1_1 #(
@@ -227,135 +289,13 @@ snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER grp_apply_rstdp_reward_Pipel
     .def_WIDTH( 2 ),
     .sel_WIDTH( 2 ),
     .dout_WIDTH( 2 ))
-sparsemux_7_2_2_1_1_U130(
+sparsemux_7_2_2_1_1_U144(
     .din0(2'd0),
     .din1(2'd1),
-    .din2(shift_sel_fu_302_p6),
-    .def(shift_sel_fu_302_p7),
-    .sel(shift_sel_fu_302_p8),
-    .dout(shift_sel_fu_302_p9)
-);
-
-(* dissolve_hierarchy = "yes" *) snn_top_hls_sparsemux_7_2_10_1_1 #(
-    .ID( 1 ),
-    .NUM_STAGE( 1 ),
-    .CASE0( 2'h0 ),
-    .din0_WIDTH( 10 ),
-    .CASE1( 2'h1 ),
-    .din1_WIDTH( 10 ),
-    .CASE2( 2'h2 ),
-    .din2_WIDTH( 10 ),
-    .def_WIDTH( 10 ),
-    .sel_WIDTH( 2 ),
-    .dout_WIDTH( 10 ))
-sparsemux_7_2_10_1_1_U131(
-    .din0(10'd784),
-    .din1(10'd256),
-    .din2(10'd256),
-    .def(tmp_fu_342_p7),
-    .sel(c_fu_130),
-    .dout(tmp_fu_342_p9)
-);
-
-(* dissolve_hierarchy = "yes" *) snn_top_hls_sparsemux_7_2_11_1_1 #(
-    .ID( 1 ),
-    .NUM_STAGE( 1 ),
-    .CASE0( 2'h0 ),
-    .din0_WIDTH( 11 ),
-    .CASE1( 2'h1 ),
-    .din1_WIDTH( 11 ),
-    .CASE2( 2'h2 ),
-    .din2_WIDTH( 11 ),
-    .def_WIDTH( 11 ),
-    .sel_WIDTH( 2 ),
-    .dout_WIDTH( 11 ))
-sparsemux_7_2_11_1_1_U132(
-    .din0(11'd0),
-    .din1(11'd784),
-    .din2(11'd1040),
-    .def(tmp_s_fu_362_p7),
-    .sel(c_fu_130),
-    .dout(tmp_s_fu_362_p9)
-);
-
-(* dissolve_hierarchy = "yes" *) snn_top_hls_sparsemux_7_2_9_1_1 #(
-    .ID( 1 ),
-    .NUM_STAGE( 1 ),
-    .CASE0( 2'h0 ),
-    .din0_WIDTH( 9 ),
-    .CASE1( 2'h1 ),
-    .din1_WIDTH( 9 ),
-    .CASE2( 2'h2 ),
-    .din2_WIDTH( 9 ),
-    .def_WIDTH( 9 ),
-    .sel_WIDTH( 2 ),
-    .dout_WIDTH( 9 ))
-sparsemux_7_2_9_1_1_U133(
-    .din0(9'd256),
-    .din1(9'd256),
-    .din2(9'd10),
-    .def(zext_ln459_cast_fu_421_p7),
-    .sel(c_3_reg_522),
-    .dout(zext_ln459_cast_fu_421_p9)
-);
-
-(* dissolve_hierarchy = "yes" *) snn_top_hls_sparsemux_7_2_19_1_1 #(
-    .ID( 1 ),
-    .NUM_STAGE( 1 ),
-    .CASE0( 2'h0 ),
-    .din0_WIDTH( 19 ),
-    .CASE1( 2'h1 ),
-    .din1_WIDTH( 19 ),
-    .CASE2( 2'h2 ),
-    .din2_WIDTH( 19 ),
-    .def_WIDTH( 19 ),
-    .sel_WIDTH( 2 ),
-    .dout_WIDTH( 19 ))
-sparsemux_7_2_19_1_1_U134(
-    .din0(19'd0),
-    .din1(19'd200704),
-    .din2(19'd266240),
-    .def(tmp_6_fu_444_p7),
-    .sel(c_3_reg_522),
-    .dout(tmp_6_fu_444_p9)
-);
-
-(* dissolve_hierarchy = "yes" *) snn_top_hls_sparsemux_7_2_11_1_1 #(
-    .ID( 1 ),
-    .NUM_STAGE( 1 ),
-    .CASE0( 2'h0 ),
-    .din0_WIDTH( 11 ),
-    .CASE1( 2'h1 ),
-    .din1_WIDTH( 11 ),
-    .CASE2( 2'h2 ),
-    .din2_WIDTH( 11 ),
-    .def_WIDTH( 11 ),
-    .sel_WIDTH( 2 ),
-    .dout_WIDTH( 11 ))
-sparsemux_7_2_11_1_1_U135(
-    .din0(11'd784),
-    .din1(11'd1040),
-    .din2(11'd1296),
-    .def(tmp_7_fu_467_p7),
-    .sel(c_3_reg_522),
-    .dout(tmp_7_fu_467_p9)
-);
-
-snn_top_hls_mac_muladd_10ns_9ns_19s_19_4_1 #(
-    .ID( 1 ),
-    .NUM_STAGE( 4 ),
-    .din0_WIDTH( 10 ),
-    .din1_WIDTH( 9 ),
-    .din2_WIDTH( 19 ),
-    .dout_WIDTH( 19 ))
-mac_muladd_10ns_9ns_19s_19_4_1_U136(
-    .clk(ap_clk),
-    .reset(ap_rst),
-    .din0(grp_fu_487_p0),
-    .din1(grp_fu_487_p1),
-    .din2(tmp_6_fu_444_p9),
-    .ce(1'b1),
-    .dout(grp_fu_487_p3)
+    .din2(shift_sel_fu_335_p6),
+    .def(shift_sel_fu_335_p7),
+    .sel(shift_sel_fu_335_p8),
+    .dout(shift_sel_fu_335_p9)
 );
 
 always @ (posedge ap_clk) begin
@@ -368,73 +308,116 @@ end
 
 always @ (posedge ap_clk) begin
     if (ap_rst == 1'b1) begin
-        grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_ap_start_reg <= 1'b0;
+        grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_ap_start_reg <= 1'b0;
     end else begin
-        if ((1'b1 == ap_CS_fsm_state8)) begin
-            grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_ap_start_reg <= 1'b1;
-        end else if ((grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_ap_ready == 1'b1)) begin
-            grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_ap_start_reg <= 1'b0;
+        if (((1'b1 == ap_CS_fsm_state4) & (icmp_ln446_fu_447_p2 == 1'd0))) begin
+            grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_ap_start_reg <= 1'b1;
+        end else if ((grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_ap_ready == 1'b1)) begin
+            grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_ap_start_reg <= 1'b0;
         end
     end
 end
 
 always @ (posedge ap_clk) begin
-    if (((1'b1 == ap_CS_fsm_state1) & (1'd1 == and_ln419_fu_198_p2) & (ap_start == 1'b1))) begin
-        c_fu_130 <= 2'd0;
-    end else if (((1'b1 == ap_CS_fsm_state3) & (icmp_ln440_fu_382_p2 == 1'd1))) begin
-        c_fu_130 <= add_ln436_reg_532;
+    if (((1'b1 == ap_CS_fsm_state1) & (1'd1 == and_ln419_fu_231_p2) & (ap_start == 1'b1))) begin
+        c_fu_138 <= 2'd0;
+    end else if (((icmp_ln440_fu_413_p2 == 1'd1) & (1'b1 == ap_CS_fsm_state3))) begin
+        c_fu_138 <= add_ln436_reg_546;
     end
 end
 
 always @ (posedge ap_clk) begin
-    if (((1'b1 == ap_CS_fsm_state2) & (icmp_ln436_fu_330_p2 == 1'd0) & (1'd1 == and_ln419_reg_501))) begin
-        ii_reg_165 <= 10'd0;
-    end else if (((1'b1 == ap_CS_fsm_state9) & (1'b0 == ap_block_state9_on_subcall_done))) begin
-        ii_reg_165 <= add_ln440_reg_550;
+    if (((1'b1 == ap_CS_fsm_state2) & (icmp_ln436_fu_363_p2 == 1'd0) & (1'd1 == and_ln419_reg_522))) begin
+        ii_reg_179 <= 9'd0;
+    end else if (((1'b1 == ap_CS_fsm_state5) & (1'b0 == ap_block_state5_on_subcall_done))) begin
+        ii_reg_179 <= add_ln440_reg_579;
     end
 end
 
 always @ (posedge ap_clk) begin
     if ((1'b1 == ap_CS_fsm_state2)) begin
-        add_ln436_reg_532 <= add_ln436_fu_336_p2;
-        c_3_reg_522 <= c_fu_130;
-        tmp_reg_537 <= tmp_fu_342_p9;
-        tmp_s_reg_542 <= tmp_s_fu_362_p9;
+        add_ln436_reg_546 <= add_ln436_fu_369_p2;
+        icmp_ln444_reg_551 <= icmp_ln444_fu_375_p2;
+        select_ln440_1_reg_571[4] <= select_ln440_1_fu_405_p3[4];
+select_ln440_1_reg_571[8] <= select_ln440_1_fu_405_p3[8];
+        select_ln440_reg_556[8] <= select_ln440_fu_381_p3[8];
+        select_ln448_reg_561[16] <= select_ln448_fu_389_p3[16];
+        select_ln451_reg_566[9 : 8] <= select_ln451_fu_397_p3[9 : 8];
     end
 end
 
 always @ (posedge ap_clk) begin
     if ((1'b1 == ap_CS_fsm_state3)) begin
-        add_ln440_reg_550 <= add_ln440_fu_387_p2;
-    end
-end
-
-always @ (posedge ap_clk) begin
-    if ((1'b1 == ap_CS_fsm_state7)) begin
-        add_ln451_2_reg_590 <= add_ln451_2_fu_463_p2;
-        add_ln451_reg_585 <= grp_fu_487_p3;
-    end
-end
-
-always @ (posedge ap_clk) begin
-    if ((1'b1 == ap_CS_fsm_state1)) begin
-        and_ln419_reg_501 <= and_ln419_fu_198_p2;
-        shift_sel_reg_517 <= shift_sel_fu_302_p9;
-        tmp_24_reg_512 <= reward_signal[32'd7];
+        add_ln440_reg_579 <= add_ln440_fu_419_p2;
+        add_ln444_reg_590 <= add_ln444_fu_429_p2;
+        trunc_ln440_reg_584 <= trunc_ln440_fu_425_p1;
+        trunc_ln445_reg_595 <= trunc_ln445_fu_434_p1;
     end
 end
 
 always @ (posedge ap_clk) begin
     if ((1'b1 == ap_CS_fsm_state4)) begin
-        icmp_ln446_reg_570 <= icmp_ln446_fu_415_p2;
-        pre_elig_reg_565 <= pre_eligibility_q0;
-        zext_ln459_reg_574[8 : 0] <= zext_ln459_fu_440_p1[8 : 0];
+        add_ln451_reg_624[17 : 4] <= add_ln451_fu_506_p2[17 : 4];
+        add_ln_reg_619[16 : 4] <= add_ln_fu_493_p3[16 : 4];
+        icmp_ln446_reg_610 <= icmp_ln446_fu_447_p2;
+        pre_elig_reg_605 <= pre_eligibility_q0;
+        tmp_37_reg_614 <= add_ln444_reg_590[32'd8];
     end
 end
 
 always @ (posedge ap_clk) begin
-    if ((1'b1 == ap_CS_fsm_state8)) begin
-        tmp_7_reg_595 <= tmp_7_fu_467_p9;
+    if ((1'b1 == ap_CS_fsm_state1)) begin
+        and_ln419_reg_522 <= and_ln419_fu_231_p2;
+        shift_sel_reg_538 <= shift_sel_fu_335_p9;
+        tmp_reg_533 <= reward_signal[32'd7];
+    end
+end
+
+always @ (posedge ap_clk) begin
+    if (((1'b1 == ap_CS_fsm_state5) & (grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_data_ap_vld == 1'b1) & (icmp_ln446_reg_610 == 1'd0))) begin
+        learn_bridge_data_reg <= grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_data;
+    end
+end
+
+always @ (posedge ap_clk) begin
+    if (((1'b1 == ap_CS_fsm_state5) & (grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_dst_group_ap_vld == 1'b1) & (icmp_ln446_reg_610 == 1'd0))) begin
+        learn_bridge_dst_group_reg <= grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_dst_group;
+    end
+end
+
+always @ (posedge ap_clk) begin
+    if (((1'b1 == ap_CS_fsm_state5) & (grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_dst_ap_vld == 1'b1) & (icmp_ln446_reg_610 == 1'd0))) begin
+        learn_bridge_dst_reg <= grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_dst;
+    end
+end
+
+always @ (posedge ap_clk) begin
+    if (((1'b1 == ap_CS_fsm_state5) & (grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_exc_ap_vld == 1'b1) & (icmp_ln446_reg_610 == 1'd0))) begin
+        learn_bridge_exc_reg <= grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_exc;
+    end
+end
+
+always @ (posedge ap_clk) begin
+    if (((1'b1 == ap_CS_fsm_state5) & (grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_group_ap_vld == 1'b1) & (icmp_ln446_reg_610 == 1'd0))) begin
+        learn_bridge_group_reg <= grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_group;
+    end
+end
+
+always @ (posedge ap_clk) begin
+    if (((1'b1 == ap_CS_fsm_state5) & (grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_is_inter_ap_vld == 1'b1) & (icmp_ln446_reg_610 == 1'd0))) begin
+        learn_bridge_is_inter_reg <= grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_is_inter;
+    end
+end
+
+always @ (posedge ap_clk) begin
+    if (((1'b1 == ap_CS_fsm_state5) & (grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_src_ap_vld == 1'b1) & (icmp_ln446_reg_610 == 1'd0))) begin
+        learn_bridge_src_reg <= grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_src;
+    end
+end
+
+always @ (posedge ap_clk) begin
+    if (((1'b1 == ap_CS_fsm_state5) & (grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_valid_o_ap_vld == 1'b1) & (icmp_ln446_reg_610 == 1'd0))) begin
+        learn_bridge_valid_o_reg <= grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_valid_o;
     end
 end
 
@@ -452,24 +435,16 @@ assign ap_ST_fsm_state3_blk = 1'b0;
 
 assign ap_ST_fsm_state4_blk = 1'b0;
 
-assign ap_ST_fsm_state5_blk = 1'b0;
-
-assign ap_ST_fsm_state6_blk = 1'b0;
-
-assign ap_ST_fsm_state7_blk = 1'b0;
-
-assign ap_ST_fsm_state8_blk = 1'b0;
-
 always @ (*) begin
-    if ((1'b1 == ap_block_state9_on_subcall_done)) begin
-        ap_ST_fsm_state9_blk = 1'b1;
+    if ((1'b1 == ap_block_state5_on_subcall_done)) begin
+        ap_ST_fsm_state5_blk = 1'b1;
     end else begin
-        ap_ST_fsm_state9_blk = 1'b0;
+        ap_ST_fsm_state5_blk = 1'b0;
     end
 end
 
 always @ (*) begin
-    if ((((1'b1 == ap_CS_fsm_state2) & ((icmp_ln436_fu_330_p2 == 1'd1) | (1'd0 == and_ln419_reg_501))) | ((1'b1 == ap_CS_fsm_state1) & (ap_start == 1'b0)))) begin
+    if ((((1'b1 == ap_CS_fsm_state2) & ((icmp_ln436_fu_363_p2 == 1'd1) | (1'd0 == and_ln419_reg_522))) | ((1'b1 == ap_CS_fsm_state1) & (ap_start == 1'b0)))) begin
         ap_done = 1'b1;
     end else begin
         ap_done = 1'b0;
@@ -485,10 +460,74 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((1'b1 == ap_CS_fsm_state2) & ((icmp_ln436_fu_330_p2 == 1'd1) | (1'd0 == and_ln419_reg_501)))) begin
+    if (((1'b1 == ap_CS_fsm_state2) & ((icmp_ln436_fu_363_p2 == 1'd1) | (1'd0 == and_ln419_reg_522)))) begin
         ap_ready = 1'b1;
     end else begin
         ap_ready = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'b1 == ap_CS_fsm_state5) & (grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_data_ap_vld == 1'b1) & (icmp_ln446_reg_610 == 1'd0))) begin
+        learn_bridge_data = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_data;
+    end else begin
+        learn_bridge_data = learn_bridge_data_reg;
+    end
+end
+
+always @ (*) begin
+    if (((1'b1 == ap_CS_fsm_state5) & (grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_dst_ap_vld == 1'b1) & (icmp_ln446_reg_610 == 1'd0))) begin
+        learn_bridge_dst = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_dst;
+    end else begin
+        learn_bridge_dst = learn_bridge_dst_reg;
+    end
+end
+
+always @ (*) begin
+    if (((1'b1 == ap_CS_fsm_state5) & (grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_dst_group_ap_vld == 1'b1) & (icmp_ln446_reg_610 == 1'd0))) begin
+        learn_bridge_dst_group = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_dst_group;
+    end else begin
+        learn_bridge_dst_group = learn_bridge_dst_group_reg;
+    end
+end
+
+always @ (*) begin
+    if (((1'b1 == ap_CS_fsm_state5) & (grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_exc_ap_vld == 1'b1) & (icmp_ln446_reg_610 == 1'd0))) begin
+        learn_bridge_exc = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_exc;
+    end else begin
+        learn_bridge_exc = learn_bridge_exc_reg;
+    end
+end
+
+always @ (*) begin
+    if (((1'b1 == ap_CS_fsm_state5) & (grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_group_ap_vld == 1'b1) & (icmp_ln446_reg_610 == 1'd0))) begin
+        learn_bridge_group = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_group;
+    end else begin
+        learn_bridge_group = learn_bridge_group_reg;
+    end
+end
+
+always @ (*) begin
+    if (((1'b1 == ap_CS_fsm_state5) & (grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_is_inter_ap_vld == 1'b1) & (icmp_ln446_reg_610 == 1'd0))) begin
+        learn_bridge_is_inter = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_is_inter;
+    end else begin
+        learn_bridge_is_inter = learn_bridge_is_inter_reg;
+    end
+end
+
+always @ (*) begin
+    if (((1'b1 == ap_CS_fsm_state5) & (grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_src_ap_vld == 1'b1) & (icmp_ln446_reg_610 == 1'd0))) begin
+        learn_bridge_src = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_src;
+    end else begin
+        learn_bridge_src = learn_bridge_src_reg;
+    end
+end
+
+always @ (*) begin
+    if (((1'b1 == ap_CS_fsm_state5) & (grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_valid_o_ap_vld == 1'b1) & (icmp_ln446_reg_610 == 1'd0))) begin
+        learn_bridge_valid_o = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_valid_o;
+    end else begin
+        learn_bridge_valid_o = learn_bridge_valid_o_reg;
     end
 end
 
@@ -510,43 +549,27 @@ always @ (*) begin
             end
         end
         ap_ST_fsm_state2 : begin
-            if (((1'b1 == ap_CS_fsm_state2) & ((icmp_ln436_fu_330_p2 == 1'd1) | (1'd0 == and_ln419_reg_501)))) begin
+            if (((1'b1 == ap_CS_fsm_state2) & ((icmp_ln436_fu_363_p2 == 1'd1) | (1'd0 == and_ln419_reg_522)))) begin
                 ap_NS_fsm = ap_ST_fsm_state1;
             end else begin
                 ap_NS_fsm = ap_ST_fsm_state3;
             end
         end
         ap_ST_fsm_state3 : begin
-            if (((1'b1 == ap_CS_fsm_state3) & (icmp_ln440_fu_382_p2 == 1'd1))) begin
+            if (((icmp_ln440_fu_413_p2 == 1'd1) & (1'b1 == ap_CS_fsm_state3))) begin
                 ap_NS_fsm = ap_ST_fsm_state2;
             end else begin
                 ap_NS_fsm = ap_ST_fsm_state4;
             end
         end
         ap_ST_fsm_state4 : begin
-            if (((icmp_ln446_fu_415_p2 == 1'd1) & (1'b1 == ap_CS_fsm_state4))) begin
-                ap_NS_fsm = ap_ST_fsm_state9;
-            end else begin
-                ap_NS_fsm = ap_ST_fsm_state5;
-            end
+            ap_NS_fsm = ap_ST_fsm_state5;
         end
         ap_ST_fsm_state5 : begin
-            ap_NS_fsm = ap_ST_fsm_state6;
-        end
-        ap_ST_fsm_state6 : begin
-            ap_NS_fsm = ap_ST_fsm_state7;
-        end
-        ap_ST_fsm_state7 : begin
-            ap_NS_fsm = ap_ST_fsm_state8;
-        end
-        ap_ST_fsm_state8 : begin
-            ap_NS_fsm = ap_ST_fsm_state9;
-        end
-        ap_ST_fsm_state9 : begin
-            if (((1'b1 == ap_CS_fsm_state9) & (1'b0 == ap_block_state9_on_subcall_done))) begin
+            if (((1'b1 == ap_CS_fsm_state5) & (1'b0 == ap_block_state5_on_subcall_done))) begin
                 ap_NS_fsm = ap_ST_fsm_state3;
             end else begin
-                ap_NS_fsm = ap_ST_fsm_state9;
+                ap_NS_fsm = ap_ST_fsm_state5;
             end
         end
         default : begin
@@ -555,19 +578,19 @@ always @ (*) begin
     endcase
 end
 
-assign add_ln436_fu_336_p2 = (c_fu_130 + 2'd1);
+assign add_ln436_fu_369_p2 = (c_fu_138 + 2'd1);
 
-assign add_ln440_fu_387_p2 = (ii_reg_165 + 10'd1);
+assign add_ln440_fu_419_p2 = (ii_reg_179 + 9'd1);
 
-assign add_ln444_fu_397_p2 = (zext_ln440_1_fu_393_p1 + tmp_s_reg_542);
+assign add_ln444_fu_429_p2 = (ii_reg_179 + select_ln440_reg_556);
 
-assign add_ln451_2_fu_463_p1 = grp_fu_487_p3;
+assign add_ln451_fu_506_p2 = (select_ln440_1_reg_571 + zext_ln451_2_fu_502_p1);
 
-assign add_ln451_2_fu_463_p2 = (zext_ln459_reg_574 + add_ln451_2_fu_463_p1);
+assign add_ln_fu_493_p3 = {{tmp_38_fu_486_p3}, {select_ln451_1_fu_479_p3}};
 
-assign and_ln419_fu_198_p2 = (params_rstdp_enable_val & icmp_ln419_fu_192_p2);
+assign and_ln419_fu_231_p2 = (params_rstdp_enable_val & icmp_ln419_fu_225_p2);
 
-assign and_ln427_fu_288_p2 = (xor_ln426_fu_282_p2 & icmp_ln427_fu_252_p2);
+assign and_ln427_fu_321_p2 = (xor_ln426_fu_315_p2 & icmp_ln427_fu_285_p2);
 
 assign ap_CS_fsm_state1 = ap_CS_fsm[32'd0];
 
@@ -577,100 +600,121 @@ assign ap_CS_fsm_state3 = ap_CS_fsm[32'd2];
 
 assign ap_CS_fsm_state4 = ap_CS_fsm[32'd3];
 
-assign ap_CS_fsm_state6 = ap_CS_fsm[32'd5];
-
-assign ap_CS_fsm_state7 = ap_CS_fsm[32'd6];
-
-assign ap_CS_fsm_state8 = ap_CS_fsm[32'd7];
-
-assign ap_CS_fsm_state9 = ap_CS_fsm[32'd8];
+assign ap_CS_fsm_state5 = ap_CS_fsm[32'd4];
 
 always @ (*) begin
-    ap_block_state9_on_subcall_done = ((icmp_ln446_reg_570 == 1'd0) & (grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_ap_done == 1'b0));
+    ap_block_state5_on_subcall_done = ((grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_ap_done == 1'b0) & (icmp_ln446_reg_610 == 1'd0));
 end
 
-assign grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_ap_start = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_ap_start_reg;
+assign grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_ap_start = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_ap_start_reg;
 
-assign grp_fu_487_p0 = grp_fu_487_p00;
+assign icmp_ln419_fu_225_p2 = ((reward_signal != 8'd0) ? 1'b1 : 1'b0);
 
-assign grp_fu_487_p00 = ii_reg_165;
+assign icmp_ln426_fu_269_p2 = ((tmp_34_fu_259_p4 != 2'd0) ? 1'b1 : 1'b0);
 
-assign grp_fu_487_p1 = grp_fu_487_p10;
+assign icmp_ln427_fu_285_p2 = ((tmp_35_fu_275_p4 != 3'd0) ? 1'b1 : 1'b0);
 
-assign grp_fu_487_p10 = zext_ln459_cast_fu_421_p9;
+assign icmp_ln428_fu_301_p2 = ((tmp_36_fu_291_p4 != 4'd0) ? 1'b1 : 1'b0);
 
-assign icmp_ln419_fu_192_p2 = ((reward_signal != 8'd0) ? 1'b1 : 1'b0);
+assign icmp_ln436_fu_363_p2 = ((c_fu_138 == 2'd2) ? 1'b1 : 1'b0);
 
-assign icmp_ln426_fu_236_p2 = ((tmp_25_fu_226_p4 != 2'd0) ? 1'b1 : 1'b0);
+assign icmp_ln440_fu_413_p2 = ((ii_reg_179 == 9'd256) ? 1'b1 : 1'b0);
 
-assign icmp_ln427_fu_252_p2 = ((tmp_26_fu_242_p4 != 3'd0) ? 1'b1 : 1'b0);
+assign icmp_ln444_fu_375_p2 = ((c_fu_138 == 2'd1) ? 1'b1 : 1'b0);
 
-assign icmp_ln428_fu_268_p2 = ((tmp_27_fu_258_p4 != 4'd0) ? 1'b1 : 1'b0);
+assign icmp_ln446_fu_447_p2 = ((pre_eligibility_q0 == 8'd0) ? 1'b1 : 1'b0);
 
-assign icmp_ln436_fu_330_p2 = ((c_fu_130 == 2'd3) ? 1'b1 : 1'b0);
+assign learn_bridge_data_ap_vld = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_data_ap_vld;
 
-assign icmp_ln440_fu_382_p2 = ((ii_reg_165 == tmp_reg_537) ? 1'b1 : 1'b0);
+assign learn_bridge_dst_ap_vld = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_dst_ap_vld;
 
-assign icmp_ln446_fu_415_p2 = ((pre_eligibility_q0 == 8'd0) ? 1'b1 : 1'b0);
+assign learn_bridge_dst_group_ap_vld = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_dst_group_ap_vld;
 
-assign post_eligibility_address0 = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_post_eligibility_address0;
+assign learn_bridge_exc_ap_vld = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_exc_ap_vld;
 
-assign post_eligibility_ce0 = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_post_eligibility_ce0;
+assign learn_bridge_group_ap_vld = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_group_ap_vld;
 
-assign pre_eligibility_address0 = zext_ln445_fu_402_p1;
+assign learn_bridge_is_inter_ap_vld = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_is_inter_ap_vld;
+
+assign learn_bridge_src_ap_vld = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_src_ap_vld;
+
+assign learn_bridge_valid_o_ap_vld = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_learn_bridge_valid_o_ap_vld;
+
+assign post_eligibility_address0 = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_post_eligibility_address0;
+
+assign post_eligibility_ce0 = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_post_eligibility_ce0;
+
+assign pre_eligibility_address0 = zext_ln445_fu_438_p1;
 
 assign pre_eligibility_ce0 = pre_eligibility_ce0_local;
 
-assign reward_mag_1_fu_218_p3 = ((tmp_24_fu_204_p3[0:0] == 1'b1) ? reward_mag_fu_212_p2 : reward_signal);
+assign reward_mag_1_fu_251_p3 = ((tmp_fu_237_p3[0:0] == 1'b1) ? reward_mag_fu_245_p2 : reward_signal);
 
-assign reward_mag_fu_212_p2 = (8'd0 - reward_signal);
+assign reward_mag_fu_245_p2 = (8'd0 - reward_signal);
 
-assign shift_sel_fu_302_p6 = ((icmp_ln428_fu_268_p2[0:0] == 1'b1) ? 2'd2 : 2'd3);
+assign select_ln440_1_fu_405_p3 = ((icmp_ln444_fu_375_p2[0:0] == 1'b1) ? 18'd16 : 18'd256);
 
-assign shift_sel_fu_302_p7 = 'bx;
+assign select_ln440_fu_381_p3 = ((icmp_ln444_fu_375_p2[0:0] == 1'b1) ? 9'd256 : 9'd0);
 
-assign shift_sel_fu_302_p8 = {{icmp_ln426_fu_236_p2}, {and_ln427_fu_288_p2}};
+assign select_ln448_fu_389_p3 = ((icmp_ln444_fu_375_p2[0:0] == 1'b1) ? 17'd65536 : 17'd0);
 
-assign tmp_24_fu_204_p3 = reward_signal[32'd7];
+assign select_ln451_1_fu_479_p3 = ((icmp_ln444_reg_551[0:0] == 1'b1) ? zext_ln451_fu_468_p1 : sf2_fu_472_p3);
 
-assign tmp_25_fu_226_p4 = {{reward_mag_1_fu_218_p3[7:6]}};
+assign select_ln451_fu_397_p3 = ((icmp_ln444_fu_375_p2[0:0] == 1'b1) ? 10'd512 : 10'd256);
 
-assign tmp_26_fu_242_p4 = {{reward_mag_1_fu_218_p3[7:5]}};
+assign sf2_fu_472_p3 = {{trunc_ln440_reg_584}, {8'd0}};
 
-assign tmp_27_fu_258_p4 = {{reward_mag_1_fu_218_p3[7:4]}};
+assign shift_sel_fu_335_p6 = ((icmp_ln428_fu_301_p2[0:0] == 1'b1) ? 2'd2 : 2'd3);
 
-assign tmp_6_fu_444_p7 = 'bx;
+assign shift_sel_fu_335_p7 = 'bx;
 
-assign tmp_7_fu_467_p7 = 'bx;
+assign shift_sel_fu_335_p8 = {{icmp_ln426_fu_269_p2}, {and_ln427_fu_321_p2}};
 
-assign tmp_fu_342_p7 = 'bx;
+assign tmp_34_fu_259_p4 = {{reward_mag_1_fu_251_p3[7:6]}};
 
-assign tmp_s_fu_362_p7 = 'bx;
+assign tmp_35_fu_275_p4 = {{reward_mag_1_fu_251_p3[7:5]}};
 
-assign weight_memory_address0 = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_weight_memory_address0;
+assign tmp_36_fu_291_p4 = {{reward_mag_1_fu_251_p3[7:4]}};
 
-assign weight_memory_address1 = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_weight_memory_address1;
+assign tmp_38_fu_486_p3 = select_ln448_reg_561[32'd16];
 
-assign weight_memory_ce0 = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_weight_memory_ce0;
+assign tmp_fu_237_p3 = reward_signal[32'd7];
 
-assign weight_memory_ce1 = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_weight_memory_ce1;
+assign tmp_s_fu_461_p3 = {{trunc_ln440_reg_584}, {4'd0}};
 
-assign weight_memory_d0 = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_weight_memory_d0;
+assign trunc_ln440_fu_425_p1 = ii_reg_179[7:0];
 
-assign weight_memory_we0 = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_177_weight_memory_we0;
+assign trunc_ln445_fu_434_p1 = add_ln444_fu_429_p2[7:0];
 
-assign xor_ln426_fu_282_p2 = (icmp_ln426_fu_236_p2 ^ 1'd1);
+assign weight_memory_address0 = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_weight_memory_address0;
 
-assign zext_ln440_1_fu_393_p1 = ii_reg_165;
+assign weight_memory_address1 = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_weight_memory_address1;
 
-assign zext_ln445_fu_402_p1 = add_ln444_fu_397_p2;
+assign weight_memory_ce0 = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_weight_memory_ce0;
 
-assign zext_ln459_cast_fu_421_p7 = 'bx;
+assign weight_memory_ce1 = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_weight_memory_ce1;
 
-assign zext_ln459_fu_440_p1 = zext_ln459_cast_fu_421_p9;
+assign weight_memory_d0 = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_weight_memory_d0;
+
+assign weight_memory_we0 = grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_weight_memory_we0;
+
+assign xor_ln426_fu_315_p2 = (icmp_ln426_fu_269_p2 ^ 1'd1);
+
+assign zext_ln445_fu_438_p1 = add_ln444_fu_429_p2;
+
+assign zext_ln451_2_fu_502_p1 = add_ln_fu_493_p3;
+
+assign zext_ln451_fu_468_p1 = tmp_s_fu_461_p3;
 
 always @ (posedge ap_clk) begin
-    zext_ln459_reg_574[18:9] <= 10'b0000000000;
+    select_ln440_reg_556[7:0] <= 8'b00000000;
+    select_ln448_reg_561[15:0] <= 16'b0000000000000000;
+    select_ln451_reg_566[7:0] <= 8'b00000000;
+    select_ln440_1_reg_571[3:0] <= 4'b0000;
+    select_ln440_1_reg_571[7:5] <= 3'b000;
+    select_ln440_1_reg_571[17:9] <= 9'b000000000;
+    add_ln_reg_619[3:0] <= 4'b0000;
+    add_ln451_reg_624[3:0] <= 4'b0000;
 end
 
 endmodule //snn_top_hls_apply_rstdp_reward

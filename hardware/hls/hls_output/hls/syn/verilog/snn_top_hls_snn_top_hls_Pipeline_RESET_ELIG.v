@@ -32,11 +32,11 @@ input   ap_start;
 output   ap_done;
 output   ap_idle;
 output   ap_ready;
-output  [10:0] pre_eligibility_address1;
+output  [9:0] pre_eligibility_address1;
 output   pre_eligibility_ce1;
 output   pre_eligibility_we1;
 output  [7:0] pre_eligibility_d1;
-output  [10:0] post_eligibility_address1;
+output  [9:0] post_eligibility_address1;
 output   post_eligibility_ce1;
 output   post_eligibility_we1;
 output  [7:0] post_eligibility_d1;
@@ -51,10 +51,10 @@ reg    ap_condition_exit_pp0_iter0_stage0;
 wire    ap_loop_exit_ready;
 reg    ap_ready_int;
 wire   [63:0] zext_ln782_fu_102_p1;
-reg   [10:0] i_fu_42;
-wire   [10:0] add_ln782_fu_96_p2;
+reg   [9:0] i_fu_42;
+wire   [9:0] add_ln782_fu_96_p2;
 wire    ap_loop_init;
-reg   [10:0] ap_sig_allocacmp_i_3;
+reg   [9:0] ap_sig_allocacmp_i_3;
 reg    pre_eligibility_we1_local;
 reg    pre_eligibility_ce1_local;
 reg    post_eligibility_we1_local;
@@ -72,7 +72,7 @@ wire    ap_ce_reg;
 // power-on initialization
 initial begin
 #0 ap_CS_fsm = 1'd1;
-#0 i_fu_42 = 11'd0;
+#0 i_fu_42 = 10'd0;
 #0 ap_done_reg = 1'b0;
 end
 
@@ -116,7 +116,7 @@ always @ (posedge ap_clk) begin
         if ((icmp_ln782_fu_90_p2 == 1'd0)) begin
             i_fu_42 <= add_ln782_fu_96_p2;
         end else if ((ap_loop_init == 1'b1)) begin
-            i_fu_42 <= 11'd0;
+            i_fu_42 <= 10'd0;
         end
     end
 end
@@ -163,7 +163,7 @@ end
 
 always @ (*) begin
     if (((ap_loop_init == 1'b1) & (1'b1 == ap_CS_fsm_state1))) begin
-        ap_sig_allocacmp_i_3 = 11'd0;
+        ap_sig_allocacmp_i_3 = 10'd0;
     end else begin
         ap_sig_allocacmp_i_3 = i_fu_42;
     end
@@ -212,7 +212,7 @@ always @ (*) begin
     endcase
 end
 
-assign add_ln782_fu_96_p2 = (ap_sig_allocacmp_i_3 + 11'd1);
+assign add_ln782_fu_96_p2 = (ap_sig_allocacmp_i_3 + 10'd1);
 
 assign ap_CS_fsm_state1 = ap_CS_fsm[32'd0];
 
@@ -226,7 +226,7 @@ assign ap_loop_exit_ready = ap_condition_exit_pp0_iter0_stage0;
 
 assign ap_ready = ap_ready_sig;
 
-assign icmp_ln782_fu_90_p2 = ((ap_sig_allocacmp_i_3 == 11'd1306) ? 1'b1 : 1'b0);
+assign icmp_ln782_fu_90_p2 = ((ap_sig_allocacmp_i_3 == 10'd528) ? 1'b1 : 1'b0);
 
 assign post_eligibility_address1 = zext_ln782_fu_102_p1;
 

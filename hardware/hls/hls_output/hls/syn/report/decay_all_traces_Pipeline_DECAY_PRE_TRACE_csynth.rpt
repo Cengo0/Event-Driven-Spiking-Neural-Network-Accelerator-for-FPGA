@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'decay_all_traces_Pipeline_DECAY_PRE_TRACE'
 ================================================================
-* Date:           Thu Sep 17 15:27:04 2026
+* Date:           Sun Sep 20 02:25:01 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -25,12 +25,12 @@
 
 + Latency: 
     * Summary: 
-    +---------+---------+-----------+-----------+-----+-----+-------------------+
-    |  Latency (cycles) |   Latency (absolute)  |  Interval |      Pipeline     |
-    |   min   |   max   |    min    |    max    | min | max |        Type       |
-    +---------+---------+-----------+-----------+-----+-----+-------------------+
-    |     1310|     1310|  13.100 us|  13.100 us|    0|    0|  loop pipeline stp|
-    +---------+---------+-----------+-----------+-----+-----+-------------------+
+    +---------+---------+----------+----------+-----+-----+-------------------+
+    |  Latency (cycles) |  Latency (absolute) |  Interval |      Pipeline     |
+    |   min   |   max   |    min   |    max   | min | max |        Type       |
+    +---------+---------+----------+----------+-----+-----+-------------------+
+    |      532|      532|  5.320 us|  5.320 us|    0|    0|  loop pipeline stp|
+    +---------+---------+----------+----------+-----+-----+-------------------+
 
     + Detail: 
         * Instance: 
@@ -41,7 +41,7 @@
         |                   |  Latency (cycles) | Iteration|  Initiation Interval  | Trip |          |
         |     Loop Name     |   min   |   max   |  Latency |  achieved |   target  | Count| Pipelined|
         +-------------------+---------+---------+----------+-----------+-----------+------+----------+
-        |- DECAY_PRE_TRACE  |     1308|     1308|         4|          1|          1|  1306|       yes|
+        |- DECAY_PRE_TRACE  |      530|      530|         4|          1|          1|   528|       yes|
         +-------------------+---------+---------+----------+-----------+-----------+------+----------+
 
 
@@ -54,14 +54,14 @@
 |       Name      | BRAM_18K| DSP |   FF   |  LUT  | URAM|
 +-----------------+---------+-----+--------+-------+-----+
 |DSP              |        -|    -|       -|      -|    -|
-|Expression       |        -|    -|       0|     41|    -|
+|Expression       |        -|    -|       0|     43|    -|
 |FIFO             |        -|    -|       -|      -|    -|
 |Instance         |        -|    1|       0|      0|    -|
 |Memory           |        -|    -|       -|      -|    -|
 |Multiplexer      |        -|    -|       0|     36|    -|
-|Register         |        -|    -|     117|     32|    -|
+|Register         |        -|    -|     115|     32|    -|
 +-----------------+---------+-----+--------+-------+-----+
-|Total            |        0|    1|     117|    109|    0|
+|Total            |        0|    1|     115|    111|    0|
 +-----------------+---------+-----+--------+-------+-----+
 |Available        |      280|  220|  106400|  53200|    0|
 +-----------------+---------+-----+--------+-------+-----+
@@ -91,12 +91,12 @@
     +----------------------+----------+----+---+----+------------+------------+
     |     Variable Name    | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
     +----------------------+----------+----+---+----+------------+------------+
-    |add_ln209_fu_107_p2   |         +|   0|  0|  12|          11|           1|
+    |add_ln209_fu_107_p2   |         +|   0|  0|  13|          10|           1|
     |sub_ln215_fu_142_p2   |         -|   0|  0|  15|           8|           8|
-    |icmp_ln209_fu_101_p2  |      icmp|   0|  0|  12|          11|          11|
+    |icmp_ln209_fu_101_p2  |      icmp|   0|  0|  13|          10|          10|
     |ap_enable_pp0         |       xor|   0|  0|   2|           1|           2|
     +----------------------+----------+----+---+----+------------+------------+
-    |Total                 |          |   0|  0|  41|          31|          22|
+    |Total                 |          |   0|  0|  43|          29|          21|
     +----------------------+----------+----+---+----+------------+------------+
 
     * Multiplexer: 
@@ -105,10 +105,10 @@
     +-------------------------+----+-----------+-----+-----------+
     |ap_done_int              |   9|          2|    1|          2|
     |ap_enable_reg_pp0_iter1  |   9|          2|    1|          2|
-    |ap_sig_allocacmp_i_5     |   9|          2|   11|         22|
-    |i_fu_62                  |   9|          2|   11|         22|
+    |ap_sig_allocacmp_i_5     |   9|          2|   10|         20|
+    |i_fu_62                  |   9|          2|   10|         20|
     +-------------------------+----+-----------+-----+-----------+
-    |Total                    |  36|          8|   24|         48|
+    |Total                    |  36|          8|   22|         44|
     +-------------------------+----+-----------+-----+-----------+
 
     * Register: 
@@ -122,14 +122,14 @@
     |ap_enable_reg_pp0_iter3           |   1|   0|    1|          0|
     |ap_loop_exit_ready_pp0_iter1_reg  |   1|   0|    1|          0|
     |ap_loop_exit_ready_pp0_iter2_reg  |   1|   0|    1|          0|
-    |i_fu_62                           |  11|   0|   11|          0|
-    |pre_traces_addr_reg_164           |  11|   0|   11|          0|
+    |i_fu_62                           |  10|   0|   10|          0|
+    |pre_traces_addr_reg_164           |  10|   0|   10|          0|
     |t_reg_170                         |   8|   0|    8|          0|
     |t_reg_170_pp0_iter2_reg           |   8|   0|    8|          0|
     |zext_ln209_cast_reg_155           |   8|   0|   16|          8|
-    |pre_traces_addr_reg_164           |  64|  32|   11|          0|
+    |pre_traces_addr_reg_164           |  64|  32|   10|          0|
     +----------------------------------+----+----+-----+-----------+
-    |Total                             | 117|  32|   72|          8|
+    |Total                             | 115|  32|   69|          8|
     +----------------------------------+----+----+-----+-----------+
 
 
@@ -148,10 +148,10 @@
 |ap_idle              |  out|    1|  ap_ctrl_hs|  decay_all_traces_Pipeline_DECAY_PRE_TRACE|  return value|
 |ap_ready             |  out|    1|  ap_ctrl_hs|  decay_all_traces_Pipeline_DECAY_PRE_TRACE|  return value|
 |zext_ln209           |   in|    8|     ap_none|                                 zext_ln209|        scalar|
-|pre_traces_address0  |  out|   11|   ap_memory|                                 pre_traces|         array|
+|pre_traces_address0  |  out|   10|   ap_memory|                                 pre_traces|         array|
 |pre_traces_ce0       |  out|    1|   ap_memory|                                 pre_traces|         array|
 |pre_traces_q0        |   in|    8|   ap_memory|                                 pre_traces|         array|
-|pre_traces_address1  |  out|   11|   ap_memory|                                 pre_traces|         array|
+|pre_traces_address1  |  out|   10|   ap_memory|                                 pre_traces|         array|
 |pre_traces_ce1       |  out|    1|   ap_memory|                                 pre_traces|         array|
 |pre_traces_we1       |  out|    1|   ap_memory|                                 pre_traces|         array|
 |pre_traces_d1        |  out|    8|   ap_memory|                                 pre_traces|         array|

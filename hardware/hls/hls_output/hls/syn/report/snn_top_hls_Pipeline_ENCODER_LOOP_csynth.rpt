@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'snn_top_hls_Pipeline_ENCODER_LOOP'
 ================================================================
-* Date:           Thu Sep 17 15:27:05 2026
+* Date:           Sun Sep 20 02:25:02 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -85,14 +85,14 @@
     +---------------------------------------+----------+----+---+----+------------+------------+
     |             Variable Name             | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
     +---------------------------------------+----------+----+---+----+------------+------------+
-    |add_ln55_fu_342_p2                     |         +|   0|  0|  39|          32|           1|
+    |add_ln55_fu_338_p2                     |         +|   0|  0|  39|          32|           1|
     |add_ln69_fu_287_p2                     |         +|   0|  0|  23|          16|          16|
     |ch_2_fu_225_p2                         |         +|   0|  0|  13|          10|           1|
     |sub_ln73_fu_297_p2                     |         -|   0|  0|  23|          16|          16|
     |sub_ln79_fu_315_p2                     |         -|   0|  0|  23|          16|          16|
     |ap_block_pp0_stage1_01001_grp1         |       and|   0|  0|   2|           1|           1|
     |ap_block_state4_pp0_stage1_iter1_grp1  |       and|   0|  0|   2|           1|           1|
-    |ap_predicate_op71_write_state4         |       and|   0|  0|   2|           1|           1|
+    |ap_predicate_op70_write_state4         |       and|   0|  0|   2|           1|           1|
     |icmp_ln72_fu_293_p2                    |      icmp|   0|  0|  23|          16|          16|
     |icmp_ln77_fu_310_p2                    |      icmp|   0|  0|  23|          16|          16|
     |icmp_ln93_fu_219_p2                    |      icmp|   0|  0|  13|          10|           9|
@@ -130,27 +130,27 @@
     +------------------------------------------------------+----+----+-----+-----------+
     |                         Name                         | FF | LUT| Bits| Const Bits|
     +------------------------------------------------------+----+----+-----+-----------+
-    |add_ln69_reg_439                                      |  16|   0|   16|          0|
+    |add_ln69_reg_435                                      |  16|   0|   16|          0|
     |ap_CS_fsm                                             |   2|   0|    2|          0|
     |ap_block_pp0_stage1_subdone_grp0_done_reg             |   1|   0|    1|          0|
     |ap_done_reg                                           |   1|   0|    1|          0|
     |ap_enable_reg_pp0_iter0_reg                           |   1|   0|    1|          0|
     |ap_enable_reg_pp0_iter1                               |   1|   0|    1|          0|
-    |ch_1_reg_399                                          |  10|   0|   10|          0|
-    |ch_1_reg_399_pp0_iter1_reg                            |  10|   0|   10|          0|
+    |ch_1_reg_395                                          |  10|   0|   10|          0|
+    |ch_1_reg_395_pp0_iter1_reg                            |  10|   0|   10|          0|
     |ch_fu_90                                              |  10|   0|   10|          0|
-    |icmp_ln77_reg_446                                     |   1|   0|    1|          0|
-    |icmp_ln93_reg_405                                     |   1|   0|    1|          0|
-    |icmp_ln95_reg_409                                     |   1|   0|    1|          0|
-    |icmp_ln95_reg_409_pp0_iter1_reg                       |   1|   0|    1|          0|
-    |icmp_ln99_reg_395                                     |   1|   0|    1|          0|
-    |p_ZL17encoder_phase_acc_0_addr_reg_423                |   9|   0|    9|          0|
-    |p_ZL17encoder_phase_acc_0_addr_reg_423_pp0_iter1_reg  |   9|   0|    9|          0|
-    |p_ZL17encoder_phase_acc_1_addr_reg_429                |   9|   0|    9|          0|
-    |p_ZL17encoder_phase_acc_1_addr_reg_429_pp0_iter1_reg  |   9|   0|    9|          0|
-    |sub_ln79_reg_454                                      |  16|   0|   16|          0|
-    |tmp_5_reg_450                                         |   1|   0|    1|          0|
-    |trunc_ln93_reg_435                                    |   1|   0|    1|          0|
+    |icmp_ln77_reg_442                                     |   1|   0|    1|          0|
+    |icmp_ln93_reg_401                                     |   1|   0|    1|          0|
+    |icmp_ln95_reg_405                                     |   1|   0|    1|          0|
+    |icmp_ln95_reg_405_pp0_iter1_reg                       |   1|   0|    1|          0|
+    |icmp_ln99_reg_391                                     |   1|   0|    1|          0|
+    |p_ZL17encoder_phase_acc_0_addr_reg_419                |   9|   0|    9|          0|
+    |p_ZL17encoder_phase_acc_0_addr_reg_419_pp0_iter1_reg  |   9|   0|    9|          0|
+    |p_ZL17encoder_phase_acc_1_addr_reg_425                |   9|   0|    9|          0|
+    |p_ZL17encoder_phase_acc_1_addr_reg_425_pp0_iter1_reg  |   9|   0|    9|          0|
+    |sub_ln79_reg_450                                      |  16|   0|   16|          0|
+    |tmp_5_reg_446                                         |   1|   0|    1|          0|
+    |trunc_ln93_reg_431                                    |   1|   0|    1|          0|
     +------------------------------------------------------+----+----+-----+-----------+
     |Total                                                 | 111|   0|  111|          0|
     +------------------------------------------------------+----+----+-----+-----------+
@@ -177,7 +177,7 @@
 |encoder_config_num_channels               |   in|   16|     ap_none|        encoder_config_num_channels|        scalar|
 |encoder_config_delta_threshold            |   in|   16|     ap_none|     encoder_config_delta_threshold|        scalar|
 |encoder_config_delta_decay                |   in|   16|     ap_none|         encoder_config_delta_decay|        scalar|
-|time_r                                    |   in|   13|     ap_none|                             time_r|        scalar|
+|time_r                                    |   in|   14|     ap_none|                             time_r|        scalar|
 |encoder_config_default_weight             |   in|    8|     ap_none|      encoder_config_default_weight|        scalar|
 |encoder_spike_counter_flag_3_out          |  out|    1|      ap_vld|   encoder_spike_counter_flag_3_out|       pointer|
 |encoder_spike_counter_flag_3_out_ap_vld   |  out|    1|      ap_vld|   encoder_spike_counter_flag_3_out|       pointer|

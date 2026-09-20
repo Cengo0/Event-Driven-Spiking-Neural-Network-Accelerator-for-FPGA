@@ -24,12 +24,12 @@
 <unit>clock cycles</unit>
 <Best-caseLatency>5</Best-caseLatency>
 <Average-caseLatency>undef</Average-caseLatency>
-<Worst-caseLatency>44107946791</Worst-caseLatency>
+<Worst-caseLatency>9606518674</Worst-caseLatency>
 <Best-caseRealTimeLatency>50.000 ns</Best-caseRealTimeLatency>
 <Average-caseRealTimeLatency>undef</Average-caseRealTimeLatency>
-<Worst-caseRealTimeLatency>441.079 sec</Worst-caseRealTimeLatency>
+<Worst-caseRealTimeLatency>96.065 sec</Worst-caseRealTimeLatency>
 <Interval-min>6</Interval-min>
-<Interval-max>44107946792</Interval-max>
+<Interval-max>9606518675</Interval-max>
 <PerformancePragma>-</PerformancePragma>
 </SummaryOfOverallLatency>
 <SummaryOfLoopLatency>
@@ -45,19 +45,19 @@
 <Latency>
 <range>
 <min>0</min>
-<max>44107676400</max>
+<max>9606447975</max>
 </range>
 </Latency>
 <AbsoluteTimeLatency>
 <range>
 <min>0</min>
-<max>441076764000</max>
+<max>96064479750</max>
 </range>
 </AbsoluteTimeLatency>
 <IterationLatency>
 <range>
 <min>8</min>
-<max>673040</max>
+<max>146585</max>
 </range>
 </IterationLatency>
 <PerformancePragma>-</PerformancePragma>
@@ -82,10 +82,10 @@
 
 <AreaEstimates>
 <Resources>
-<BRAM_18K>133</BRAM_18K>
-<DSP>13</DSP>
-<FF>3684</FF>
-<LUT>7709</LUT>
+<BRAM_18K>37</BRAM_18K>
+<DSP>10</DSP>
+<FF>4053</FF>
+<LUT>7891</LUT>
 <URAM>0</URAM>
 </Resources>
 <AvailableResources>
@@ -974,7 +974,7 @@
 <IOProtocol>ap_none</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>3</Bits>
+<Bits>2</Bits>
 <Attribute>data</Attribute>
 <CType>int</CType>
 </RtlPorts>
@@ -986,7 +986,7 @@
 <IOProtocol>ap_none</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>7</Bits>
+<Bits>8</Bits>
 <Attribute>data</Attribute>
 <CType>int</CType>
 </RtlPorts>
@@ -998,7 +998,7 @@
 <IOProtocol>ap_none</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>7</Bits>
+<Bits>8</Bits>
 <Attribute>data</Attribute>
 <CType>int</CType>
 </RtlPorts>
@@ -1046,7 +1046,7 @@
 <IOProtocol>ap_none</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>3</Bits>
+<Bits>2</Bits>
 <Attribute>data</Attribute>
 <CType>int</CType>
 </RtlPorts>
@@ -1058,7 +1058,7 @@
 <IOProtocol>ap_none</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>4</Bits>
+<Bits>8</Bits>
 <Attribute>data</Attribute>
 <CType>int</CType>
 </RtlPorts>

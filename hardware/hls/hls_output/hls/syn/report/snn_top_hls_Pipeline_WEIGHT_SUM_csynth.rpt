@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'snn_top_hls_Pipeline_WEIGHT_SUM'
 ================================================================
-* Date:           Thu Sep 17 15:27:06 2026
+* Date:           Sun Sep 20 02:25:03 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -142,7 +142,7 @@
 |ap_ready                |  out|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_WEIGHT_SUM|  return value|
 |weight_sum_out          |  out|   10|      ap_vld|                   weight_sum_out|       pointer|
 |weight_sum_out_ap_vld   |  out|    1|      ap_vld|                   weight_sum_out|       pointer|
-|weight_memory_address0  |  out|   19|   ap_memory|                    weight_memory|         array|
+|weight_memory_address0  |  out|   17|   ap_memory|                    weight_memory|         array|
 |weight_memory_ce0       |  out|    1|   ap_memory|                    weight_memory|         array|
 |weight_memory_q0        |   in|    4|   ap_memory|                    weight_memory|         array|
 +------------------------+-----+-----+------------+---------------------------------+--------------+

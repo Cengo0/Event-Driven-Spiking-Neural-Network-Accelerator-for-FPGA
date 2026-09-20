@@ -33,10 +33,10 @@ output   ap_done;
 output   ap_idle;
 output   ap_ready;
 input  [7:0] zext_ln209;
-output  [10:0] post_traces_address0;
+output  [9:0] post_traces_address0;
 output   post_traces_ce0;
 input  [7:0] post_traces_q0;
-output  [10:0] post_traces_address1;
+output  [9:0] post_traces_address1;
 output   post_traces_ce1;
 output   post_traces_we1;
 output  [7:0] post_traces_d1;
@@ -58,17 +58,17 @@ reg    ap_ready_int;
 wire   [15:0] zext_ln209_cast_fu_89_p1;
 reg   [15:0] zext_ln209_cast_reg_155;
 wire    ap_block_pp0_stage0_11001;
-reg   [10:0] post_traces_addr_reg_164;
-reg   [10:0] post_traces_addr_reg_164_pp0_iter1_reg;
-reg   [10:0] post_traces_addr_reg_164_pp0_iter2_reg;
+reg   [9:0] post_traces_addr_reg_164;
+reg   [9:0] post_traces_addr_reg_164_pp0_iter1_reg;
+reg   [9:0] post_traces_addr_reg_164_pp0_iter2_reg;
 reg   [7:0] t_reg_170;
 reg   [7:0] t_reg_170_pp0_iter2_reg;
 wire   [63:0] zext_ln217_fu_113_p1;
 wire    ap_block_pp0_stage0;
-reg   [10:0] i_5_fu_62;
-wire   [10:0] add_ln217_fu_107_p2;
+reg   [9:0] i_5_fu_62;
+wire   [9:0] add_ln217_fu_107_p2;
 wire    ap_loop_init;
-reg   [10:0] ap_sig_allocacmp_i;
+reg   [9:0] ap_sig_allocacmp_i;
 reg    post_traces_ce0_local;
 reg    post_traces_we1_local;
 wire   [7:0] sub_ln223_fu_142_p2;
@@ -96,7 +96,7 @@ initial begin
 #0 ap_enable_reg_pp0_iter1 = 1'b0;
 #0 ap_enable_reg_pp0_iter2 = 1'b0;
 #0 ap_enable_reg_pp0_iter3 = 1'b0;
-#0 i_5_fu_62 = 11'd0;
+#0 i_5_fu_62 = 10'd0;
 #0 ap_done_reg = 1'b0;
 end
 
@@ -187,7 +187,7 @@ always @ (posedge ap_clk) begin
         if (((icmp_ln217_fu_101_p2 == 1'd0) & (ap_enable_reg_pp0_iter0 == 1'b1))) begin
             i_5_fu_62 <= add_ln217_fu_107_p2;
         end else if ((ap_loop_init == 1'b1)) begin
-            i_5_fu_62 <= 11'd0;
+            i_5_fu_62 <= 10'd0;
         end
     end
 end
@@ -257,7 +257,7 @@ end
 
 always @ (*) begin
     if (((1'b0 == ap_block_pp0_stage0) & (1'b1 == ap_CS_fsm_pp0_stage0) & (ap_loop_init == 1'b1))) begin
-        ap_sig_allocacmp_i = 11'd0;
+        ap_sig_allocacmp_i = 10'd0;
     end else begin
         ap_sig_allocacmp_i = i_5_fu_62;
     end
@@ -298,7 +298,7 @@ always @ (*) begin
     endcase
 end
 
-assign add_ln217_fu_107_p2 = (ap_sig_allocacmp_i + 11'd1);
+assign add_ln217_fu_107_p2 = (ap_sig_allocacmp_i + 10'd1);
 
 assign ap_CS_fsm_pp0_stage0 = ap_CS_fsm[32'd0];
 
@@ -324,7 +324,7 @@ assign grp_fu_127_p00 = post_traces_q0;
 
 assign grp_fu_127_p1 = zext_ln209_cast_reg_155;
 
-assign icmp_ln217_fu_101_p2 = ((ap_sig_allocacmp_i == 11'd1306) ? 1'b1 : 1'b0);
+assign icmp_ln217_fu_101_p2 = ((ap_sig_allocacmp_i == 10'd528) ? 1'b1 : 1'b0);
 
 assign post_traces_address0 = zext_ln217_fu_113_p1;
 

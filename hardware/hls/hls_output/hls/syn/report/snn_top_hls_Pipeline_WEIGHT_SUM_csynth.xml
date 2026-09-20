@@ -175,7 +175,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>19</Bits>
+<Bits>17</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>

@@ -31,7 +31,7 @@ output   ap_idle;
 output   ap_ready;
 output  [9:0] weight_sum_out;
 output   weight_sum_out_ap_vld;
-output  [18:0] weight_memory_address0;
+output  [16:0] weight_memory_address0;
 output   weight_memory_ce0;
 input  [3:0] weight_memory_q0;
 

@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'decay_eligibility_traces_Pipeline_DECAY_PRE'
 ================================================================
-* Date:           Thu Sep 17 15:27:05 2026
+* Date:           Sun Sep 20 02:25:03 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -25,12 +25,12 @@
 
 + Latency: 
     * Summary: 
-    +---------+---------+-----------+-----------+-----+-----+-------------------+
-    |  Latency (cycles) |   Latency (absolute)  |  Interval |      Pipeline     |
-    |   min   |   max   |    min    |    max    | min | max |        Type       |
-    +---------+---------+-----------+-----------+-----+-----+-------------------+
-    |     1308|     1308|  13.080 us|  13.080 us|    0|    0|  loop pipeline stp|
-    +---------+---------+-----------+-----------+-----+-----+-------------------+
+    +---------+---------+----------+----------+-----+-----+-------------------+
+    |  Latency (cycles) |  Latency (absolute) |  Interval |      Pipeline     |
+    |   min   |   max   |    min   |    max   | min | max |        Type       |
+    +---------+---------+----------+----------+-----+-----+-------------------+
+    |      530|      530|  5.300 us|  5.300 us|    0|    0|  loop pipeline stp|
+    +---------+---------+----------+----------+-----+-----+-------------------+
 
     + Detail: 
         * Instance: 
@@ -41,7 +41,7 @@
         |             |  Latency (cycles) | Iteration|  Initiation Interval  | Trip |          |
         |  Loop Name  |   min   |   max   |  Latency |  achieved |   target  | Count| Pipelined|
         +-------------+---------+---------+----------+-----------+-----------+------+----------+
-        |- DECAY_PRE  |     1306|     1306|         2|          1|          1|  1306|       yes|
+        |- DECAY_PRE  |      528|      528|         2|          1|          1|   528|       yes|
         +-------------+---------+---------+----------+-----------+-----------+------+----------+
 
 
@@ -54,14 +54,14 @@
 |       Name      | BRAM_18K| DSP |   FF   |  LUT  | URAM|
 +-----------------+---------+-----+--------+-------+-----+
 |DSP              |        -|    -|       -|      -|    -|
-|Expression       |        -|    -|       0|     41|    -|
+|Expression       |        -|    -|       0|     43|    -|
 |FIFO             |        -|    -|       -|      -|    -|
 |Instance         |        -|    -|       -|      -|    -|
 |Memory           |        -|    -|       -|      -|    -|
 |Multiplexer      |        -|    -|       0|     36|    -|
-|Register         |        -|    -|      25|      -|    -|
+|Register         |        -|    -|      23|      -|    -|
 +-----------------+---------+-----+--------+-------+-----+
-|Total            |        0|    0|      25|     77|    0|
+|Total            |        0|    0|      23|     79|    0|
 +-----------------+---------+-----+--------+-------+-----+
 |Available        |      280|  220|  106400|  53200|    0|
 +-----------------+---------+-----+--------+-------+-----+
@@ -85,12 +85,12 @@
     +---------------------+----------+----+---+----+------------+------------+
     |    Variable Name    | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
     +---------------------+----------+----+---+----+------------+------------+
-    |add_ln506_fu_79_p2   |         +|   0|  0|  12|          11|           1|
+    |add_ln506_fu_79_p2   |         +|   0|  0|  13|          10|           1|
     |sub_ln512_fu_109_p2  |         -|   0|  0|  15|           8|           8|
-    |icmp_ln506_fu_73_p2  |      icmp|   0|  0|  12|          11|          11|
+    |icmp_ln506_fu_73_p2  |      icmp|   0|  0|  13|          10|          10|
     |ap_enable_pp0        |       xor|   0|  0|   2|           1|           2|
     +---------------------+----------+----+---+----+------------+------------+
-    |Total                |          |   0|  0|  41|          31|          22|
+    |Total                |          |   0|  0|  43|          29|          21|
     +---------------------+----------+----+---+----+------------+------------+
 
     * Multiplexer: 
@@ -99,10 +99,10 @@
     +-------------------------+----+-----------+-----+-----------+
     |ap_done_int              |   9|          2|    1|          2|
     |ap_enable_reg_pp0_iter1  |   9|          2|    1|          2|
-    |ap_sig_allocacmp_i_4     |   9|          2|   11|         22|
-    |i_fu_44                  |   9|          2|   11|         22|
+    |ap_sig_allocacmp_i_4     |   9|          2|   10|         20|
+    |i_fu_44                  |   9|          2|   10|         20|
     +-------------------------+----+-----------+-----+-----------+
-    |Total                    |  36|          8|   24|         48|
+    |Total                    |  36|          8|   22|         44|
     +-------------------------+----+-----------+-----+-----------+
 
     * Register: 
@@ -112,10 +112,10 @@
     |ap_CS_fsm                     |   1|   0|    1|          0|
     |ap_done_reg                   |   1|   0|    1|          0|
     |ap_enable_reg_pp0_iter1       |   1|   0|    1|          0|
-    |i_fu_44                       |  11|   0|   11|          0|
-    |pre_eligibility_addr_reg_126  |  11|   0|   11|          0|
+    |i_fu_44                       |  10|   0|   10|          0|
+    |pre_eligibility_addr_reg_126  |  10|   0|   10|          0|
     +------------------------------+----+----+-----+-----------+
-    |Total                         |  25|   0|   25|          0|
+    |Total                         |  23|   0|   23|          0|
     +------------------------------+----+----+-----+-----------+
 
 
@@ -133,10 +133,10 @@
 |ap_done                   |  out|    1|  ap_ctrl_hs|  decay_eligibility_traces_Pipeline_DECAY_PRE|  return value|
 |ap_idle                   |  out|    1|  ap_ctrl_hs|  decay_eligibility_traces_Pipeline_DECAY_PRE|  return value|
 |ap_ready                  |  out|    1|  ap_ctrl_hs|  decay_eligibility_traces_Pipeline_DECAY_PRE|  return value|
-|pre_eligibility_address0  |  out|   11|   ap_memory|                              pre_eligibility|         array|
+|pre_eligibility_address0  |  out|   10|   ap_memory|                              pre_eligibility|         array|
 |pre_eligibility_ce0       |  out|    1|   ap_memory|                              pre_eligibility|         array|
 |pre_eligibility_q0        |   in|    8|   ap_memory|                              pre_eligibility|         array|
-|pre_eligibility_address1  |  out|   11|   ap_memory|                              pre_eligibility|         array|
+|pre_eligibility_address1  |  out|   10|   ap_memory|                              pre_eligibility|         array|
 |pre_eligibility_ce1       |  out|    1|   ap_memory|                              pre_eligibility|         array|
 |pre_eligibility_we1       |  out|    1|   ap_memory|                              pre_eligibility|         array|
 |pre_eligibility_d1        |  out|    8|   ap_memory|                              pre_eligibility|         array|
