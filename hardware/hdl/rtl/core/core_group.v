@@ -42,7 +42,8 @@ module core_group #(
     parameter LEAK_WIDTH            = `SNN_LEAK_WIDTH,
     parameter REFRAC_WIDTH          = `SNN_REFRAC_WIDTH,
     parameter SPIKE_BUFFER_DEPTH    = `SNN_SPIKE_BUFFER_DEPTH,
-    parameter LOCAL_ID_WIDTH        = $clog2(NEURONS_PER_GROUP)
+    parameter LOCAL_ID_WIDTH        = $clog2(NEURONS_PER_GROUP),
+    parameter ENABLE_INTRA_GROUP    = 0
 )(
     input  wire                         clk,
     input  wire                         rst_n,
@@ -236,7 +237,7 @@ module core_group #(
     reg                      fifo_pop;
 
     // Block external writes during intra-group routing to prevent FIFO write collision
-    wire intra_routing = (state == ST_INTRA_ROUTE || state == ST_INTRA_READ);
+    wire intra_routing = ENABLE_INTRA_GROUP && (state == ST_INTRA_ROUTE || state == ST_INTRA_READ);
     assign ext_spike_ready = !fifo_full && !intra_routing;
     assign group_busy  = (state != ST_IDLE) || !fifo_empty;
     assign spike_count = total_spikes;
@@ -385,12 +386,16 @@ module core_group #(
                             sf_set_bit     <= sp_addr[2:0];
                             total_spikes   <= total_spikes + 1;
 
-                            // Start intra-group recurrent routing
-                            fired_neuron_id <= sp_addr;
-                            intra_scan_idx  <= 0;
-                            // Issue first weight memory read
-                            wm_rd_addr <= sp_addr * NEURONS_PER_GROUP;  // weight[fired][0]
-                            state      <= ST_INTRA_READ;
+                            if (ENABLE_INTRA_GROUP) begin
+                                // Start intra-group recurrent routing
+                                fired_neuron_id <= sp_addr;
+                                intra_scan_idx  <= 0;
+                                // Issue first weight memory read
+                                wm_rd_addr <= sp_addr * NEURONS_PER_GROUP;  // weight[fired][0]
+                                state      <= ST_INTRA_READ;
+                            end else begin
+                                state      <= ST_IDLE;
+                            end
                         end else begin
                             // Not fired: update membrane
                             if (sp_exc) begin

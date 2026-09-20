@@ -5,7 +5,14 @@
 # Usage: vivado -mode batch -source hardware/scripts/rebuild_integrated.tcl
 #-----------------------------------------------------------------------------
 
-set project_dir "/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA"
+if {[info exists ::env(PROJECT_DIR)] && $::env(PROJECT_DIR) ne ""} {
+    set project_dir $::env(PROJECT_DIR)
+} elseif {[info script] ne ""} {
+    set script_dir [file normalize [file dirname [info script]]]
+    set project_dir [file normalize "${script_dir}/../.."]
+} else {
+    set project_dir "/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA"
+}
 set build_dir   "${project_dir}/hardware/build/snn_core_group_v2"
 set rtl_dir     "${project_dir}/hardware/hdl/rtl"
 set ip_repo     "${project_dir}/hardware/ip_repo"

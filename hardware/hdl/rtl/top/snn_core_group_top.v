@@ -91,7 +91,10 @@ module snn_core_group_top #(
     // HLS Compatibility
     parameter HLS_NEURON_ID_WIDTH   = `SNN_HLS_NEURON_ID_WIDTH,
     parameter HLS_MAX_NEURONS       = `SNN_TOTAL_NEURONS,
-    parameter HLS_WEIGHT_WIDTH      = `SNN_HLS_WEIGHT_WIDTH
+    parameter HLS_WEIGHT_WIDTH      = `SNN_HLS_WEIGHT_WIDTH,
+
+    // Architectural Options
+    parameter ENABLE_INTRA_GROUP    = 0
 )(
     //-------------------------------------------------------------------------
     // DDR Interface (directly from PS)
@@ -120,7 +123,13 @@ module snn_core_group_top #(
     inout  wire [53:0]  FIXED_IO_mio,
     inout  wire         FIXED_IO_ps_clk,
     inout  wire         FIXED_IO_ps_porb,
-    inout  wire         FIXED_IO_ps_srstb
+    inout  wire         FIXED_IO_ps_srstb,
+
+    //-------------------------------------------------------------------------
+    // Side-Channel Trigger Output (PACKAGE_PIN Y18 in pynq_z2_pins.xdc)
+    // Active HIGH when accelerator is actively routing or integrating spikes
+    //-------------------------------------------------------------------------
+    output wire         snn_busy
 );
 
     //=========================================================================
@@ -306,16 +315,17 @@ module snn_core_group_top #(
             if (cfg_router_config_we) begin
                 case (cfg_cmd)
                     4'h0: begin
-                        // Connectivity table write (8-bit weight format)
-                        // src_group is in address register [3:0]
+                        // Connectivity table write (Full 8-bit addressing support for 256 neurons / 256 fanout)
+                        // ADDR:  [31:28]=cmd(0x0), [27:20]=fanout_idx(8b), [19:12]=src_neuron(8b), [3:0]=src_group(4b)
+                        // WDATA: [31]=valid, [30:27]=dst_group(4b), [23:16]=dst_neuron(8b), [15:8]=weight(8b), [0]=exc_inh
                         ct_cfg_we_reg         <= 1;
                         ct_cfg_valid_reg      <= cfg_router_config_wdata[31];
                         ct_cfg_dst_group_reg  <= cfg_router_config_wdata[30:27];
-                        ct_cfg_dst_neuron_reg <= cfg_router_config_wdata[26:20];
-                        ct_cfg_weight_reg     <= cfg_router_config_wdata[19:12];
-                        ct_cfg_exc_inh_reg    <= cfg_router_config_wdata[11];
-                        ct_cfg_fanout_idx_reg <= cfg_router_config_wdata[10:7];
-                        ct_cfg_src_neuron_reg <= cfg_router_config_wdata[6:0];
+                        ct_cfg_dst_neuron_reg <= cfg_router_config_wdata[23:16];
+                        ct_cfg_weight_reg     <= cfg_router_config_wdata[15:8];
+                        ct_cfg_exc_inh_reg    <= cfg_router_config_wdata[0];
+                        ct_cfg_fanout_idx_reg <= cfg_router_config_addr[27:20];
+                        ct_cfg_src_neuron_reg <= cfg_router_config_addr[19:12];
                         ct_cfg_src_group_reg  <= cfg_router_config_addr[3:0];
                     end
                     4'h1: begin
@@ -500,6 +510,7 @@ module snn_core_group_top #(
     assign rtl_spike_in_ready = !router_busy;
     assign rtl_snn_ready      = !router_busy & (grp_busy == {NUM_GROUPS{1'b0}});
     assign rtl_snn_busy       = router_busy | (grp_busy != {NUM_GROUPS{1'b0}});
+    assign snn_busy           = rtl_snn_busy;
 
     //=========================================================================
     // Core Group Instantiations
@@ -567,7 +578,8 @@ module snn_core_group_top #(
                 .THRESHOLD_WIDTH    (THRESHOLD_WIDTH),
                 .LEAK_WIDTH         (LEAK_WIDTH),
                 .REFRAC_WIDTH       (REFRAC_WIDTH),
-                .SPIKE_BUFFER_DEPTH (SPIKE_BUFFER_DEPTH)
+                .SPIKE_BUFFER_DEPTH (SPIKE_BUFFER_DEPTH),
+                .ENABLE_INTRA_GROUP (ENABLE_INTRA_GROUP)
             ) u_core_group (
                 .clk                (clk_100mhz),
                 .rst_n              (rst_n_sync & ~hls_snn_reset),
@@ -585,10 +597,10 @@ module snn_core_group_top #(
                 .out_spike_neuron_id(grp_spike_neuron_id[g*LOCAL_ID_WIDTH +: LOCAL_ID_WIDTH]),
                 .out_spike_ready    (grp_spike_ready[g]),
 
-                // Global neuron parameters
-                .global_threshold   (cfg_global_threshold),
-                .global_leak_rate   (cfg_global_leak_rate),
-                .global_refrac_period(cfg_global_refrac_period),
+                // Neuron parameters: Group 0 is input relay (threshold=1, no leak, no refrac)
+                .global_threshold    ((g == 0) ? 16'd1 : cfg_global_threshold),
+                .global_leak_rate    ((g == 0) ? 8'd0  : cfg_global_leak_rate),
+                .global_refrac_period((g == 0) ? 8'd0  : cfg_global_refrac_period),
 
                 // Weight load (combined from AXI config + learning engine)
                 .weight_we          (combined_weight_we[g]),

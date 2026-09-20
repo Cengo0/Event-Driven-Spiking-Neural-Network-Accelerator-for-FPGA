@@ -32,61 +32,32 @@
 #
 #   Fallback: if group_sizes is absent, all groups get `neurons_per_group`.
 architecture:
-  neurons_per_group: 128    # Default / fallback per-group size
+  neurons_per_group: 256    # Default / fallback per-group size
   group_sizes:              # Per-group neuron counts (len = num_groups)
-    - 128
-    - 128
-    - 128
-    - 128
-    - 128
-  max_fanout_inter: 16      # Max inter-group fanout entries per neuron
+    - 256                   # Group 0: Layer 1 input relay neurons (256)
+    - 256                   # Group 1: Layer 2 hidden LIF neurons (256)
+    - 16                    # Group 2: Layer 3 output class neurons (10 classes)
+  max_fanout_inter: 256     # Max inter-group fanout entries per neuron (Group 0 -> Group 1)
   spike_buffer_depth: 64    # Input FIFO depth per core group (entries)
 
 # ─────────────────────────────────────────────────────────────────────────────
-# NeuronGroup Connection Topology (Brian2-style, Block-Sparse K=1024)
+# NeuronGroup Connection Topology (Layer 1 Relay -> Layer 2 Hidden -> Layer 3 Output)
 # ─────────────────────────────────────────────────────────────────────────────
-# Block-sparse connectivity inspired by Loihi's core-local synapses.
-# Instead of fully-connected Input(784)→Hidden(2048), the image is split
-# into 4 horizontal stripes (7 rows each = 196 pixels) and each stripe
-# connects to a dedicated block of 1024 hidden neurons.
-#
-# Block-sparse advantages:
-#   - 74% fewer synapses vs fully-connected Input(784)→Hidden(4096)
-#   - HLS BRAM is quantized: weight_memory uses 256 BRAM18K for any
-#     entry count >524,288. K=1024 maximizes neurons within this budget.
-#   - At 4-bit: 263 BRAM18K (93%) — same cost as K=640 or K=768
-#   - 4× faster STDP per spike (loop over 1024 instead of 4096)
-#   - Biologically plausible local receptive fields
-#   - DSP48E1-mapped trace decay for II=1 global decay pipeline
-#
-# Layout:
-#   input_0 (rows 0-6,  196px) → hidden_0 (1024) ─┐
-#   input_1 (rows 7-13, 196px) → hidden_1 (1024) ─┤→ output (10)
-#   input_2 (rows 14-20,196px) → hidden_2 (1024) ─┤
-#   input_3 (rows 21-27,196px) → hidden_3 (1024) ─┘
-#
-# Total weights = 4×(196×1024) + 4×(1024×10) = 802,816 + 40,960 = 843,776
-#
 neuron_groups:
-  - name: "input_0"
-    size: 784
-  - name: "hidden_0"
+  - name: "layer1_relay"
     size: 256
-  - name: "hidden_1"
+  - name: "layer2_hidden"
     size: 256
-  - name: "output"
-    size: 10
+  - name: "layer3_output"
+    size: 16
 
 connections:
-  - name: "in_to_hid0"
+  - name: "l1_to_l2"
     src_group: 0
     dst_group: 1
-  - name: "hid0_to_hid1"
+  - name: "l2_to_l3"
     src_group: 1
     dst_group: 2
-  - name: "hid1_to_out"
-    src_group: 2
-    dst_group: 3
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Weight Memory Optimization (Loihi / TrueNorth / KIST-inspired, ALL on-chip)
