@@ -147,7 +147,7 @@ def main():
                         help='Bitstream path')
     parser.add_argument('--data',          default='mnist_3layer_deployment.npz',
                         help='Deployment payload (.npz)')
-    parser.add_argument('--samples',  type=int, default=1000,
+    parser.add_argument('--samples',  type=int, default=10000,
                         help='Number of test images')
     parser.add_argument('--timesteps', type=int, default=4,
                         help='Number of SNN timesteps')
