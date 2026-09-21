@@ -39,11 +39,11 @@ try:
     # Bypass macOS Python certificate verification issue
     ssl._create_default_https_context = ssl._create_unverified_context
     from torchvision import datasets, transforms
+    # CIFAR-10 model was trained with direct rate spike intensity in [0, 1] without mean/std subtraction
     transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+        transforms.ToTensor()
     ])
-    test_ds = datasets.CIFAR10('./data', train=False, download=True, transform=transform)
+    test_ds = datasets.CIFAR10('./data', train=False, download=False, transform=transform)
     test_imgs = np.stack([img.numpy() for img, _ in test_ds]) # (10000, 3, 32, 32)
     test_lbls = np.array([lbl for _, lbl in test_ds], dtype=np.int64)
     print(f"  Loaded {len(test_imgs)} CIFAR-10 test images, shape: {test_imgs.shape}")
