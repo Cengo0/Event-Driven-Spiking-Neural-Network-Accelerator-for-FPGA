@@ -35,6 +35,9 @@ print(f"  Layer 3 shape: {w3_f.shape} (Hidden 256 -> 10 Output)")
 # ─────────────────────────────────────────────────────────────────────
 print("\nLoading CIFAR-10 Test Dataset...")
 try:
+    import ssl
+    # Bypass macOS Python certificate verification issue
+    ssl._create_default_https_context = ssl._create_unverified_context
     from torchvision import datasets, transforms
     transform = transforms.Compose([
         transforms.ToTensor(),
