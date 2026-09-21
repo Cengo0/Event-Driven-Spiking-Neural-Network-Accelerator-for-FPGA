@@ -4,8 +4,8 @@ import sys
 import numpy as np
 import torch
 
-MODEL_PATH  = 'models/fc3_T_4_rate_spikes_clean_l2[0.000500].pth'
-OUTPUT_PATH = 'data/cache/cifar10_3layer_deployment.npz'
+MODEL_PATH  = 'models/fc3_T_4_rate_logits_clean_l2[0.000500].pth'
+OUTPUT_PATH = 'data/cache/cifar10_3layer_deployment_v2.npz'
 TIMESTEPS   = 4
 
 def fuse_batchnorm(w, bn_gamma, bn_beta, bn_mean, bn_var, eps=1e-5):
