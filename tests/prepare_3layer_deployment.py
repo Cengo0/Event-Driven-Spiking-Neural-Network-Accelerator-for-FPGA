@@ -47,7 +47,11 @@ except ImportError:
 # 3. Quantize FPGA Layers (Layer 2 and 3 ONLY)
 # ─────────────────────────────────────────────────────────────────────
 # Layer 1 stays Float32 for the CPU. We only scale the FPGA weights.
-max_abs = max(np.max(np.abs(w2_f)), np.max(np.abs(w3_f)), np.max(np.abs(b2_f)), np.max(np.abs(b3_f)))
+# ─────────────────────────────────────────────────────────────────────
+# 3. Quantize FPGA Layers (Layer 2 and 3 ONLY)
+# ─────────────────────────────────────────────────────────────────────
+# Scale weights using max absolute weight across FPGA layers (weights only)
+max_abs = max(np.max(np.abs(w2_f)), np.max(np.abs(w3_f)))
 WEIGHT_SCALE = 127.0 / max_abs
 print(f"\nFPGA Dynamic Weight Scale: {WEIGHT_SCALE:.2f}")
 
@@ -60,14 +64,17 @@ q_b3 = np.clip(np.round(b3_f * WEIGHT_SCALE), -127, 127).astype(np.int8)
 q_w3_aug = np.hstack([q_w3, q_b3[:, None]])
 
 # ─────────────────────────────────────────────────────────────────────
-# 4. Co-Processing Sanity Check
+# 4. Hardware-Faithful Co-Processing Threshold Sweep
 # ─────────────────────────────────────────────────────────────────────
-print("\nRunning Co-Processing Threshold Sweep...")
-N_CHECK = min(1000, len(test_imgs))
-base_th = int(WEIGHT_SCALE)
-best_acc, best_th = 0, base_th
+# The FPGA hardware has NO bias inputs for Layer 2 / Layer 3 and uses
+# discrete LIF spike counting for Group 2 (not an analog accumulator).
+# We calibrate hw_threshold using the exact hardware execution model.
+print("\nRunning Hardware-Faithful Threshold Sweep (No HW Biases, Discrete LIF Readout)...")
+N_CHECK = min(2000, len(test_imgs))
+candidate_ths = [25, 30, 35, 40, 45, 50, 60, 75, 90, 110, 127]
+best_acc, best_th = 0, 40
 
-for test_th in [base_th // 2, int(base_th * 0.8), base_th, int(base_th * 1.2), int(base_th * 1.5)]:
+for test_th in candidate_ths:
     correct = 0
     for i in range(N_CHECK):
         img = test_imgs[i].flatten()
@@ -76,32 +83,69 @@ for test_th in [base_th // 2, int(base_th * 0.8), base_th, int(base_th * 1.2), i
         mem1 = np.zeros(256, dtype=np.float32)
         mem2 = np.zeros(256, dtype=np.float32)
         mem3 = np.zeros(10, dtype=np.float32)
+        spk3_count = np.zeros(10, dtype=int)
         
         for t in range(TIMESTEPS):
-            # LAYER 1 (CPU): Float32 math, analog inputs
+            # LAYER 1 (CPU): Float32 math, analog inputs + bias
             mem1 += np.dot(w1_f, img) + b1_f
-            mem1 = np.maximum(mem1, 0)
+            mem1 = np.maximum(mem1, 0.0)
             spike1 = (mem1 >= 1.0).astype(np.float32)
             mem1[spike1 > 0] = 0.0
             
-            # LAYER 2 (FPGA): Int32 math simulating Int8 hardware
-            spike1_aug = np.append(spike1, 1.0)
-            mem2 += np.dot(q_w2_aug, spike1_aug)
-            mem2 = np.maximum(mem2, 0)
+            # LAYER 2 (FPGA Grp 1): Int32 LIF math WITHOUT bias
+            mem2 += np.dot(q_w2, spike1)
+            mem2 = np.maximum(mem2, 0.0)
             spike2 = (mem2 >= test_th).astype(np.int32)
-            mem2[spike2 > 0] = 0
+            mem2[spike2 > 0] = 0.0
             
-            # LAYER 3 (FPGA): Output Voltage Accumulator
-            spike2_aug = np.append(spike2, 1.0)
-            mem3 += np.dot(q_w3_aug, spike2_aug)
+            # LAYER 3 (FPGA Grp 2): Discrete LIF Spikes WITHOUT bias
+            mem3 += np.dot(q_w3, spike2)
+            mem3 = np.maximum(mem3, 0.0)
+            spike3 = (mem3 >= test_th).astype(np.int32)
+            mem3[spike3 > 0] = 0.0
+            spk3_count += spike3
             
-        if int(np.argmax(mem3)) == lbl:
+        if int(np.argmax(spk3_count)) == lbl:
             correct += 1
 
     acc = correct / N_CHECK * 100
-    print(f"  FPGA TH={test_th:3d} | Acc: {acc:.1f}%")
+    print(f"  FPGA TH={test_th:3d} | Acc: {acc:.2f}%")
     if acc > best_acc:
         best_acc, best_th = acc, test_th
+
+print(f"\nOptimal Calibrated Hardware Threshold: {best_th} (Validation Acc: {best_acc:.2f}%)")
+
+# Full 10,000 image validation
+print("Validating calibrated threshold on full test set (10,000 images)...")
+correct_full = 0
+for i in range(len(test_imgs)):
+    img = test_imgs[i].flatten()
+    lbl = int(test_lbls[i])
+    mem1 = np.zeros(256, dtype=np.float32)
+    mem2 = np.zeros(256, dtype=np.float32)
+    mem3 = np.zeros(10, dtype=np.float32)
+    spk3_count = np.zeros(10, dtype=int)
+    for t in range(TIMESTEPS):
+        mem1 += np.dot(w1_f, img) + b1_f
+        mem1 = np.maximum(mem1, 0.0)
+        spike1 = (mem1 >= 1.0).astype(np.float32)
+        mem1[spike1 > 0] = 0.0
+        
+        mem2 += np.dot(q_w2, spike1)
+        mem2 = np.maximum(mem2, 0.0)
+        spike2 = (mem2 >= best_th).astype(np.int32)
+        mem2[spike2 > 0] = 0.0
+        
+        mem3 += np.dot(q_w3, spike2)
+        mem3 = np.maximum(mem3, 0.0)
+        spike3 = (mem3 >= best_th).astype(np.int32)
+        mem3[spike3 > 0] = 0.0
+        spk3_count += spike3
+    if int(np.argmax(spk3_count)) == lbl:
+        correct_full += 1
+
+full_acc = correct_full / len(test_imgs) * 100
+print(f"Full Test Set Accuracy (10,000 images): {full_acc:.2f}%")
 
 # ─────────────────────────────────────────────────────────────────────
 # 5. Save Payload

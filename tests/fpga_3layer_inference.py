@@ -155,6 +155,8 @@ def main():
                         help='Results output JSON')
     parser.add_argument('--skip-bitstream', action='store_true',
                         help='Skip PL programming')
+    parser.add_argument('--rate-coding',   action='store_true',
+                        help='Use stochastic Poisson rate encoding at Layer 1 (matching rate_spikes training)')
     args = parser.parse_args()
 
     # ── Load payload ──────────────────────────────────────────────────────────
@@ -220,12 +222,27 @@ def main():
         img_flat = test_imgs[img_idx].flatten().astype(np.float32)
         lbl      = int(test_lbls[img_idx])
 
+        # ── Inter-Image Hardware State Reset (Issue 3 fix) ───────────────────
+        # Flush residual membrane potential in BRAM across Core Groups 1 & 2
+        # via a rapid 768-cycle 100% leak sweep (0x0009), then return to 0-leak.
+        mmio.write(CFG_NEURON_PARAMS, 0x0009)
+        time.sleep(0.00005)                         # 50 µs > 7.68 µs required for full 256-neuron sweep
+        mmio.write(CFG_NEURON_PARAMS, 0x0000)      # restore zero-leak for clean inference
+        hls_ctrl.write(0x00, 0x02)                  # pulse HLS FSM reset
+        hls_ctrl.write(0x00, 0x00)
+
         mem1 = np.zeros(256, dtype=np.float32)
         class_spikes = np.zeros(10, dtype=np.int32)
 
         for t in range(args.timesteps):
             # ── Layer 1 (CPU Host, Float32 LIF): ~0.08 ms ────────────────────
-            mem1 += np.dot(w1_f, img_flat) + b1_f
+            if args.rate_coding:
+                # Stochastic Poisson/Bernoulli rate spikes matching training
+                in_val = (np.random.rand(*img_flat.shape) < img_flat).astype(np.float32)
+            else:
+                in_val = img_flat
+
+            mem1 += np.dot(w1_f, in_val) + b1_f
             mem1  = np.maximum(mem1, 0.0)
             sp1   = (mem1 >= 1.0).astype(np.uint32)
             mem1[sp1 > 0] = 0.0
