@@ -197,8 +197,8 @@ def main():
             img = test_imgs[i] # 28x28 float32
             lbl = int(test_lbls[i])
 
-            # Quantize pixel values to Q8 fixed-point (pixel * 128)
-            px_quant = np.clip(np.round(img.flatten() * 128.0), -32768, 32767).astype(np.int16)
+            # Quantize pixel values to Q8.8 fixed-point (pixel * 256)
+            px_quant = np.clip(np.round(img.flatten() * 256.0), -32768, 32767).astype(np.int16)
             for k in range(784):
                 in_buffer[k] = int(px_quant[k]) & 0xFFFF
 

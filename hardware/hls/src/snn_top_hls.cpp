@@ -1035,7 +1035,8 @@ void snn_top_hls(
 
             if (op_mode == MODE_CNN_STREAM && encoder_spikes.empty() && !s_axis_spikes.empty()) {
                 axis_spike_t px_pkt = s_axis_spikes.read();
-                ap_fixed<16,8> pixel_val = (ap_fixed<16,8>)((ap_int<16>)px_pkt.data(15, 0)) / 128.0;
+                ap_fixed<16,8> pixel_val;
+                pixel_val.range(15, 0) = (ap_uint<16>)px_pkt.data(15, 0);
                 run_cnn3_streaming_pixel(pixel_val, encoder_spikes);
             }
 
