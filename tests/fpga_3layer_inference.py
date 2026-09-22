@@ -222,15 +222,6 @@ def main():
         img_flat = test_imgs[img_idx].flatten().astype(np.float32)
         lbl      = int(test_lbls[img_idx])
 
-        # ── Inter-Image Hardware State Reset (Issue 3 fix) ───────────────────
-        # Flush residual membrane potential in BRAM across Core Groups 1 & 2
-        # via a rapid 768-cycle 100% leak sweep (0x0009), then return to 0-leak.
-        mmio.write(CFG_NEURON_PARAMS, 0x0009)
-        time.sleep(0.00005)                         # 50 µs > 7.68 µs required for full 256-neuron sweep
-        mmio.write(CFG_NEURON_PARAMS, 0x0000)      # restore zero-leak for clean inference
-        hls_ctrl.write(0x00, 0x02)                  # pulse HLS FSM reset
-        hls_ctrl.write(0x00, 0x00)
-
         mem1 = np.zeros(256, dtype=np.float32)
         class_spikes = np.zeros(10, dtype=np.int32)
 

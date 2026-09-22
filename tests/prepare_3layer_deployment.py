@@ -99,48 +99,54 @@ base_th = max(1, int(round(WEIGHT_SCALE)))
 multipliers = [0.15, 0.20, 0.25, 0.30, 0.40, 0.50, 0.65, 0.80, 1.00, 1.20, 1.50]
 candidate_ths = sorted(list(set([max(1, int(round(base_th * m))) for m in multipliers])))
 
-print(f"\nRunning Hardware-Faithful Threshold Sweep (base_th = {base_th})...")
+print(f"\nRunning Hardware-Faithful Sequential Threshold Sweep (base_th = {base_th})...")
 print(f"Candidate thresholds ({len(candidate_ths)} points): {candidate_ths}")
-N_CHECK = min(2000, len(test_imgs))
+N_CHECK = min(1000, len(test_imgs))
 best_acc, best_th = 0, base_th
 
 for test_th in candidate_ths:
     correct = 0
+    total_output_spikes = 0
     for i in range(N_CHECK):
         img = test_imgs[i].flatten()
         lbl = int(test_lbls[i])
         
         mem1 = np.zeros(256, dtype=np.float32)
-        mem2 = np.zeros(256, dtype=np.float32)
-        mem3 = np.zeros(10, dtype=np.float32)
+        mem2 = np.zeros(256, dtype=np.int32)
+        mem3 = np.zeros(10, dtype=np.int32)
         spk3_count = np.zeros(10, dtype=int)
         
         for t in range(TIMESTEPS):
             # LAYER 1 (CPU): Float32 math, analog inputs + bias
             mem1 += np.dot(w1_f, img) + b1_f
             mem1 = np.maximum(mem1, 0.0)
-            spike1 = (mem1 >= 1.0).astype(np.float32)
+            spike1 = (mem1 >= 1.0).astype(np.int32)
             mem1[spike1 > 0] = 0.0
             
-            # LAYER 2 (FPGA Grp 1): Int32 LIF math WITHOUT bias
-            mem2 += np.dot(q_w2, spike1)
-            mem2 = np.maximum(mem2, 0.0)
-            spike2 = (mem2 >= test_th).astype(np.int32)
-            mem2[spike2 > 0] = 0.0
+            # LAYER 2 & 3 (FPGA Hardware Emulation): Sequential event-driven spike delivery
+            for src in np.nonzero(spike1)[0]:
+                mem2 += q_w2[:, src]
+                mem2 = np.maximum(mem2, 0)
+                f2 = np.nonzero(mem2 >= test_th)[0]
+                mem2[f2] = 0
+                for f in f2:
+                    mem3 += q_w3[:, f]
+                    mem3 = np.maximum(mem3, 0)
+                    f3 = np.nonzero(mem3 >= test_th)[0]
+                    mem3[f3] = 0
+                    spk3_count[f3] += 1
             
-            # LAYER 3 (FPGA Grp 2): Discrete LIF Spikes WITHOUT bias
-            mem3 += np.dot(q_w3, spike2)
-            mem3 = np.maximum(mem3, 0.0)
-            spike3 = (mem3 >= test_th).astype(np.int32)
-            mem3[spike3 > 0] = 0.0
-            spk3_count += spike3
-            
+        total_output_spikes += np.sum(spk3_count)
         if int(np.argmax(spk3_count)) == lbl:
             correct += 1
 
     acc = correct / N_CHECK * 100
-    print(f"  FPGA TH={test_th:3d} | Acc: {acc:.2f}%")
-    if acc > best_acc:
+    avg_spikes = total_output_spikes / N_CHECK
+    print(f"  FPGA TH={test_th:3d} (m={test_th/base_th:.2f}) | Acc: {acc:.2f}% | Avg Spikes/Img: {avg_spikes:.1f}")
+    
+    # Select threshold with highest accuracy and well-behaved spike counts (< 250 spikes/img)
+    # to avoid flooding DMA buffers on the physical FPGA
+    if avg_spikes < 250 and acc > best_acc:
         best_acc, best_th = acc, test_th
 
 print(f"\nOptimal Calibrated Hardware Threshold: {best_th} (Validation Acc: {best_acc:.2f}%)")
@@ -148,34 +154,37 @@ print(f"\nOptimal Calibrated Hardware Threshold: {best_th} (Validation Acc: {bes
 # Full 10,000 image validation
 print("Validating calibrated threshold on full test set (10,000 images)...")
 correct_full = 0
+total_full_spikes = 0
 for i in range(len(test_imgs)):
     img = test_imgs[i].flatten()
     lbl = int(test_lbls[i])
     mem1 = np.zeros(256, dtype=np.float32)
-    mem2 = np.zeros(256, dtype=np.float32)
-    mem3 = np.zeros(10, dtype=np.float32)
+    mem2 = np.zeros(256, dtype=np.int32)
+    mem3 = np.zeros(10, dtype=np.int32)
     spk3_count = np.zeros(10, dtype=int)
     for t in range(TIMESTEPS):
         mem1 += np.dot(w1_f, img) + b1_f
         mem1 = np.maximum(mem1, 0.0)
-        spike1 = (mem1 >= 1.0).astype(np.float32)
+        spike1 = (mem1 >= 1.0).astype(np.int32)
         mem1[spike1 > 0] = 0.0
         
-        mem2 += np.dot(q_w2, spike1)
-        mem2 = np.maximum(mem2, 0.0)
-        spike2 = (mem2 >= best_th).astype(np.int32)
-        mem2[spike2 > 0] = 0.0
-        
-        mem3 += np.dot(q_w3, spike2)
-        mem3 = np.maximum(mem3, 0.0)
-        spike3 = (mem3 >= best_th).astype(np.int32)
-        mem3[spike3 > 0] = 0.0
-        spk3_count += spike3
+        for src in np.nonzero(spike1)[0]:
+            mem2 += q_w2[:, src]
+            mem2 = np.maximum(mem2, 0)
+            f2 = np.nonzero(mem2 >= best_th)[0]
+            mem2[f2] = 0
+            for f in f2:
+                mem3 += q_w3[:, f]
+                mem3 = np.maximum(mem3, 0)
+                f3 = np.nonzero(mem3 >= best_th)[0]
+                mem3[f3] = 0
+                spk3_count[f3] += 1
+    total_full_spikes += np.sum(spk3_count)
     if int(np.argmax(spk3_count)) == lbl:
         correct_full += 1
 
 full_acc = correct_full / len(test_imgs) * 100
-print(f"Full Test Set Accuracy (10,000 images): {full_acc:.2f}%")
+print(f"Full Test Set Accuracy (10,000 images): {full_acc:.2f}% (Avg Spikes/Img: {total_full_spikes/len(test_imgs):.1f})")
 
 # ─────────────────────────────────────────────────────────────────────
 # 5. Save Payload
