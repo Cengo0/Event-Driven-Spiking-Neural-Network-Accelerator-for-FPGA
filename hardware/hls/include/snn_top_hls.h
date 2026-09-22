@@ -18,6 +18,28 @@
 
 // Centralized parameters (source of truth: config/snn_params.yaml)
 #include "snn_params.h"
+#include "cnn3_weights.h"
+
+//=============================================================================
+// CNN3 Streaming 2D Convolution Engine Definitions
+//=============================================================================
+#define MODE_CNN_STREAM 3      // Mode 3: 2D streaming conv engine active
+
+const int CNN_IMG_WIDTH        = 28;
+const int CNN_IMG_HEIGHT       = 28;
+const int CNN_IMG_PIXELS       = 784;
+
+const int CNN_CONV1_CHANNELS   = 8;
+const int CNN_CONV1_K          = 3;
+const int CNN_POOL1_WIDTH      = 14;
+const int CNN_POOL1_HEIGHT     = 14;
+const int CNN_POOL1_SIZE       = 196; // 14 x 14 = 196 per channel
+
+const int CNN_CONV2_CHANNELS   = 16;
+const int CNN_POOL2_WIDTH      = 7;
+const int CNN_POOL2_HEIGHT     = 7;
+const int CNN_POOL2_SIZE       = 49;  // 7 x 7 = 49 per channel
+const int CNN_L2_TOTAL         = 784; // 16 x 49 = 784 neurons
 
 //=============================================================================
 // Configuration (derived from snn_params.h)

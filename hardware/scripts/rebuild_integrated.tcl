@@ -13,10 +13,10 @@ if {[info exists ::env(PROJECT_DIR)] && $::env(PROJECT_DIR) ne ""} {
 } else {
     set project_dir "/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA"
 }
-set build_dir   "${project_dir}/hardware/build/snn_core_group_v2"
+set build_dir   "${project_dir}/hardware/build/snn_core_group_v3"
 set rtl_dir     "${project_dir}/hardware/hdl/rtl"
 set ip_repo     "${project_dir}/hardware/ip_repo"
-set output_dir  "${project_dir}/outputs_v2"
+set output_dir  "${project_dir}/outputs_v3"
 set part        "xc7z020clg400-1"
 # Integrated default clock for generated bitstream.
 # Override with SNN_PL_CLK_MHZ when sweeping lower/higher operating points.
@@ -30,7 +30,7 @@ puts "Using processing_system7_0/FCLK_CLK0 frequency: ${pl_clk_mhz} MHz"
 file delete -force $build_dir
 
 # Create project
-create_project snn_core_group_v2 $build_dir -part $part -force
+create_project snn_core_group_v3 $build_dir -part $part -force
 set_property target_language Verilog [current_project]
 # Use automatic source management so module-reference BD cells resolve correctly.
 set_property source_mgmt_mode All [current_project]
@@ -445,14 +445,13 @@ validate_bd_design
 save_bd_design
 
 # Generate BD wrapper
-make_wrapper -files [get_files ${build_dir}/snn_core_group_v2.srcs/sources_1/bd/design_1/design_1.bd] -top
-add_files -norecurse ${build_dir}/snn_core_group_v2.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v
+make_wrapper -files [get_files ${build_dir}/snn_core_group_v3.srcs/sources_1/bd/design_1/design_1.bd] -top
+add_files -norecurse ${build_dir}/snn_core_group_v3.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v
 
 # =============================================================================
-# Add RTL Sources (spike_router, lif_neuron_array, snn_integrated_top with fixes)
+# Add RTL Sources (fifo, core_group, event_router_ng, synaptic_connectivity_table, snn_core_group_top)
 # =============================================================================
 add_files -norecurse ${rtl_dir}/common/fifo.v
-add_files -norecurse ${rtl_dir}/neurons/lif_neuron_array.v
 add_files -norecurse ${rtl_dir}/core/core_group.v
 add_files -norecurse ${rtl_dir}/core/event_router_ng.v
 add_files -norecurse ${rtl_dir}/core/synaptic_connectivity_table.v
@@ -500,25 +499,25 @@ puts "===== Implementation Complete ====="
 # =============================================================================
 # Copy Outputs
 # =============================================================================
-set bit_file [glob -nocomplain ${build_dir}/snn_core_group_v2.runs/impl_1/*.bit]
-set hwh_file [glob -nocomplain ${build_dir}/snn_core_group_v2.gen/sources_1/bd/design_1/hw_handoff/*.hwh]
+set bit_file [glob -nocomplain ${build_dir}/snn_core_group_v3.runs/impl_1/*.bit]
+set hwh_file [glob -nocomplain ${build_dir}/snn_core_group_v3.gen/sources_1/bd/design_1/hw_handoff/*.hwh]
 
 if {$bit_file ne ""} {
-    file copy -force $bit_file ${output_dir}/snn_core_group_v2.bit
-    puts "Bitstream: ${output_dir}/snn_core_group_v2.bit"
+    file copy -force $bit_file ${output_dir}/snn_core_group_v3.bit
+    puts "Bitstream: ${output_dir}/snn_core_group_v3.bit"
 }
 if {$hwh_file ne ""} {
-    file copy -force $hwh_file ${output_dir}/snn_core_group_v2.hwh
-    puts "HWH: ${output_dir}/snn_core_group_v2.hwh"
+    file copy -force $hwh_file ${output_dir}/snn_core_group_v3.hwh
+    puts "HWH: ${output_dir}/snn_core_group_v3.hwh"
 }
 
 # Reports
 if {[catch {open_run impl_1} open_err]} {
     puts "WARNING: Could not open impl_1 for report generation: $open_err"
 } else {
-    report_utilization -file ${output_dir}/snn_core_group_v2_utilization.rpt
-    report_timing_summary -file ${output_dir}/snn_core_group_v2_timing.rpt
-    report_power -file ${output_dir}/snn_core_group_v2_power.rpt
+    report_utilization -file ${output_dir}/snn_core_group_v3_utilization.rpt
+    report_timing_summary -file ${output_dir}/snn_core_group_v3_timing.rpt
+    report_power -file ${output_dir}/snn_core_group_v3_power.rpt
 }
 
 puts "===== ALL DONE ====="

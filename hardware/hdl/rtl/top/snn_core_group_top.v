@@ -678,10 +678,10 @@ module snn_core_group_top #(
                 .out_spike_neuron_id(grp_spike_neuron_id[g*LOCAL_ID_WIDTH +: LOCAL_ID_WIDTH]),
                 .out_spike_ready    (grp_spike_ready[g]),
 
-                // Neuron parameters: Group 0 is input relay (threshold=1, no leak, no refrac)
-                .global_threshold    ((g == 0) ? 16'd1 : cfg_global_threshold),
-                .global_leak_rate    ((g == 0) ? 8'd0  : cfg_global_leak_rate),
-                .global_refrac_period((g == 0) ? 8'd0  : cfg_global_refrac_period),
+                // Neuron parameters: All groups in CNN3 are active LIF neurons
+                .global_threshold    (cfg_global_threshold),
+                .global_leak_rate    (cfg_global_leak_rate),
+                .global_refrac_period(cfg_global_refrac_period),
 
                 // Weight load (combined from AXI config + learning engine)
                 .weight_we          (combined_weight_we[g]),

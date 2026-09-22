@@ -73,33 +73,29 @@ module synaptic_connectivity_table #(
 
     //=========================================================================
     // Connection Table - Dual-Port BRAM
-    // Layered Dense/Sparse Allocation to fit Zynq-7020 BRAM:
-    //   Group 0 (Layer 1->2): 256 neurons x 256 fanout = 65,536 entries (addr 0..65535)
-    //   Group 1 (Layer 2->3): 256 neurons x 16 fanout  =  4,096 entries (addr 65536..69631)
-    //   Total capacity = 73,728 entries (fits in 38 RAMB36 tiles instead of 145)
+    // Compact Layered Allocation for Core Groups v3:
+    //   Groups 0..3 (Layer 2): 4 groups x 196 neurons x 16 fanout = 12,544 entries
+    //   Total capacity = 16,384 entries (fits in 9 RAMB36 / 18 RAMB18 tiles)
+    //   Address mapping: {src_group[1:0], src_neuron[7:0], fanout_idx[3:0]}
     //=========================================================================
-    localparam TABLE_ADDR_WIDTH = 17;
-    localparam TABLE_DEPTH      = 73728;
+    localparam TABLE_ADDR_WIDTH = 14;
+    localparam TABLE_DEPTH      = 16384;
     localparam TABLE_DATA_WIDTH = 1 + GROUP_ID_WIDTH + LOCAL_ID_WIDTH + WEIGHT_WIDTH + 1;
 
     // Connection memory
     (* ram_style = "block" *) reg [TABLE_DATA_WIDTH-1:0] conn_mem [0:TABLE_DEPTH-1];
 
-    // Address construction (layered compact mapping)
-    // Group 0 (L2): 256 src x 256 fanout = addrs 0..65535
-    // Group 1 (L3): 256 src x 16 fanout  = addrs 65536..69631
+    // Address construction (compact bit-concatenated mapping)
     wire [7:0] cfg_src_neuron_8b    = cfg_src_neuron;
-    wire [7:0] cfg_fanout_idx_8b    = cfg_fanout_idx;
+    wire [3:0] cfg_fanout_idx_4b    = cfg_fanout_idx[3:0];
     wire [7:0] lookup_src_neuron_8b = lookup_src_neuron;
-    wire [7:0] lookup_fanout_idx_8b = lookup_fanout_idx;
+    wire [3:0] lookup_fanout_idx_4b = lookup_fanout_idx[3:0];
 
-    wire [TABLE_ADDR_WIDTH-1:0] wr_addr = (cfg_src_group == 0) ? {1'b0, cfg_src_neuron_8b, cfg_fanout_idx_8b} :
-                                          (cfg_src_group == 1) ? (cfg_fanout_idx_8b < 16 ? (17'd65536 + {5'd0, cfg_src_neuron_8b, cfg_fanout_idx_8b[3:0]}) : 17'd73727) :
-                                          17'd73727;
+    wire [TABLE_ADDR_WIDTH-1:0] wr_addr = (cfg_src_group < 4) ? {cfg_src_group[1:0], cfg_src_neuron_8b, cfg_fanout_idx_4b} :
+                                          14'd0;
 
-    wire [TABLE_ADDR_WIDTH-1:0] rd_addr = (lookup_src_group == 0) ? {1'b0, lookup_src_neuron_8b, lookup_fanout_idx_8b} :
-                                          (lookup_src_group == 1) ? (lookup_fanout_idx_8b < 16 ? (17'd65536 + {5'd0, lookup_src_neuron_8b, lookup_fanout_idx_8b[3:0]}) : 17'd73727) :
-                                          17'd73727;
+    wire [TABLE_ADDR_WIDTH-1:0] rd_addr = (lookup_src_group < 4) ? {lookup_src_group[1:0], lookup_src_neuron_8b, lookup_fanout_idx_4b} :
+                                          14'd0;
 
     // Data packing
     wire [TABLE_DATA_WIDTH-1:0] wr_data = {

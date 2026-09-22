@@ -55,6 +55,127 @@ static void encoder_write_axis_spike(
     counter++;
 }
 
+//=============================================================================
+// CNN3 Streaming 2D Line-Buffer Convolution & LIF Engine
+//=============================================================================
+static ap_fixed<16,8> cnn_line_buf[2][CNN_IMG_WIDTH];
+static ap_fixed<16,8> cnn_win[3][3];
+static ap_fixed<16,8> cnn_v_mem[CNN_CONV1_CHANNELS][CNN_IMG_HEIGHT][CNN_IMG_WIDTH];
+static ap_uint<4>     cnn_pool_spikes[CNN_CONV1_CHANNELS][CNN_POOL1_HEIGHT][CNN_POOL1_WIDTH];
+static ap_uint<16>    cnn_pixel_counter = 0;
+
+static void reset_cnn3_engine() {
+    #pragma HLS INLINE
+    cnn_pixel_counter = 0;
+    for (int r = 0; r < 2; r++) {
+        for (int c = 0; c < CNN_IMG_WIDTH; c++) {
+            #pragma HLS UNROLL
+            cnn_line_buf[r][c] = 0;
+        }
+    }
+    for (int r = 0; r < 3; r++) {
+        for (int c = 0; c < 3; c++) {
+            #pragma HLS UNROLL
+            cnn_win[r][c] = 0;
+        }
+    }
+    for (int k = 0; k < CNN_CONV1_CHANNELS; k++) {
+        for (int y = 0; y < CNN_IMG_HEIGHT; y++) {
+            for (int x = 0; x < CNN_IMG_WIDTH; x++) {
+                cnn_v_mem[k][y][x] = 0;
+            }
+        }
+        for (int py = 0; py < CNN_POOL1_HEIGHT; py++) {
+            for (int px = 0; px < CNN_POOL1_WIDTH; px++) {
+                cnn_pool_spikes[k][py][px] = 0;
+            }
+        }
+    }
+}
+
+static void run_cnn3_streaming_pixel(
+    ap_fixed<16,8> pixel_val,
+    hls::stream<encoder_axis_word_t> &spike_fifo
+) {
+    #pragma HLS INLINE
+    int r = cnn_pixel_counter / CNN_IMG_WIDTH;
+    int c = cnn_pixel_counter % CNN_IMG_WIDTH;
+
+    // Shift 3x3 window registers
+    for (int i = 0; i < 3; i++) {
+        #pragma HLS UNROLL
+        cnn_win[i][0] = cnn_win[i][1];
+        cnn_win[i][1] = cnn_win[i][2];
+    }
+    cnn_win[0][2] = (r >= 2) ? cnn_line_buf[0][c] : (ap_fixed<16,8>)0;
+    cnn_win[1][2] = (r >= 1) ? cnn_line_buf[1][c] : (ap_fixed<16,8>)0;
+    cnn_win[2][2] = pixel_val;
+
+    cnn_line_buf[0][c] = cnn_line_buf[1][c];
+    cnn_line_buf[1][c] = pixel_val;
+
+    // Center convolution tap at (y, x) = (r-1, c-1)
+    if (r >= 1 && c >= 1) {
+        int y = r - 1;
+        int x = c - 1;
+
+        CONV1_FILTERS: for (int k = 0; k < CNN_CONV1_CHANNELS; k++) {
+            #pragma HLS UNROLL
+            ap_fixed<16,8> acc = (ap_fixed<16,8>)CONV1_BIAS[k];
+            for (int dy = 0; dy < 3; dy++) {
+                #pragma HLS UNROLL
+                for (int dx = 0; dx < 3; dx++) {
+                    #pragma HLS UNROLL
+                    acc += (ap_fixed<16,8>)CONV1_WEIGHTS[k][dy][dx] * cnn_win[dy][dx];
+                }
+            }
+
+            // LIF Membrane Potential Update with Hard Reset
+            cnn_v_mem[k][y][x] += acc;
+            if (cnn_v_mem[k][y][x] >= (ap_fixed<16,8>)1.0) {
+                cnn_v_mem[k][y][x] -= (ap_fixed<16,8>)1.0;
+                int py = y >> 1; // 2x2 average pool bin
+                int px = x >> 1;
+                cnn_pool_spikes[k][py][px]++;
+
+                // Fan out to Layer 2 Core Groups
+                FANOUT_CO: for (int co = 0; co < CNN_CONV2_CHANNELS; co++) {
+                    #pragma HLS UNROLL
+                    int dst_grp = co >> 2;   // 4 groups of 4 channels: co / 4
+                    int local_ch = co & 3;   // co % 4
+
+                    for (int dy2 = -1; dy2 <= 1; dy2++) {
+                        for (int dx2 = -1; dx2 <= 1; dx2++) {
+                            int y2 = (py + dy2) >> 1;
+                            int x2 = (px + dx2) >> 1;
+                            if (y2 >= 0 && y2 < CNN_POOL2_HEIGHT && x2 >= 0 && x2 < CNN_POOL2_WIDTH) {
+                                int local_nid = local_ch * CNN_POOL2_SIZE + y2 * CNN_POOL2_WIDTH + x2;
+                                signed char wt = CONV2_WEIGHTS[co][k][dy2 + 1][dx2 + 1];
+                                if (wt != 0 && !spike_fifo.full()) {
+                                    encoder_axis_word_t pkt;
+                                    ap_uint<11> global_nid = ((ap_uint<3>)dst_grp << 8) | (ap_uint<8>)local_nid;
+                                    pkt.data = 0;
+                                    pkt.data(SPIKE_PKT_ID_HI, SPIKE_PKT_ID_LO) = global_nid;
+                                    pkt.data(SPIKE_PKT_WGT_HI, SPIKE_PKT_WGT_LO) = (ap_uint<8>)wt;
+                                    pkt.keep = 0xF;
+                                    pkt.strb = 0xF;
+                                    pkt.last = 1;
+                                    spike_fifo.write(pkt);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    cnn_pixel_counter++;
+    if (cnn_pixel_counter >= CNN_IMG_PIXELS) {
+        cnn_pixel_counter = 0;
+    }
+}
+
 static void encoder_delta_sigma(
     int channel,
     pixel_t value,
@@ -798,6 +919,8 @@ void snn_top_hls(
             #pragma HLS PIPELINE II=1
             encoder_phase_acc[i] = 0;
         }
+
+        reset_cnn3_engine();
         
         // Initialize weights (flat buffer)
         if (!initialized) {
@@ -910,7 +1033,13 @@ void snn_top_hls(
             axis_spike_t in_pkt;
             bool have_pkt = false;
 
-            if (encoder_enable && !encoder_spikes.empty()) {
+            if (op_mode == MODE_CNN_STREAM && encoder_spikes.empty() && !s_axis_spikes.empty()) {
+                axis_spike_t px_pkt = s_axis_spikes.read();
+                ap_fixed<16,8> pixel_val = (ap_fixed<16,8>)((ap_int<16>)px_pkt.data(15, 0)) / 128.0;
+                run_cnn3_streaming_pixel(pixel_val, encoder_spikes);
+            }
+
+            if (!encoder_spikes.empty()) {
                 encoder_axis_word_t enc_word = encoder_spikes.read();
                 in_pkt.data = enc_word.data;
                 in_pkt.keep = enc_word.keep;
@@ -920,7 +1049,7 @@ void snn_top_hls(
                 in_pkt.dest = 0;
                 in_pkt.user = 0;
                 have_pkt = true;
-            } else if (!s_axis_spikes.empty()) {
+            } else if (!s_axis_spikes.empty() && op_mode != MODE_CNN_STREAM) {
                 in_pkt = s_axis_spikes.read();
                 have_pkt = true;
             }

@@ -32,32 +32,44 @@
 #
 #   Fallback: if group_sizes is absent, all groups get `neurons_per_group`.
 architecture:
-  neurons_per_group: 256    # Default / fallback per-group size
+  neurons_per_group: 196    # Default / fallback per-group size
   group_sizes:              # Per-group neuron counts (len = num_groups)
-    - 256                   # Group 0: Layer 1 input relay neurons (256)
-    - 256                   # Group 1: Layer 2 hidden LIF neurons (256)
-    - 16                    # Group 2: Layer 3 output class neurons (10 classes)
-  max_fanout_inter: 256     # Max inter-group fanout entries per neuron (Group 0 -> Group 1)
+    - 196                   # Group 0: Layer 2 Conv2 neurons partition 0 (0..195)
+    - 196                   # Group 1: Layer 2 Conv2 neurons partition 1 (196..391)
+    - 196                   # Group 2: Layer 2 Conv2 neurons partition 2 (392..587)
+    - 196                   # Group 3: Layer 2 Conv2 neurons partition 3 (588..783) -> Total L2 = 784
+    - 16                    # Group 4: Layer 3 output class neurons (10 classes: 0..9)
+  max_fanout_inter: 16      # Max inter-group fanout entries per neuron (Layer 2 -> Layer 3 is 10)
   spike_buffer_depth: 64    # Input FIFO depth per core group (entries)
 
 # ─────────────────────────────────────────────────────────────────────────────
-# NeuronGroup Connection Topology (Layer 1 Relay -> Layer 2 Hidden -> Layer 3 Output)
+# NeuronGroup Connection Topology (Layer 2 -> Layer 3 Classifier)
 # ─────────────────────────────────────────────────────────────────────────────
 neuron_groups:
-  - name: "layer1_relay"
-    size: 256
-  - name: "layer2_hidden"
-    size: 256
+  - name: "layer2_g0"
+    size: 196
+  - name: "layer2_g1"
+    size: 196
+  - name: "layer2_g2"
+    size: 196
+  - name: "layer2_g3"
+    size: 196
   - name: "layer3_output"
     size: 16
 
 connections:
-  - name: "l1_to_l2"
+  - name: "l2_g0_to_l3"
     src_group: 0
-    dst_group: 1
-  - name: "l2_to_l3"
+    dst_group: 4
+  - name: "l2_g1_to_l3"
     src_group: 1
-    dst_group: 2
+    dst_group: 4
+  - name: "l2_g2_to_l3"
+    src_group: 2
+    dst_group: 4
+  - name: "l2_g3_to_l3"
+    src_group: 3
+    dst_group: 4
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Weight Memory Optimization (Loihi / TrueNorth / KIST-inspired, ALL on-chip)
