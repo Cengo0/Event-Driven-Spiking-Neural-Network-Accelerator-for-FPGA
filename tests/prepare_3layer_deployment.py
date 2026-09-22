@@ -22,7 +22,10 @@ def fuse_batchnorm(w, bn_gamma, bn_beta, bn_mean, bn_var, eps=1e-5):
     """Fold BatchNorm parameters into the Linear layer weights and biases."""
     std = torch.sqrt(bn_var + eps)
     w_fused = w * (bn_gamma / std).unsqueeze(1)
-    b_fused = bn_beta - bn_mean * (bn_gamma / std)
+    if bn_beta is not None:
+        b_fused = bn_beta - bn_mean * (bn_gamma / std)
+    else:
+        b_fused = - bn_mean * (bn_gamma / std)
     return w_fused.numpy(), b_fused.numpy()
 
 # ─────────────────────────────────────────────────────────────────────
@@ -31,10 +34,41 @@ def fuse_batchnorm(w, bn_gamma, bn_beta, bn_mean, bn_var, eps=1e-5):
 print(f"Loading PyTorch model: {MODEL_PATH}")
 state_dict = torch.load(MODEL_PATH, map_location='cpu')
 
-w1_f, b1_f = fuse_batchnorm(state_dict['features.0.weight'], state_dict['features.1.weight'], state_dict['features.1.bias'], state_dict['features.1.running_mean'], state_dict['features.1.running_var'])
-w2_f, b2_f = fuse_batchnorm(state_dict['features.3.weight'], state_dict['features.4.weight'], state_dict['features.4.bias'], state_dict['features.4.running_mean'], state_dict['features.4.running_var'])
+# Layer 1 extraction (detect if BatchNorm is present)
+if 'features.1.running_var' in state_dict:
+    w1_f, b1_f = fuse_batchnorm(
+        state_dict['features.0.weight'],
+        state_dict['features.1.weight'],
+        state_dict.get('features.1.bias', None),
+        state_dict['features.1.running_mean'],
+        state_dict['features.1.running_var']
+    )
+else:
+    w1_f = state_dict['features.0.weight'].numpy()
+    b1_f = state_dict['features.0.bias'].numpy() if 'features.0.bias' in state_dict else np.zeros(w1_f.shape[0], dtype=np.float32)
+
+# Layer 2 extraction (detect if BatchNorm is present)
+if 'features.4.running_var' in state_dict:
+    w2_f, b2_f = fuse_batchnorm(
+        state_dict['features.3.weight'],
+        state_dict['features.4.weight'],
+        state_dict.get('features.4.bias', None),
+        state_dict['features.4.running_mean'],
+        state_dict['features.4.running_var']
+    )
+else:
+    w2_key = 'features.2.weight' if 'features.2.weight' in state_dict else 'features.3.weight'
+    w2_f = state_dict[w2_key].numpy()
+    b2_key = 'features.2.bias' if 'features.2.bias' in state_dict else 'features.3.bias'
+    b2_f = state_dict[b2_key].numpy() if b2_key in state_dict else np.zeros(w2_f.shape[0], dtype=np.float32)
+
+# Layer 3 extraction
 w3_f = state_dict['classifier.weight'].numpy()
-b3_f = state_dict['classifier.bias'].numpy()
+b3_f = state_dict['classifier.bias'].numpy() if 'classifier.bias' in state_dict else np.zeros(w3_f.shape[0], dtype=np.float32)
+
+has_biases = not (np.all(b1_f == 0) and np.all(b2_f == 0) and np.all(b3_f == 0))
+print(f"Model Biases Detected: {'Yes (fused/explicit)' if has_biases else 'No (bias=False / zero bias)'}")
+
 
 # ─────────────────────────────────────────────────────────────────────
 # 2. Load MNIST Data (Auto-Detect Normalization)
