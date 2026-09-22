@@ -145,7 +145,7 @@ def main():
     parser = argparse.ArgumentParser(description="Multi-Layer SNN Hardware Inference with SCA Trigger")
     parser.add_argument('--bitstream',     default='snn_core_group_v2.bit',
                         help='Bitstream path')
-    parser.add_argument('--data',          default='cifar10_3layer_deployment_v2.npz',
+    parser.add_argument('--data',          default='mnist_3layer_deployment_v2.npz',
                         help='Deployment payload (.npz)')
     parser.add_argument('--samples',  type=int, default=10000,
                         help='Number of test images')
