@@ -151,7 +151,7 @@ def main():
                         help='Number of test images')
     parser.add_argument('--timesteps', type=int, default=4,
                         help='Number of SNN timesteps')
-    parser.add_argument('--output-json',   default='inference_results_v2.json',
+    parser.add_argument('--output-json',   default='mnist_inference_results_v2.json',
                         help='Results output JSON')
     parser.add_argument('--skip-bitstream', action='store_true',
                         help='Skip PL programming')

@@ -4,8 +4,8 @@ import sys
 import numpy as np
 import torch
 
-MODEL_PATH  = 'models/fc3_T_4_clean_l2[0.000500].pth'
-OUTPUT_PATH = 'data/cache/mnist_3layer_deployment.npz'
+MODEL_PATH  = 'models/fc3_T_4_rate_spikes_clean_l2[0.000500].pth'
+OUTPUT_PATH = 'data/cache/mnist_3layer_deployment_v2.npz'
 TIMESTEPS   = 4
 
 def fuse_batchnorm(w, bn_gamma, bn_beta, bn_mean, bn_var, eps=1e-5):
@@ -27,15 +27,14 @@ w3_f = state_dict['classifier.weight'].numpy()
 b3_f = state_dict['classifier.bias'].numpy()
 
 # ─────────────────────────────────────────────────────────────────────
-# 2. Load and Normalize MNIST Data
+# 2. Load MNIST Data (Raw [0, 1] for Rate-Spikes Model)
 # ─────────────────────────────────────────────────────────────────────
-print("\nLoading and Z-Score Normalizing MNIST...")
+print("\nLoading MNIST Data (Raw [0, 1] intensities)...")
 try:
     from torchvision import datasets, transforms
-    # Apply the exact normalization the PyTorch model expects
+    # This rate_spikes model was trained on raw [0, 1] pixel intensities without Z-score normalization
     transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.1307,), (0.3081,))
+        transforms.ToTensor()
     ])
     test_ds = datasets.MNIST('./data', train=False, download=True, transform=transform)
     test_imgs = np.stack([img.squeeze(0).numpy() for img, _ in test_ds])
