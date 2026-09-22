@@ -1,12 +1,22 @@
 #!/usr/bin/env python3
 import os
 import sys
+import argparse
 import numpy as np
 import torch
 
-MODEL_PATH  = 'models/fc3_T_4_rate_spikes_clean_l2[0.000500].pth'
-OUTPUT_PATH = 'data/cache/mnist_3layer_deployment_v2.npz'
-TIMESTEPS   = 4
+parser = argparse.ArgumentParser(description="Prepare 3-Layer SNN Payload with Dynamic Threshold Calibration")
+parser.add_argument('--model',  default='models/fc3_T_4_rate_spikes_clean_l2[0.000500].pth',
+                    help='Path to PyTorch .pth model checkpoint')
+parser.add_argument('--output', default='data/cache/mnist_3layer_deployment_v2.npz',
+                    help='Output deployment payload path')
+parser.add_argument('--timesteps', type=int, default=4,
+                    help='Number of SNN timesteps')
+args = parser.parse_args()
+
+MODEL_PATH  = args.model
+OUTPUT_PATH = args.output
+TIMESTEPS   = args.timesteps
 
 def fuse_batchnorm(w, bn_gamma, bn_beta, bn_mean, bn_var, eps=1e-5):
     """Fold BatchNorm parameters into the Linear layer weights and biases."""
@@ -27,15 +37,29 @@ w3_f = state_dict['classifier.weight'].numpy()
 b3_f = state_dict['classifier.bias'].numpy()
 
 # ─────────────────────────────────────────────────────────────────────
-# 2. Load MNIST Data (Raw [0, 1] for Rate-Spikes Model)
+# 2. Load MNIST Data (Auto-Detect Normalization)
 # ─────────────────────────────────────────────────────────────────────
-print("\nLoading MNIST Data (Raw [0, 1] intensities)...")
 try:
     from torchvision import datasets, transforms
-    # This rate_spikes model was trained on raw [0, 1] pixel intensities without Z-score normalization
-    transform = transforms.Compose([
-        transforms.ToTensor()
-    ])
+    # Auto-detect whether checkpoint was trained with Z-score normalization or raw [0, 1] pixels
+    if 'features.1.running_var' in state_dict:
+        var_mean = state_dict['features.1.running_var'].mean().item()
+        is_normalized = (var_mean >= 0.5)
+    else:
+        is_normalized = False
+
+    if is_normalized:
+        print("Detected Training Normalization: Z-Score Normalized (mean=0.1307, std=0.3081)")
+        transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.1307,), (0.3081,))
+        ])
+    else:
+        print("Detected Training Normalization: Raw [0, 1] intensities (No Z-score normalization)")
+        transform = transforms.Compose([
+            transforms.ToTensor()
+        ])
+
     test_ds = datasets.MNIST('./data', train=False, download=True, transform=transform)
     test_imgs = np.stack([img.squeeze(0).numpy() for img, _ in test_ds])
     test_lbls = np.array([lbl for _, lbl in test_ds], dtype=np.int64)
@@ -68,11 +92,17 @@ q_w3_aug = np.hstack([q_w3, q_b3[:, None]])
 # ─────────────────────────────────────────────────────────────────────
 # The FPGA hardware has NO bias inputs for Layer 2 / Layer 3 and uses
 # discrete LIF spike counting for Group 2 (not an analog accumulator).
-# We calibrate hw_threshold using the exact hardware execution model.
-print("\nRunning Hardware-Faithful Threshold Sweep (No HW Biases, Discrete LIF Readout)...")
+# We calibrate hw_threshold dynamically relative to the theoretical base
+# threshold (base_th = round(WEIGHT_SCALE)), scanning a comprehensive
+# range of multipliers to accommodate both unbiased and biased architectures.
+base_th = max(1, int(round(WEIGHT_SCALE)))
+multipliers = [0.15, 0.20, 0.25, 0.30, 0.40, 0.50, 0.65, 0.80, 1.00, 1.20, 1.50]
+candidate_ths = sorted(list(set([max(1, int(round(base_th * m))) for m in multipliers])))
+
+print(f"\nRunning Hardware-Faithful Threshold Sweep (base_th = {base_th})...")
+print(f"Candidate thresholds ({len(candidate_ths)} points): {candidate_ths}")
 N_CHECK = min(2000, len(test_imgs))
-candidate_ths = [25, 30, 35, 40, 45, 50, 60, 75, 90, 110, 127]
-best_acc, best_th = 0, 40
+best_acc, best_th = 0, base_th
 
 for test_th in candidate_ths:
     correct = 0
