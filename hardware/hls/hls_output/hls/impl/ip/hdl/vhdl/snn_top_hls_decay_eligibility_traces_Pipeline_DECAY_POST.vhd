@@ -38,7 +38,7 @@ architecture behav of snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_POST i
     constant ap_const_lv1_1 : STD_LOGIC_VECTOR (0 downto 0) := "1";
     constant ap_const_lv1_0 : STD_LOGIC_VECTOR (0 downto 0) := "0";
     constant ap_const_lv10_0 : STD_LOGIC_VECTOR (9 downto 0) := "0000000000";
-    constant ap_const_lv10_210 : STD_LOGIC_VECTOR (9 downto 0) := "1000010000";
+    constant ap_const_lv10_320 : STD_LOGIC_VECTOR (9 downto 0) := "1100100000";
     constant ap_const_lv10_1 : STD_LOGIC_VECTOR (9 downto 0) := "0000000001";
     constant ap_const_lv32_3 : STD_LOGIC_VECTOR (31 downto 0) := "00000000000000000000000000000011";
     constant ap_const_lv32_7 : STD_LOGIC_VECTOR (31 downto 0) := "00000000000000000000000000000111";
@@ -53,24 +53,24 @@ attribute shreg_extract : string;
     signal ap_enable_reg_pp0_iter1 : STD_LOGIC := '0';
     signal ap_idle_pp0 : STD_LOGIC;
     signal ap_block_pp0_stage0_subdone : BOOLEAN;
-    signal icmp_ln516_fu_73_p2 : STD_LOGIC_VECTOR (0 downto 0);
+    signal icmp_ln637_fu_73_p2 : STD_LOGIC_VECTOR (0 downto 0);
     signal ap_condition_exit_pp0_iter0_stage0 : STD_LOGIC;
     signal ap_loop_exit_ready : STD_LOGIC;
     signal ap_ready_int : STD_LOGIC;
     signal post_eligibility_addr_reg_126 : STD_LOGIC_VECTOR (9 downto 0);
     signal ap_block_pp0_stage0_11001 : BOOLEAN;
-    signal zext_ln516_fu_85_p1 : STD_LOGIC_VECTOR (63 downto 0);
+    signal zext_ln637_fu_85_p1 : STD_LOGIC_VECTOR (63 downto 0);
     signal ap_block_pp0_stage0 : BOOLEAN;
     signal j_fu_44 : STD_LOGIC_VECTOR (9 downto 0) := "0000000000";
-    signal add_ln516_fu_79_p2 : STD_LOGIC_VECTOR (9 downto 0);
+    signal add_ln637_fu_79_p2 : STD_LOGIC_VECTOR (9 downto 0);
     signal ap_loop_init : STD_LOGIC;
     signal ap_sig_allocacmp_j_1 : STD_LOGIC_VECTOR (9 downto 0);
     signal post_eligibility_ce0_local : STD_LOGIC;
     signal post_eligibility_we1_local : STD_LOGIC;
-    signal sub_ln521_fu_109_p2 : STD_LOGIC_VECTOR (7 downto 0);
+    signal sub_ln642_fu_109_p2 : STD_LOGIC_VECTOR (7 downto 0);
     signal post_eligibility_ce1_local : STD_LOGIC;
     signal trunc_ln_fu_95_p4 : STD_LOGIC_VECTOR (4 downto 0);
-    signal sext_ln521_fu_105_p1 : STD_LOGIC_VECTOR (7 downto 0);
+    signal sext_ln642_fu_105_p1 : STD_LOGIC_VECTOR (7 downto 0);
     signal ap_done_reg : STD_LOGIC := '0';
     signal ap_continue_int : STD_LOGIC;
     signal ap_done_int : STD_LOGIC;
@@ -167,8 +167,8 @@ begin
     begin
         if (ap_clk'event and ap_clk = '1') then
             if (((ap_const_boolean_0 = ap_block_pp0_stage0_11001) and (ap_const_logic_1 = ap_CS_fsm_pp0_stage0))) then
-                if (((icmp_ln516_fu_73_p2 = ap_const_lv1_0) and (ap_enable_reg_pp0_iter0 = ap_const_logic_1))) then 
-                    j_fu_44 <= add_ln516_fu_79_p2;
+                if (((icmp_ln637_fu_73_p2 = ap_const_lv1_0) and (ap_enable_reg_pp0_iter0 = ap_const_logic_1))) then 
+                    j_fu_44 <= add_ln637_fu_79_p2;
                 elsif ((ap_loop_init = ap_const_logic_1)) then 
                     j_fu_44 <= ap_const_lv10_0;
                 end if;
@@ -179,7 +179,7 @@ begin
     begin
         if (ap_clk'event and ap_clk = '1') then
             if (((ap_const_boolean_0 = ap_block_pp0_stage0_11001) and (ap_const_logic_1 = ap_CS_fsm_pp0_stage0))) then
-                post_eligibility_addr_reg_126 <= zext_ln516_fu_85_p1(10 - 1 downto 0);
+                post_eligibility_addr_reg_126 <= zext_ln637_fu_85_p1(10 - 1 downto 0);
             end if;
         end if;
     end process;
@@ -193,15 +193,15 @@ begin
                 ap_NS_fsm <= "X";
         end case;
     end process;
-    add_ln516_fu_79_p2 <= std_logic_vector(unsigned(ap_sig_allocacmp_j_1) + unsigned(ap_const_lv10_1));
+    add_ln637_fu_79_p2 <= std_logic_vector(unsigned(ap_sig_allocacmp_j_1) + unsigned(ap_const_lv10_1));
     ap_CS_fsm_pp0_stage0 <= ap_CS_fsm(0);
         ap_block_pp0_stage0 <= not((ap_const_boolean_1 = ap_const_boolean_1));
         ap_block_pp0_stage0_11001 <= not((ap_const_boolean_1 = ap_const_boolean_1));
         ap_block_pp0_stage0_subdone <= not((ap_const_boolean_1 = ap_const_boolean_1));
 
-    ap_condition_exit_pp0_iter0_stage0_assign_proc : process(ap_CS_fsm_pp0_stage0, ap_enable_reg_pp0_iter0, ap_block_pp0_stage0_subdone, icmp_ln516_fu_73_p2)
+    ap_condition_exit_pp0_iter0_stage0_assign_proc : process(ap_CS_fsm_pp0_stage0, ap_enable_reg_pp0_iter0, ap_block_pp0_stage0_subdone, icmp_ln637_fu_73_p2)
     begin
-        if (((icmp_ln516_fu_73_p2 = ap_const_lv1_1) and (ap_const_boolean_0 = ap_block_pp0_stage0_subdone) and (ap_enable_reg_pp0_iter0 = ap_const_logic_1) and (ap_const_logic_1 = ap_CS_fsm_pp0_stage0))) then 
+        if (((icmp_ln637_fu_73_p2 = ap_const_lv1_1) and (ap_const_boolean_0 = ap_block_pp0_stage0_subdone) and (ap_enable_reg_pp0_iter0 = ap_const_logic_1) and (ap_const_logic_1 = ap_CS_fsm_pp0_stage0))) then 
             ap_condition_exit_pp0_iter0_stage0 <= ap_const_logic_1;
         else 
             ap_condition_exit_pp0_iter0_stage0 <= ap_const_logic_0;
@@ -263,8 +263,8 @@ begin
         end if; 
     end process;
 
-    icmp_ln516_fu_73_p2 <= "1" when (ap_sig_allocacmp_j_1 = ap_const_lv10_210) else "0";
-    post_eligibility_address0 <= zext_ln516_fu_85_p1(10 - 1 downto 0);
+    icmp_ln637_fu_73_p2 <= "1" when (ap_sig_allocacmp_j_1 = ap_const_lv10_320) else "0";
+    post_eligibility_address0 <= zext_ln637_fu_85_p1(10 - 1 downto 0);
     post_eligibility_address1 <= post_eligibility_addr_reg_126;
     post_eligibility_ce0 <= post_eligibility_ce0_local;
 
@@ -288,7 +288,7 @@ begin
         end if; 
     end process;
 
-    post_eligibility_d1 <= sub_ln521_fu_109_p2;
+    post_eligibility_d1 <= sub_ln642_fu_109_p2;
     post_eligibility_we1 <= post_eligibility_we1_local;
 
     post_eligibility_we1_local_assign_proc : process(ap_CS_fsm_pp0_stage0, ap_enable_reg_pp0_iter1, ap_block_pp0_stage0_11001)
@@ -300,9 +300,9 @@ begin
         end if; 
     end process;
 
-        sext_ln521_fu_105_p1 <= std_logic_vector(IEEE.numeric_std.resize(signed(trunc_ln_fu_95_p4),8));
+        sext_ln642_fu_105_p1 <= std_logic_vector(IEEE.numeric_std.resize(signed(trunc_ln_fu_95_p4),8));
 
-    sub_ln521_fu_109_p2 <= std_logic_vector(unsigned(post_eligibility_q0) - unsigned(sext_ln521_fu_105_p1));
+    sub_ln642_fu_109_p2 <= std_logic_vector(unsigned(post_eligibility_q0) - unsigned(sext_ln642_fu_105_p1));
     trunc_ln_fu_95_p4 <= post_eligibility_q0(7 downto 3);
-    zext_ln516_fu_85_p1 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(ap_sig_allocacmp_j_1),64));
+    zext_ln637_fu_85_p1 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(ap_sig_allocacmp_j_1),64));
 end behav;

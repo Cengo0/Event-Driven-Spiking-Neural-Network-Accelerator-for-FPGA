@@ -22,37 +22,37 @@
 </SummaryOfTimingAnalysis>
 <SummaryOfOverallLatency>
 <unit>clock cycles</unit>
-<Best-caseLatency>7</Best-caseLatency>
-<Average-caseLatency>3083</Average-caseLatency>
-<Worst-caseLatency>6159</Worst-caseLatency>
-<Best-caseRealTimeLatency>70.000 ns</Best-caseRealTimeLatency>
-<Average-caseRealTimeLatency>30.830 us</Average-caseRealTimeLatency>
-<Worst-caseRealTimeLatency>61.590 us</Worst-caseRealTimeLatency>
-<Interval-min>7</Interval-min>
-<Interval-max>6159</Interval-max>
+<Best-caseLatency>11</Best-caseLatency>
+<Average-caseLatency>4723</Average-caseLatency>
+<Worst-caseLatency>9435</Worst-caseLatency>
+<Best-caseRealTimeLatency>0.110 us</Best-caseRealTimeLatency>
+<Average-caseRealTimeLatency>47.230 us</Average-caseRealTimeLatency>
+<Worst-caseRealTimeLatency>94.350 us</Worst-caseRealTimeLatency>
+<Interval-min>11</Interval-min>
+<Interval-max>9435</Interval-max>
 <PerformancePragma>-</PerformancePragma>
 </SummaryOfOverallLatency>
 <SummaryOfLoopLatency>
 <LTP_CONN_LOOP>
 <Slack>7.30</Slack>
-<TripCount>2</TripCount>
+<TripCount>4</TripCount>
 <isPerfectNested>0</isPerfectNested>
 <Latency>
 <range>
-<min>4</min>
-<max>6156</max>
+<min>8</min>
+<max>9432</max>
 </range>
 </Latency>
 <AbsoluteTimeLatency>
 <range>
-<min>40</min>
-<max>61560</max>
+<min>80</min>
+<max>94320</max>
 </range>
 </AbsoluteTimeLatency>
 <IterationLatency>
 <range>
 <min>2</min>
-<max>3078</max>
+<max>2358</max>
 </range>
 </IterationLatency>
 <PerformancePragma>-</PerformancePragma>
@@ -63,13 +63,13 @@
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:341</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:462</SourceLocation>
 <SummaryOfLoopViolations>
 <LTP_CONN_LOOP>
 <Name>LTP_CONN_LOOP</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:341</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:462</SourceLocation>
 </LTP_CONN_LOOP>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>
@@ -78,8 +78,8 @@
 <AreaEstimates>
 <Resources>
 <DSP>3</DSP>
-<FF>252</FF>
-<LUT>667</LUT>
+<FF>257</FF>
+<LUT>697</LUT>
 <BRAM_18K>0</BRAM_18K>
 <URAM>0</URAM>
 </Resources>
@@ -167,7 +167,7 @@
 <IOProtocol>ap_none</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>in</Dir>
-<Bits>10</Bits>
+<Bits>11</Bits>
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -321,7 +321,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>17</Bits>
+<Bits>14</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -409,7 +409,7 @@
 <IOProtocol>ap_vld</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>1</Bits>
+<Bits>2</Bits>
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -453,7 +453,7 @@
 <IOProtocol>ap_vld</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>8</Bits>
+<Bits>6</Bits>
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>

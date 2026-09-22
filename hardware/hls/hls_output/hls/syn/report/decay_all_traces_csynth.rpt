@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'decay_all_traces'
 ================================================================
-* Date:           Sun Sep 20 02:25:02 2026
+* Date:           Wed Sep 23 00:23:55 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -29,7 +29,7 @@
     |  Latency (cycles) |  Latency (absolute) |  Interval | Pipeline|
     |   min   |   max   |    min   |    max   | min | max |   Type  |
     +---------+---------+----------+----------+-----+-----+---------+
-    |      533|      533|  5.330 us|  5.330 us|  533|  533|       no|
+    |      805|      805|  8.050 us|  8.050 us|  805|  805|       no|
     +---------+---------+----------+----------+-----+-----+---------+
 
     + Detail: 
@@ -38,8 +38,8 @@
         |                                                      |                                            |  Latency (cycles) |  Latency (absolute) |  Interval |      Pipeline     |
         |                       Instance                       |                   Module                   |   min   |   max   |    min   |    max   | min | max |        Type       |
         +------------------------------------------------------+--------------------------------------------+---------+---------+----------+----------+-----+-----+-------------------+
-        |grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28   |decay_all_traces_Pipeline_DECAY_PRE_TRACE   |      532|      532|  5.320 us|  5.320 us|    0|    0|  loop pipeline stp|
-        |grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36  |decay_all_traces_Pipeline_DECAY_POST_TRACE  |      532|      532|  5.320 us|  5.320 us|    0|    0|  loop pipeline stp|
+        |grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28   |decay_all_traces_Pipeline_DECAY_PRE_TRACE   |      804|      804|  8.040 us|  8.040 us|    0|    0|  loop pipeline stp|
+        |grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36  |decay_all_traces_Pipeline_DECAY_POST_TRACE  |      804|      804|  8.040 us|  8.040 us|    0|    0|  loop pipeline stp|
         +------------------------------------------------------+--------------------------------------------+---------+---------+----------+----------+-----+-----+-------------------+
 
         * Loop: 

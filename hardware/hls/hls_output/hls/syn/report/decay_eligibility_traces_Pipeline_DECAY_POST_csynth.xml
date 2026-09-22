@@ -22,23 +22,23 @@
 </SummaryOfTimingAnalysis>
 <SummaryOfOverallLatency>
 <unit>clock cycles</unit>
-<Best-caseLatency>530</Best-caseLatency>
-<Average-caseLatency>530</Average-caseLatency>
-<Worst-caseLatency>530</Worst-caseLatency>
-<Best-caseRealTimeLatency>5.300 us</Best-caseRealTimeLatency>
-<Average-caseRealTimeLatency>5.300 us</Average-caseRealTimeLatency>
-<Worst-caseRealTimeLatency>5.300 us</Worst-caseRealTimeLatency>
-<Interval-min>529</Interval-min>
-<Interval-max>529</Interval-max>
+<Best-caseLatency>802</Best-caseLatency>
+<Average-caseLatency>802</Average-caseLatency>
+<Worst-caseLatency>802</Worst-caseLatency>
+<Best-caseRealTimeLatency>8.020 us</Best-caseRealTimeLatency>
+<Average-caseRealTimeLatency>8.020 us</Average-caseRealTimeLatency>
+<Worst-caseRealTimeLatency>8.020 us</Worst-caseRealTimeLatency>
+<Interval-min>801</Interval-min>
+<Interval-max>801</Interval-max>
 <PerformancePragma>-</PerformancePragma>
 </SummaryOfOverallLatency>
 <SummaryOfLoopLatency>
 <DECAY_POST>
 <Slack>7.30</Slack>
-<TripCount>528</TripCount>
+<TripCount>800</TripCount>
 <isPerfectNested>0</isPerfectNested>
-<Latency>528</Latency>
-<AbsoluteTimeLatency>5280</AbsoluteTimeLatency>
+<Latency>800</Latency>
+<AbsoluteTimeLatency>8000</AbsoluteTimeLatency>
 <PipelineII>1</PipelineII>
 <PipelineDepth>2</PipelineDepth>
 <PerformancePragma>-</PerformancePragma>
@@ -49,13 +49,13 @@
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:516</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:637</SourceLocation>
 <SummaryOfLoopViolations>
 <DECAY_POST>
 <Name>DECAY_POST</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:516</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:637</SourceLocation>
 </DECAY_POST>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>

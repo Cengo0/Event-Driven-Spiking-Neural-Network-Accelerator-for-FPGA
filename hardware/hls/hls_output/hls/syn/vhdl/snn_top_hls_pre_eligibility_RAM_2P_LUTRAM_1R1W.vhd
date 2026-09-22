@@ -13,7 +13,7 @@ entity snn_top_hls_pre_eligibility_RAM_2P_LUTRAM_1R1W is
         MEM_TYPE        : string    := "distributed";
         DataWidth       : integer   := 8;
         AddressWidth    : integer   := 10;
-        AddressRange    : integer   := 528
+        AddressRange    : integer   := 800
     );
     port (
         address0    : in std_logic_vector(AddressWidth-1 downto 0);

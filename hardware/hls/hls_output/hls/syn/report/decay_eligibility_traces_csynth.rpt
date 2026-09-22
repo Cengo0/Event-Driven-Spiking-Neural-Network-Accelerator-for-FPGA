@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'decay_eligibility_traces'
 ================================================================
-* Date:           Sun Sep 20 02:25:03 2026
+* Date:           Wed Sep 23 00:24:17 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -29,7 +29,7 @@
     |  Latency (cycles) |  Latency (absolute) |  Interval | Pipeline|
     |   min   |   max   |    min   |    max   | min | max |   Type  |
     +---------+---------+----------+----------+-----+-----+---------+
-    |      531|      531|  5.310 us|  5.310 us|  531|  531|       no|
+    |      803|      803|  8.030 us|  8.030 us|  803|  803|       no|
     +---------+---------+----------+----------+-----+-----+---------+
 
     + Detail: 
@@ -38,8 +38,8 @@
         |                                                        |                                              |  Latency (cycles) |  Latency (absolute) |  Interval |      Pipeline     |
         |                        Instance                        |                    Module                    |   min   |   max   |    min   |    max   | min | max |        Type       |
         +--------------------------------------------------------+----------------------------------------------+---------+---------+----------+----------+-----+-----+-------------------+
-        |grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_18   |decay_eligibility_traces_Pipeline_DECAY_PRE   |      530|      530|  5.300 us|  5.300 us|    0|    0|  loop pipeline stp|
-        |grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_24  |decay_eligibility_traces_Pipeline_DECAY_POST  |      530|      530|  5.300 us|  5.300 us|    0|    0|  loop pipeline stp|
+        |grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_18   |decay_eligibility_traces_Pipeline_DECAY_PRE   |      802|      802|  8.020 us|  8.020 us|    0|    0|  loop pipeline stp|
+        |grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_24  |decay_eligibility_traces_Pipeline_DECAY_POST  |      802|      802|  8.020 us|  8.020 us|    0|    0|  loop pipeline stp|
         +--------------------------------------------------------+----------------------------------------------+---------+---------+----------+----------+-----+-----+-------------------+
 
         * Loop: 

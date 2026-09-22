@@ -22,23 +22,23 @@
 </SummaryOfTimingAnalysis>
 <SummaryOfOverallLatency>
 <unit>clock cycles</unit>
-<Best-caseLatency>532</Best-caseLatency>
-<Average-caseLatency>532</Average-caseLatency>
-<Worst-caseLatency>532</Worst-caseLatency>
-<Best-caseRealTimeLatency>5.320 us</Best-caseRealTimeLatency>
-<Average-caseRealTimeLatency>5.320 us</Average-caseRealTimeLatency>
-<Worst-caseRealTimeLatency>5.320 us</Worst-caseRealTimeLatency>
-<Interval-min>529</Interval-min>
-<Interval-max>529</Interval-max>
+<Best-caseLatency>804</Best-caseLatency>
+<Average-caseLatency>804</Average-caseLatency>
+<Worst-caseLatency>804</Worst-caseLatency>
+<Best-caseRealTimeLatency>8.040 us</Best-caseRealTimeLatency>
+<Average-caseRealTimeLatency>8.040 us</Average-caseRealTimeLatency>
+<Worst-caseRealTimeLatency>8.040 us</Worst-caseRealTimeLatency>
+<Interval-min>801</Interval-min>
+<Interval-max>801</Interval-max>
 <PerformancePragma>-</PerformancePragma>
 </SummaryOfOverallLatency>
 <SummaryOfLoopLatency>
 <DECAY_PRE_TRACE>
 <Slack>7.30</Slack>
-<TripCount>528</TripCount>
+<TripCount>800</TripCount>
 <isPerfectNested>0</isPerfectNested>
-<Latency>530</Latency>
-<AbsoluteTimeLatency>5300</AbsoluteTimeLatency>
+<Latency>802</Latency>
+<AbsoluteTimeLatency>8020</AbsoluteTimeLatency>
 <PipelineII>1</PipelineII>
 <PipelineDepth>4</PipelineDepth>
 <PerformancePragma>-</PerformancePragma>
@@ -49,13 +49,13 @@
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:209</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:330</SourceLocation>
 <SummaryOfLoopViolations>
 <DECAY_PRE_TRACE>
 <Name>DECAY_PRE_TRACE</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:209</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:330</SourceLocation>
 </DECAY_PRE_TRACE>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>
@@ -146,8 +146,8 @@
 <Attribute>control</Attribute>
 </RtlPorts>
 <RtlPorts>
-<name>zext_ln209</name>
-<Object>zext_ln209</Object>
+<name>zext_ln330</name>
+<Object>zext_ln330</Object>
 <Type>scalar</Type>
 <Scope></Scope>
 <IOProtocol>ap_none</IOProtocol>

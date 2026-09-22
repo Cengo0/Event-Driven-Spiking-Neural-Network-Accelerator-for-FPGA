@@ -23,13 +23,13 @@
 <SummaryOfOverallLatency>
 <unit>clock cycles</unit>
 <Best-caseLatency>5</Best-caseLatency>
-<Average-caseLatency>undef</Average-caseLatency>
-<Worst-caseLatency>9606518674</Worst-caseLatency>
+<Average-caseLatency>198115651</Average-caseLatency>
+<Worst-caseLatency>2649140443</Worst-caseLatency>
 <Best-caseRealTimeLatency>50.000 ns</Best-caseRealTimeLatency>
-<Average-caseRealTimeLatency>undef</Average-caseRealTimeLatency>
-<Worst-caseRealTimeLatency>96.065 sec</Worst-caseRealTimeLatency>
+<Average-caseRealTimeLatency>1.981 sec</Average-caseRealTimeLatency>
+<Worst-caseRealTimeLatency>26.491 sec</Worst-caseRealTimeLatency>
 <Interval-min>6</Interval-min>
-<Interval-max>9606518675</Interval-max>
+<Interval-max>2649140444</Interval-max>
 <PerformancePragma>-</PerformancePragma>
 </SummaryOfOverallLatency>
 <SummaryOfLoopLatency>
@@ -45,19 +45,19 @@
 <Latency>
 <range>
 <min>0</min>
-<max>9606447975</max>
+<max>2649121305</max>
 </range>
 </Latency>
 <AbsoluteTimeLatency>
 <range>
 <min>0</min>
-<max>96064479750</max>
+<max>26491213050</max>
 </range>
 </AbsoluteTimeLatency>
 <IterationLatency>
 <range>
 <min>8</min>
-<max>146585</max>
+<max>40423</max>
 </range>
 </IterationLatency>
 <PerformancePragma>-</PerformancePragma>
@@ -68,13 +68,13 @@
 <SummaryOfViolations>
 <IssueType>Timing Violation</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:546</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:667</SourceLocation>
 <SummaryOfLoopViolations>
 <TIME_LOOP>
 <Name>TIME_LOOP</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:884</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:1007</SourceLocation>
 </TIME_LOOP>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>
@@ -82,10 +82,10 @@
 
 <AreaEstimates>
 <Resources>
-<BRAM_18K>37</BRAM_18K>
-<DSP>10</DSP>
-<FF>4053</FF>
-<LUT>7891</LUT>
+<BRAM_18K>18</BRAM_18K>
+<DSP>59</DSP>
+<FF>16319</FF>
+<LUT>52858</LUT>
 <URAM>0</URAM>
 </Resources>
 <AvailableResources>
@@ -878,7 +878,7 @@
 <IOProtocol>ap_none</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>10</Bits>
+<Bits>11</Bits>
 <Attribute>data</Attribute>
 <CType>int</CType>
 </RtlPorts>
@@ -926,7 +926,7 @@
 <IOProtocol>ap_none</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>in</Dir>
-<Bits>10</Bits>
+<Bits>11</Bits>
 <Attribute>data</Attribute>
 <CType>int</CType>
 </RtlPorts>
@@ -974,7 +974,7 @@
 <IOProtocol>ap_none</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>2</Bits>
+<Bits>3</Bits>
 <Attribute>data</Attribute>
 <CType>int</CType>
 </RtlPorts>
@@ -1046,7 +1046,7 @@
 <IOProtocol>ap_none</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>2</Bits>
+<Bits>3</Bits>
 <Attribute>data</Attribute>
 <CType>int</CType>
 </RtlPorts>
@@ -1058,7 +1058,7 @@
 <IOProtocol>ap_none</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>8</Bits>
+<Bits>4</Bits>
 <Attribute>data</Attribute>
 <CType>int</CType>
 </RtlPorts>

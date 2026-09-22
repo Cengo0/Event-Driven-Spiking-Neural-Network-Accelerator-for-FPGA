@@ -22,20 +22,20 @@
 </SummaryOfTimingAnalysis>
 <SummaryOfOverallLatency>
 <unit>clock cycles</unit>
-<Best-caseLatency>533</Best-caseLatency>
-<Average-caseLatency>533</Average-caseLatency>
-<Worst-caseLatency>533</Worst-caseLatency>
-<Best-caseRealTimeLatency>5.330 us</Best-caseRealTimeLatency>
-<Average-caseRealTimeLatency>5.330 us</Average-caseRealTimeLatency>
-<Worst-caseRealTimeLatency>5.330 us</Worst-caseRealTimeLatency>
-<Interval-min>533</Interval-min>
-<Interval-max>533</Interval-max>
+<Best-caseLatency>805</Best-caseLatency>
+<Average-caseLatency>805</Average-caseLatency>
+<Worst-caseLatency>805</Worst-caseLatency>
+<Best-caseRealTimeLatency>8.050 us</Best-caseRealTimeLatency>
+<Average-caseRealTimeLatency>8.050 us</Average-caseRealTimeLatency>
+<Worst-caseRealTimeLatency>8.050 us</Worst-caseRealTimeLatency>
+<Interval-min>805</Interval-min>
+<Interval-max>805</Interval-max>
 <PerformancePragma>-</PerformancePragma>
 </SummaryOfOverallLatency>
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:207</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:328</SourceLocation>
 </SummaryOfViolations>
 </PerformanceEstimates>
 

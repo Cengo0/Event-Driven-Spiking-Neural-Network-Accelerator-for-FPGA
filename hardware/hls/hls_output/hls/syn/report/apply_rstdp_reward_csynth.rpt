@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'apply_rstdp_reward'
 ================================================================
-* Date:           Sun Sep 20 02:25:02 2026
+* Date:           Wed Sep 23 00:24:17 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -25,12 +25,12 @@
 
 + Latency: 
     * Summary: 
-    +---------+---------+-----------+----------+-----+--------+---------+
-    |  Latency (cycles) |  Latency (absolute)  |   Interval   | Pipeline|
-    |   min   |   max   |    min    |    max   | min |   max  |   Type  |
-    +---------+---------+-----------+----------+-----+--------+---------+
-    |        1|   137221|  10.000 ns|  1.372 ms|    1|  137221|       no|
-    +---------+---------+-----------+----------+-----+--------+---------+
+    +---------+---------+-----------+----------+-----+-------+---------+
+    |  Latency (cycles) |  Latency (absolute)  |   Interval  | Pipeline|
+    |   min   |   max   |    min    |    max   | min |  max  |   Type  |
+    +---------+---------+-----------+----------+-----+-------+---------+
+    |        1|    25097|  10.000 ns|  0.251 ms|    1|  25097|       no|
+    +---------+---------+-----------+----------+-----+-------+---------+
 
     + Detail: 
         * Instance: 
@@ -38,17 +38,17 @@
         |                                                    |                                         |  Latency (cycles) |  Latency (absolute) |  Interval |      Pipeline     |
         |                      Instance                      |                  Module                 |   min   |   max   |    min   |    max   | min | max |        Type       |
         +----------------------------------------------------+-----------------------------------------+---------+---------+----------+----------+-----+-----+-------------------+
-        |grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190  |apply_rstdp_reward_Pipeline_RSTDP_INNER  |       25|      265|  0.250 us|  2.650 us|    0|    0|  loop pipeline stp|
+        |grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_205  |apply_rstdp_reward_Pipeline_RSTDP_INNER  |       25|       25|  0.250 us|  0.250 us|    0|    0|  loop pipeline stp|
         +----------------------------------------------------+-----------------------------------------+---------+---------+----------+----------+-----+-----+-------------------+
 
         * Loop: 
-        +-------------------+---------+---------+-------------+-----------+-----------+------+----------+
-        |                   |  Latency (cycles) |  Iteration  |  Initiation Interval  | Trip |          |
-        |     Loop Name     |   min   |   max   |   Latency   |  achieved |   target  | Count| Pipelined|
-        +-------------------+---------+---------+-------------+-----------+-----------+------+----------+
-        |- RSTDP_CONN_LOOP  |     1540|   137220|  770 ~ 68610|          -|          -|     2|        no|
-        | + RSTDP_OUTER     |      768|    68608|      3 ~ 268|          -|          -|   256|        no|
-        +-------------------+---------+---------+-------------+-----------+-----------+------+----------+
+        +-------------------+---------+---------+------------+-----------+-----------+------+----------+
+        |                   |  Latency (cycles) |  Iteration |  Initiation Interval  | Trip |          |
+        |     Loop Name     |   min   |   max   |   Latency  |  achieved |   target  | Count| Pipelined|
+        +-------------------+---------+---------+------------+-----------+-----------+------+----------+
+        |- RSTDP_CONN_LOOP  |     2360|    25096|  590 ~ 6274|          -|          -|     4|        no|
+        | + RSTDP_OUTER     |      588|     6272|      3 ~ 32|          -|          -|   196|        no|
+        +-------------------+---------+---------+------------+-----------+-----------+------+----------+
 
 
 
@@ -59,19 +59,19 @@
 +-----------------+---------+-----+--------+-------+-----+
 |       Name      | BRAM_18K| DSP |   FF   |  LUT  | URAM|
 +-----------------+---------+-----+--------+-------+-----+
-|DSP              |        -|    -|       -|      -|    -|
-|Expression       |        -|    -|       0|    259|    -|
+|DSP              |        -|    1|       -|      -|    -|
+|Expression       |        -|    -|       0|    180|    -|
 |FIFO             |        -|    -|       -|      -|    -|
-|Instance         |        -|    2|     533|    602|    -|
+|Instance         |        -|    2|     353|    536|    -|
 |Memory           |        -|    -|       -|      -|    -|
-|Multiplexer      |        -|    -|       0|    121|    -|
-|Register         |        -|    -|     127|      -|    -|
+|Multiplexer      |        -|    -|       0|    143|    -|
+|Register         |        -|    -|     152|      -|    -|
 +-----------------+---------+-----+--------+-------+-----+
-|Total            |        0|    2|     660|    982|    0|
+|Total            |        0|    3|     505|    859|    0|
 +-----------------+---------+-----+--------+-------+-----+
 |Available        |      280|  220|  106400|  53200|    0|
 +-----------------+---------+-----+--------+-------+-----+
-|Utilization (%)  |        0|   ~0|      ~0|      1|    0|
+|Utilization (%)  |        0|    1|      ~0|      1|    0|
 +-----------------+---------+-----+--------+-------+-----+
 
 + Detail: 
@@ -79,14 +79,23 @@
     +----------------------------------------------------+-----------------------------------------+---------+----+-----+-----+-----+
     |                      Instance                      |                  Module                 | BRAM_18K| DSP|  FF | LUT | URAM|
     +----------------------------------------------------+-----------------------------------------+---------+----+-----+-----+-----+
-    |grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190  |apply_rstdp_reward_Pipeline_RSTDP_INNER  |        0|   2|  533|  593|    0|
-    |sparsemux_7_2_2_1_1_U144                            |sparsemux_7_2_2_1_1                      |        0|   0|    0|    9|    0|
+    |grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_205  |apply_rstdp_reward_Pipeline_RSTDP_INNER  |        0|   2|  353|  427|    0|
+    |sparsemux_7_2_2_1_1_U711                            |sparsemux_7_2_2_1_1                      |        0|   0|    0|    9|    0|
+    |sparsemux_9_2_10_1_1_U713                           |sparsemux_9_2_10_1_1                     |        0|   0|    0|   20|    0|
+    |sparsemux_9_2_14_1_1_U715                           |sparsemux_9_2_14_1_1                     |        0|   0|    0|   20|    0|
+    |sparsemux_9_2_5_1_1_U714                            |sparsemux_9_2_5_1_1                      |        0|   0|    0|   20|    0|
+    |sparsemux_9_2_7_1_1_U712                            |sparsemux_9_2_7_1_1                      |        0|   0|    0|   20|    0|
+    |sparsemux_9_2_9_1_1_U716                            |sparsemux_9_2_9_1_1                      |        0|   0|    0|   20|    0|
     +----------------------------------------------------+-----------------------------------------+---------+----+-----+-----+-----+
-    |Total                                               |                                         |        0|   2|  533|  602|    0|
+    |Total                                               |                                         |        0|   2|  353|  536|    0|
     +----------------------------------------------------+-----------------------------------------+---------+----+-----+-----+-----+
 
     * DSP: 
-    N/A
+    +------------------------------------+-------------------------------+--------------+
+    |              Instance              |             Module            |  Expression  |
+    +------------------------------------+-------------------------------+--------------+
+    |mac_muladd_8ns_5ns_14s_14_4_1_U717  |mac_muladd_8ns_5ns_14s_14_4_1  |  i0 * i1 + i2|
+    +------------------------------------+-------------------------------+--------------+
 
     * Memory: 
     N/A
@@ -98,89 +107,81 @@
     +---------------------------------+----------+----+---+----+------------+------------+
     |          Variable Name          | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
     +---------------------------------+----------+----+---+----+------------+------------+
-    |add_ln436_fu_369_p2              |         +|   0|  0|  10|           2|           1|
-    |add_ln440_fu_419_p2              |         +|   0|  0|  14|           9|           1|
-    |add_ln444_fu_429_p2              |         +|   0|  0|  14|           9|           9|
-    |add_ln451_fu_506_p2              |         +|   0|  0|  25|          18|          18|
-    |reward_mag_fu_245_p2             |         -|   0|  0|  15|           1|           8|
-    |and_ln419_fu_231_p2              |       and|   0|  0|   2|           1|           1|
-    |and_ln427_fu_321_p2              |       and|   0|  0|   2|           1|           1|
-    |ap_block_state5_on_subcall_done  |       and|   0|  0|   2|           1|           1|
-    |icmp_ln419_fu_225_p2             |      icmp|   0|  0|  15|           8|           1|
-    |icmp_ln426_fu_269_p2             |      icmp|   0|  0|  10|           2|           1|
-    |icmp_ln427_fu_285_p2             |      icmp|   0|  0|  11|           3|           1|
-    |icmp_ln428_fu_301_p2             |      icmp|   0|  0|  13|           4|           1|
-    |icmp_ln436_fu_363_p2             |      icmp|   0|  0|  11|           2|           3|
-    |icmp_ln440_fu_413_p2             |      icmp|   0|  0|  13|           9|          10|
-    |icmp_ln444_fu_375_p2             |      icmp|   0|  0|  10|           2|           1|
-    |icmp_ln446_fu_447_p2             |      icmp|   0|  0|  15|           8|           1|
-    |reward_mag_1_fu_251_p3           |    select|   0|  0|   8|           1|           8|
-    |select_ln440_1_fu_405_p3         |    select|   0|  0|   9|           1|           5|
-    |select_ln440_fu_381_p3           |    select|   0|  0|  10|           1|          10|
-    |select_ln448_fu_389_p3           |    select|   0|  0|  18|           1|          18|
-    |select_ln451_1_fu_479_p3         |    select|   0|  0|  16|           1|          16|
-    |select_ln451_fu_397_p3           |    select|   0|  0|  11|           1|          11|
-    |shift_sel_fu_335_p6              |    select|   0|  0|   3|           1|           3|
-    |xor_ln426_fu_315_p2              |       xor|   0|  0|   2|           1|           2|
+    |add_ln557_fu_378_p2              |         +|   0|  0|  11|           3|           1|
+    |add_ln561_fu_445_p2              |         +|   0|  0|  15|           8|           1|
+    |add_ln565_fu_455_p2              |         +|   0|  0|  13|          10|          10|
+    |add_ln572_2_fu_545_p2            |         +|   0|  0|  17|          14|          14|
+    |reward_mag_fu_254_p2             |         -|   0|  0|  15|           1|           8|
+    |and_ln548_fu_330_p2              |       and|   0|  0|   2|           1|           1|
+    |ap_block_state9_on_subcall_done  |       and|   0|  0|   2|           1|           1|
+    |icmp_ln540_fu_240_p2             |      icmp|   0|  0|  15|           8|           1|
+    |icmp_ln547_fu_278_p2             |      icmp|   0|  0|  10|           2|           1|
+    |icmp_ln548_fu_294_p2             |      icmp|   0|  0|  11|           3|           1|
+    |icmp_ln549_fu_310_p2             |      icmp|   0|  0|  13|           4|           1|
+    |icmp_ln557_fu_372_p2             |      icmp|   0|  0|  13|           3|           4|
+    |icmp_ln561_fu_440_p2             |      icmp|   0|  0|  15|           8|           8|
+    |icmp_ln567_fu_477_p2             |      icmp|   0|  0|  15|           8|           1|
+    |reward_mag_1_fu_260_p3           |    select|   0|  0|   8|           1|           8|
+    |shift_sel_fu_344_p6              |    select|   0|  0|   3|           1|           3|
+    |xor_ln547_fu_324_p2              |       xor|   0|  0|   2|           1|           2|
     +---------------------------------+----------+----+---+----+------------+------------+
-    |Total                            |          |   0|  0| 259|          88|         132|
+    |Total                            |          |   0|  0| 180|          77|          66|
     +---------------------------------+----------+----+---+----+------------+------------+
 
     * Multiplexer: 
     +------------------------+----+-----------+-----+-----------+
     |          Name          | LUT| Input Size| Bits| Total Bits|
     +------------------------+----+-----------+-----+-----------+
-    |ap_NS_fsm               |  31|          6|    1|          6|
-    |c_fu_138                |   9|          2|    2|          4|
-    |ii_reg_179              |   9|          2|    9|         18|
+    |ap_NS_fsm               |  53|         10|    1|         10|
+    |c_fu_158                |   9|          2|    3|          6|
+    |ii_reg_193              |   9|          2|    8|         16|
     |learn_bridge_data       |   9|          2|    4|          8|
-    |learn_bridge_dst        |   9|          2|    8|         16|
+    |learn_bridge_dst        |   9|          2|    6|         12|
     |learn_bridge_dst_group  |   9|          2|    2|          4|
     |learn_bridge_exc        |   9|          2|    1|          2|
-    |learn_bridge_group      |   9|          2|    1|          2|
+    |learn_bridge_group      |   9|          2|    2|          4|
     |learn_bridge_is_inter   |   9|          2|    1|          2|
     |learn_bridge_src        |   9|          2|    8|         16|
     |learn_bridge_valid_o    |   9|          2|    1|          2|
     +------------------------+----+-----------+-----+-----------+
-    |Total                   | 121|         26|   38|         80|
+    |Total                   | 143|         30|   37|         82|
     +------------------------+----+-----------+-----+-----------+
 
     * Register: 
     +-----------------------------------------------------------------+----+----+-----+-----------+
     |                               Name                              | FF | LUT| Bits| Const Bits|
     +-----------------------------------------------------------------+----+----+-----+-----------+
-    |add_ln436_reg_546                                                |   2|   0|    2|          0|
-    |add_ln440_reg_579                                                |   9|   0|    9|          0|
-    |add_ln444_reg_590                                                |   9|   0|    9|          0|
-    |add_ln451_reg_624                                                |  14|   0|   18|          4|
-    |add_ln_reg_619                                                   |  13|   0|   17|          4|
-    |and_ln419_reg_522                                                |   1|   0|    1|          0|
-    |ap_CS_fsm                                                        |   5|   0|    5|          0|
-    |c_fu_138                                                         |   2|   0|    2|          0|
-    |grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_ap_start_reg  |   1|   0|    1|          0|
-    |icmp_ln444_reg_551                                               |   1|   0|    1|          0|
-    |icmp_ln446_reg_610                                               |   1|   0|    1|          0|
-    |ii_reg_179                                                       |   9|   0|    9|          0|
+    |add_ln557_reg_617                                                |   3|   0|    3|          0|
+    |add_ln561_reg_642                                                |   8|   0|    8|          0|
+    |add_ln565_reg_647                                                |  10|   0|   10|          0|
+    |add_ln572_2_reg_702                                              |  14|   0|   14|          0|
+    |add_ln572_reg_697                                                |  14|   0|   14|          0|
+    |ap_CS_fsm                                                        |   9|   0|    9|          0|
+    |c_fu_158                                                         |   3|   0|    3|          0|
+    |grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_205_ap_start_reg  |   1|   0|    1|          0|
+    |icmp_ln540_reg_593                                               |   1|   0|    1|          0|
+    |icmp_ln567_reg_672                                               |   1|   0|    1|          0|
+    |ii_reg_193                                                       |   8|   0|    8|          0|
     |learn_bridge_data_reg                                            |   4|   0|    4|          0|
     |learn_bridge_dst_group_reg                                       |   2|   0|    2|          0|
-    |learn_bridge_dst_reg                                             |   8|   0|    8|          0|
+    |learn_bridge_dst_reg                                             |   6|   0|    6|          0|
     |learn_bridge_exc_reg                                             |   1|   0|    1|          0|
-    |learn_bridge_group_reg                                           |   1|   0|    1|          0|
+    |learn_bridge_group_reg                                           |   2|   0|    2|          0|
     |learn_bridge_is_inter_reg                                        |   1|   0|    1|          0|
     |learn_bridge_src_reg                                             |   8|   0|    8|          0|
     |learn_bridge_valid_o_reg                                         |   1|   0|    1|          0|
-    |pre_elig_reg_605                                                 |   8|   0|    8|          0|
-    |select_ln440_1_reg_571                                           |   2|   0|   18|         16|
-    |select_ln440_reg_556                                             |   1|   0|    9|          8|
-    |select_ln448_reg_561                                             |   1|   0|   17|         16|
-    |select_ln451_reg_566                                             |   2|   0|   10|          8|
-    |shift_sel_reg_538                                                |   2|   0|    2|          0|
-    |tmp_37_reg_614                                                   |   1|   0|    1|          0|
-    |tmp_reg_533                                                      |   1|   0|    1|          0|
-    |trunc_ln440_reg_584                                              |   8|   0|    8|          0|
-    |trunc_ln445_reg_595                                              |   8|   0|    8|          0|
+    |pre_elig_reg_667                                                 |   8|   0|    8|          0|
+    |sext_ln565_reg_629                                               |   8|   0|    8|          0|
+    |shift_sel_reg_609                                                |   2|   0|    2|          0|
+    |tmp_222_reg_604                                                  |   1|   0|    1|          0|
+    |tmp_85_reg_686                                                   |   2|   0|    2|          0|
+    |tmp_86_reg_707                                                   |   9|   0|    9|          0|
+    |tmp_s_reg_634                                                    |  10|   0|   10|          0|
+    |trunc_ln557_reg_622                                              |   2|   0|    2|          0|
+    |trunc_ln566_reg_652                                              |   8|   0|    8|          0|
+    |zext_ln572_1_cast_reg_676                                        |   5|   0|    5|          0|
     +-----------------------------------------------------------------+----+----+-----+-----------+
-    |Total                                                            | 127|   0|  183|         56|
+    |Total                                                            | 152|   0|  152|          0|
     +-----------------------------------------------------------------+----+----+-----+-----------+
 
 
@@ -199,7 +200,6 @@
 |ap_idle                        |  out|    1|  ap_ctrl_hs|       apply_rstdp_reward|  return value|
 |ap_ready                       |  out|    1|  ap_ctrl_hs|       apply_rstdp_reward|  return value|
 |reward_signal                  |   in|    8|     ap_none|            reward_signal|        scalar|
-|params_rstdp_enable_val        |   in|    1|     ap_none|  params_rstdp_enable_val|        scalar|
 |params_reward_scale_val        |   in|   16|     ap_none|  params_reward_scale_val|        scalar|
 |learn_weight_ready             |   in|    1|     ap_none|       learn_weight_ready|        scalar|
 |pre_eligibility_address0       |  out|   10|   ap_memory|          pre_eligibility|         array|
@@ -208,21 +208,21 @@
 |post_eligibility_address0      |  out|   10|   ap_memory|         post_eligibility|         array|
 |post_eligibility_ce0           |  out|    1|   ap_memory|         post_eligibility|         array|
 |post_eligibility_q0            |   in|    8|   ap_memory|         post_eligibility|         array|
-|weight_memory_address0         |  out|   17|   ap_memory|            weight_memory|         array|
+|weight_memory_address0         |  out|   14|   ap_memory|            weight_memory|         array|
 |weight_memory_ce0              |  out|    1|   ap_memory|            weight_memory|         array|
 |weight_memory_we0              |  out|    1|   ap_memory|            weight_memory|         array|
 |weight_memory_d0               |  out|    4|   ap_memory|            weight_memory|         array|
-|weight_memory_address1         |  out|   17|   ap_memory|            weight_memory|         array|
+|weight_memory_address1         |  out|   14|   ap_memory|            weight_memory|         array|
 |weight_memory_ce1              |  out|    1|   ap_memory|            weight_memory|         array|
 |weight_memory_q1               |   in|    4|   ap_memory|            weight_memory|         array|
 |learn_bridge_valid_i           |   in|    1|     ap_ovld|       learn_bridge_valid|       pointer|
 |learn_bridge_valid_o           |  out|    1|     ap_ovld|       learn_bridge_valid|       pointer|
 |learn_bridge_valid_o_ap_vld    |  out|    1|     ap_ovld|       learn_bridge_valid|       pointer|
-|learn_bridge_group             |  out|    1|      ap_vld|       learn_bridge_group|       pointer|
+|learn_bridge_group             |  out|    2|      ap_vld|       learn_bridge_group|       pointer|
 |learn_bridge_group_ap_vld      |  out|    1|      ap_vld|       learn_bridge_group|       pointer|
 |learn_bridge_src               |  out|    8|      ap_vld|         learn_bridge_src|       pointer|
 |learn_bridge_src_ap_vld        |  out|    1|      ap_vld|         learn_bridge_src|       pointer|
-|learn_bridge_dst               |  out|    8|      ap_vld|         learn_bridge_dst|       pointer|
+|learn_bridge_dst               |  out|    6|      ap_vld|         learn_bridge_dst|       pointer|
 |learn_bridge_dst_ap_vld        |  out|    1|      ap_vld|         learn_bridge_dst|       pointer|
 |learn_bridge_data              |  out|    4|      ap_vld|        learn_bridge_data|       pointer|
 |learn_bridge_data_ap_vld       |  out|    1|      ap_vld|        learn_bridge_data|       pointer|

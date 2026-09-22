@@ -49,13 +49,13 @@
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:37~src/snn_top_hls.cpp:78~src/snn_top_hls.cpp:100~src/snn_top_hls.cpp:901</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:37~src/snn_top_hls.cpp:199~src/snn_top_hls.cpp:221~src/snn_top_hls.cpp:1024</SourceLocation>
 <SummaryOfLoopViolations>
 <ENCODER_LOOP>
 <Name>ENCODER_LOOP</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:93~src/snn_top_hls.cpp:901</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:214~src/snn_top_hls.cpp:1024</SourceLocation>
 </ENCODER_LOOP>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>
@@ -230,7 +230,7 @@
 <IOProtocol>ap_none</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>in</Dir>
-<Bits>14</Bits>
+<Bits>13</Bits>
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>

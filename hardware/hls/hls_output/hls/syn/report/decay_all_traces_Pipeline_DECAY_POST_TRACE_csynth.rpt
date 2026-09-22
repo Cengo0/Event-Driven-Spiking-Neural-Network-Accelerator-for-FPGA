@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'decay_all_traces_Pipeline_DECAY_POST_TRACE'
 ================================================================
-* Date:           Sun Sep 20 02:25:01 2026
+* Date:           Wed Sep 23 00:23:55 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -29,7 +29,7 @@
     |  Latency (cycles) |  Latency (absolute) |  Interval |      Pipeline     |
     |   min   |   max   |    min   |    max   | min | max |        Type       |
     +---------+---------+----------+----------+-----+-----+-------------------+
-    |      532|      532|  5.320 us|  5.320 us|    0|    0|  loop pipeline stp|
+    |      804|      804|  8.040 us|  8.040 us|    0|    0|  loop pipeline stp|
     +---------+---------+----------+----------+-----+-----+-------------------+
 
     + Detail: 
@@ -41,7 +41,7 @@
         |                    |  Latency (cycles) | Iteration|  Initiation Interval  | Trip |          |
         |      Loop Name     |   min   |   max   |  Latency |  achieved |   target  | Count| Pipelined|
         +--------------------+---------+---------+----------+-----------+-----------+------+----------+
-        |- DECAY_POST_TRACE  |      530|      530|         4|          1|          1|   528|       yes|
+        |- DECAY_POST_TRACE  |      802|      802|         4|          1|          1|   800|       yes|
         +--------------------+---------+---------+----------+-----------+-----------+------+----------+
 
 
@@ -73,7 +73,7 @@
     +------------------------+--------------------+---------+----+---+----+-----+
     |        Instance        |       Module       | BRAM_18K| DSP| FF| LUT| URAM|
     +------------------------+--------------------+---------+----+---+----+-----+
-    |mul_8ns_8ns_16_3_1_U21  |mul_8ns_8ns_16_3_1  |        0|   1|  0|   0|    0|
+    |mul_8ns_8ns_16_3_1_U57  |mul_8ns_8ns_16_3_1  |        0|   1|  0|   0|    0|
     +------------------------+--------------------+---------+----+---+----+-----+
     |Total                   |                    |        0|   1|  0|   0|    0|
     +------------------------+--------------------+---------+----+---+----+-----+
@@ -91,12 +91,12 @@
     +----------------------+----------+----+---+----+------------+------------+
     |     Variable Name    | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
     +----------------------+----------+----+---+----+------------+------------+
-    |add_ln217_fu_107_p2   |         +|   0|  0|  13|          10|           1|
-    |sub_ln223_fu_142_p2   |         -|   0|  0|  15|           8|           8|
-    |icmp_ln217_fu_101_p2  |      icmp|   0|  0|  13|          10|          10|
+    |add_ln338_fu_107_p2   |         +|   0|  0|  13|          10|           1|
+    |sub_ln344_fu_142_p2   |         -|   0|  0|  15|           8|           8|
+    |icmp_ln338_fu_101_p2  |      icmp|   0|  0|  13|          10|           9|
     |ap_enable_pp0         |       xor|   0|  0|   2|           1|           2|
     +----------------------+----------+----+---+----+------------+------------+
-    |Total                 |          |   0|  0|  43|          29|          21|
+    |Total                 |          |   0|  0|  43|          29|          20|
     +----------------------+----------+----+---+----+------------+------------+
 
     * Multiplexer: 
@@ -126,7 +126,7 @@
     |post_traces_addr_reg_164          |  10|   0|   10|          0|
     |t_reg_170                         |   8|   0|    8|          0|
     |t_reg_170_pp0_iter2_reg           |   8|   0|    8|          0|
-    |zext_ln209_cast_reg_155           |   8|   0|   16|          8|
+    |zext_ln330_cast_reg_155           |   8|   0|   16|          8|
     |post_traces_addr_reg_164          |  64|  32|   10|          0|
     +----------------------------------+----+----+-----+-----------+
     |Total                             | 115|  32|   69|          8|
@@ -147,7 +147,7 @@
 |ap_done               |  out|    1|  ap_ctrl_hs|  decay_all_traces_Pipeline_DECAY_POST_TRACE|  return value|
 |ap_idle               |  out|    1|  ap_ctrl_hs|  decay_all_traces_Pipeline_DECAY_POST_TRACE|  return value|
 |ap_ready              |  out|    1|  ap_ctrl_hs|  decay_all_traces_Pipeline_DECAY_POST_TRACE|  return value|
-|zext_ln209            |   in|    8|     ap_none|                                  zext_ln209|        scalar|
+|zext_ln330            |   in|    8|     ap_none|                                  zext_ln330|        scalar|
 |post_traces_address0  |  out|   10|   ap_memory|                                 post_traces|         array|
 |post_traces_ce0       |  out|    1|   ap_memory|                                 post_traces|         array|
 |post_traces_q0        |   in|    8|   ap_memory|                                 post_traces|         array|

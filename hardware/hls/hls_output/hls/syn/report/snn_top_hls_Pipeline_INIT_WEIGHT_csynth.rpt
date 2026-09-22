@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'snn_top_hls_Pipeline_INIT_WEIGHT'
 ================================================================
-* Date:           Sun Sep 20 02:25:01 2026
+* Date:           Wed Sep 23 00:23:55 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -20,7 +20,7 @@
     +--------+----------+----------+------------+
     |  Clock |  Target  | Estimated| Uncertainty|
     +--------+----------+----------+------------+
-    |ap_clk  |  10.00 ns|  5.377 ns|     2.70 ns|
+    |ap_clk  |  10.00 ns|  5.082 ns|     2.70 ns|
     +--------+----------+----------+------------+
 
 + Latency: 
@@ -29,7 +29,7 @@
     |  Latency (cycles) |  Latency (absolute) |  Interval |      Pipeline     |
     |   min   |   max   |    min   |    max   | min | max |        Type       |
     +---------+---------+----------+----------+-----+-----+-------------------+
-    |    69634|    69634|  0.696 ms|  0.696 ms|    0|    0|  loop pipeline stp|
+    |    12546|    12546|  0.125 ms|  0.125 ms|    0|    0|  loop pipeline stp|
     +---------+---------+----------+----------+-----+-----+-------------------+
 
     + Detail: 
@@ -41,7 +41,7 @@
         |               |  Latency (cycles) | Iteration|  Initiation Interval  |  Trip |          |
         |   Loop Name   |   min   |   max   |  Latency |  achieved |   target  | Count | Pipelined|
         +---------------+---------+---------+----------+-----------+-----------+-------+----------+
-        |- INIT_WEIGHT  |    69632|    69632|         2|          1|          1|  69632|       yes|
+        |- INIT_WEIGHT  |    12544|    12544|         2|          1|          1|  12544|       yes|
         +---------------+---------+---------+----------+-----------+-----------+-------+----------+
 
 
@@ -54,14 +54,14 @@
 |       Name      | BRAM_18K| DSP |   FF   |  LUT  | URAM|
 +-----------------+---------+-----+--------+-------+-----+
 |DSP              |        -|    -|       -|      -|    -|
-|Expression       |        -|    -|       0|     50|    -|
+|Expression       |        -|    -|       0|     36|    -|
 |FIFO             |        -|    -|       -|      -|    -|
 |Instance         |        -|    -|       -|      -|    -|
 |Memory           |        -|    -|       -|      -|    -|
 |Multiplexer      |        -|    -|       0|     36|    -|
-|Register         |        -|    -|      20|      -|    -|
+|Register         |        -|    -|      17|      -|    -|
 +-----------------+---------+-----+--------+-------+-----+
-|Total            |        0|    0|      20|     86|    0|
+|Total            |        0|    0|      17|     72|    0|
 +-----------------+---------+-----+--------+-------+-----+
 |Available        |      280|  220|  106400|  53200|    0|
 +-----------------+---------+-----+--------+-------+-----+
@@ -85,11 +85,11 @@
     +---------------------+----------+----+---+----+------------+------------+
     |    Variable Name    | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
     +---------------------+----------+----+---+----+------------+------------+
-    |add_ln804_fu_72_p2   |         +|   0|  0|  24|          17|           1|
-    |icmp_ln804_fu_66_p2  |      icmp|   0|  0|  24|          17|          17|
+    |add_ln927_fu_72_p2   |         +|   0|  0|  17|          14|           1|
+    |icmp_ln927_fu_66_p2  |      icmp|   0|  0|  17|          14|          13|
     |ap_enable_pp0        |       xor|   0|  0|   2|           1|           2|
     +---------------------+----------+----+---+----+------------+------------+
-    |Total                |          |   0|  0|  50|          35|          20|
+    |Total                |          |   0|  0|  36|          29|          16|
     +---------------------+----------+----+---+----+------------+------------+
 
     * Multiplexer: 
@@ -98,10 +98,10 @@
     +-------------------------+----+-----------+-----+-----------+
     |ap_done_int              |   9|          2|    1|          2|
     |ap_enable_reg_pp0_iter1  |   9|          2|    1|          2|
-    |ap_sig_allocacmp_k_1     |   9|          2|   17|         34|
-    |k_fu_40                  |   9|          2|   17|         34|
+    |ap_sig_allocacmp_k_1     |   9|          2|   14|         28|
+    |k_fu_40                  |   9|          2|   14|         28|
     +-------------------------+----+-----------+-----+-----------+
-    |Total                    |  36|          8|   36|         72|
+    |Total                    |  36|          8|   30|         60|
     +-------------------------+----+-----------+-----+-----------+
 
     * Register: 
@@ -111,9 +111,9 @@
     |ap_CS_fsm                |   1|   0|    1|          0|
     |ap_done_reg              |   1|   0|    1|          0|
     |ap_enable_reg_pp0_iter1  |   1|   0|    1|          0|
-    |k_fu_40                  |  17|   0|   17|          0|
+    |k_fu_40                  |  14|   0|   14|          0|
     +-------------------------+----+----+-----+-----------+
-    |Total                    |  20|   0|   20|          0|
+    |Total                    |  17|   0|   17|          0|
     +-------------------------+----+----+-----+-----------+
 
 
@@ -131,7 +131,7 @@
 |ap_done                 |  out|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_INIT_WEIGHT|  return value|
 |ap_idle                 |  out|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_INIT_WEIGHT|  return value|
 |ap_ready                |  out|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_INIT_WEIGHT|  return value|
-|weight_memory_address0  |  out|   17|   ap_memory|                     weight_memory|         array|
+|weight_memory_address0  |  out|   14|   ap_memory|                     weight_memory|         array|
 |weight_memory_ce0       |  out|    1|   ap_memory|                     weight_memory|         array|
 |weight_memory_we0       |  out|    1|   ap_memory|                     weight_memory|         array|
 |weight_memory_d0        |  out|    4|   ap_memory|                     weight_memory|         array|
