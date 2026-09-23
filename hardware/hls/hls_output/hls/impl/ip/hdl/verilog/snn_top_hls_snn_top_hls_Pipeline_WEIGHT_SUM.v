@@ -46,14 +46,14 @@ reg    ap_enable_reg_pp0_iter2;
 reg    ap_enable_reg_pp0_iter3;
 reg    ap_idle_pp0;
 wire    ap_block_pp0_stage0_subdone;
-wire   [0:0] icmp_ln1267_fu_85_p2;
+wire   [0:0] icmp_ln1270_fu_85_p2;
 reg    ap_condition_exit_pp0_iter0_stage0;
 wire    ap_loop_exit_ready;
 reg    ap_ready_int;
 wire    ap_block_pp0_stage0_11001;
-reg   [0:0] icmp_ln1267_reg_144;
-reg   [0:0] icmp_ln1267_reg_144_pp0_iter1_reg;
-wire   [63:0] zext_ln1267_fu_97_p1;
+reg   [0:0] icmp_ln1270_reg_144;
+reg   [0:0] icmp_ln1270_reg_144_pp0_iter1_reg;
+wire   [63:0] zext_ln1270_fu_97_p1;
 wire    ap_block_pp0_stage0;
 reg   [9:0] weight_sum_fu_44;
 wire   [9:0] weight_sum_1_fu_114_p2;
@@ -61,11 +61,11 @@ wire    ap_loop_init;
 reg    ap_loop_exit_ready_pp0_iter1_reg;
 reg    ap_loop_exit_ready_pp0_iter2_reg;
 reg   [6:0] i_fu_48;
-wire   [6:0] add_ln1267_fu_91_p2;
+wire   [6:0] add_ln1270_fu_91_p2;
 reg   [6:0] ap_sig_allocacmp_i_1;
 wire    ap_block_pp0_stage0_01001;
 reg    weight_memory_ce0_local;
-wire  signed [9:0] sext_ln1269_fu_110_p1;
+wire  signed [9:0] sext_ln1272_fu_110_p1;
 reg    ap_done_reg;
 wire    ap_continue_int;
 reg    ap_done_int;
@@ -156,8 +156,8 @@ end
 
 always @ (posedge ap_clk) begin
     if (((1'b0 == ap_block_pp0_stage0_11001) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
-        if (((icmp_ln1267_fu_85_p2 == 1'd0) & (ap_enable_reg_pp0_iter0 == 1'b1))) begin
-            i_fu_48 <= add_ln1267_fu_91_p2;
+        if (((icmp_ln1270_fu_85_p2 == 1'd0) & (ap_enable_reg_pp0_iter0 == 1'b1))) begin
+            i_fu_48 <= add_ln1270_fu_91_p2;
         end else if ((ap_loop_init == 1'b1)) begin
             i_fu_48 <= 7'd0;
         end
@@ -178,13 +178,13 @@ always @ (posedge ap_clk) begin
     if (((1'b0 == ap_block_pp0_stage0_11001) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
         ap_loop_exit_ready_pp0_iter1_reg <= ap_loop_exit_ready;
         ap_loop_exit_ready_pp0_iter2_reg <= ap_loop_exit_ready_pp0_iter1_reg;
-        icmp_ln1267_reg_144 <= icmp_ln1267_fu_85_p2;
-        icmp_ln1267_reg_144_pp0_iter1_reg <= icmp_ln1267_reg_144;
+        icmp_ln1270_reg_144 <= icmp_ln1270_fu_85_p2;
+        icmp_ln1270_reg_144_pp0_iter1_reg <= icmp_ln1270_reg_144;
     end
 end
 
 always @ (*) begin
-    if (((icmp_ln1267_fu_85_p2 == 1'd1) & (1'b0 == ap_block_pp0_stage0_subdone) & (ap_enable_reg_pp0_iter0 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
+    if (((icmp_ln1270_fu_85_p2 == 1'd1) & (1'b0 == ap_block_pp0_stage0_subdone) & (ap_enable_reg_pp0_iter0 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
         ap_condition_exit_pp0_iter0_stage0 = 1'b1;
     end else begin
         ap_condition_exit_pp0_iter0_stage0 = 1'b0;
@@ -240,7 +240,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((ap_loop_exit_ready_pp0_iter2_reg == 1'b1) & (icmp_ln1267_reg_144_pp0_iter1_reg == 1'd1) & (1'b0 == ap_block_pp0_stage0_11001))) begin
+    if (((ap_loop_exit_ready_pp0_iter2_reg == 1'b1) & (icmp_ln1270_reg_144_pp0_iter1_reg == 1'd1) & (1'b0 == ap_block_pp0_stage0_11001))) begin
         weight_sum_out_ap_vld = 1'b1;
     end else begin
         weight_sum_out_ap_vld = 1'b0;
@@ -258,7 +258,7 @@ always @ (*) begin
     endcase
 end
 
-assign add_ln1267_fu_91_p2 = (ap_sig_allocacmp_i_1 + 7'd1);
+assign add_ln1270_fu_91_p2 = (ap_sig_allocacmp_i_1 + 7'd1);
 
 assign ap_CS_fsm_pp0_stage0 = ap_CS_fsm[32'd0];
 
@@ -280,18 +280,18 @@ assign ap_loop_exit_ready = ap_condition_exit_pp0_iter0_stage0;
 
 assign ap_ready = ap_ready_sig;
 
-assign icmp_ln1267_fu_85_p2 = ((ap_sig_allocacmp_i_1 == 7'd64) ? 1'b1 : 1'b0);
+assign icmp_ln1270_fu_85_p2 = ((ap_sig_allocacmp_i_1 == 7'd64) ? 1'b1 : 1'b0);
 
-assign sext_ln1269_fu_110_p1 = $signed(weight_memory_q0);
+assign sext_ln1272_fu_110_p1 = $signed(weight_memory_q0);
 
-assign weight_memory_address0 = zext_ln1267_fu_97_p1;
+assign weight_memory_address0 = zext_ln1270_fu_97_p1;
 
 assign weight_memory_ce0 = weight_memory_ce0_local;
 
-assign weight_sum_1_fu_114_p2 = ($signed(sext_ln1269_fu_110_p1) + $signed(weight_sum_fu_44));
+assign weight_sum_1_fu_114_p2 = ($signed(sext_ln1272_fu_110_p1) + $signed(weight_sum_fu_44));
 
 assign weight_sum_out = weight_sum_fu_44;
 
-assign zext_ln1267_fu_97_p1 = ap_sig_allocacmp_i_1;
+assign zext_ln1270_fu_97_p1 = ap_sig_allocacmp_i_1;
 
 endmodule //snn_top_hls_snn_top_hls_Pipeline_WEIGHT_SUM

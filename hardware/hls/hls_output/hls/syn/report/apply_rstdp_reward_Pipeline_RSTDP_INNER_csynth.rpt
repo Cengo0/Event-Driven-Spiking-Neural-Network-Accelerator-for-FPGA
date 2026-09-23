@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'apply_rstdp_reward_Pipeline_RSTDP_INNER'
 ================================================================
-* Date:           Wed Sep 23 19:58:51 2026
+* Date:           Thu Sep 24 00:27:21 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -73,9 +73,9 @@
     +--------------------------+---------------------+---------+----+---+----+-----+
     |         Instance         |        Module       | BRAM_18K| DSP| FF| LUT| URAM|
     +--------------------------+---------------------+---------+----+---+----+-----+
-    |mul_7s_16s_23_3_1_U686    |mul_7s_16s_23_3_1    |        0|   1|  0|   0|    0|
-    |mul_8s_8s_16_3_1_U684     |mul_8s_8s_16_3_1     |        0|   1|  0|   0|    0|
-    |sparsemux_9_3_7_1_1_U685  |sparsemux_9_3_7_1_1  |        0|   0|  0|  14|    0|
+    |mul_7s_16s_23_3_1_U687    |mul_7s_16s_23_3_1    |        0|   1|  0|   0|    0|
+    |mul_8s_8s_16_3_1_U685     |mul_8s_8s_16_3_1     |        0|   1|  0|   0|    0|
+    |sparsemux_9_3_7_1_1_U686  |sparsemux_9_3_7_1_1  |        0|   0|  0|  14|    0|
     +--------------------------+---------------------+---------+----+---+----+-----+
     |Total                     |                     |        0|   2|  0|  14|    0|
     +--------------------------+---------------------+---------+----+---+----+-----+
@@ -195,7 +195,7 @@
 |ap_ready                       |  out|    1|  ap_ctrl_hs|  apply_rstdp_reward_Pipeline_RSTDP_INNER|  return value|
 |add_ln574                      |   in|   14|     ap_none|                                add_ln574|        scalar|
 |add_ln574_2                    |   in|   14|     ap_none|                              add_ln574_2|        scalar|
-|tmp_224                        |   in|    9|     ap_none|                                  tmp_224|        scalar|
+|tmp_162                        |   in|    9|     ap_none|                                  tmp_162|        scalar|
 |sext_ln608                     |   in|    8|     ap_none|                               sext_ln608|        scalar|
 |shift_sel                      |   in|    2|     ap_none|                                shift_sel|        scalar|
 |sext_ln559                     |   in|   16|     ap_none|                               sext_ln559|        scalar|
@@ -203,7 +203,7 @@
 |learn_weight_ready             |   in|    1|     ap_none|                       learn_weight_ready|        scalar|
 |pre_id                         |   in|    8|     ap_none|                                   pre_id|        scalar|
 |zext_ln299                     |   in|    2|     ap_none|                               zext_ln299|        scalar|
-|tmp_195                        |   in|    2|     ap_none|                                  tmp_195|        scalar|
+|tmp_350                        |   in|    2|     ap_none|                                  tmp_350|        scalar|
 |post_eligibility_address0      |  out|   10|   ap_memory|                         post_eligibility|         array|
 |post_eligibility_ce0           |  out|    1|   ap_memory|                         post_eligibility|         array|
 |post_eligibility_q0            |   in|    8|   ap_memory|                         post_eligibility|         array|

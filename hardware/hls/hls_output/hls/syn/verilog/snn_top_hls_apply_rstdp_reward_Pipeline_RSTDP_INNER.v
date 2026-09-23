@@ -16,7 +16,7 @@ module snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER (
         ap_ready,
         add_ln574,
         add_ln574_2,
-        tmp_224,
+        tmp_162,
         sext_ln608,
         shift_sel,
         sext_ln559,
@@ -24,7 +24,7 @@ module snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER (
         learn_weight_ready,
         pre_id,
         zext_ln299,
-        tmp_195,
+        tmp_350,
         post_eligibility_address0,
         post_eligibility_ce0,
         post_eligibility_q0,
@@ -64,7 +64,7 @@ output   ap_idle;
 output   ap_ready;
 input  [13:0] add_ln574;
 input  [13:0] add_ln574_2;
-input  [8:0] tmp_224;
+input  [8:0] tmp_162;
 input  [7:0] sext_ln608;
 input  [1:0] shift_sel;
 input  [15:0] sext_ln559;
@@ -72,7 +72,7 @@ input  [0:0] empty;
 input  [0:0] learn_weight_ready;
 input  [7:0] pre_id;
 input  [1:0] zext_ln299;
-input  [1:0] tmp_195;
+input  [1:0] tmp_350;
 output  [9:0] post_eligibility_address0;
 output   post_eligibility_ce0;
 input  [7:0] post_eligibility_q0;
@@ -189,7 +189,7 @@ wire  signed [7:0] icmp_ln580_fu_356_p0;
 wire  signed [7:0] sext_ln582_fu_362_p0;
 wire  signed [7:0] grp_fu_366_p1;
 wire   [0:0] xor_ln286_fu_375_p2;
-wire   [0:0] tmp_135_fu_386_p3;
+wire   [0:0] tmp_62_fu_386_p3;
 wire   [15:0] grp_fu_366_p2;
 wire   [3:0] base_scaled_fu_443_p4;
 wire   [5:0] base_scaled_2_fu_467_p4;
@@ -209,13 +209,13 @@ wire   [14:0] scaled_fu_552_p4;
 wire   [15:0] delta_1_fu_572_p3;
 wire  signed [15:0] sext_ln605_fu_577_p1;
 wire   [15:0] w_fu_580_p2;
-wire   [12:0] tmp_134_fu_586_p4;
+wire   [12:0] tmp_61_fu_586_p4;
 wire   [0:0] icmp_ln254_fu_596_p2;
 wire   [0:0] icmp_ln255_fu_602_p2;
 wire   [0:0] or_ln254_fu_620_p2;
 wire   [3:0] select_ln254_fu_612_p3;
 wire   [3:0] trunc_ln256_fu_608_p1;
-wire   [0:0] tmp_136_fu_635_p3;
+wire   [0:0] tmp_63_fu_635_p3;
 wire   [3:0] mag_5_fu_648_p2;
 reg    ap_done_reg;
 wire    ap_continue_int;
@@ -260,7 +260,7 @@ snn_top_hls_mul_8s_8s_16_3_1 #(
     .din0_WIDTH( 8 ),
     .din1_WIDTH( 8 ),
     .dout_WIDTH( 16 ))
-mul_8s_8s_16_3_1_U684(
+mul_8s_8s_16_3_1_U685(
     .clk(ap_clk),
     .reset(ap_rst),
     .din0(sext_ln582_fu_362_p0),
@@ -283,7 +283,7 @@ mul_8s_8s_16_3_1_U684(
     .def_WIDTH( 7 ),
     .sel_WIDTH( 3 ),
     .dout_WIDTH( 7 ))
-sparsemux_9_3_7_1_1_U685(
+sparsemux_9_3_7_1_1_U686(
     .din0(base_scaled_4_fu_520_p2),
     .din1(base_scaled_4_fu_520_p4),
     .din2(base_scaled_4_fu_520_p6),
@@ -299,7 +299,7 @@ snn_top_hls_mul_7s_16s_23_3_1 #(
     .din0_WIDTH( 7 ),
     .din1_WIDTH( 16 ),
     .dout_WIDTH( 23 ))
-mul_7s_16s_23_3_1_U686(
+mul_7s_16s_23_3_1_U687(
     .clk(ap_clk),
     .reset(ap_rst),
     .din0(base_scaled_4_reg_767),
@@ -715,7 +715,7 @@ assign grp_fu_366_p1 = sext_ln608_cast_reg_723;
 
 assign grp_fu_547_p1 = sext_ln559_cast_reg_718;
 
-assign icmp_ln254_fu_596_p2 = (($signed(tmp_134_fu_586_p4) > $signed(13'd0)) ? 1'b1 : 1'b0);
+assign icmp_ln254_fu_596_p2 = (($signed(tmp_61_fu_586_p4) > $signed(13'd0)) ? 1'b1 : 1'b0);
 
 assign icmp_ln255_fu_602_p2 = (($signed(w_fu_580_p2) < $signed(16'd65528)) ? 1'b1 : 1'b0);
 
@@ -731,17 +731,17 @@ assign icmp_ln588_2_fu_505_p2 = ((shift_sel == 2'd0) ? 1'b1 : 1'b0);
 
 assign icmp_ln588_fu_495_p2 = ((shift_sel == 2'd2) ? 1'b1 : 1'b0);
 
-assign learn_bridge_data = ((tmp_136_fu_635_p3[0:0] == 1'b1) ? mag_5_fu_648_p2 : updated_reg_792);
+assign learn_bridge_data = ((tmp_63_fu_635_p3[0:0] == 1'b1) ? mag_5_fu_648_p2 : updated_reg_792);
 
 assign learn_bridge_dst = post_id_reg_737[5:0];
 
 assign learn_bridge_dst_group = select_ln300_fu_393_p3;
 
-assign learn_bridge_exc = (tmp_136_fu_635_p3 ^ 1'd1);
+assign learn_bridge_exc = (tmp_63_fu_635_p3 ^ 1'd1);
 
 assign learn_bridge_group = zext_ln299;
 
-assign learn_bridge_is_inter = ((tmp_195 != select_ln300_fu_393_p3) ? 1'b1 : 1'b0);
+assign learn_bridge_is_inter = ((tmp_350 != select_ln300_fu_393_p3) ? 1'b1 : 1'b0);
 
 assign learn_bridge_src = pre_id;
 
@@ -755,13 +755,13 @@ assign post_eligibility_address0 = zext_ln579_fu_331_p1;
 
 assign post_eligibility_ce0 = post_eligibility_ce0_local;
 
-assign post_id_fu_321_p2 = (zext_ln574_1_fu_317_p1 + tmp_224);
+assign post_id_fu_321_p2 = (zext_ln574_1_fu_317_p1 + tmp_162);
 
 assign scaled_fu_552_p4 = {{grp_fu_547_p2[22:8]}};
 
 assign select_ln254_fu_612_p3 = ((icmp_ln254_fu_596_p2[0:0] == 1'b1) ? 4'd7 : 4'd8);
 
-assign select_ln300_fu_393_p3 = ((tmp_135_fu_386_p3[0:0] == 1'b1) ? 2'd3 : 2'd0);
+assign select_ln300_fu_393_p3 = ((tmp_62_fu_386_p3[0:0] == 1'b1) ? 2'd3 : 2'd0);
 
 assign sext_ln559_cast_fu_281_p1 = $signed(sext_ln559);
 
@@ -775,11 +775,11 @@ assign sext_ln605_fu_577_p1 = current_w_reg_787;
 
 assign sext_ln608_cast_fu_285_p1 = $signed(sext_ln608);
 
-assign tmp_134_fu_586_p4 = {{w_fu_580_p2[15:3]}};
+assign tmp_61_fu_586_p4 = {{w_fu_580_p2[15:3]}};
 
-assign tmp_135_fu_386_p3 = post_id_reg_737[32'd8];
+assign tmp_62_fu_386_p3 = post_id_reg_737[32'd8];
 
-assign tmp_136_fu_635_p3 = updated_reg_792[32'd3];
+assign tmp_63_fu_635_p3 = updated_reg_792[32'd3];
 
 assign trunc_ln256_fu_608_p1 = w_fu_580_p2[3:0];
 

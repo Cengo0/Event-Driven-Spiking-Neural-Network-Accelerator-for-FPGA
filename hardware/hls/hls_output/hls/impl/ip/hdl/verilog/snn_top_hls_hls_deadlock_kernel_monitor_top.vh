@@ -14,12 +14,12 @@ assign axis_block_sigs[0] = ~s_axis_spikes_TDATA_blk_n;
 assign axis_block_sigs[1] = ~s_axis_weights_TDATA_blk_n;
 assign axis_block_sigs[2] = ~m_axis_spikes_TDATA_blk_n;
 assign axis_block_sigs[3] = ~m_axis_weights_TDATA_blk_n;
-assign axis_block_sigs[4] = ~grp_snn_top_hls_Pipeline_LOAD_FRAME_fu_2835.s_axis_data_TDATA_blk_n;
+assign axis_block_sigs[4] = ~grp_snn_top_hls_Pipeline_LOAD_FRAME_fu_2838.s_axis_data_TDATA_blk_n;
 
 assign inst_block_sigs[0] = 1'b0;
 
 assign inst_idle_sigs[0] = 1'b0;
-assign inst_idle_sigs[1] = grp_snn_top_hls_Pipeline_LOAD_FRAME_fu_2835.ap_idle;
+assign inst_idle_sigs[1] = grp_snn_top_hls_Pipeline_LOAD_FRAME_fu_2838.ap_idle;
 
 snn_top_hls_hls_deadlock_idx0_monitor snn_top_hls_hls_deadlock_idx0_monitor_U (
     .clock(kernel_monitor_clock),

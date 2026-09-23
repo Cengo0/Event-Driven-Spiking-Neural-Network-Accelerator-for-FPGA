@@ -18,7 +18,7 @@ port (
     ap_ready : OUT STD_LOGIC;
     base_offset : IN STD_LOGIC_VECTOR (15 downto 0);
     add_ln388_1 : IN STD_LOGIC_VECTOR (15 downto 0);
-    tmp_s : IN STD_LOGIC_VECTOR (8 downto 0);
+    tmp_157 : IN STD_LOGIC_VECTOR (8 downto 0);
     sext_ln417 : IN STD_LOGIC_VECTOR (15 downto 0);
     sext_ln291 : IN STD_LOGIC_VECTOR (15 downto 0);
     learn_weight_ready : IN STD_LOGIC_VECTOR (0 downto 0);
@@ -190,7 +190,7 @@ attribute shreg_extract : string;
     signal sext_ln395_fu_288_p1 : STD_LOGIC_VECTOR (9 downto 0);
     signal xor_ln286_fu_327_p2 : STD_LOGIC_VECTOR (0 downto 0);
     signal and_ln286_fu_332_p2 : STD_LOGIC_VECTOR (0 downto 0);
-    signal tmp_129_fu_343_p3 : STD_LOGIC_VECTOR (0 downto 0);
+    signal tmp_56_fu_343_p3 : STD_LOGIC_VECTOR (0 downto 0);
     signal bit_sel_fu_400_p1 : STD_LOGIC_VECTOR (3 downto 0);
     signal bit_sel_fu_400_p3 : STD_LOGIC_VECTOR (0 downto 0);
     signal trunc_ln405_fu_414_p0 : STD_LOGIC_VECTOR (3 downto 0);
@@ -215,7 +215,7 @@ attribute shreg_extract : string;
     signal or_ln254_fu_520_p2 : STD_LOGIC_VECTOR (0 downto 0);
     signal select_ln254_fu_512_p3 : STD_LOGIC_VECTOR (3 downto 0);
     signal trunc_ln256_fu_508_p1 : STD_LOGIC_VECTOR (3 downto 0);
-    signal tmp_130_fu_534_p3 : STD_LOGIC_VECTOR (0 downto 0);
+    signal tmp_57_fu_534_p3 : STD_LOGIC_VECTOR (0 downto 0);
     signal mag_1_fu_547_p2 : STD_LOGIC_VECTOR (3 downto 0);
     signal ap_done_reg : STD_LOGIC := '0';
     signal ap_continue_int : STD_LOGIC;
@@ -313,7 +313,7 @@ attribute shreg_extract : string;
 
 
 begin
-    mul_4ns_8ns_12_3_1_U589 : component snn_top_hls_mul_4ns_8ns_12_3_1
+    mul_4ns_8ns_12_3_1_U590 : component snn_top_hls_mul_4ns_8ns_12_3_1
     generic map (
         ID => 1,
         NUM_STAGE => 3,
@@ -328,7 +328,7 @@ begin
         ce => ap_const_logic_1,
         dout => grp_fu_433_p2);
 
-    mul_12ns_16s_28_4_1_U590 : component snn_top_hls_mul_12ns_16s_28_4_1
+    mul_12ns_16s_28_4_1_U591 : component snn_top_hls_mul_12ns_16s_28_4_1
     generic map (
         ID => 1,
         NUM_STAGE => 4,
@@ -343,7 +343,7 @@ begin
         ce => ap_const_logic_1,
         dout => grp_fu_443_p2);
 
-    mul_12s_16s_28_4_1_U591 : component snn_top_hls_mul_12s_16s_28_4_1
+    mul_12s_16s_28_4_1_U592 : component snn_top_hls_mul_12s_16s_28_4_1
     generic map (
         ID => 1,
         NUM_STAGE => 4,
@@ -822,7 +822,7 @@ begin
     icmp_ln388_fu_266_p2 <= "1" when (ap_sig_allocacmp_widx_1 = add_ln388_1) else "0";
     icmp_ln399_fu_317_p2 <= "1" when (post_traces_q0 = ap_const_lv8_0) else "0";
     learn_bridge_data <= 
-        mag_1_fu_547_p2 when (tmp_130_fu_534_p3(0) = '1') else 
+        mag_1_fu_547_p2 when (tmp_57_fu_534_p3(0) = '1') else 
         updated_reg_680;
 
     learn_bridge_data_ap_vld_assign_proc : process(ap_enable_reg_pp0_iter13, ap_block_pp0_stage0_11001, icmp_ln399_reg_641_pp0_iter12_reg, or_ln286_reg_651_pp0_iter12_reg)
@@ -856,7 +856,7 @@ begin
         end if; 
     end process;
 
-    learn_bridge_exc <= (tmp_130_fu_534_p3 xor ap_const_lv1_1);
+    learn_bridge_exc <= (tmp_57_fu_534_p3 xor ap_const_lv1_1);
 
     learn_bridge_exc_ap_vld_assign_proc : process(ap_enable_reg_pp0_iter13, ap_block_pp0_stage0_11001, icmp_ln399_reg_641_pp0_iter12_reg, or_ln286_reg_651_pp0_iter12_reg)
     begin
@@ -923,7 +923,7 @@ begin
     mag_1_fu_547_p2 <= std_logic_vector(unsigned(ap_const_lv4_0) - unsigned(updated_reg_680));
     or_ln254_fu_520_p2 <= (icmp_ln255_fu_502_p2 or icmp_ln254_fu_496_p2);
     or_ln286_fu_338_p2 <= (icmp_ln291 or and_ln286_fu_332_p2);
-    post_id_fu_282_p2 <= std_logic_vector(unsigned(zext_ln388_1_fu_278_p1) + unsigned(tmp_s));
+    post_id_fu_282_p2 <= std_logic_vector(unsigned(zext_ln388_1_fu_278_p1) + unsigned(tmp_157));
     post_traces_address0 <= zext_ln395_fu_292_p1(10 - 1 downto 0);
     post_traces_ce0 <= post_traces_ce0_local;
 
@@ -940,7 +940,7 @@ begin
         ap_const_lv4_7 when (icmp_ln254_fu_496_p2(0) = '1') else 
         ap_const_lv4_8;
     select_ln301_fu_350_p3 <= 
-        ap_const_lv2_3 when (tmp_129_fu_343_p3(0) = '1') else 
+        ap_const_lv2_3 when (tmp_56_fu_343_p3(0) = '1') else 
         ap_const_lv2_0;
         sext_ln291_cast_fu_246_p1 <= std_logic_vector(IEEE.numeric_std.resize(signed(sext_ln291),28));
 
@@ -950,8 +950,8 @@ begin
 
         sext_ln417_cast_fu_242_p1 <= std_logic_vector(IEEE.numeric_std.resize(signed(sext_ln417),28));
 
-    tmp_129_fu_343_p3 <= post_id_reg_625(8 downto 8);
-    tmp_130_fu_534_p3 <= updated_reg_680(3 downto 3);
+    tmp_56_fu_343_p3 <= post_id_reg_625(8 downto 8);
+    tmp_57_fu_534_p3 <= updated_reg_680(3 downto 3);
     tmp_fu_486_p4 <= w_fu_480_p2(15 downto 3);
     trunc_ln1_fu_470_p4 <= grp_fu_462_p2(23 downto 8);
     trunc_ln256_fu_508_p1 <= w_fu_480_p2(4 - 1 downto 0);

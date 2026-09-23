@@ -48,13 +48,13 @@
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:82~src/snn_top_hls.cpp:925</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:82~src/snn_top_hls.cpp:927</SourceLocation>
 <SummaryOfLoopViolations>
 <VITIS_LOOP_82_5>
 <Name>VITIS_LOOP_82_5</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:82~src/snn_top_hls.cpp:925</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:82~src/snn_top_hls.cpp:927</SourceLocation>
 </VITIS_LOOP_82_5>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>

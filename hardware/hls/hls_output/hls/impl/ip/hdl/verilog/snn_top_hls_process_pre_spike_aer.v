@@ -147,8 +147,8 @@ reg   [15:0] base_offset_reg_579;
 wire    ap_CS_fsm_state7;
 (* use_dsp = "no" *) wire   [15:0] add_ln388_fu_448_p2;
 reg   [15:0] add_ln388_reg_584;
-wire   [8:0] tmp_s_fu_452_p11;
-reg   [8:0] tmp_s_reg_589;
+wire   [8:0] tmp_157_fu_452_p11;
+reg   [8:0] tmp_157_reg_589;
 wire    ap_CS_fsm_state8;
 wire    grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_181_ap_start;
 wire    grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_181_ap_done;
@@ -197,7 +197,7 @@ wire   [7:0] select_ln369_fu_259_p3;
 reg    pre_traces_ce1_local;
 wire   [8:0] zext_ln368_1_fu_238_p1;
 wire   [8:0] new_trace_fu_241_p2;
-wire   [0:0] tmp_131_fu_247_p3;
+wire   [0:0] tmp_58_fu_247_p3;
 wire   [7:0] trunc_ln369_fu_255_p1;
 wire   [9:0] src_start_fu_292_p9;
 wire   [9:0] src_start_fu_292_p11;
@@ -217,7 +217,7 @@ wire   [4:0] zext_ln385_1_cast_fu_393_p11;
 wire   [13:0] zext_ln385_cast_fu_421_p9;
 wire   [13:0] zext_ln385_cast_fu_421_p11;
 wire  signed [15:0] add_ln388_fu_448_p0;
-wire   [8:0] tmp_s_fu_452_p9;
+wire   [8:0] tmp_157_fu_452_p9;
 wire   [4:0] grp_fu_480_p1;
 wire   [13:0] grp_fu_480_p2;
 wire   [0:0] icmp_ln377_fu_276_p2;
@@ -249,10 +249,10 @@ wire   [1:0] zext_ln385_cast_fu_421_p1;
 wire   [1:0] zext_ln385_cast_fu_421_p3;
 wire  signed [1:0] zext_ln385_cast_fu_421_p5;
 wire  signed [1:0] zext_ln385_cast_fu_421_p7;
-wire   [1:0] tmp_s_fu_452_p1;
-wire   [1:0] tmp_s_fu_452_p3;
-wire  signed [1:0] tmp_s_fu_452_p5;
-wire  signed [1:0] tmp_s_fu_452_p7;
+wire   [1:0] tmp_157_fu_452_p1;
+wire   [1:0] tmp_157_fu_452_p3;
+wire  signed [1:0] tmp_157_fu_452_p5;
+wire  signed [1:0] tmp_157_fu_452_p7;
 wire    ap_ce_reg;
 
 // power-on initialization
@@ -271,7 +271,7 @@ snn_top_hls_process_pre_spike_aer_Pipeline_LTD_LOOP grp_process_pre_spike_aer_Pi
     .ap_ready(grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_181_ap_ready),
     .base_offset(base_offset_reg_579),
     .add_ln388_1(add_ln388_reg_584),
-    .tmp_s(tmp_s_reg_589),
+    .tmp_157(tmp_157_reg_589),
     .sext_ln417(params_a_minus_val),
     .sext_ln291(params_learning_rate_val),
     .learn_weight_ready(learn_weight_ready),
@@ -321,7 +321,7 @@ snn_top_hls_process_pre_spike_aer_Pipeline_LTD_LOOP grp_process_pre_spike_aer_Pi
     .def_WIDTH( 10 ),
     .sel_WIDTH( 2 ),
     .dout_WIDTH( 10 ))
-sparsemux_9_2_10_1_1_U614(
+sparsemux_9_2_10_1_1_U615(
     .din0(10'd0),
     .din1(10'd196),
     .din2(10'd392),
@@ -345,7 +345,7 @@ sparsemux_9_2_10_1_1_U614(
     .def_WIDTH( 7 ),
     .sel_WIDTH( 2 ),
     .dout_WIDTH( 7 ))
-sparsemux_9_2_7_1_1_U615(
+sparsemux_9_2_7_1_1_U616(
     .din0(7'd68),
     .din1(7'd68),
     .din2(7'd68),
@@ -369,7 +369,7 @@ sparsemux_9_2_7_1_1_U615(
     .def_WIDTH( 5 ),
     .sel_WIDTH( 2 ),
     .dout_WIDTH( 5 ))
-sparsemux_9_2_5_1_1_U616(
+sparsemux_9_2_5_1_1_U617(
     .din0(5'd16),
     .din1(5'd16),
     .din2(5'd16),
@@ -393,7 +393,7 @@ sparsemux_9_2_5_1_1_U616(
     .def_WIDTH( 14 ),
     .sel_WIDTH( 2 ),
     .dout_WIDTH( 14 ))
-sparsemux_9_2_14_1_1_U617(
+sparsemux_9_2_14_1_1_U618(
     .din0(14'd0),
     .din1(14'd3136),
     .din2(14'd6272),
@@ -417,14 +417,14 @@ sparsemux_9_2_14_1_1_U617(
     .def_WIDTH( 9 ),
     .sel_WIDTH( 2 ),
     .dout_WIDTH( 9 ))
-sparsemux_9_2_9_1_1_U618(
+sparsemux_9_2_9_1_1_U619(
     .din0(9'd272),
     .din1(9'd272),
     .din2(9'd272),
     .din3(9'd272),
-    .def(tmp_s_fu_452_p9),
+    .def(tmp_157_fu_452_p9),
     .sel(trunc_ln377_reg_553),
-    .dout(tmp_s_fu_452_p11)
+    .dout(tmp_157_fu_452_p11)
 );
 
 snn_top_hls_mac_muladd_11s_5ns_14ns_16_4_1 #(
@@ -434,7 +434,7 @@ snn_top_hls_mac_muladd_11s_5ns_14ns_16_4_1 #(
     .din1_WIDTH( 5 ),
     .din2_WIDTH( 14 ),
     .dout_WIDTH( 16 ))
-mac_muladd_11s_5ns_14ns_16_4_1_U619(
+mac_muladd_11s_5ns_14ns_16_4_1_U620(
     .clk(ap_clk),
     .reset(ap_rst),
     .din0(local_src_fu_384_p2),
@@ -558,7 +558,7 @@ end
 
 always @ (posedge ap_clk) begin
     if ((1'b1 == ap_CS_fsm_state8)) begin
-        tmp_s_reg_589 <= tmp_s_fu_452_p11;
+        tmp_157_reg_589 <= tmp_157_fu_452_p11;
     end
 end
 
@@ -837,7 +837,7 @@ assign pre_traces_d1 = select_ln369_fu_259_p3;
 
 assign pre_traces_we1 = pre_traces_we1_local;
 
-assign select_ln369_fu_259_p3 = ((tmp_131_fu_247_p3[0:0] == 1'b1) ? 8'd255 : trunc_ln369_fu_255_p1);
+assign select_ln369_fu_259_p3 = ((tmp_58_fu_247_p3[0:0] == 1'b1) ? 8'd255 : trunc_ln369_fu_255_p1);
 
 assign sext_ln381_fu_344_p1 = $signed(tmp_fu_320_p11);
 
@@ -845,11 +845,11 @@ assign src_end_fu_352_p2 = (zext_ln381_fu_348_p1 + src_start_fu_292_p11);
 
 assign src_start_fu_292_p9 = 'bx;
 
-assign tmp_131_fu_247_p3 = new_trace_fu_241_p2[32'd8];
+assign tmp_157_fu_452_p9 = 'bx;
+
+assign tmp_58_fu_247_p3 = new_trace_fu_241_p2[32'd8];
 
 assign tmp_fu_320_p9 = 'bx;
-
-assign tmp_s_fu_452_p9 = 'bx;
 
 assign trunc_ln369_fu_255_p1 = new_trace_fu_241_p2[7:0];
 

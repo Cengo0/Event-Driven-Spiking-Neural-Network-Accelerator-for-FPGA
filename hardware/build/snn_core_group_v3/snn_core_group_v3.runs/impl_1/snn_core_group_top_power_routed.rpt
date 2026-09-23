@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
-| Date             : Wed Sep 23 20:21:45 2026
+| Date             : Thu Sep 24 00:47:04 2026
 | Host             : Mariana running 64-bit Ubuntu 22.04.5 LTS
 | Command          : report_power -file snn_core_group_top_power_routed.rpt -pb snn_core_group_top_power_summary_routed.pb -rpx snn_core_group_top_power_routed.rpx
 | Design           : snn_core_group_top
@@ -30,14 +30,14 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 1.937        |
+| Total On-Chip Power (W)  | 1.921        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 1.779        |
-| Device Static (W)        | 0.158        |
+| Dynamic (W)              | 1.763        |
+| Device Static (W)        | 0.157        |
 | Effective TJA (C/W)      | 11.5         |
-| Max Ambient (C)          | 62.7         |
-| Junction Temperature (C) | 47.3         |
+| Max Ambient (C)          | 62.8         |
+| Junction Temperature (C) | 47.2         |
 | Confidence Level         | Medium       |
 | Setting File             | ---          |
 | Simulation Activity File | ---          |
@@ -53,21 +53,21 @@ Table of Contents
 | On-Chip                  | Power (W) | Used     | Available | Utilization (%) |
 +--------------------------+-----------+----------+-----------+-----------------+
 | Clocks                   |     0.068 |        3 |       --- |             --- |
-| Slice Logic              |     0.049 |    46052 |       --- |             --- |
-|   LUT as Logic           |     0.042 |    17952 |     53200 |           33.74 |
-|   CARRY4                 |     0.003 |     1399 |     13300 |           10.52 |
-|   Register               |     0.003 |    18608 |    106400 |           17.49 |
-|   LUT as Distributed RAM |    <0.001 |     1114 |     17400 |            6.40 |
+| Slice Logic              |     0.049 |    46119 |       --- |             --- |
+|   LUT as Logic           |     0.041 |    17947 |     53200 |           33.73 |
+|   CARRY4                 |     0.003 |     1405 |     13300 |           10.56 |
+|   Register               |     0.003 |    18664 |    106400 |           17.54 |
+|   LUT as Distributed RAM |     0.001 |     1114 |     17400 |            6.40 |
 |   LUT as Shift Register  |    <0.001 |      470 |     17400 |            2.70 |
-|   F7/F8 Muxes            |    <0.001 |      400 |     53200 |            0.75 |
-|   Others                 |     0.000 |     1629 |       --- |             --- |
-| Signals                  |     0.057 |    34018 |       --- |             --- |
-| Block RAM                |     0.036 |     40.5 |       140 |           28.93 |
-| DSPs                     |     0.029 |       59 |       220 |           26.82 |
+|   F7/F8 Muxes            |    <0.001 |      408 |     53200 |            0.77 |
+|   Others                 |     0.000 |     1630 |       --- |             --- |
+| Signals                  |     0.055 |    34119 |       --- |             --- |
+| Block RAM                |     0.037 |     40.5 |       140 |           28.93 |
+| DSPs                     |     0.016 |       59 |       220 |           26.82 |
 | I/O                      |    <0.001 |        1 |       125 |            0.80 |
 | PS7                      |     1.540 |        1 |       --- |             --- |
-| Static Power             |     0.158 |          |           |                 |
-| Total                    |     1.937 |          |           |                 |
+| Static Power             |     0.157 |          |           |                 |
+| Total                    |     1.921 |          |           |                 |
 +--------------------------+-----------+----------+-----------+-----------------+
 
 
@@ -77,7 +77,7 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
-| Vccint    |       1.000 |     0.255 |       0.237 |      0.019 |       NA    | Unspecified | NA         |
+| Vccint    |       1.000 |     0.240 |       0.221 |      0.019 |       NA    | Unspecified | NA         |
 | Vccaux    |       1.800 |     0.016 |       0.000 |      0.016 |       NA    | Unspecified | NA         |
 | Vcco33    |       3.300 |     0.001 |       0.000 |      0.001 |       NA    | Unspecified | NA         |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
@@ -153,20 +153,20 @@ Table of Contents
 +-----------------------------------+-----------+
 | Name                              | Power (W) |
 +-----------------------------------+-----------+
-| snn_core_group_top                |     1.779 |
+| snn_core_group_top                |     1.763 |
 |   gen_core_groups[0].u_core_group |     0.006 |
 |   gen_core_groups[1].u_core_group |     0.005 |
 |   gen_core_groups[2].u_core_group |     0.006 |
-|   gen_core_groups[3].u_core_group |     0.006 |
+|   gen_core_groups[3].u_core_group |     0.005 |
 |   gen_core_groups[4].u_core_group |     0.002 |
-|   u_block_design                  |     1.733 |
-|     design_1_i                    |     1.732 |
-|       axi_dma_0                   |     0.009 |
-|       axi_dma_1                   |     0.009 |
+|   u_block_design                  |     1.719 |
+|     design_1_i                    |     1.718 |
+|       axi_dma_0                   |     0.008 |
+|       axi_dma_1                   |     0.008 |
 |       axi_interconnect_0          |     0.005 |
-|       axi_interconnect_hp0        |     0.008 |
+|       axi_interconnect_hp0        |     0.009 |
 |       processing_system7_0        |     1.542 |
-|       snn_top_hls_0               |     0.159 |
+|       snn_top_hls_0               |     0.146 |
 |   u_connectivity_table            |     0.019 |
 +-----------------------------------+-----------+
 

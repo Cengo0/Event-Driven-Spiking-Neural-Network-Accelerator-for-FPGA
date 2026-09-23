@@ -49,13 +49,13 @@
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:905</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:907</SourceLocation>
 <SummaryOfLoopViolations>
 <RESET_ELIG>
 <Name>RESET_ELIG</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:905</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:907</SourceLocation>
 </RESET_ELIG>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>

@@ -49,13 +49,13 @@
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:920</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:922</SourceLocation>
 <SummaryOfLoopViolations>
 <RESET_ENCODER>
 <Name>RESET_ENCODER</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:920</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:922</SourceLocation>
 </RESET_ENCODER>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>

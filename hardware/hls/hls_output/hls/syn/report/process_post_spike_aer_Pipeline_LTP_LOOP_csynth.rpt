@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'process_post_spike_aer_Pipeline_LTP_LOOP'
 ================================================================
-* Date:           Wed Sep 23 19:58:50 2026
+* Date:           Thu Sep 24 00:27:20 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -73,9 +73,9 @@
     +--------------------------+---------------------+---------+----+---+----+-----+
     |         Instance         |        Module       | BRAM_18K| DSP| FF| LUT| URAM|
     +--------------------------+---------------------+---------+----+---+----+-----+
-    |mul_12ns_16s_28_4_1_U642  |mul_12ns_16s_28_4_1  |        0|   1|  0|   0|    0|
-    |mul_12s_16s_28_4_1_U643   |mul_12s_16s_28_4_1   |        0|   1|  0|   0|    0|
-    |mul_4ns_8ns_12_3_1_U641   |mul_4ns_8ns_12_3_1   |        0|   1|  0|   0|    0|
+    |mul_12ns_16s_28_4_1_U643  |mul_12ns_16s_28_4_1  |        0|   1|  0|   0|    0|
+    |mul_12s_16s_28_4_1_U644   |mul_12s_16s_28_4_1   |        0|   1|  0|   0|    0|
+    |mul_4ns_8ns_12_3_1_U642   |mul_4ns_8ns_12_3_1   |        0|   1|  0|   0|    0|
     +--------------------------+---------------------+---------+----+---+----+-----+
     |Total                     |                     |        0|   3|  0|   0|    0|
     +--------------------------+---------------------+---------+----+---+----+-----+
@@ -179,7 +179,7 @@
 |widx                           |   in|   14|     ap_none|                                      widx|        scalar|
 |tmp_s                          |   in|    7|     ap_none|                                     tmp_s|        scalar|
 |zext_ln475                     |   in|    5|     ap_none|                                zext_ln475|        scalar|
-|tmp_222                        |   in|   10|     ap_none|                                   tmp_222|        scalar|
+|tmp_159                        |   in|   10|     ap_none|                                   tmp_159|        scalar|
 |sext_ln504                     |   in|   16|     ap_none|                                sext_ln504|        scalar|
 |sext_ln292                     |   in|   16|     ap_none|                                sext_ln292|        scalar|
 |learn_weight_ready             |   in|    1|     ap_none|                        learn_weight_ready|        scalar|

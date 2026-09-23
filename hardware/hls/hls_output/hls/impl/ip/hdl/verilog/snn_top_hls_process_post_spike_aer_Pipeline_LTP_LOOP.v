@@ -17,7 +17,7 @@ module snn_top_hls_process_post_spike_aer_Pipeline_LTP_LOOP (
         widx,
         tmp_s,
         zext_ln475,
-        tmp_222,
+        tmp_159,
         sext_ln504,
         sext_ln292,
         learn_weight_ready,
@@ -73,7 +73,7 @@ output   ap_ready;
 input  [13:0] widx;
 input  [6:0] tmp_s;
 input  [4:0] zext_ln475;
-input  [9:0] tmp_222;
+input  [9:0] tmp_159;
 input  [15:0] sext_ln504;
 input  [15:0] sext_ln292;
 input  [0:0] learn_weight_ready;
@@ -199,13 +199,13 @@ wire   [27:0] grp_fu_443_p2;
 wire   [15:0] delta_fu_451_p4;
 wire  signed [15:0] sext_ln492_fu_448_p1;
 wire   [15:0] w_fu_461_p2;
-wire   [12:0] tmp_132_fu_467_p4;
+wire   [12:0] tmp_59_fu_467_p4;
 wire   [0:0] icmp_ln254_fu_477_p2;
 wire   [0:0] icmp_ln255_fu_483_p2;
 wire   [0:0] or_ln254_fu_501_p2;
 wire   [3:0] select_ln254_fu_493_p3;
 wire   [3:0] trunc_ln256_fu_489_p1;
-wire   [0:0] tmp_133_fu_516_p3;
+wire   [0:0] tmp_60_fu_516_p3;
 wire   [3:0] mag_3_fu_529_p2;
 reg    ap_done_reg;
 wire    ap_continue_int;
@@ -246,7 +246,7 @@ snn_top_hls_mul_4ns_8ns_12_3_1 #(
     .din0_WIDTH( 4 ),
     .din1_WIDTH( 8 ),
     .dout_WIDTH( 12 ))
-mul_4ns_8ns_12_3_1_U641(
+mul_4ns_8ns_12_3_1_U642(
     .clk(ap_clk),
     .reset(ap_rst),
     .din0(grp_fu_414_p0),
@@ -261,7 +261,7 @@ snn_top_hls_mul_12ns_16s_28_4_1 #(
     .din0_WIDTH( 12 ),
     .din1_WIDTH( 16 ),
     .dout_WIDTH( 28 ))
-mul_12ns_16s_28_4_1_U642(
+mul_12ns_16s_28_4_1_U643(
     .clk(ap_clk),
     .reset(ap_rst),
     .din0(grp_fu_424_p0),
@@ -276,7 +276,7 @@ snn_top_hls_mul_12s_16s_28_4_1 #(
     .din0_WIDTH( 12 ),
     .din1_WIDTH( 16 ),
     .dout_WIDTH( 28 ))
-mul_12s_16s_28_4_1_U643(
+mul_12s_16s_28_4_1_U644(
     .clk(ap_clk),
     .reset(ap_rst),
     .din0(trunc_ln_fu_429_p4),
@@ -745,7 +745,7 @@ assign grp_fu_424_p1 = sext_ln504_cast_reg_589;
 
 assign grp_fu_443_p1 = sext_ln292_cast_reg_599;
 
-assign icmp_ln254_fu_477_p2 = (($signed(tmp_132_fu_467_p4) > $signed(13'd0)) ? 1'b1 : 1'b0);
+assign icmp_ln254_fu_477_p2 = (($signed(tmp_59_fu_467_p4) > $signed(13'd0)) ? 1'b1 : 1'b0);
 
 assign icmp_ln255_fu_483_p2 = (($signed(w_fu_461_p2) < $signed(16'd65528)) ? 1'b1 : 1'b0);
 
@@ -753,13 +753,13 @@ assign icmp_ln475_fu_271_p2 = ((ap_sig_allocacmp_ii_1 == sext_ln472_fu_254_p1) ?
 
 assign icmp_ln486_fu_311_p2 = ((pre_traces_q0 == 8'd0) ? 1'b1 : 1'b0);
 
-assign learn_bridge_data = ((tmp_133_fu_516_p3[0:0] == 1'b1) ? mag_3_fu_529_p2 : updated_reg_662);
+assign learn_bridge_data = ((tmp_60_fu_516_p3[0:0] == 1'b1) ? mag_3_fu_529_p2 : updated_reg_662);
 
 assign learn_bridge_dst = post_id_cast_reg_584;
 
 assign learn_bridge_dst_group = dst_group;
 
-assign learn_bridge_exc = (tmp_133_fu_516_p3 ^ 1'd1);
+assign learn_bridge_exc = (tmp_60_fu_516_p3 ^ 1'd1);
 
 assign learn_bridge_group = {{pre_id_reg_608[9:8]}};
 
@@ -775,7 +775,7 @@ assign or_ln286_fu_332_p2 = (icmp_ln292 | and_ln286_fu_326_p2);
 
 assign post_id_cast_fu_238_p1 = post_id;
 
-assign pre_id_fu_287_p2 = (zext_ln475_2_fu_283_p1 + tmp_222);
+assign pre_id_fu_287_p2 = (zext_ln475_2_fu_283_p1 + tmp_159);
 
 assign pre_traces_address0 = zext_ln482_fu_293_p1;
 
@@ -791,9 +791,9 @@ assign sext_ln492_fu_448_p1 = current_w_reg_637;
 
 assign sext_ln504_cast_fu_242_p1 = $signed(sext_ln504);
 
-assign tmp_132_fu_467_p4 = {{w_fu_461_p2[15:3]}};
+assign tmp_59_fu_467_p4 = {{w_fu_461_p2[15:3]}};
 
-assign tmp_133_fu_516_p3 = updated_reg_662[32'd3];
+assign tmp_60_fu_516_p3 = updated_reg_662[32'd3];
 
 assign tmp_fu_337_p4 = {{pre_id_reg_608[9:8]}};
 

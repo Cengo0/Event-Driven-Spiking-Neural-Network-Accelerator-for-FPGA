@@ -168,8 +168,8 @@
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
-<name>tmp_224</name>
-<Object>tmp_224</Object>
+<name>tmp_162</name>
+<Object>tmp_162</Object>
 <Type>scalar</Type>
 <Scope></Scope>
 <IOProtocol>ap_none</IOProtocol>
@@ -256,8 +256,8 @@
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
-<name>tmp_195</name>
-<Object>tmp_195</Object>
+<name>tmp_350</name>
+<Object>tmp_350</Object>
 <Type>scalar</Type>
 <Scope></Scope>
 <IOProtocol>ap_none</IOProtocol>

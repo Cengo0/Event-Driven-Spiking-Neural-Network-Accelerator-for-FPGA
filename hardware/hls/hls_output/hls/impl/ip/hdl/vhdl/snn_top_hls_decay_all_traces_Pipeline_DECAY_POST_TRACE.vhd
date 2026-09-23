@@ -131,7 +131,7 @@ attribute shreg_extract : string;
 
 
 begin
-    mul_8ns_8ns_16_3_1_U57 : component snn_top_hls_mul_8ns_8ns_16_3_1
+    mul_8ns_8ns_16_3_1_U58 : component snn_top_hls_mul_8ns_8ns_16_3_1
     generic map (
         ID => 1,
         NUM_STAGE => 3,

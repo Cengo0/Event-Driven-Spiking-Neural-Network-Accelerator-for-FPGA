@@ -6,58 +6,58 @@
 +---------------+----------------------------+--------------+----------------------------------------------------------------------------------------+
 | Phase         | Step                       | Instructions | Description                                                                            |
 +---------------+----------------------------+--------------+----------------------------------------------------------------------------------------+
-| Compile/Link  |                            | 23,757       | After all functions are compiled and linked into a single design                       |
+| Compile/Link  |                            | 23,741       | After all functions are compiled and linked into a single design                       |
 |               |                            |              |                                                                                        |
 | Unroll/Inline |                            |              | After user unroll and inline pragmas are applied                                       |
-|               | (1) unroll                 | 17,033       | user unroll pragmas are applied                                                        |
-|               | (2) simplification         | 12,955       | simplification of applied user unroll pragmas                                          |
-|               | (3) inline                 |  8,488       | user inline pragmas are applied                                                        |
-|               | (4) simplification         |  7,890       | simplification of applied user inline pragmas                                          |
+|               | (1) unroll                 | 17,031       | user unroll pragmas are applied                                                        |
+|               | (2) simplification         | 12,959       | simplification of applied user unroll pragmas                                          |
+|               | (3) inline                 |  8,487       | user inline pragmas are applied                                                        |
+|               | (4) simplification         |  7,889       | simplification of applied user inline pragmas                                          |
 |               |                            |              |                                                                                        |
 | Array/Struct  |                            |              | After user array partition and struct aggregate/disaggregate pragmas are applied       |
-|               | (1) array partition        |  7,897       | user array partition pragmas are applied                                               |
-|               | (2) simplification         |  7,894       | simplification of applied user array partition & struct aggregate/disaggregate pragmas |
-|               | (3) aggregate/disaggregate |  8,025       | user struct aggregate/disaggregate pragmas are applied                                 |
-|               | (4) array reshape          | 11,529       | apply array reshape pragmas                                                            |
-|               | (5) access patterns        | 11,763       | array access pattern optmizations                                                      |
+|               | (1) array partition        |  7,896       | user array partition pragmas are applied                                               |
+|               | (2) simplification         |  7,893       | simplification of applied user array partition & struct aggregate/disaggregate pragmas |
+|               | (3) aggregate/disaggregate |  7,893       | user struct aggregate/disaggregate pragmas are applied                                 |
+|               | (4) array reshape          |  7,892       | apply array reshape pragmas                                                            |
+|               | (5) access patterns        |  8,145       | array access pattern optmizations                                                      |
 |               |                            |              |                                                                                        |
 | Performance   |                            |              | After transformations are applied to meet performance pragma targets                   |
-|               | (1) loop simplification    | 11,736       | loop and instruction simplification                                                    |
-|               | (2) parallelization        | 11,619       | loops are unrolled or pipelined to meet performance targets                            |
-|               | (3) array partition        | 28,999       | arrays are partitioned to meet performance targets                                     |
-|               | (4) simplification         | 11,856       | simplification of design after performance transformations                             |
+|               | (1) loop simplification    |  8,119       | loop and instruction simplification                                                    |
+|               | (2) parallelization        |  8,002       | loops are unrolled or pipelined to meet performance targets                            |
+|               | (3) array partition        | 25,383       | arrays are partitioned to meet performance targets                                     |
+|               | (4) simplification         |  8,240       | simplification of design after performance transformations                             |
 |               |                            |              |                                                                                        |
 | HW Transforms |                            |              | After hardware transfomations                                                          |
-|               | (1) lowering               | 10,794       | initial conversion to HW specific instructions                                         |
-|               | (2) optimizations          | 11,101       | high level synthesis optimizations                                                     |
+|               | (1) lowering               |  8,341       | initial conversion to HW specific instructions                                         |
+|               | (2) optimizations          |  9,042       | high level synthesis optimizations                                                     |
 +---------------+----------------------------+--------------+----------------------------------------------------------------------------------------+
 
 * Instructions per Function for each Compilation Phase
 +------------------------------------+---------------------+-----------------+---------------+--------------+-------------+---------------+
 | Function                           | Location            | Compile/Link    | Unroll/Inline | Array/Struct | Performance | HW Transforms |
 +------------------------------------+---------------------+-----------------+---------------+--------------+-------------+---------------+
-| + snn_top_hls                      | snn_top_hls.cpp:669 | 23,757          | 7,890         | 11,763       | 11,856      | 11,101        |
+| + snn_top_hls                      | snn_top_hls.cpp:669 | 23,741          | 7,889         | 8,145        | 8,240       | 9,042         |
 |    reset_cnn3_engine               | snn_top_hls.cpp:67  |   326           |               |              |             |               |
 |  + weight_index                    | snn_top_hls.h:416   |   167           |               |              |             |               |
 |     find_neuron_group              | snn_top_hls.h:389   |    86 (2 calls) |               |              |             |               |
 |     find_connection                | snn_top_hls.h:402   |    28           |               |              |             |               |
 |    clip_weight                     | snn_top_hls.cpp:252 |    74           |               |              |             |               |
-|    decay_all_traces                | snn_top_hls.cpp:326 |   861           |   43          |    43        |    42       |    51         |
+|    decay_all_traces                | snn_top_hls.cpp:326 |   861           |   43          |   43         |   42        |   51          |
 |  + run_encoder_once                | snn_top_hls.cpp:206 |   649           |               |              |             |               |
 |   + encoder_delta_sigma            | snn_top_hls.cpp:181 |   564           |               |              |             |               |
 |      encoder_write_axis_spike      | snn_top_hls.cpp:36  |   429           |               |              |             |               |
-|  + process_pre_spike_aer           | snn_top_hls.cpp:358 | 2,977           |  133          |   132        |   124       |   131         |
+|  + process_pre_spike_aer           | snn_top_hls.cpp:358 | 2,977           |  133          |  132         |  124        |  131          |
 |     clip_weight                    | snn_top_hls.cpp:252 |    74           |               |              |             |               |
 |     enqueue_learn_weight_update    | snn_top_hls.cpp:277 |   933           |               |              |             |               |
 |    update_eligibility_on_pre_sp... | snn_top_hls.cpp:652 |   306           |               |              |             |               |
-|  + process_post_spike_aer          | snn_top_hls.cpp:445 | 2,832           |  133          |   132        |   124       |   134         |
+|  + process_post_spike_aer          | snn_top_hls.cpp:445 | 2,832           |  133          |  132         |  124        |  134          |
 |     clip_weight                    | snn_top_hls.cpp:252 |    74           |               |              |             |               |
 |     enqueue_learn_weight_update    | snn_top_hls.cpp:277 |   933           |               |              |             |               |
 |    update_eligibility_on_post_s... | snn_top_hls.cpp:659 |   306           |               |              |             |               |
-|  + apply_rstdp_reward              | snn_top_hls.cpp:533 | 2,845           |  150          |   149        |   139       |   148         |
+|  + apply_rstdp_reward              | snn_top_hls.cpp:533 | 2,845           |  150          |  149         |  139        |  148          |
 |     clip_weight                    | snn_top_hls.cpp:252 |    74           |               |              |             |               |
 |     enqueue_learn_weight_update    | snn_top_hls.cpp:277 |   933           |               |              |             |               |
-|    decay_eligibility_traces        | snn_top_hls.cpp:625 |   415           |   21          |    21        |    21       |    30         |
+|    decay_eligibility_traces        | snn_top_hls.cpp:625 |   415           |   21          |   21         |   21        |   30          |
 |    run_cnn3_streaming_pixel        | snn_top_hls.cpp:96  | 3,453           |               |              |             |               |
 +------------------------------------+---------------------+-----------------+---------------+--------------+-------------+---------------+
 

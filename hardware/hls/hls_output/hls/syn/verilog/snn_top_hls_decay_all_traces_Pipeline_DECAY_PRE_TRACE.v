@@ -106,7 +106,7 @@ snn_top_hls_mul_8ns_8ns_16_3_1 #(
     .din0_WIDTH( 8 ),
     .din1_WIDTH( 8 ),
     .dout_WIDTH( 16 ))
-mul_8ns_8ns_16_3_1_U53(
+mul_8ns_8ns_16_3_1_U54(
     .clk(ap_clk),
     .reset(ap_rst),
     .din0(grp_fu_127_p0),

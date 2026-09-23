@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
-| Date         : Wed Sep 23 20:21:35 2026
+| Date         : Thu Sep 24 00:46:55 2026
 | Host         : Mariana running 64-bit Ubuntu 22.04.5 LTS
 | Command      : report_bus_skew -warn_on_violation -file snn_core_group_top_bus_skew_routed.rpt -pb snn_core_group_top_bus_skew_routed.pb -rpx snn_core_group_top_bus_skew_routed.rpx
 | Design       : snn_core_group_top
