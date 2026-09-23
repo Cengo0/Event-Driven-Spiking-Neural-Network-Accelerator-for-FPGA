@@ -57,7 +57,7 @@ wire    ap_CS_fsm_pp0_stage1;
 wire    ap_block_pp0_stage1_subdone;
 reg    ap_enable_reg_pp0_iter0_reg;
 wire   [3:0] p_ZL13CONV2_WEIGHTS_2_6_address0;
-wire   [6:0] p_ZL13CONV2_WEIGHTS_2_6_q0;
+wire   [4:0] p_ZL13CONV2_WEIGHTS_2_6_q0;
 reg    encoder_spikes_blk_n;
 wire    ap_block_pp0_stage0_grp1;
 wire  signed [5:0] sext_ln137_1_cast_fu_134_p1;
@@ -148,7 +148,7 @@ initial begin
 end
 
 snn_top_hls_snn_top_hls_Pipeline_VITIS_LOOP_147_4_VITIS_LOOP_148_598_p_ZL13CONV2_WEIGHTS_bLp #(
-    .DataWidth( 7 ),
+    .DataWidth( 5 ),
     .AddressRange( 9 ),
     .AddressWidth( 4 ))
 p_ZL13CONV2_WEIGHTS_2_6_U(

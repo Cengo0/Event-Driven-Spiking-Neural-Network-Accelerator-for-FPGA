@@ -75,7 +75,7 @@ attribute shreg_extract : string;
     signal ap_block_pp0_stage1_subdone : BOOLEAN;
     signal ap_enable_reg_pp0_iter0_reg : STD_LOGIC := '0';
     signal p_ZL13CONV2_WEIGHTS_2_6_address0 : STD_LOGIC_VECTOR (3 downto 0);
-    signal p_ZL13CONV2_WEIGHTS_2_6_q0 : STD_LOGIC_VECTOR (6 downto 0);
+    signal p_ZL13CONV2_WEIGHTS_2_6_q0 : STD_LOGIC_VECTOR (4 downto 0);
     signal encoder_spikes_blk_n : STD_LOGIC;
     signal ap_block_pp0_stage0_grp1 : BOOLEAN;
     signal sext_ln137_1_cast_fu_134_p1 : STD_LOGIC_VECTOR (5 downto 0);
@@ -163,7 +163,7 @@ attribute shreg_extract : string;
         reset : IN STD_LOGIC;
         address0 : IN STD_LOGIC_VECTOR (3 downto 0);
         ce0 : IN STD_LOGIC;
-        q0 : OUT STD_LOGIC_VECTOR (6 downto 0) );
+        q0 : OUT STD_LOGIC_VECTOR (4 downto 0) );
     end component;
 
 
@@ -188,7 +188,7 @@ attribute shreg_extract : string;
 begin
     p_ZL13CONV2_WEIGHTS_2_6_U : component snn_top_hls_snn_top_hls_Pipeline_VITIS_LOOP_147_4_VITIS_LOOP_148_598_p_ZL13CONV2_WEIGHTS_bLp
     generic map (
-        DataWidth => 7,
+        DataWidth => 5,
         AddressRange => 9,
         AddressWidth => 4)
     port map (

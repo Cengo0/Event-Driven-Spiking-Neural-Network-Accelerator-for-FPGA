@@ -57,7 +57,7 @@ reg    ap_condition_exit_pp0_iter0_stage1;
 wire    ap_loop_exit_ready;
 reg    ap_ready_int;
 wire   [3:0] p_ZL13CONV2_WEIGHTS_9_2_address0;
-wire   [6:0] p_ZL13CONV2_WEIGHTS_9_2_q0;
+wire   [4:0] p_ZL13CONV2_WEIGHTS_9_2_q0;
 reg    encoder_spikes_blk_n;
 wire    ap_block_pp0_stage1_grp1;
 wire   [4:0] px_2_cast_fu_132_p1;
@@ -86,11 +86,11 @@ wire   [0:0] and_ln151_fu_296_p2;
 wire    ap_block_pp0_stage1_11001_grp0;
 reg    ap_block_pp0_stage1_subdone_grp0_done_reg;
 wire    ap_block_pp0_stage1_subdone_grp0;
-reg   [6:0] wt_reg_485;
+reg   [4:0] wt_reg_485;
 wire   [0:0] icmp_ln154_fu_351_p2;
 wire   [7:0] global_nid_fu_371_p2;
 reg   [7:0] global_nid_reg_498;
-wire   [63:0] zext_ln153_160_fu_317_p1;
+wire   [63:0] zext_ln153_161_fu_317_p1;
 wire    ap_block_pp0_stage1_grp0;
 reg   [2:0] dx2_fu_80;
 wire   [2:0] add_ln148_fu_302_p2;
@@ -117,16 +117,16 @@ wire   [4:0] add_ln150_fu_275_p2;
 wire   [0:0] icmp_ln151_60_fu_290_p2;
 wire   [0:0] icmp_ln151_fu_266_p2;
 wire   [3:0] sub_ln151_fu_260_p2;
-wire   [3:0] zext_ln153_159_fu_307_p1;
+wire   [3:0] zext_ln153_160_fu_307_p1;
 wire   [3:0] add_ln153_128_fu_311_p2;
 wire   [7:0] p_shl_fu_335_p3;
 wire  signed [7:0] sext_ln152_fu_332_p1;
-wire   [4:0] zext_ln153_161_fu_348_p1;
+wire   [4:0] zext_ln153_162_fu_348_p1;
 wire   [4:0] add_ln156_fu_357_p2;
 wire  signed [5:0] sext_ln156_fu_363_p1;
 wire   [7:0] zext_ln156_fu_367_p1;
 wire   [7:0] sub_ln152_fu_342_p2;
-wire   [7:0] zext_ln153_7_fu_377_p1;
+wire   [7:0] zext_ln153_8_fu_377_p1;
 wire   [10:0] zext_ln156_31_fu_380_p1;
 wire   [32:0] or_ln163_s_fu_383_p4;
 reg    ap_done_reg;
@@ -153,7 +153,7 @@ initial begin
 end
 
 snn_top_hls_snn_top_hls_Pipeline_VITIS_LOOP_147_4_VITIS_LOOP_148_541_p_ZL13CONV2_WEIGHTS_QgW #(
-    .DataWidth( 7 ),
+    .DataWidth( 5 ),
     .AddressRange( 9 ),
     .AddressWidth( 4 ))
 p_ZL13CONV2_WEIGHTS_9_2_U(
@@ -415,11 +415,11 @@ assign add_ln150_fu_275_p2 = ($signed(sext_ln150_fu_272_p1) + $signed(px_2_cast_
 
 assign add_ln153_127_fu_196_p2 = (ap_sig_allocacmp_dy2_load + 3'd1);
 
-assign add_ln153_128_fu_311_p2 = (sub_ln151_fu_260_p2 + zext_ln153_159_fu_307_p1);
+assign add_ln153_128_fu_311_p2 = (sub_ln151_fu_260_p2 + zext_ln153_160_fu_307_p1);
 
 assign add_ln153_fu_190_p2 = (ap_sig_allocacmp_dy2_load + 3'd2);
 
-assign add_ln156_fu_357_p2 = ($signed(zext_ln153_161_fu_348_p1) + $signed(5'd17));
+assign add_ln156_fu_357_p2 = ($signed(zext_ln153_162_fu_348_p1) + $signed(5'd17));
 
 assign and_ln151_fu_296_p2 = (icmp_ln151_fu_266_p2 & icmp_ln151_60_fu_290_p2);
 
@@ -481,11 +481,11 @@ assign icmp_ln151_60_fu_290_p2 = ((trunc_ln150_s_fu_280_p4 < 4'd7) ? 1'b1 : 1'b0
 
 assign icmp_ln151_fu_266_p2 = ((tmp_fu_234_p4 < 5'd7) ? 1'b1 : 1'b0);
 
-assign icmp_ln154_fu_351_p2 = ((p_ZL13CONV2_WEIGHTS_9_2_q0 == 7'd0) ? 1'b1 : 1'b0);
+assign icmp_ln154_fu_351_p2 = ((p_ZL13CONV2_WEIGHTS_9_2_q0 == 5'd0) ? 1'b1 : 1'b0);
 
-assign or_ln163_s_fu_383_p4 = {{{{14'd8192}, {zext_ln153_7_fu_377_p1}}}, {zext_ln156_31_fu_380_p1}};
+assign or_ln163_s_fu_383_p4 = {{{{14'd8192}, {zext_ln153_8_fu_377_p1}}}, {zext_ln156_31_fu_380_p1}};
 
-assign p_ZL13CONV2_WEIGHTS_9_2_address0 = zext_ln153_160_fu_317_p1;
+assign p_ZL13CONV2_WEIGHTS_9_2_address0 = zext_ln153_161_fu_317_p1;
 
 assign p_shl_fu_335_p3 = {{tmp_reg_465}, {3'd0}};
 
@@ -523,13 +523,13 @@ assign trunc_ln150_s_fu_280_p4 = {{add_ln150_fu_275_p2[4:1]}};
 
 assign trunc_ln153_fu_244_p1 = select_ln147_119_fu_211_p3[1:0];
 
-assign zext_ln153_159_fu_307_p1 = add_ln148_fu_302_p2;
+assign zext_ln153_160_fu_307_p1 = add_ln148_fu_302_p2;
 
-assign zext_ln153_160_fu_317_p1 = add_ln153_128_fu_311_p2;
+assign zext_ln153_161_fu_317_p1 = add_ln153_128_fu_311_p2;
 
-assign zext_ln153_161_fu_348_p1 = trunc_ln150_s_reg_471;
+assign zext_ln153_162_fu_348_p1 = trunc_ln150_s_reg_471;
 
-assign zext_ln153_7_fu_377_p1 = wt_reg_485;
+assign zext_ln153_8_fu_377_p1 = wt_reg_485;
 
 assign zext_ln153_fu_256_p1 = select_ln147_119_fu_211_p3;
 

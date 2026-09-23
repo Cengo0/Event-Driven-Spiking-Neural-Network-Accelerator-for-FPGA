@@ -9,7 +9,7 @@ use ieee.std_logic_unsigned.all;
 
 entity snn_top_hls_snn_top_hls_Pipeline_VITIS_LOOP_147_4_VITIS_LOOP_148_565_p_ZL13CONV2_WEIGHTS_bek is 
     generic(
-             DataWidth     : integer := 7; 
+             DataWidth     : integer := 5; 
              AddressWidth     : integer := 4; 
              AddressRange    : integer := 9
     ); 
@@ -34,9 +34,9 @@ signal address0_tmp : std_logic_vector(AddressWidth-1 downto 0);
 type mem_array is array (0 to AddressRange-1) of std_logic_vector (DataWidth-1 downto 0); 
 
 signal mem0 : mem_array := (
-    0 => "1110011", 1 => "1111001", 2 => "1100010", 3 => "1011011", 
-    4 => "1010111", 5 => "1100010", 6 => "0000011", 7 => "0001010", 
-    8 => "0100010");
+    0 => "11101", 1 => "11110", 2 => "11000", 3 => "10111", 
+    4 => "10110", 5 => "11000", 6 => "00001", 7 => "00010", 
+    8 => "01000");
 
 
 

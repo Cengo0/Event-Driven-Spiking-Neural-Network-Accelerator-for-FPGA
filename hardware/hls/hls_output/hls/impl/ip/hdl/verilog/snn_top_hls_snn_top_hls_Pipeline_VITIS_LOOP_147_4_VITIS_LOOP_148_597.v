@@ -57,7 +57,7 @@ reg    ap_condition_exit_pp0_iter0_stage1;
 wire    ap_loop_exit_ready;
 reg    ap_ready_int;
 wire   [3:0] p_ZL13CONV2_WEIGHTS_1_6_address0;
-wire   [6:0] p_ZL13CONV2_WEIGHTS_1_6_q0;
+wire   [4:0] p_ZL13CONV2_WEIGHTS_1_6_q0;
 reg    encoder_spikes_blk_n;
 wire    ap_block_pp0_stage1_grp1;
 wire   [4:0] px_2_cast_fu_132_p1;
@@ -86,7 +86,7 @@ wire   [0:0] and_ln151_fu_296_p2;
 wire    ap_block_pp0_stage1_11001_grp0;
 reg    ap_block_pp0_stage1_subdone_grp0_done_reg;
 wire    ap_block_pp0_stage1_subdone_grp0;
-reg  signed [6:0] wt_reg_485;
+reg  signed [4:0] wt_reg_485;
 wire   [0:0] icmp_ln154_fu_351_p2;
 wire   [7:0] global_nid_fu_371_p2;
 reg   [7:0] global_nid_reg_498;
@@ -121,7 +121,7 @@ wire   [3:0] zext_ln153_6_fu_307_p1;
 wire   [3:0] add_ln153_6_fu_311_p2;
 wire   [7:0] p_shl_fu_335_p3;
 wire  signed [7:0] sext_ln152_fu_332_p1;
-wire  signed [6:0] icmp_ln154_fu_351_p0;
+wire  signed [4:0] icmp_ln154_fu_351_p0;
 wire   [4:0] zext_ln153_8_fu_348_p1;
 wire   [4:0] add_ln156_fu_357_p2;
 wire  signed [5:0] sext_ln156_fu_363_p1;
@@ -154,7 +154,7 @@ initial begin
 end
 
 snn_top_hls_snn_top_hls_Pipeline_VITIS_LOOP_147_4_VITIS_LOOP_148_597_p_ZL13CONV2_WEIGHTS_bKp #(
-    .DataWidth( 7 ),
+    .DataWidth( 5 ),
     .AddressRange( 9 ),
     .AddressWidth( 4 ))
 p_ZL13CONV2_WEIGHTS_1_6_U(
@@ -484,7 +484,7 @@ assign icmp_ln151_fu_266_p2 = ((tmp_fu_234_p4 < 5'd7) ? 1'b1 : 1'b0);
 
 assign icmp_ln154_fu_351_p0 = p_ZL13CONV2_WEIGHTS_1_6_q0;
 
-assign icmp_ln154_fu_351_p2 = ((icmp_ln154_fu_351_p0 == 7'd0) ? 1'b1 : 1'b0);
+assign icmp_ln154_fu_351_p2 = ((icmp_ln154_fu_351_p0 == 5'd0) ? 1'b1 : 1'b0);
 
 assign or_ln163_s_fu_383_p4 = {{{{14'd8192}, {sext_ln153_fu_377_p1}}}, {zext_ln156_2_fu_380_p1}};
 

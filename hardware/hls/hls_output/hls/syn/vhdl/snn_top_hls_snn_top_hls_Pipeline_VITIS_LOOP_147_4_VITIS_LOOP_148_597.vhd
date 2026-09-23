@@ -49,7 +49,7 @@ architecture behav of snn_top_hls_snn_top_hls_Pipeline_VITIS_LOOP_147_4_VITIS_LO
     constant ap_const_lv5_7 : STD_LOGIC_VECTOR (4 downto 0) := "00111";
     constant ap_const_lv32_4 : STD_LOGIC_VECTOR (31 downto 0) := "00000000000000000000000000000100";
     constant ap_const_lv4_7 : STD_LOGIC_VECTOR (3 downto 0) := "0111";
-    constant ap_const_lv7_0 : STD_LOGIC_VECTOR (6 downto 0) := "0000000";
+    constant ap_const_lv5_0 : STD_LOGIC_VECTOR (4 downto 0) := "00000";
     constant ap_const_lv5_11 : STD_LOGIC_VECTOR (4 downto 0) := "10001";
     constant ap_const_lv14_2000 : STD_LOGIC_VECTOR (13 downto 0) := "10000000000000";
 
@@ -76,7 +76,7 @@ attribute shreg_extract : string;
     signal ap_loop_exit_ready : STD_LOGIC;
     signal ap_ready_int : STD_LOGIC;
     signal p_ZL13CONV2_WEIGHTS_1_6_address0 : STD_LOGIC_VECTOR (3 downto 0);
-    signal p_ZL13CONV2_WEIGHTS_1_6_q0 : STD_LOGIC_VECTOR (6 downto 0);
+    signal p_ZL13CONV2_WEIGHTS_1_6_q0 : STD_LOGIC_VECTOR (4 downto 0);
     signal encoder_spikes_blk_n : STD_LOGIC;
     signal ap_block_pp0_stage1_grp1 : BOOLEAN;
     signal px_2_cast_fu_132_p1 : STD_LOGIC_VECTOR (4 downto 0);
@@ -105,7 +105,7 @@ attribute shreg_extract : string;
     signal ap_block_pp0_stage1_11001_grp0 : BOOLEAN;
     signal ap_block_pp0_stage1_subdone_grp0_done_reg : BOOLEAN := false;
     signal ap_block_pp0_stage1_subdone_grp0 : BOOLEAN;
-    signal wt_reg_485 : STD_LOGIC_VECTOR (6 downto 0);
+    signal wt_reg_485 : STD_LOGIC_VECTOR (4 downto 0);
     signal icmp_ln154_fu_351_p2 : STD_LOGIC_VECTOR (0 downto 0);
     signal global_nid_fu_371_p2 : STD_LOGIC_VECTOR (7 downto 0);
     signal global_nid_reg_498 : STD_LOGIC_VECTOR (7 downto 0);
@@ -140,7 +140,7 @@ attribute shreg_extract : string;
     signal add_ln153_6_fu_311_p2 : STD_LOGIC_VECTOR (3 downto 0);
     signal p_shl_fu_335_p3 : STD_LOGIC_VECTOR (7 downto 0);
     signal sext_ln152_fu_332_p1 : STD_LOGIC_VECTOR (7 downto 0);
-    signal icmp_ln154_fu_351_p0 : STD_LOGIC_VECTOR (6 downto 0);
+    signal icmp_ln154_fu_351_p0 : STD_LOGIC_VECTOR (4 downto 0);
     signal zext_ln153_8_fu_348_p1 : STD_LOGIC_VECTOR (4 downto 0);
     signal add_ln156_fu_357_p2 : STD_LOGIC_VECTOR (4 downto 0);
     signal sext_ln156_fu_363_p1 : STD_LOGIC_VECTOR (5 downto 0);
@@ -170,7 +170,7 @@ attribute shreg_extract : string;
         reset : IN STD_LOGIC;
         address0 : IN STD_LOGIC_VECTOR (3 downto 0);
         ce0 : IN STD_LOGIC;
-        q0 : OUT STD_LOGIC_VECTOR (6 downto 0) );
+        q0 : OUT STD_LOGIC_VECTOR (4 downto 0) );
     end component;
 
 
@@ -195,7 +195,7 @@ attribute shreg_extract : string;
 begin
     p_ZL13CONV2_WEIGHTS_1_6_U : component snn_top_hls_snn_top_hls_Pipeline_VITIS_LOOP_147_4_VITIS_LOOP_148_597_p_ZL13CONV2_WEIGHTS_bKp
     generic map (
-        DataWidth => 7,
+        DataWidth => 5,
         AddressRange => 9,
         AddressWidth => 4)
     port map (
@@ -555,7 +555,7 @@ begin
     icmp_ln151_3_fu_290_p2 <= "1" when (unsigned(trunc_ln150_s_fu_280_p4) < unsigned(ap_const_lv4_7)) else "0";
     icmp_ln151_fu_266_p2 <= "1" when (unsigned(tmp_fu_234_p4) < unsigned(ap_const_lv5_7)) else "0";
     icmp_ln154_fu_351_p0 <= p_ZL13CONV2_WEIGHTS_1_6_q0;
-    icmp_ln154_fu_351_p2 <= "1" when (icmp_ln154_fu_351_p0 = ap_const_lv7_0) else "0";
+    icmp_ln154_fu_351_p2 <= "1" when (icmp_ln154_fu_351_p0 = ap_const_lv5_0) else "0";
     or_ln163_s_fu_383_p4 <= ((ap_const_lv14_2000 & sext_ln153_fu_377_p1) & zext_ln156_2_fu_380_p1);
     p_ZL13CONV2_WEIGHTS_1_6_address0 <= zext_ln153_7_fu_317_p1(4 - 1 downto 0);
 

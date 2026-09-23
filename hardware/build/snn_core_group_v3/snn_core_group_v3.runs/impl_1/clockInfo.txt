@@ -1,6 +1,6 @@
 -------------------------------------
 | Tool Version : Vivado v.2025.2
-| Date         : Wed Sep 23 01:36:34 2026
+| Date         : Wed Sep 23 16:18:10 2026
 | Host         : Mariana
 | Design       : design_1
 | Device       : xc7z020-clg400-1--

@@ -2000,7 +2000,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>304a0e2d</spirit:value>
+            <spirit:value>e441d35f</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2016,7 +2016,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>4967e7ce</spirit:value>
+            <spirit:value>a6ff08f8</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2032,7 +2032,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>8efb89e7</spirit:value>
+            <spirit:value>54c42441</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2048,7 +2048,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>790dedac</spirit:value>
+            <spirit:value>3fb35496</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -9006,7 +9006,7 @@
       <spirit:file>
         <spirit:name>hdl/vhdl/snn_top_hls.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_5c56989a</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_33fc48e5</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -10756,7 +10756,7 @@
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>II</spirit:name>
-      <spirit:value spirit:id="PARAM_VALUE.II" spirit:order="5">6 ~ 2649140444</spirit:value>
+      <spirit:value spirit:id="PARAM_VALUE.II" spirit:order="5">6 ~ 2649337049</spirit:value>
     </spirit:parameter>
   </spirit:parameters>
   <spirit:vendorExtensions>
@@ -10769,8 +10769,8 @@
       </xilinx:taxonomies>
       <xilinx:displayName>Snn_top_hls</xilinx:displayName>
       <xilinx:definitionSource>HLS</xilinx:definitionSource>
-      <xilinx:coreRevision>2114797764</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2026-09-22T22:24:53Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>2114798700</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2026-09-23T14:01:09Z</xilinx:coreCreationDateTime>
       <xilinx:sdxKernelAttributes>
         <xilinx:sdx_kernel>true</xilinx:sdx_kernel>
         <xilinx:sdx_kernel_type>hls</xilinx:sdx_kernel_type>
@@ -10780,10 +10780,10 @@
       <xilinx:xilinxVersion>2025.2</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="804234dc"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="f17df90b"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="5fbb0d69"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="453c58e9"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="739d4b71"/>
       <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="4395c73a"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="4174bab8"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="6deeac7c"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>

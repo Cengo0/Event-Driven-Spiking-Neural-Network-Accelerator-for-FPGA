@@ -35,32 +35,32 @@
                 <row id="0" col0="snn_top_hls" col1="snn_top_hls.cpp:667" col2="23757" col3="7634" col4="11507" col5="11600" col6="10845">
                     <row id="6" col0="reset_cnn3_engine" col1="snn_top_hls.cpp:67" col2="326" col3="" col4="" col5="" col6=""/>
                     <row id="17" col0="weight_index" col1="snn_top_hls.h:416" col2="167" col3="" col4="" col5="" col6="">
-                        <row id="16" col0="find_neuron_group" col1="snn_top_hls.h:389" col2="86" col2_disp="   86 (2 calls)" col3="" col4="" col5="" col6=""/>
-                        <row id="13" col0="find_connection" col1="snn_top_hls.h:402" col2="28" col3="" col4="" col5="" col6=""/>
+                        <row id="1" col0="find_neuron_group" col1="snn_top_hls.h:389" col2="86" col2_disp="   86 (2 calls)" col3="" col4="" col5="" col6=""/>
+                        <row id="7" col0="find_connection" col1="snn_top_hls.h:402" col2="28" col3="" col4="" col5="" col6=""/>
                     </row>
-                    <row id="3" col0="clip_weight" col1="snn_top_hls.cpp:250" col2="74" col3="" col4="" col5="" col6=""/>
+                    <row id="15" col0="clip_weight" col1="snn_top_hls.cpp:250" col2="74" col3="" col4="" col5="" col6=""/>
                     <row id="14" col0="decay_all_traces" col1="snn_top_hls.cpp:324" col2="861" col3="43" col4="43" col5="42" col6="51"/>
-                    <row id="15" col0="run_encoder_once" col1="snn_top_hls.cpp:204" col2="649" col3="" col4="" col5="" col6="">
-                        <row id="5" col0="encoder_delta_sigma" col1="snn_top_hls.cpp:179" col2="564" col3="" col4="" col5="" col6="">
-                            <row id="7" col0="encoder_write_axis_spike" col1="snn_top_hls.cpp:36" col2="429" col3="" col4="" col5="" col6=""/>
+                    <row id="12" col0="run_encoder_once" col1="snn_top_hls.cpp:204" col2="649" col3="" col4="" col5="" col6="">
+                        <row id="4" col0="encoder_delta_sigma" col1="snn_top_hls.cpp:179" col2="564" col3="" col4="" col5="" col6="">
+                            <row id="11" col0="encoder_write_axis_spike" col1="snn_top_hls.cpp:36" col2="429" col3="" col4="" col5="" col6=""/>
                         </row>
                     </row>
-                    <row id="10" col0="process_pre_spike_aer" col1="snn_top_hls.cpp:356" col2="2977" col3="133" col4="132" col5="124" col6="131">
-                        <row id="3" col0="clip_weight" col1="snn_top_hls.cpp:250" col2="74" col3="" col4="" col5="" col6=""/>
-                        <row id="9" col0="enqueue_learn_weight_update" col1="snn_top_hls.cpp:275" col2="933" col3="" col4="" col5="" col6=""/>
+                    <row id="8" col0="process_pre_spike_aer" col1="snn_top_hls.cpp:356" col2="2977" col3="133" col4="132" col5="124" col6="131">
+                        <row id="15" col0="clip_weight" col1="snn_top_hls.cpp:250" col2="74" col3="" col4="" col5="" col6=""/>
+                        <row id="13" col0="enqueue_learn_weight_update" col1="snn_top_hls.cpp:275" col2="933" col3="" col4="" col5="" col6=""/>
                     </row>
-                    <row id="11" col0="update_eligibility_on_pre_spike" col1="snn_top_hls.cpp:650" col2="306" col3="" col4="" col5="" col6=""/>
-                    <row id="2" col0="process_post_spike_aer" col1="snn_top_hls.cpp:443" col2="2832" col3="133" col4="132" col5="124" col6="134">
-                        <row id="3" col0="clip_weight" col1="snn_top_hls.cpp:250" col2="74" col3="" col4="" col5="" col6=""/>
-                        <row id="9" col0="enqueue_learn_weight_update" col1="snn_top_hls.cpp:275" col2="933" col3="" col4="" col5="" col6=""/>
+                    <row id="9" col0="update_eligibility_on_pre_spike" col1="snn_top_hls.cpp:650" col2="306" col3="" col4="" col5="" col6=""/>
+                    <row id="5" col0="process_post_spike_aer" col1="snn_top_hls.cpp:443" col2="2832" col3="133" col4="132" col5="124" col6="134">
+                        <row id="15" col0="clip_weight" col1="snn_top_hls.cpp:250" col2="74" col3="" col4="" col5="" col6=""/>
+                        <row id="13" col0="enqueue_learn_weight_update" col1="snn_top_hls.cpp:275" col2="933" col3="" col4="" col5="" col6=""/>
                     </row>
-                    <row id="4" col0="update_eligibility_on_post_spike" col1="snn_top_hls.cpp:657" col2="306" col3="" col4="" col5="" col6=""/>
-                    <row id="12" col0="apply_rstdp_reward" col1="snn_top_hls.cpp:531" col2="2845" col3="150" col4="149" col5="139" col6="148">
-                        <row id="3" col0="clip_weight" col1="snn_top_hls.cpp:250" col2="74" col3="" col4="" col5="" col6=""/>
-                        <row id="9" col0="enqueue_learn_weight_update" col1="snn_top_hls.cpp:275" col2="933" col3="" col4="" col5="" col6=""/>
+                    <row id="3" col0="update_eligibility_on_post_spike" col1="snn_top_hls.cpp:657" col2="306" col3="" col4="" col5="" col6=""/>
+                    <row id="2" col0="apply_rstdp_reward" col1="snn_top_hls.cpp:531" col2="2845" col3="150" col4="149" col5="139" col6="148">
+                        <row id="15" col0="clip_weight" col1="snn_top_hls.cpp:250" col2="74" col3="" col4="" col5="" col6=""/>
+                        <row id="13" col0="enqueue_learn_weight_update" col1="snn_top_hls.cpp:275" col2="933" col3="" col4="" col5="" col6=""/>
                     </row>
-                    <row id="1" col0="decay_eligibility_traces" col1="snn_top_hls.cpp:623" col2="415" col3="21" col4="21" col5="21" col6="30"/>
-                    <row id="8" col0="run_cnn3_streaming_pixel" col1="snn_top_hls.cpp:96" col2="3453" col3="" col4="" col5="" col6=""/>
+                    <row id="16" col0="decay_eligibility_traces" col1="snn_top_hls.cpp:623" col2="415" col3="21" col4="21" col5="21" col6="30"/>
+                    <row id="10" col0="run_cnn3_streaming_pixel" col1="snn_top_hls.cpp:96" col2="3453" col3="" col4="" col5="" col6=""/>
                 </row>
             </rows>
             <notes/>

@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
-| Date         : Wed Sep 23 01:34:27 2026
+| Date         : Wed Sep 23 16:16:04 2026
 | Host         : Mariana running 64-bit Ubuntu 22.04.5 LTS
 | Command      : report_utilization -file snn_core_group_top_utilization_synth.rpt -pb snn_core_group_top_utilization_synth.pb
 | Design       : snn_core_group_top
@@ -31,8 +31,8 @@ Table of Contents
 +----------------------------+------+-------+------------+-----------+-------+
 |          Site Type         | Used | Fixed | Prohibited | Available | Util% |
 +----------------------------+------+-------+------------+-----------+-------+
-| Slice LUTs*                | 3563 |     0 |          0 |     53200 |  6.70 |
-|   LUT as Logic             | 3417 |     0 |          0 |     53200 |  6.42 |
+| Slice LUTs*                | 3567 |     0 |          0 |     53200 |  6.70 |
+|   LUT as Logic             | 3421 |     0 |          0 |     53200 |  6.43 |
 |   LUT as Memory            |  146 |     0 |          0 |     17400 |  0.84 |
 |     LUT as Distributed RAM |  146 |     0 |            |           |       |
 |     LUT as Shift Register  |    0 |     0 |            |           |       |
@@ -155,12 +155,12 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 +----------+------+---------------------+
 | Ref Name | Used | Functional Category |
 +----------+------+---------------------+
-| LUT6     | 2137 |                 LUT |
+| LUT6     | 2159 |                 LUT |
 | FDRE     | 1944 |        Flop & Latch |
 | LUT2     |  483 |                 LUT |
-| LUT5     |  407 |                 LUT |
-| LUT3     |  374 |                 LUT |
-| LUT4     |  345 |                 LUT |
+| LUT5     |  409 |                 LUT |
+| LUT3     |  373 |                 LUT |
+| LUT4     |  327 |                 LUT |
 | MUXF7    |  189 |               MuxFx |
 | CARRY4   |  179 |          CarryLogic |
 | RAMD64E  |  120 |  Distributed Memory |
