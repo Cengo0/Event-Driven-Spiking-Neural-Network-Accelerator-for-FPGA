@@ -119,15 +119,15 @@ def upload_layer3_weights(mmio, q_fc_w: np.ndarray):
 
 def main():
     parser = argparse.ArgumentParser(description="All-on-FPGA CNN3 SNN Hardware Inference with SCA Trigger")
-    parser.add_argument('--bitstream',     default='outputs_v3/snn_core_group_v3.bit',
+    parser.add_argument('--bitstream',     default='snn_core_group_v3.bit',
                         help='Path to snn_core_group_v3 bitstream')
-    parser.add_argument('--data',          default='data/cache/mnist_cnn3_deployment.npz',
+    parser.add_argument('--data',          default='mnist_cnn3_deployment.npz',
                         help='Deployment payload (.npz)')
     parser.add_argument('--samples',  type=int, default=10000,
                         help='Number of test images to evaluate (default: 10000)')
     parser.add_argument('--timesteps', type=int, default=4,
                         help='Number of SNN timesteps (default: 4)')
-    parser.add_argument('--output-json',   default='outputs_v3/mnist_cnn3_inference_results.json',
+    parser.add_argument('--output-json',   default='mnist_cnn3_inference_results.json',
                         help='Results output JSON path')
     parser.add_argument('--skip-bitstream', action='store_true',
                         help='Skip PL programming if overlay is already active')
