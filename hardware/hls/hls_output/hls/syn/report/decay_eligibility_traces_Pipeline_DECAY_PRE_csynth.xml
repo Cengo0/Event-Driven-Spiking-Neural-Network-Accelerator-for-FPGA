@@ -49,13 +49,13 @@
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:627</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:629</SourceLocation>
 <SummaryOfLoopViolations>
 <DECAY_PRE>
 <Name>DECAY_PRE</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:627</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:629</SourceLocation>
 </DECAY_PRE>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>

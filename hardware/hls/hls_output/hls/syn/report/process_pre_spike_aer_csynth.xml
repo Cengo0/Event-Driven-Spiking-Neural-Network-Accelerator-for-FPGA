@@ -63,13 +63,13 @@
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:375</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:377</SourceLocation>
 <SummaryOfLoopViolations>
 <LTD_CONN_LOOP>
 <Name>LTD_CONN_LOOP</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:375</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:377</SourceLocation>
 </LTD_CONN_LOOP>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>

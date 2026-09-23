@@ -23,13 +23,13 @@
 <SummaryOfOverallLatency>
 <unit>clock cycles</unit>
 <Best-caseLatency>5</Best-caseLatency>
-<Average-caseLatency>198115651</Average-caseLatency>
-<Worst-caseLatency>2649337048</Worst-caseLatency>
+<Average-caseLatency>197493078</Average-caseLatency>
+<Worst-caseLatency>2619977368</Worst-caseLatency>
 <Best-caseRealTimeLatency>50.000 ns</Best-caseRealTimeLatency>
-<Average-caseRealTimeLatency>1.981 sec</Average-caseRealTimeLatency>
-<Worst-caseRealTimeLatency>26.493 sec</Worst-caseRealTimeLatency>
+<Average-caseRealTimeLatency>1.975 sec</Average-caseRealTimeLatency>
+<Worst-caseRealTimeLatency>26.200 sec</Worst-caseRealTimeLatency>
 <Interval-min>6</Interval-min>
-<Interval-max>2649337049</Interval-max>
+<Interval-max>2619977369</Interval-max>
 <PerformancePragma>-</PerformancePragma>
 </SummaryOfOverallLatency>
 <SummaryOfLoopLatency>
@@ -45,19 +45,19 @@
 <Latency>
 <range>
 <min>0</min>
-<max>2649317910</max>
+<max>2619958230</max>
 </range>
 </Latency>
 <AbsoluteTimeLatency>
 <range>
 <min>0</min>
-<max>26493179100</max>
+<max>26199582300</max>
 </range>
 </AbsoluteTimeLatency>
 <IterationLatency>
 <range>
 <min>8</min>
-<max>40426</max>
+<max>39978</max>
 </range>
 </IterationLatency>
 <PerformancePragma>-</PerformancePragma>
@@ -68,13 +68,13 @@
 <SummaryOfViolations>
 <IssueType>Timing Violation</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:667</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:669</SourceLocation>
 <SummaryOfLoopViolations>
 <TIME_LOOP>
 <Name>TIME_LOOP</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:1007</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:1009</SourceLocation>
 </TIME_LOOP>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>
@@ -82,10 +82,10 @@
 
 <AreaEstimates>
 <Resources>
-<BRAM_18K>18</BRAM_18K>
+<BRAM_18K>20</BRAM_18K>
 <DSP>59</DSP>
-<FF>15918</FF>
-<LUT>52775</LUT>
+<FF>15036</FF>
+<LUT>52464</LUT>
 <URAM>0</URAM>
 </Resources>
 <AvailableResources>

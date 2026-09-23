@@ -49,13 +49,13 @@
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:1264</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:1266</SourceLocation>
 <SummaryOfLoopViolations>
 <WEIGHT_SUM>
 <Name>WEIGHT_SUM</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:1265</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:1267</SourceLocation>
 </WEIGHT_SUM>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>

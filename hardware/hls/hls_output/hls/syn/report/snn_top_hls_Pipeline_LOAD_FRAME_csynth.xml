@@ -64,13 +64,13 @@
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:981</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:983</SourceLocation>
 <SummaryOfLoopViolations>
 <LOAD_FRAME>
 <Name>LOAD_FRAME</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:981</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:983</SourceLocation>
 </LOAD_FRAME>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>

@@ -14,7 +14,7 @@ module snn_top_hls_decay_all_traces_Pipeline_DECAY_POST_TRACE (
         ap_done,
         ap_idle,
         ap_ready,
-        zext_ln330,
+        zext_ln332,
         post_traces_address0,
         post_traces_ce0,
         post_traces_q0,
@@ -32,7 +32,7 @@ input   ap_start;
 output   ap_done;
 output   ap_idle;
 output   ap_ready;
-input  [7:0] zext_ln330;
+input  [7:0] zext_ln332;
 output  [9:0] post_traces_address0;
 output   post_traces_ce0;
 input  [7:0] post_traces_q0;
@@ -51,27 +51,27 @@ reg    ap_enable_reg_pp0_iter2;
 reg    ap_enable_reg_pp0_iter3;
 reg    ap_idle_pp0;
 wire    ap_block_pp0_stage0_subdone;
-wire   [0:0] icmp_ln338_fu_101_p2;
+wire   [0:0] icmp_ln340_fu_101_p2;
 reg    ap_condition_exit_pp0_iter0_stage0;
 wire    ap_loop_exit_ready;
 reg    ap_ready_int;
-wire   [15:0] zext_ln330_cast_fu_89_p1;
-reg   [15:0] zext_ln330_cast_reg_155;
+wire   [15:0] zext_ln332_cast_fu_89_p1;
+reg   [15:0] zext_ln332_cast_reg_155;
 wire    ap_block_pp0_stage0_11001;
 reg   [9:0] post_traces_addr_reg_164;
 reg   [9:0] post_traces_addr_reg_164_pp0_iter1_reg;
 reg   [9:0] post_traces_addr_reg_164_pp0_iter2_reg;
 reg   [7:0] t_reg_170;
 reg   [7:0] t_reg_170_pp0_iter2_reg;
-wire   [63:0] zext_ln338_fu_113_p1;
+wire   [63:0] zext_ln340_fu_113_p1;
 wire    ap_block_pp0_stage0;
 reg   [9:0] i_5_fu_62;
-wire   [9:0] add_ln338_fu_107_p2;
+wire   [9:0] add_ln340_fu_107_p2;
 wire    ap_loop_init;
 reg   [9:0] ap_sig_allocacmp_i;
 reg    post_traces_ce0_local;
 reg    post_traces_we1_local;
-wire   [7:0] sub_ln344_fu_142_p2;
+wire   [7:0] sub_ln346_fu_142_p2;
 reg    post_traces_ce1_local;
 wire   [7:0] grp_fu_127_p0;
 wire   [7:0] grp_fu_127_p1;
@@ -184,8 +184,8 @@ end
 
 always @ (posedge ap_clk) begin
     if (((1'b0 == ap_block_pp0_stage0_11001) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
-        if (((icmp_ln338_fu_101_p2 == 1'd0) & (ap_enable_reg_pp0_iter0 == 1'b1))) begin
-            i_5_fu_62 <= add_ln338_fu_107_p2;
+        if (((icmp_ln340_fu_101_p2 == 1'd0) & (ap_enable_reg_pp0_iter0 == 1'b1))) begin
+            i_5_fu_62 <= add_ln340_fu_107_p2;
         end else if ((ap_loop_init == 1'b1)) begin
             i_5_fu_62 <= 10'd0;
         end
@@ -196,9 +196,9 @@ always @ (posedge ap_clk) begin
     if (((1'b0 == ap_block_pp0_stage0_11001) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
         ap_loop_exit_ready_pp0_iter1_reg <= ap_loop_exit_ready;
         ap_loop_exit_ready_pp0_iter2_reg <= ap_loop_exit_ready_pp0_iter1_reg;
-        post_traces_addr_reg_164 <= zext_ln338_fu_113_p1;
+        post_traces_addr_reg_164 <= zext_ln340_fu_113_p1;
         post_traces_addr_reg_164_pp0_iter1_reg <= post_traces_addr_reg_164;
-        zext_ln330_cast_reg_155[7 : 0] <= zext_ln330_cast_fu_89_p1[7 : 0];
+        zext_ln332_cast_reg_155[7 : 0] <= zext_ln332_cast_fu_89_p1[7 : 0];
     end
 end
 
@@ -216,7 +216,7 @@ always @ (posedge ap_clk) begin
 end
 
 always @ (*) begin
-    if (((icmp_ln338_fu_101_p2 == 1'd1) & (1'b0 == ap_block_pp0_stage0_subdone) & (ap_enable_reg_pp0_iter0 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
+    if (((icmp_ln340_fu_101_p2 == 1'd1) & (1'b0 == ap_block_pp0_stage0_subdone) & (ap_enable_reg_pp0_iter0 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
         ap_condition_exit_pp0_iter0_stage0 = 1'b1;
     end else begin
         ap_condition_exit_pp0_iter0_stage0 = 1'b0;
@@ -298,7 +298,7 @@ always @ (*) begin
     endcase
 end
 
-assign add_ln338_fu_107_p2 = (ap_sig_allocacmp_i + 10'd1);
+assign add_ln340_fu_107_p2 = (ap_sig_allocacmp_i + 10'd1);
 
 assign ap_CS_fsm_pp0_stage0 = ap_CS_fsm[32'd0];
 
@@ -322,11 +322,11 @@ assign grp_fu_127_p0 = grp_fu_127_p00;
 
 assign grp_fu_127_p00 = post_traces_q0;
 
-assign grp_fu_127_p1 = zext_ln330_cast_reg_155;
+assign grp_fu_127_p1 = zext_ln332_cast_reg_155;
 
-assign icmp_ln338_fu_101_p2 = ((ap_sig_allocacmp_i == 10'd800) ? 1'b1 : 1'b0);
+assign icmp_ln340_fu_101_p2 = ((ap_sig_allocacmp_i == 10'd800) ? 1'b1 : 1'b0);
 
-assign post_traces_address0 = zext_ln338_fu_113_p1;
+assign post_traces_address0 = zext_ln340_fu_113_p1;
 
 assign post_traces_address1 = post_traces_addr_reg_164_pp0_iter2_reg;
 
@@ -334,20 +334,20 @@ assign post_traces_ce0 = post_traces_ce0_local;
 
 assign post_traces_ce1 = post_traces_ce1_local;
 
-assign post_traces_d1 = sub_ln344_fu_142_p2;
+assign post_traces_d1 = sub_ln346_fu_142_p2;
 
 assign post_traces_we1 = post_traces_we1_local;
 
-assign sub_ln344_fu_142_p2 = (t_reg_170_pp0_iter2_reg - trunc_ln_fu_132_p4);
+assign sub_ln346_fu_142_p2 = (t_reg_170_pp0_iter2_reg - trunc_ln_fu_132_p4);
 
 assign trunc_ln_fu_132_p4 = {{grp_fu_127_p2[15:8]}};
 
-assign zext_ln330_cast_fu_89_p1 = zext_ln330;
+assign zext_ln332_cast_fu_89_p1 = zext_ln332;
 
-assign zext_ln338_fu_113_p1 = ap_sig_allocacmp_i;
+assign zext_ln340_fu_113_p1 = ap_sig_allocacmp_i;
 
 always @ (posedge ap_clk) begin
-    zext_ln330_cast_reg_155[15:8] <= 8'b00000000;
+    zext_ln332_cast_reg_155[15:8] <= 8'b00000000;
 end
 
 endmodule //snn_top_hls_decay_all_traces_Pipeline_DECAY_POST_TRACE

@@ -9,5 +9,6 @@ set_directive_pipeline snn_top_hls/VITIS_LOOP_148_5
 # Inferred from Performance Budgeter performance directives
 set_directive_loop_flatten snn_top_hls/VITIS_LOOP_83_6
 set_directive_loop_flatten snn_top_hls/VITIS_LOOP_88_8
+set_directive_loop_flatten snn_top_hls/VITIS_LOOP_147_4
 # Inferred from performance & pipeline pragmas/directives
 set_directive_array_partition snn_top_hls/encoder_frame -dim=1 -type=cyclic -factor=2 encoder_frame

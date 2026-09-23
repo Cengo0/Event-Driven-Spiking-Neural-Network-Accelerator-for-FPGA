@@ -4,7 +4,7 @@
     "xci_name": "design_1_snn_top_hls_0_0",
     "cell_name": "snn_top_hls_0",
     "component_reference": "xilinx.com:hls:snn_top_hls:1.0",
-    "ip_revision": "2114798700",
+    "ip_revision": "2114798939",
     "gen_directory": "../../../../../../snn_core_group_v3.gen/sources_1/bd/design_1/ip/design_1_snn_top_hls_0_0",
     "parameters": {
       "component_parameters": {
@@ -13,7 +13,7 @@
         "machine": [ { "value": "64", "enabled": false, "usage": "all" } ],
         "combinational": [ { "value": "0", "enabled": false, "usage": "all" } ],
         "latency": [ { "value": "5", "enabled": false, "usage": "all" } ],
-        "II": [ { "value": "6 ~ 2649337049", "enabled": false, "usage": "all" } ]
+        "II": [ { "value": "6 ~ 2619977369", "enabled": false, "usage": "all" } ]
       },
       "model_parameters": {
         "C_S_AXI_CTRL_ADDR_WIDTH": [ { "value": "8", "resolve_type": "generated", "format": "long", "usage": "all" } ],
@@ -34,7 +34,7 @@
       },
       "runtime_parameters": {
         "IPCONTEXT": [ { "value": "IP_Integrator" } ],
-        "IPREVISION": [ { "value": "2114798700" } ],
+        "IPREVISION": [ { "value": "2114798939" } ],
         "MANAGED": [ { "value": "TRUE" } ],
         "OUTPUTDIR": [ { "value": "../../../../../../snn_core_group_v3.gen/sources_1/bd/design_1/ip/design_1_snn_top_hls_0_0" } ],
         "SELECTEDSIMMODEL": [ { "value": "" } ],
@@ -1196,5 +1196,5 @@
       }
     }
   },
-  "checksum": "ee93582d"
+  "checksum": "c0e5c356"
 }

@@ -80,7 +80,7 @@ wire   [2:0] trunc_ln90_fu_76_p1;
 wire   [4:0] tmp_fu_88_p3;
 wire   [6:0] p_shl6_fu_80_p3;
 wire   [6:0] zext_ln90_fu_96_p1;
-wire   [5:0] tmp_129_fu_115_p3;
+wire   [5:0] tmp_1_fu_115_p3;
 wire   [7:0] p_shl_fu_107_p3;
 wire   [7:0] zext_ln85_fu_123_p1;
 reg   [2:0] ap_NS_fsm;
@@ -286,13 +286,13 @@ assign sub_ln85_fu_127_p2 = (p_shl_fu_107_p3 - zext_ln85_fu_123_p1);
 
 assign sub_ln90_fu_100_p2 = (p_shl6_fu_80_p3 - zext_ln90_fu_96_p1);
 
-assign tmp_129_fu_115_p3 = {{k_fu_38}, {2'd0}};
+assign tmp_1_fu_115_p3 = {{k_fu_38}, {2'd0}};
 
 assign tmp_fu_88_p3 = {{k_fu_38}, {1'd0}};
 
 assign trunc_ln90_fu_76_p1 = k_fu_38[2:0];
 
-assign zext_ln85_fu_123_p1 = tmp_129_fu_115_p3;
+assign zext_ln85_fu_123_p1 = tmp_1_fu_115_p3;
 
 assign zext_ln90_fu_96_p1 = tmp_fu_88_p3;
 

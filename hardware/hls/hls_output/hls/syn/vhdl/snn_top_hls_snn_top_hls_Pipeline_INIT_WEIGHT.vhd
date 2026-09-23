@@ -49,15 +49,15 @@ attribute shreg_extract : string;
     signal ap_enable_reg_pp0_iter1 : STD_LOGIC := '0';
     signal ap_idle_pp0 : STD_LOGIC;
     signal ap_block_pp0_stage0_subdone : BOOLEAN;
-    signal icmp_ln927_fu_66_p2 : STD_LOGIC_VECTOR (0 downto 0);
+    signal icmp_ln929_fu_66_p2 : STD_LOGIC_VECTOR (0 downto 0);
     signal ap_condition_exit_pp0_iter0_stage0 : STD_LOGIC;
     signal ap_loop_exit_ready : STD_LOGIC;
     signal ap_ready_int : STD_LOGIC;
     signal ap_block_pp0_stage0_11001 : BOOLEAN;
-    signal zext_ln927_fu_78_p1 : STD_LOGIC_VECTOR (63 downto 0);
+    signal zext_ln929_fu_78_p1 : STD_LOGIC_VECTOR (63 downto 0);
     signal ap_block_pp0_stage0 : BOOLEAN;
     signal k_fu_40 : STD_LOGIC_VECTOR (13 downto 0) := "00000000000000";
-    signal add_ln927_fu_72_p2 : STD_LOGIC_VECTOR (13 downto 0);
+    signal add_ln929_fu_72_p2 : STD_LOGIC_VECTOR (13 downto 0);
     signal ap_loop_init : STD_LOGIC;
     signal ap_sig_allocacmp_k_1 : STD_LOGIC_VECTOR (13 downto 0);
     signal weight_memory_we0_local : STD_LOGIC;
@@ -158,8 +158,8 @@ begin
     begin
         if (ap_clk'event and ap_clk = '1') then
             if (((ap_const_boolean_0 = ap_block_pp0_stage0_11001) and (ap_const_logic_1 = ap_CS_fsm_pp0_stage0))) then
-                if (((icmp_ln927_fu_66_p2 = ap_const_lv1_0) and (ap_enable_reg_pp0_iter0 = ap_const_logic_1))) then 
-                    k_fu_40 <= add_ln927_fu_72_p2;
+                if (((icmp_ln929_fu_66_p2 = ap_const_lv1_0) and (ap_enable_reg_pp0_iter0 = ap_const_logic_1))) then 
+                    k_fu_40 <= add_ln929_fu_72_p2;
                 elsif ((ap_loop_init = ap_const_logic_1)) then 
                     k_fu_40 <= ap_const_lv14_0;
                 end if;
@@ -176,15 +176,15 @@ begin
                 ap_NS_fsm <= "X";
         end case;
     end process;
-    add_ln927_fu_72_p2 <= std_logic_vector(unsigned(ap_sig_allocacmp_k_1) + unsigned(ap_const_lv14_1));
+    add_ln929_fu_72_p2 <= std_logic_vector(unsigned(ap_sig_allocacmp_k_1) + unsigned(ap_const_lv14_1));
     ap_CS_fsm_pp0_stage0 <= ap_CS_fsm(0);
         ap_block_pp0_stage0 <= not((ap_const_boolean_1 = ap_const_boolean_1));
         ap_block_pp0_stage0_11001 <= not((ap_const_boolean_1 = ap_const_boolean_1));
         ap_block_pp0_stage0_subdone <= not((ap_const_boolean_1 = ap_const_boolean_1));
 
-    ap_condition_exit_pp0_iter0_stage0_assign_proc : process(ap_CS_fsm_pp0_stage0, ap_enable_reg_pp0_iter0, ap_block_pp0_stage0_subdone, icmp_ln927_fu_66_p2)
+    ap_condition_exit_pp0_iter0_stage0_assign_proc : process(ap_CS_fsm_pp0_stage0, ap_enable_reg_pp0_iter0, ap_block_pp0_stage0_subdone, icmp_ln929_fu_66_p2)
     begin
-        if (((icmp_ln927_fu_66_p2 = ap_const_lv1_1) and (ap_const_boolean_0 = ap_block_pp0_stage0_subdone) and (ap_enable_reg_pp0_iter0 = ap_const_logic_1) and (ap_const_logic_1 = ap_CS_fsm_pp0_stage0))) then 
+        if (((icmp_ln929_fu_66_p2 = ap_const_lv1_1) and (ap_const_boolean_0 = ap_block_pp0_stage0_subdone) and (ap_enable_reg_pp0_iter0 = ap_const_logic_1) and (ap_const_logic_1 = ap_CS_fsm_pp0_stage0))) then 
             ap_condition_exit_pp0_iter0_stage0 <= ap_const_logic_1;
         else 
             ap_condition_exit_pp0_iter0_stage0 <= ap_const_logic_0;
@@ -246,8 +246,8 @@ begin
         end if; 
     end process;
 
-    icmp_ln927_fu_66_p2 <= "1" when (ap_sig_allocacmp_k_1 = ap_const_lv14_3100) else "0";
-    weight_memory_address0 <= zext_ln927_fu_78_p1(14 - 1 downto 0);
+    icmp_ln929_fu_66_p2 <= "1" when (ap_sig_allocacmp_k_1 = ap_const_lv14_3100) else "0";
+    weight_memory_address0 <= zext_ln929_fu_78_p1(14 - 1 downto 0);
     weight_memory_ce0 <= weight_memory_ce0_local;
 
     weight_memory_ce0_local_assign_proc : process(ap_CS_fsm_pp0_stage0, ap_enable_reg_pp0_iter0, ap_enable_reg_pp0_iter1, ap_block_pp0_stage0_11001)
@@ -262,14 +262,14 @@ begin
     weight_memory_d0 <= ap_const_lv4_0;
     weight_memory_we0 <= weight_memory_we0_local;
 
-    weight_memory_we0_local_assign_proc : process(ap_CS_fsm_pp0_stage0, ap_enable_reg_pp0_iter0, icmp_ln927_fu_66_p2, ap_block_pp0_stage0_11001)
+    weight_memory_we0_local_assign_proc : process(ap_CS_fsm_pp0_stage0, ap_enable_reg_pp0_iter0, icmp_ln929_fu_66_p2, ap_block_pp0_stage0_11001)
     begin
-        if (((icmp_ln927_fu_66_p2 = ap_const_lv1_0) and (ap_const_boolean_0 = ap_block_pp0_stage0_11001) and (ap_enable_reg_pp0_iter0 = ap_const_logic_1) and (ap_const_logic_1 = ap_CS_fsm_pp0_stage0))) then 
+        if (((icmp_ln929_fu_66_p2 = ap_const_lv1_0) and (ap_const_boolean_0 = ap_block_pp0_stage0_11001) and (ap_enable_reg_pp0_iter0 = ap_const_logic_1) and (ap_const_logic_1 = ap_CS_fsm_pp0_stage0))) then 
             weight_memory_we0_local <= ap_const_logic_1;
         else 
             weight_memory_we0_local <= ap_const_logic_0;
         end if; 
     end process;
 
-    zext_ln927_fu_78_p1 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(ap_sig_allocacmp_k_1),64));
+    zext_ln929_fu_78_p1 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(ap_sig_allocacmp_k_1),64));
 end behav;

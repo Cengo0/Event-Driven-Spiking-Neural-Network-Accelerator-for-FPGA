@@ -50,13 +50,13 @@ attribute shreg_extract : string;
     signal ap_CS_fsm_state1 : STD_LOGIC;
     attribute fsm_encoding of ap_CS_fsm_state1 : signal is "none";
     signal ap_block_state1_pp0_stage0_iter0 : BOOLEAN;
-    signal icmp_ln903_fu_90_p2 : STD_LOGIC_VECTOR (0 downto 0);
+    signal icmp_ln905_fu_90_p2 : STD_LOGIC_VECTOR (0 downto 0);
     signal ap_condition_exit_pp0_iter0_stage0 : STD_LOGIC;
     signal ap_loop_exit_ready : STD_LOGIC;
     signal ap_ready_int : STD_LOGIC;
-    signal zext_ln903_fu_102_p1 : STD_LOGIC_VECTOR (63 downto 0);
+    signal zext_ln905_fu_102_p1 : STD_LOGIC_VECTOR (63 downto 0);
     signal i_fu_42 : STD_LOGIC_VECTOR (9 downto 0) := "0000000000";
-    signal add_ln903_fu_96_p2 : STD_LOGIC_VECTOR (9 downto 0);
+    signal add_ln905_fu_96_p2 : STD_LOGIC_VECTOR (9 downto 0);
     signal ap_loop_init : STD_LOGIC;
     signal ap_sig_allocacmp_i_3 : STD_LOGIC_VECTOR (9 downto 0);
     signal pre_eligibility_we1_local : STD_LOGIC;
@@ -143,8 +143,8 @@ begin
     begin
         if (ap_clk'event and ap_clk = '1') then
             if (((ap_const_boolean_0 = ap_block_state1_pp0_stage0_iter0) and (ap_const_logic_1 = ap_CS_fsm_state1))) then
-                if ((icmp_ln903_fu_90_p2 = ap_const_lv1_0)) then 
-                    i_fu_42 <= add_ln903_fu_96_p2;
+                if ((icmp_ln905_fu_90_p2 = ap_const_lv1_0)) then 
+                    i_fu_42 <= add_ln905_fu_96_p2;
                 elsif ((ap_loop_init = ap_const_logic_1)) then 
                     i_fu_42 <= ap_const_lv10_0;
                 end if;
@@ -161,7 +161,7 @@ begin
                 ap_NS_fsm <= "X";
         end case;
     end process;
-    add_ln903_fu_96_p2 <= std_logic_vector(unsigned(ap_sig_allocacmp_i_3) + unsigned(ap_const_lv10_1));
+    add_ln905_fu_96_p2 <= std_logic_vector(unsigned(ap_sig_allocacmp_i_3) + unsigned(ap_const_lv10_1));
     ap_CS_fsm_state1 <= ap_CS_fsm(0);
 
     ap_ST_fsm_state1_blk_assign_proc : process(ap_block_state1_pp0_stage0_iter0)
@@ -180,9 +180,9 @@ begin
     end process;
 
 
-    ap_condition_exit_pp0_iter0_stage0_assign_proc : process(ap_CS_fsm_state1, ap_block_state1_pp0_stage0_iter0, icmp_ln903_fu_90_p2)
+    ap_condition_exit_pp0_iter0_stage0_assign_proc : process(ap_CS_fsm_state1, ap_block_state1_pp0_stage0_iter0, icmp_ln905_fu_90_p2)
     begin
-        if (((icmp_ln903_fu_90_p2 = ap_const_lv1_1) and (ap_const_boolean_0 = ap_block_state1_pp0_stage0_iter0) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
+        if (((icmp_ln905_fu_90_p2 = ap_const_lv1_1) and (ap_const_boolean_0 = ap_block_state1_pp0_stage0_iter0) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
             ap_condition_exit_pp0_iter0_stage0 <= ap_const_logic_1;
         else 
             ap_condition_exit_pp0_iter0_stage0 <= ap_const_logic_0;
@@ -232,8 +232,8 @@ begin
         end if; 
     end process;
 
-    icmp_ln903_fu_90_p2 <= "1" when (ap_sig_allocacmp_i_3 = ap_const_lv10_320) else "0";
-    post_eligibility_address1 <= zext_ln903_fu_102_p1(10 - 1 downto 0);
+    icmp_ln905_fu_90_p2 <= "1" when (ap_sig_allocacmp_i_3 = ap_const_lv10_320) else "0";
+    post_eligibility_address1 <= zext_ln905_fu_102_p1(10 - 1 downto 0);
     post_eligibility_ce1 <= post_eligibility_ce1_local;
 
     post_eligibility_ce1_local_assign_proc : process(ap_CS_fsm_state1, ap_block_state1_pp0_stage0_iter0)
@@ -248,16 +248,16 @@ begin
     post_eligibility_d1 <= ap_const_lv8_0;
     post_eligibility_we1 <= post_eligibility_we1_local;
 
-    post_eligibility_we1_local_assign_proc : process(ap_CS_fsm_state1, ap_block_state1_pp0_stage0_iter0, icmp_ln903_fu_90_p2)
+    post_eligibility_we1_local_assign_proc : process(ap_CS_fsm_state1, ap_block_state1_pp0_stage0_iter0, icmp_ln905_fu_90_p2)
     begin
-        if (((icmp_ln903_fu_90_p2 = ap_const_lv1_0) and (ap_const_boolean_0 = ap_block_state1_pp0_stage0_iter0) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
+        if (((icmp_ln905_fu_90_p2 = ap_const_lv1_0) and (ap_const_boolean_0 = ap_block_state1_pp0_stage0_iter0) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
             post_eligibility_we1_local <= ap_const_logic_1;
         else 
             post_eligibility_we1_local <= ap_const_logic_0;
         end if; 
     end process;
 
-    pre_eligibility_address1 <= zext_ln903_fu_102_p1(10 - 1 downto 0);
+    pre_eligibility_address1 <= zext_ln905_fu_102_p1(10 - 1 downto 0);
     pre_eligibility_ce1 <= pre_eligibility_ce1_local;
 
     pre_eligibility_ce1_local_assign_proc : process(ap_CS_fsm_state1, ap_block_state1_pp0_stage0_iter0)
@@ -272,14 +272,14 @@ begin
     pre_eligibility_d1 <= ap_const_lv8_0;
     pre_eligibility_we1 <= pre_eligibility_we1_local;
 
-    pre_eligibility_we1_local_assign_proc : process(ap_CS_fsm_state1, ap_block_state1_pp0_stage0_iter0, icmp_ln903_fu_90_p2)
+    pre_eligibility_we1_local_assign_proc : process(ap_CS_fsm_state1, ap_block_state1_pp0_stage0_iter0, icmp_ln905_fu_90_p2)
     begin
-        if (((icmp_ln903_fu_90_p2 = ap_const_lv1_0) and (ap_const_boolean_0 = ap_block_state1_pp0_stage0_iter0) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
+        if (((icmp_ln905_fu_90_p2 = ap_const_lv1_0) and (ap_const_boolean_0 = ap_block_state1_pp0_stage0_iter0) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
             pre_eligibility_we1_local <= ap_const_logic_1;
         else 
             pre_eligibility_we1_local <= ap_const_logic_0;
         end if; 
     end process;
 
-    zext_ln903_fu_102_p1 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(ap_sig_allocacmp_i_3),64));
+    zext_ln905_fu_102_p1 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(ap_sig_allocacmp_i_3),64));
 end behav;

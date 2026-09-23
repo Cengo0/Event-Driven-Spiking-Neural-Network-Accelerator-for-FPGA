@@ -2,11 +2,11 @@
 -- Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
--- Date        : Wed Sep 23 16:07:46 2026
+-- Date        : Wed Sep 23 20:04:37 2026
 -- Host        : Mariana running 64-bit Ubuntu 22.04.5 LTS
--- Command     : write_vhdl -force -mode funcsim
---               /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v3/snn_core_group_v3.gen/sources_1/bd/design_1/ip/design_1_axi_interconnect_hp0_imp_auto_us_1/design_1_axi_interconnect_hp0_imp_auto_us_1_sim_netlist.vhdl
--- Design      : design_1_axi_interconnect_hp0_imp_auto_us_1
+-- Command     : write_vhdl -force -mode funcsim -rename_top design_1_axi_interconnect_hp0_imp_auto_us_1 -prefix
+--               design_1_axi_interconnect_hp0_imp_auto_us_1_ design_1_axi_interconnect_hp0_imp_auto_us_3_sim_netlist.vhdl
+-- Design      : design_1_axi_interconnect_hp0_imp_auto_us_3
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
 -- Device      : xc7z020clg400-1
@@ -61,8 +61,6 @@ entity design_1_axi_interconnect_hp0_imp_auto_us_1_axi_dwidth_converter_v2_1_37_
     D : in STD_LOGIC_VECTOR ( 2 downto 0 );
     \USE_RTL_CURR_WORD.current_word_q_reg[2]_1\ : in STD_LOGIC_VECTOR ( 2 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of design_1_axi_interconnect_hp0_imp_auto_us_1_axi_dwidth_converter_v2_1_37_w_upsizer : entity is "axi_dwidth_converter_v2_1_37_w_upsizer";
 end design_1_axi_interconnect_hp0_imp_auto_us_1_axi_dwidth_converter_v2_1_37_w_upsizer;
 
 architecture STRUCTURE of design_1_axi_interconnect_hp0_imp_auto_us_1_axi_dwidth_converter_v2_1_37_w_upsizer is
@@ -2839,8 +2837,6 @@ entity design_1_axi_interconnect_hp0_imp_auto_us_1_axi_register_slice_v2_1_36_ax
     SR : in STD_LOGIC_VECTOR ( 0 to 0 );
     D : in STD_LOGIC_VECTOR ( 53 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of design_1_axi_interconnect_hp0_imp_auto_us_1_axi_register_slice_v2_1_36_axic_register_slice : entity is "axi_register_slice_v2_1_36_axic_register_slice";
 end design_1_axi_interconnect_hp0_imp_auto_us_1_axi_register_slice_v2_1_36_axic_register_slice;
 
 architecture STRUCTURE of design_1_axi_interconnect_hp0_imp_auto_us_1_axi_register_slice_v2_1_36_axic_register_slice is
@@ -4199,8 +4195,6 @@ entity design_1_axi_interconnect_hp0_imp_auto_us_1_generic_baseblocks_v2_1_2_com
     m_axi_awready : in STD_LOGIC;
     \in\ : in STD_LOGIC_VECTOR ( 23 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of design_1_axi_interconnect_hp0_imp_auto_us_1_generic_baseblocks_v2_1_2_command_fifo : entity is "generic_baseblocks_v2_1_2_command_fifo";
 end design_1_axi_interconnect_hp0_imp_auto_us_1_generic_baseblocks_v2_1_2_command_fifo;
 
 architecture STRUCTURE of design_1_axi_interconnect_hp0_imp_auto_us_1_generic_baseblocks_v2_1_2_command_fifo is
@@ -5705,8 +5699,6 @@ entity design_1_axi_interconnect_hp0_imp_auto_us_1_axi_dwidth_converter_v2_1_37_
     m_axi_awready : in STD_LOGIC;
     \in\ : in STD_LOGIC_VECTOR ( 23 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of design_1_axi_interconnect_hp0_imp_auto_us_1_axi_dwidth_converter_v2_1_37_a_upsizer : entity is "axi_dwidth_converter_v2_1_37_a_upsizer";
 end design_1_axi_interconnect_hp0_imp_auto_us_1_axi_dwidth_converter_v2_1_37_a_upsizer;
 
 architecture STRUCTURE of design_1_axi_interconnect_hp0_imp_auto_us_1_axi_dwidth_converter_v2_1_37_a_upsizer is
@@ -5798,8 +5790,6 @@ entity design_1_axi_interconnect_hp0_imp_auto_us_1_axi_register_slice_v2_1_36_ax
     SR : in STD_LOGIC_VECTOR ( 0 to 0 );
     D : in STD_LOGIC_VECTOR ( 53 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of design_1_axi_interconnect_hp0_imp_auto_us_1_axi_register_slice_v2_1_36_axi_register_slice : entity is "axi_register_slice_v2_1_36_axi_register_slice";
 end design_1_axi_interconnect_hp0_imp_auto_us_1_axi_register_slice_v2_1_36_axi_register_slice;
 
 architecture STRUCTURE of design_1_axi_interconnect_hp0_imp_auto_us_1_axi_register_slice_v2_1_36_axi_register_slice is
@@ -5852,8 +5842,6 @@ entity design_1_axi_interconnect_hp0_imp_auto_us_1_axi_dwidth_converter_v2_1_37_
     s_axi_wvalid : in STD_LOGIC;
     m_axi_awready : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of design_1_axi_interconnect_hp0_imp_auto_us_1_axi_dwidth_converter_v2_1_37_axi_upsizer : entity is "axi_dwidth_converter_v2_1_37_axi_upsizer";
 end design_1_axi_interconnect_hp0_imp_auto_us_1_axi_dwidth_converter_v2_1_37_axi_upsizer;
 
 architecture STRUCTURE of design_1_axi_interconnect_hp0_imp_auto_us_1_axi_dwidth_converter_v2_1_37_axi_upsizer is
@@ -6201,8 +6189,6 @@ entity design_1_axi_interconnect_hp0_imp_auto_us_1_axi_dwidth_converter_v2_1_37_
   attribute C_S_AXI_ID_WIDTH of design_1_axi_interconnect_hp0_imp_auto_us_1_axi_dwidth_converter_v2_1_37_top : entity is 1;
   attribute DowngradeIPIdentifiedWarnings : string;
   attribute DowngradeIPIdentifiedWarnings of design_1_axi_interconnect_hp0_imp_auto_us_1_axi_dwidth_converter_v2_1_37_top : entity is "yes";
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of design_1_axi_interconnect_hp0_imp_auto_us_1_axi_dwidth_converter_v2_1_37_top : entity is "axi_dwidth_converter_v2_1_37_top";
   attribute P_AXI3 : integer;
   attribute P_AXI3 of design_1_axi_interconnect_hp0_imp_auto_us_1_axi_dwidth_converter_v2_1_37_top : entity is 1;
   attribute P_AXI4 : integer;
@@ -6424,7 +6410,7 @@ entity design_1_axi_interconnect_hp0_imp_auto_us_1 is
   attribute NotValidForBitStream : boolean;
   attribute NotValidForBitStream of design_1_axi_interconnect_hp0_imp_auto_us_1 : entity is true;
   attribute CHECK_LICENSE_TYPE : string;
-  attribute CHECK_LICENSE_TYPE of design_1_axi_interconnect_hp0_imp_auto_us_1 : entity is "design_1_axi_interconnect_hp0_imp_auto_us_1,axi_dwidth_converter_v2_1_37_top,{}";
+  attribute CHECK_LICENSE_TYPE of design_1_axi_interconnect_hp0_imp_auto_us_1 : entity is "design_1_axi_interconnect_hp0_imp_auto_us_3,axi_dwidth_converter_v2_1_37_top,{}";
   attribute DowngradeIPIdentifiedWarnings : string;
   attribute DowngradeIPIdentifiedWarnings of design_1_axi_interconnect_hp0_imp_auto_us_1 : entity is "yes";
   attribute X_CORE_INFO : string;

@@ -47,24 +47,24 @@ wire    ap_enable_reg_pp0_iter0;
 reg    ap_enable_reg_pp0_iter1;
 reg    ap_idle_pp0;
 wire    ap_block_pp0_stage0_subdone;
-wire   [0:0] icmp_ln637_fu_73_p2;
+wire   [0:0] icmp_ln639_fu_73_p2;
 reg    ap_condition_exit_pp0_iter0_stage0;
 wire    ap_loop_exit_ready;
 reg    ap_ready_int;
 reg   [9:0] post_eligibility_addr_reg_126;
 wire    ap_block_pp0_stage0_11001;
-wire   [63:0] zext_ln637_fu_85_p1;
+wire   [63:0] zext_ln639_fu_85_p1;
 wire    ap_block_pp0_stage0;
 reg   [9:0] j_fu_44;
-wire   [9:0] add_ln637_fu_79_p2;
+wire   [9:0] add_ln639_fu_79_p2;
 wire    ap_loop_init;
 reg   [9:0] ap_sig_allocacmp_j_1;
 reg    post_eligibility_ce0_local;
 reg    post_eligibility_we1_local;
-wire   [7:0] sub_ln642_fu_109_p2;
+wire   [7:0] sub_ln644_fu_109_p2;
 reg    post_eligibility_ce1_local;
 wire   [4:0] trunc_ln_fu_95_p4;
-wire  signed [7:0] sext_ln642_fu_105_p1;
+wire  signed [7:0] sext_ln644_fu_105_p1;
 reg    ap_done_reg;
 wire    ap_continue_int;
 reg    ap_done_int;
@@ -132,8 +132,8 @@ end
 
 always @ (posedge ap_clk) begin
     if (((1'b0 == ap_block_pp0_stage0_11001) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
-        if (((icmp_ln637_fu_73_p2 == 1'd0) & (ap_enable_reg_pp0_iter0 == 1'b1))) begin
-            j_fu_44 <= add_ln637_fu_79_p2;
+        if (((icmp_ln639_fu_73_p2 == 1'd0) & (ap_enable_reg_pp0_iter0 == 1'b1))) begin
+            j_fu_44 <= add_ln639_fu_79_p2;
         end else if ((ap_loop_init == 1'b1)) begin
             j_fu_44 <= 10'd0;
         end
@@ -142,12 +142,12 @@ end
 
 always @ (posedge ap_clk) begin
     if (((1'b0 == ap_block_pp0_stage0_11001) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
-        post_eligibility_addr_reg_126 <= zext_ln637_fu_85_p1;
+        post_eligibility_addr_reg_126 <= zext_ln639_fu_85_p1;
     end
 end
 
 always @ (*) begin
-    if (((icmp_ln637_fu_73_p2 == 1'd1) & (1'b0 == ap_block_pp0_stage0_subdone) & (ap_enable_reg_pp0_iter0 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
+    if (((icmp_ln639_fu_73_p2 == 1'd1) & (1'b0 == ap_block_pp0_stage0_subdone) & (ap_enable_reg_pp0_iter0 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
         ap_condition_exit_pp0_iter0_stage0 = 1'b1;
     end else begin
         ap_condition_exit_pp0_iter0_stage0 = 1'b0;
@@ -229,7 +229,7 @@ always @ (*) begin
     endcase
 end
 
-assign add_ln637_fu_79_p2 = (ap_sig_allocacmp_j_1 + 10'd1);
+assign add_ln639_fu_79_p2 = (ap_sig_allocacmp_j_1 + 10'd1);
 
 assign ap_CS_fsm_pp0_stage0 = ap_CS_fsm[32'd0];
 
@@ -249,9 +249,9 @@ assign ap_loop_exit_ready = ap_condition_exit_pp0_iter0_stage0;
 
 assign ap_ready = ap_ready_sig;
 
-assign icmp_ln637_fu_73_p2 = ((ap_sig_allocacmp_j_1 == 10'd800) ? 1'b1 : 1'b0);
+assign icmp_ln639_fu_73_p2 = ((ap_sig_allocacmp_j_1 == 10'd800) ? 1'b1 : 1'b0);
 
-assign post_eligibility_address0 = zext_ln637_fu_85_p1;
+assign post_eligibility_address0 = zext_ln639_fu_85_p1;
 
 assign post_eligibility_address1 = post_eligibility_addr_reg_126;
 
@@ -259,16 +259,16 @@ assign post_eligibility_ce0 = post_eligibility_ce0_local;
 
 assign post_eligibility_ce1 = post_eligibility_ce1_local;
 
-assign post_eligibility_d1 = sub_ln642_fu_109_p2;
+assign post_eligibility_d1 = sub_ln644_fu_109_p2;
 
 assign post_eligibility_we1 = post_eligibility_we1_local;
 
-assign sext_ln642_fu_105_p1 = $signed(trunc_ln_fu_95_p4);
+assign sext_ln644_fu_105_p1 = $signed(trunc_ln_fu_95_p4);
 
-assign sub_ln642_fu_109_p2 = ($signed(post_eligibility_q0) - $signed(sext_ln642_fu_105_p1));
+assign sub_ln644_fu_109_p2 = ($signed(post_eligibility_q0) - $signed(sext_ln644_fu_105_p1));
 
 assign trunc_ln_fu_95_p4 = {{post_eligibility_q0[7:3]}};
 
-assign zext_ln637_fu_85_p1 = ap_sig_allocacmp_j_1;
+assign zext_ln639_fu_85_p1 = ap_sig_allocacmp_j_1;
 
 endmodule //snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_POST

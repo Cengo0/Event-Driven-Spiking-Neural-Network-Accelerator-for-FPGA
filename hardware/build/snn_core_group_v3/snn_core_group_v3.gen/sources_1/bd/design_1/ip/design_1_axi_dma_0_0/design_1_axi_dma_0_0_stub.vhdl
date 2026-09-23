@@ -2,7 +2,7 @@
 -- Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
--- Date        : Wed Sep 23 16:07:08 2026
+-- Date        : Wed Sep 23 20:05:03 2026
 -- Host        : Mariana running 64-bit Ubuntu 22.04.5 LTS
 -- Command     : write_vhdl -force -mode synth_stub -rename_top design_1_axi_dma_0_0 -prefix
 --               design_1_axi_dma_0_0_ design_1_axi_dma_1_0_stub.vhdl

@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'decay_all_traces_Pipeline_DECAY_POST_TRACE'
 ================================================================
-* Date:           Wed Sep 23 16:00:16 2026
+* Date:           Wed Sep 23 19:58:28 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -91,9 +91,9 @@
     +----------------------+----------+----+---+----+------------+------------+
     |     Variable Name    | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
     +----------------------+----------+----+---+----+------------+------------+
-    |add_ln338_fu_107_p2   |         +|   0|  0|  13|          10|           1|
-    |sub_ln344_fu_142_p2   |         -|   0|  0|  15|           8|           8|
-    |icmp_ln338_fu_101_p2  |      icmp|   0|  0|  13|          10|           9|
+    |add_ln340_fu_107_p2   |         +|   0|  0|  13|          10|           1|
+    |sub_ln346_fu_142_p2   |         -|   0|  0|  15|           8|           8|
+    |icmp_ln340_fu_101_p2  |      icmp|   0|  0|  13|          10|           9|
     |ap_enable_pp0         |       xor|   0|  0|   2|           1|           2|
     +----------------------+----------+----+---+----+------------+------------+
     |Total                 |          |   0|  0|  43|          29|          20|
@@ -126,7 +126,7 @@
     |post_traces_addr_reg_164          |  10|   0|   10|          0|
     |t_reg_170                         |   8|   0|    8|          0|
     |t_reg_170_pp0_iter2_reg           |   8|   0|    8|          0|
-    |zext_ln330_cast_reg_155           |   8|   0|   16|          8|
+    |zext_ln332_cast_reg_155           |   8|   0|   16|          8|
     |post_traces_addr_reg_164          |  64|  32|   10|          0|
     +----------------------------------+----+----+-----+-----------+
     |Total                             | 115|  32|   69|          8|
@@ -147,7 +147,7 @@
 |ap_done               |  out|    1|  ap_ctrl_hs|  decay_all_traces_Pipeline_DECAY_POST_TRACE|  return value|
 |ap_idle               |  out|    1|  ap_ctrl_hs|  decay_all_traces_Pipeline_DECAY_POST_TRACE|  return value|
 |ap_ready              |  out|    1|  ap_ctrl_hs|  decay_all_traces_Pipeline_DECAY_POST_TRACE|  return value|
-|zext_ln330            |   in|    8|     ap_none|                                  zext_ln330|        scalar|
+|zext_ln332            |   in|    8|     ap_none|                                  zext_ln332|        scalar|
 |post_traces_address0  |  out|   10|   ap_memory|                                 post_traces|         array|
 |post_traces_ce0       |  out|    1|   ap_memory|                                 post_traces|         array|
 |post_traces_q0        |   in|    8|   ap_memory|                                 post_traces|         array|

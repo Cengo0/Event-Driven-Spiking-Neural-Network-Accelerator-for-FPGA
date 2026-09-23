@@ -41,15 +41,15 @@ wire    ap_enable_reg_pp0_iter0;
 reg    ap_enable_reg_pp0_iter1;
 reg    ap_idle_pp0;
 wire    ap_block_pp0_stage0_subdone;
-wire   [0:0] icmp_ln927_fu_66_p2;
+wire   [0:0] icmp_ln929_fu_66_p2;
 reg    ap_condition_exit_pp0_iter0_stage0;
 wire    ap_loop_exit_ready;
 reg    ap_ready_int;
 wire    ap_block_pp0_stage0_11001;
-wire   [63:0] zext_ln927_fu_78_p1;
+wire   [63:0] zext_ln929_fu_78_p1;
 wire    ap_block_pp0_stage0;
 reg   [13:0] k_fu_40;
-wire   [13:0] add_ln927_fu_72_p2;
+wire   [13:0] add_ln929_fu_72_p2;
 wire    ap_loop_init;
 reg   [13:0] ap_sig_allocacmp_k_1;
 reg    weight_memory_we0_local;
@@ -121,8 +121,8 @@ end
 
 always @ (posedge ap_clk) begin
     if (((1'b0 == ap_block_pp0_stage0_11001) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
-        if (((icmp_ln927_fu_66_p2 == 1'd0) & (ap_enable_reg_pp0_iter0 == 1'b1))) begin
-            k_fu_40 <= add_ln927_fu_72_p2;
+        if (((icmp_ln929_fu_66_p2 == 1'd0) & (ap_enable_reg_pp0_iter0 == 1'b1))) begin
+            k_fu_40 <= add_ln929_fu_72_p2;
         end else if ((ap_loop_init == 1'b1)) begin
             k_fu_40 <= 14'd0;
         end
@@ -130,7 +130,7 @@ always @ (posedge ap_clk) begin
 end
 
 always @ (*) begin
-    if (((icmp_ln927_fu_66_p2 == 1'd1) & (1'b0 == ap_block_pp0_stage0_subdone) & (ap_enable_reg_pp0_iter0 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
+    if (((icmp_ln929_fu_66_p2 == 1'd1) & (1'b0 == ap_block_pp0_stage0_subdone) & (ap_enable_reg_pp0_iter0 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
         ap_condition_exit_pp0_iter0_stage0 = 1'b1;
     end else begin
         ap_condition_exit_pp0_iter0_stage0 = 1'b0;
@@ -186,7 +186,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((icmp_ln927_fu_66_p2 == 1'd0) & (1'b0 == ap_block_pp0_stage0_11001) & (ap_enable_reg_pp0_iter0 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
+    if (((icmp_ln929_fu_66_p2 == 1'd0) & (1'b0 == ap_block_pp0_stage0_11001) & (ap_enable_reg_pp0_iter0 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
         weight_memory_we0_local = 1'b1;
     end else begin
         weight_memory_we0_local = 1'b0;
@@ -204,7 +204,7 @@ always @ (*) begin
     endcase
 end
 
-assign add_ln927_fu_72_p2 = (ap_sig_allocacmp_k_1 + 14'd1);
+assign add_ln929_fu_72_p2 = (ap_sig_allocacmp_k_1 + 14'd1);
 
 assign ap_CS_fsm_pp0_stage0 = ap_CS_fsm[32'd0];
 
@@ -224,9 +224,9 @@ assign ap_loop_exit_ready = ap_condition_exit_pp0_iter0_stage0;
 
 assign ap_ready = ap_ready_sig;
 
-assign icmp_ln927_fu_66_p2 = ((ap_sig_allocacmp_k_1 == 14'd12544) ? 1'b1 : 1'b0);
+assign icmp_ln929_fu_66_p2 = ((ap_sig_allocacmp_k_1 == 14'd12544) ? 1'b1 : 1'b0);
 
-assign weight_memory_address0 = zext_ln927_fu_78_p1;
+assign weight_memory_address0 = zext_ln929_fu_78_p1;
 
 assign weight_memory_ce0 = weight_memory_ce0_local;
 
@@ -234,6 +234,6 @@ assign weight_memory_d0 = 4'd0;
 
 assign weight_memory_we0 = weight_memory_we0_local;
 
-assign zext_ln927_fu_78_p1 = ap_sig_allocacmp_k_1;
+assign zext_ln929_fu_78_p1 = ap_sig_allocacmp_k_1;
 
 endmodule //snn_top_hls_snn_top_hls_Pipeline_INIT_WEIGHT

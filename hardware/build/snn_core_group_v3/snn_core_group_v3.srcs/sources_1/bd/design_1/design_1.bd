@@ -1790,7 +1790,7 @@
       },
       "snn_top_hls_0": {
         "vlnv": "xilinx.com:hls:snn_top_hls:1.0",
-        "ip_revision": "2114798700",
+        "ip_revision": "2114798939",
         "xci_name": "design_1_snn_top_hls_0_0",
         "xci_path": "ip/design_1_snn_top_hls_0_0/design_1_snn_top_hls_0_0.xci",
         "inst_hier_path": "snn_top_hls_0",

@@ -2000,7 +2000,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>e441d35f</spirit:value>
+            <spirit:value>b4fbe745</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2016,7 +2016,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>a6ff08f8</spirit:value>
+            <spirit:value>84d33395</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2032,7 +2032,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>54c42441</spirit:value>
+            <spirit:value>a294dc88</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2048,7 +2048,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>3fb35496</spirit:value>
+            <spirit:value>ae57b3e3</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -3666,7 +3666,7 @@
         <spirit:fileType>verilogSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/verilog/snn_top_hls_fifo_w41_d32_A.v</spirit:name>
+        <spirit:name>hdl/verilog/snn_top_hls_fifo_w41_d2048_A.v</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
@@ -5548,7 +5548,7 @@
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/verilog/snn_top_hls_fifo_w41_d32_A.v</spirit:name>
+        <spirit:name>hdl/verilog/snn_top_hls_fifo_w41_d2048_A.v</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
@@ -7736,7 +7736,7 @@
         <spirit:fileType>vhdlSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/vhdl/snn_top_hls_fifo_w41_d32_A.vhd</spirit:name>
+        <spirit:name>hdl/vhdl/snn_top_hls_fifo_w41_d2048_A.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
@@ -9006,7 +9006,7 @@
       <spirit:file>
         <spirit:name>hdl/vhdl/snn_top_hls.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_33fc48e5</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_97a970f9</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -9067,7 +9067,7 @@
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/vhdl/snn_top_hls_fifo_w41_d32_A.vhd</spirit:name>
+        <spirit:name>hdl/vhdl/snn_top_hls_fifo_w41_d2048_A.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
@@ -10756,7 +10756,7 @@
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>II</spirit:name>
-      <spirit:value spirit:id="PARAM_VALUE.II" spirit:order="5">6 ~ 2649337049</spirit:value>
+      <spirit:value spirit:id="PARAM_VALUE.II" spirit:order="5">6 ~ 2619977369</spirit:value>
     </spirit:parameter>
   </spirit:parameters>
   <spirit:vendorExtensions>
@@ -10769,8 +10769,8 @@
       </xilinx:taxonomies>
       <xilinx:displayName>Snn_top_hls</xilinx:displayName>
       <xilinx:definitionSource>HLS</xilinx:definitionSource>
-      <xilinx:coreRevision>2114798700</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2026-09-23T14:01:09Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>2114798939</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2026-09-23T17:59:23Z</xilinx:coreCreationDateTime>
       <xilinx:sdxKernelAttributes>
         <xilinx:sdx_kernel>true</xilinx:sdx_kernel>
         <xilinx:sdx_kernel_type>hls</xilinx:sdx_kernel_type>
@@ -10780,10 +10780,10 @@
       <xilinx:xilinxVersion>2025.2</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="804234dc"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="f17df90b"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="453c58e9"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="b435c610"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="739d4b71"/>
       <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="4395c73a"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="6deeac7c"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="cc1b4417"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>

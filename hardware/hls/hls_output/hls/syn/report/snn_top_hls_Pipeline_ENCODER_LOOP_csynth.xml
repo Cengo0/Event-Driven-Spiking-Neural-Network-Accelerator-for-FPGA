@@ -49,13 +49,13 @@
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:37~src/snn_top_hls.cpp:199~src/snn_top_hls.cpp:221~src/snn_top_hls.cpp:1024</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:37~src/snn_top_hls.cpp:201~src/snn_top_hls.cpp:223~src/snn_top_hls.cpp:1026</SourceLocation>
 <SummaryOfLoopViolations>
 <ENCODER_LOOP>
 <Name>ENCODER_LOOP</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:214~src/snn_top_hls.cpp:1024</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:216~src/snn_top_hls.cpp:1026</SourceLocation>
 </ENCODER_LOOP>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>
