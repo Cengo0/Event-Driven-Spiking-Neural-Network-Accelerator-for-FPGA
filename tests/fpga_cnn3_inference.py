@@ -175,10 +175,11 @@ def main():
         print(f"  Hardware global threshold configured: {hw_threshold}")
 
         # ── Configure HLS for CNN Streaming Mode ───────────────────────────────
-        hls_ctrl.write(0x10, MODE_CNN_STREAM)   # Mode 3: Streaming 2D Conv
-        hls_ctrl.write(0x18, hw_threshold)
-        hls_ctrl.write(0x28, 1)                 # time_steps = 1 (kernel loops continuously via auto-restart)
-        hls_ctrl.write(0x00, 0x00)
+        hls_ctrl.write(0x10, 0x01)              # 0x10: ctrl_reg: enable=1, reset=0
+        hls_ctrl.write(0x18, hw_threshold)      # 0x18: config_reg: threshold
+        hls_ctrl.write(0x20, MODE_CNN_STREAM)   # 0x20: mode_reg: Mode 3 (Streaming 2D Conv)
+        hls_ctrl.write(0x28, 1)                 # 0x28: time_steps_reg: 1
+        hls_ctrl.write(0x00, 0x00)              # 0x00: ap_ctrl: idle
 
         # ── Allocate DMA Buffers ──────────────────────────────────────────────
         in_buffer  = allocate(shape=(784,), dtype=np.uint32)
@@ -197,13 +198,11 @@ def main():
             img = test_imgs[i] # 28x28 float32
             lbl = int(test_lbls[i])
 
-            # Reset HLS CNN engine between images for clean membrane potentials
-            hls_ctrl.write(0x00, 0x02)
+            # Pulse reset in HLS to clear line buffers & membrane potentials between images
+            hls_ctrl.write(0x10, 0x03)          # ctrl_reg: enable=1, reset=1
             time.sleep(0.0001)
-            hls_ctrl.write(0x00, 0x00)
-            hls_ctrl.write(0x10, MODE_CNN_STREAM)
-            hls_ctrl.write(0x18, hw_threshold)
-            hls_ctrl.write(0x28, 1)
+            hls_ctrl.write(0x10, 0x01)          # ctrl_reg: enable=1, reset=0
+            hls_ctrl.write(0x20, MODE_CNN_STREAM) # ensure Mode 3 is set
 
             # Quantize pixel values to Q8.8 fixed-point (pixel * 256)
             px_quant = np.clip(np.round(img.flatten() * 256.0), -32768, 32767).astype(np.int16)
@@ -305,7 +304,9 @@ def main():
         print(f"========================================================")
 
         # Save summary JSON
-        os.makedirs(os.path.dirname(args.output_json), exist_ok=True)
+        out_dir = os.path.dirname(args.output_json)
+        if out_dir:
+            os.makedirs(out_dir, exist_ok=True)
         results = {
             "model": "cnn3_T_4_clean_l2",
             "samples": n_test,
