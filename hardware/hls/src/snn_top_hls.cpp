@@ -146,11 +146,13 @@ static void run_cnn3_streaming_pixel(
 
                     for (int dy2 = -1; dy2 <= 1; dy2++) {
                         for (int dx2 = -1; dx2 <= 1; dx2++) {
-                            int y2 = (py + dy2) >> 1;
-                            int x2 = (px + dx2) >> 1;
-                            if (y2 >= 0 && y2 < CNN_POOL2_HEIGHT && x2 >= 0 && x2 < CNN_POOL2_WIDTH) {
+                            int oy = py + dy2;
+                            int ox = px + dx2;
+                            if (oy >= 0 && oy < CNN_POOL1_HEIGHT && ox >= 0 && ox < CNN_POOL1_WIDTH) {
+                                int y2 = oy >> 1;
+                                int x2 = ox >> 1;
                                 int local_nid = local_ch * CNN_POOL2_SIZE + y2 * CNN_POOL2_WIDTH + x2;
-                                signed char wt = CONV2_WEIGHTS[co][k][dy2 + 1][dx2 + 1];
+                                signed char wt = CONV2_WEIGHTS[co][k][1 - dy2][1 - dx2];
                                 if (wt != 0 && !spike_fifo.full()) {
                                     encoder_axis_word_t pkt;
                                     ap_uint<11> global_nid = ((ap_uint<3>)dst_grp << 8) | (ap_uint<8>)local_nid;
@@ -999,7 +1001,7 @@ void snn_top_hls(
     }
 
     hls::stream<encoder_axis_word_t> encoder_spikes("encoder_spikes");
-    #pragma HLS STREAM variable=encoder_spikes depth=32
+    #pragma HLS STREAM variable=encoder_spikes depth=2048
 
     //=========================================================================
     // Time-Stepped Processing Loop
