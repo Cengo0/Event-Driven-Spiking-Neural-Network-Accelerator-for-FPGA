@@ -514,10 +514,15 @@ module snn_core_group_top #(
                              (~hls_spike_valid_d | hls_spike_payload_changed);
 
     wire [GLOBAL_ID_WIDTH-1:0]   hls_global_id;
-    wire [WEIGHT_WIDTH-1:0]      hls_weight_truncated;
+    wire                         hls_weight_is_neg;
+    wire [WEIGHT_WIDTH-1:0]      hls_weight_abs;
+    wire                         hls_weight_exc;
 
     assign hls_global_id       = hls_spike_out_neuron_id[GLOBAL_ID_WIDTH-1:0];
-    assign hls_weight_truncated = hls_spike_out_weight[WEIGHT_WIDTH-1:0];
+    assign hls_weight_is_neg   = hls_spike_out_weight[WEIGHT_WIDTH-1];
+    assign hls_weight_abs      = hls_weight_is_neg ? (-hls_spike_out_weight[WEIGHT_WIDTH-1:0]) :
+                                                     hls_spike_out_weight[WEIGHT_WIDTH-1:0];
+    assign hls_weight_exc      = ~hls_weight_is_neg;
 
     // 2. Output Spike FIFO for Class Output Spikes (Group 2 -> HLS -> S2MM DMA)
     // Group 2 is the output classification layer (digits 0..9).
@@ -787,8 +792,8 @@ module snn_core_group_top #(
         // External spike input (from HLS)
         .ext_spike_valid    (hls_spike_event),
         .ext_spike_neuron_id(hls_global_id),
-        .ext_spike_weight   (hls_weight_truncated),
-        .ext_spike_exc      (1'b1),  // HLS spikes default excitatory
+        .ext_spike_weight   (hls_weight_abs),
+        .ext_spike_exc      (hls_weight_exc),
         .ext_spike_ready    (/* unused, use rtl_spike_in_ready */),
 
         // Learning engine observation

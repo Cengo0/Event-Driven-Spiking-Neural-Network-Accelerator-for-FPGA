@@ -60,13 +60,15 @@ def export_hls_weights_header(w1_f, b1_f, q_conv2_int, header_path):
         f.write("\n};\n\n")
 
         # CONV2_WEIGHTS [16][8][3][3]
+        # Divide by 4 to account for AvgPool2d(2, 2) scale factor (0.25) in event-driven streaming
+        q_conv2_div4 = np.clip(np.round(q_conv2_int.astype(np.float32) / 4.0), -127, 127).astype(np.int8)
         f.write(f"static const signed char CONV2_WEIGHTS[{q_conv2_int.shape[0]}][{q_conv2_int.shape[1]}][{q_conv2_int.shape[2]}][{q_conv2_int.shape[3]}] = {{\n")
         for co in range(q_conv2_int.shape[0]):
             f.write(f"    {{ // Out Channel {co}\n")
             for ci in range(q_conv2_int.shape[1]):
                 f.write(f"        {{ // In Channel {ci}\n")
                 for dy in range(q_conv2_int.shape[2]):
-                    row = ", ".join([f"{q_conv2_int[co, ci, dy, dx]:4d}" for dx in range(q_conv2_int.shape[3])])
+                    row = ", ".join([f"{q_conv2_div4[co, ci, dy, dx]:4d}" for dx in range(q_conv2_int.shape[3])])
                     f.write(f"            {{ {row} }},\n")
                 f.write("        },\n")
             f.write("    },\n")
@@ -375,7 +377,7 @@ def main():
         w1_f=w1_f,
         b1_f=b1_f,
         # FPGA Quantized Payload (Layer 2 & Layer 3)
-        q_conv2_w=q_conv2_int,
+        q_conv2_w=np.clip(np.round(q_conv2_int.astype(np.float32) / 4.0), -127, 127).astype(np.int8),
         q_conv2_b=np.clip(np.round(b2_f * SCALE2), -127, 127).astype(np.int8),
         q_fc_w=q_fc_int,
         q_fc_b=np.clip(np.round(b3_f * final_scale3), -127, 127).astype(np.int8),
