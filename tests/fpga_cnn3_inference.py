@@ -157,7 +157,7 @@ def main():
 
         mmio     = overlay.snn_config_regs_0.mmio
         hls_ctrl = overlay.snn_top_hls_0.mmio
-        dma      = overlay.axi_dma_0
+        dma_mmio = overlay.axi_dma_0.mmio
 
         # Reset HLS core
         print("Resetting HLS core and hardware state...")
@@ -177,8 +177,8 @@ def main():
         # ── Configure HLS for CNN Streaming Mode ───────────────────────────────
         hls_ctrl.write(0x10, MODE_CNN_STREAM)   # Mode 3: Streaming 2D Conv
         hls_ctrl.write(0x18, hw_threshold)
-        hls_ctrl.write(0x28, args.timesteps)    # timesteps = 4
-        hls_ctrl.write(0x00, 0x01)              # enable = 1
+        hls_ctrl.write(0x28, 1)                 # time_steps = 1 (kernel loops continuously via auto-restart)
+        hls_ctrl.write(0x00, 0x00)
 
         # ── Allocate DMA Buffers ──────────────────────────────────────────────
         in_buffer  = allocate(shape=(784,), dtype=np.uint32)
@@ -197,40 +197,97 @@ def main():
             img = test_imgs[i] # 28x28 float32
             lbl = int(test_lbls[i])
 
+            # Reset HLS CNN engine between images for clean membrane potentials
+            hls_ctrl.write(0x00, 0x02)
+            time.sleep(0.0001)
+            hls_ctrl.write(0x00, 0x00)
+            hls_ctrl.write(0x10, MODE_CNN_STREAM)
+            hls_ctrl.write(0x18, hw_threshold)
+            hls_ctrl.write(0x28, 1)
+
             # Quantize pixel values to Q8.8 fixed-point (pixel * 256)
             px_quant = np.clip(np.round(img.flatten() * 256.0), -32768, 32767).astype(np.int16)
             for k in range(784):
                 in_buffer[k] = int(px_quant[k]) & 0xFFFF
+            in_buffer.flush()
 
-            # DMA Transfer: Send pixels to HLS Conv1 -> SNN Core Groups -> Read output
+            class_spk = np.zeros(10, dtype=np.int32)
             t0 = time.time()
-            dma.sendchannel.transfer(in_buffer)
-            dma.recvchannel.transfer(out_buffer)
-            dma.sendchannel.wait()
-            dma.recvchannel.wait()
+
+            # Stream across SNN timesteps (T=4)
+            for t in range(args.timesteps):
+                # 1. Reset DMA channels for clean state
+                dma_mmio.write(0x00, 0x04) # MM2S reset
+                dma_mmio.write(0x30, 0x04) # S2MM reset
+                time.sleep(0.0001)
+
+                # 2. Arm S2MM DMA (FPGA -> ARM) to capture output class spikes
+                dest_ptr = out_buffer.device_address
+                dma_mmio.write(0x34, 0x1000) # clear IOC
+                dma_mmio.write(0x30, 0x01)   # run S2MM
+                dma_mmio.write(0x48, dest_ptr)
+                dma_mmio.write(0x58, 4)      # arm for 1st spike
+
+                # 3. Start MM2S DMA (ARM -> FPGA): send 784 pixels
+                src_ptr = in_buffer.device_address
+                dma_mmio.write(0x00, 0x01)   # run MM2S
+                dma_mmio.write(0x18, src_ptr)
+                dma_mmio.write(0x28, 784 * 4) # trigger transfer (3136 bytes)
+
+                # 4. Start HLS Kernel with Auto-Restart (Pin Y18 SCA Trigger goes HIGH!)
+                hls_ctrl.write(0x00, 0x81)
+
+                # 5. Non-blocking poll for output spikes with tight 5ms timeout
+                spikes_received = 0
+                while spikes_received < 128:
+                    timeout = time.time() + 0.005 # 5 ms timeout
+                    got_spike = False
+
+                    while time.time() < timeout:
+                        if dma_mmio.read(0x34) & 0x1000: # IOC flag set
+                            got_spike = True
+                            break
+
+                    if got_spike:
+                        spikes_received += 1
+                        dma_mmio.write(0x34, 0x1000)
+                        dma_mmio.write(0x30, 0x01)
+                        dma_mmio.write(0x48, dest_ptr + (spikes_received * 4))
+                        dma_mmio.write(0x58, 4)
+                    else:
+                        break
+
+                # 6. Stop HLS & S2MM channel for this timestep
+                hls_ctrl.write(0x00, 0x00)
+                dma_mmio.write(0x30, 0x00)
+
+                out_buffer.invalidate()
+
+                # 7. Decode received output class spikes from Group 4
+                for s in range(spikes_received):
+                    pkt = int(out_buffer[s])
+                    if pkt != 0:
+                        gid = pkt & 0x7FF
+                        grp = (gid >> LOCAL_ID_WIDTH) & 0x7
+                        nid = gid & 0xFF
+                        if grp == OUTPUT_GROUP and nid < 10:
+                            class_spk[nid] += 1
+
+                out_buffer[:] = 0
+
             t1 = time.time()
             latencies_ms.append((t1 - t0) * 1000.0)
-
-            # Unpack class spikes from output buffer
-            # Output packets: [9:0] = global_id {group[2:0], local[7:0]}
-            class_spk = np.zeros(10, dtype=np.int32)
-            for pkt in out_buffer:
-                if pkt != 0:
-                    gid = pkt & 0x7FF
-                    grp = (gid >> LOCAL_ID_WIDTH) & 0x7
-                    nid = gid & 0xFF
-                    if grp == OUTPUT_GROUP and nid < 10:
-                        class_spk[nid] += 1
 
             total_spikes += np.sum(class_spk)
             pred = int(np.argmax(class_spk))
             if pred == lbl:
                 correct += 1
 
-            if (i + 1) % 500 == 0 or (i + 1) == n_test:
+            # Print initial images and periodic progress
+            if (i + 1) <= 10 or (i + 1) % 500 == 0 or (i + 1) == n_test:
                 acc_so_far = correct / (i + 1) * 100
                 avg_spk_so_far = total_spikes / (i + 1)
-                print(f"  Processed [{i+1:5d}/{n_test:5d}] | Acc: {acc_so_far:.2f}% | Avg Spikes/Img: {avg_spk_so_far:.1f}")
+                print(f"  Processed [{i+1:5d}/{n_test:5d}] | Pred: {pred} (True: {lbl}) | Acc: {acc_so_far:.2f}% | Avg Spk/Img: {avg_spk_so_far:.1f}")
 
         total_time = time.time() - t_start_all
         accuracy = correct / n_test * 100
