@@ -190,6 +190,7 @@ def main():
         correct = 0
         total_spikes = 0
         latencies_ms = []
+        log = []
 
         print(f"\nStarting 100% on-FPGA inference on {n_test} images (Pin Y18 SCA Trigger active)...")
         t_start_all = time.time()
@@ -282,6 +283,13 @@ def main():
             if pred == lbl:
                 correct += 1
 
+            log.append({
+                "image_index":     i,
+                "true_label":      lbl,
+                "predicted_label": pred,
+                "spikes":          class_spk.tolist()
+            })
+
             # Print initial images and periodic progress
             if (i + 1) <= 10 or (i + 1) % 500 == 0 or (i + 1) == n_test:
                 acc_so_far = correct / (i + 1) * 100
@@ -293,6 +301,9 @@ def main():
         avg_lat = np.mean(latencies_ms)
         fps = n_test / total_time
 
+        final_router_spks = int(mmio.read(CFG_ROUTER_SPKS))
+        final_neuron_spks = int(mmio.read(CFG_NEURON_SPKS))
+
         print(f"\n========================================================")
         print(f"  CNN3 Hardware Inference Results (All-on-FPGA)")
         print(f"========================================================")
@@ -301,25 +312,41 @@ def main():
         print(f"  Avg Latency    : {avg_lat:.2f} ms/image")
         print(f"  Throughput     : {fps:.1f} FPS")
         print(f"  Avg Spk/Img    : {total_spikes / n_test:.1f}")
+        print(f"\n  Hardware Diagnostics:")
+        print(f"    Router Spikes: {final_router_spks}")
+        print(f"    Neuron Spikes: {final_neuron_spks}")
         print(f"========================================================")
 
-        # Save summary JSON
+        # Save summary and detailed JSON matching v3 schema
         out_dir = os.path.dirname(args.output_json)
         if out_dir:
             os.makedirs(out_dir, exist_ok=True)
         results = {
-            "model": "cnn3_T_4_clean_l2",
-            "samples": n_test,
-            "accuracy": accuracy,
-            "latency_ms_avg": avg_lat,
-            "fps": fps,
-            "avg_spikes_per_image": total_spikes / n_test,
-            "hardware_threshold": hw_threshold,
-            "timestamp": datetime.now().isoformat()
+            "metadata": {
+                "timestamp":    datetime.now().isoformat(),
+                "model":        "cnn3_T_4_clean_l2",
+                "samples":      n_test,
+                "timesteps":    args.timesteps,
+                "hw_threshold": hw_threshold,
+                "trigger_pin":  "Y18"
+            },
+            "metrics": {
+                "accuracy_percent":   round(accuracy, 2),
+                "correct":            correct,
+                "total":              n_test,
+                "average_latency_ms": round(avg_lat, 2),
+                "fps":                round(fps, 1),
+                "avg_spikes_per_image": round(total_spikes / n_test, 2),
+                "diagnostics": {
+                    "router_spikes": final_router_spks,
+                    "neuron_spikes": final_neuron_spks
+                }
+            },
+            "predictions": log
         }
         with open(args.output_json, 'w') as f:
-            json.dump(results, f, indent=2)
-        print(f"Saved results to: {args.output_json}")
+            json.dump(results, f, indent=4)
+        print(f"Saved detailed results to: {args.output_json}")
 
     except ImportError:
         print("Note: pynq library not found on this host. Run this script directly on the PYNQ-Z2 board.")
