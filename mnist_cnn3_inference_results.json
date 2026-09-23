@@ -1,0 +1,10 @@
+{
+  "model": "cnn3_T_4_clean_l2",
+  "samples": 10000,
+  "accuracy": 9.94,
+  "latency_ms_avg": 122.43994493484497,
+  "fps": 7.7411019097705065,
+  "avg_spikes_per_image": 510.2881,
+  "hardware_threshold": 103,
+  "timestamp": "2026-09-23T12:20:25.814028"
+}
