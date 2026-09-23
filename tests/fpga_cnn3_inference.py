@@ -178,7 +178,7 @@ def main():
         hls_ctrl.write(0x10, 0x01)              # 0x10: ctrl_reg: enable=1, reset=0
         hls_ctrl.write(0x18, hw_threshold)      # 0x18: config_reg: threshold
         hls_ctrl.write(0x20, MODE_CNN_STREAM)   # 0x20: mode_reg: Mode 3 (Streaming 2D Conv)
-        hls_ctrl.write(0x28, 1)                 # 0x28: time_steps_reg: 1
+        hls_ctrl.write(0x28, 200000)            # 0x28: time_steps_reg: 200,000 cycles (drain 784 pixels + ~40k L2 fanout spikes)
         hls_ctrl.write(0x00, 0x00)              # 0x00: ap_ctrl: idle
 
         # ── Allocate DMA Buffers ──────────────────────────────────────────────
@@ -204,6 +204,7 @@ def main():
             time.sleep(0.0001)
             hls_ctrl.write(0x10, 0x01)          # ctrl_reg: enable=1, reset=0
             hls_ctrl.write(0x20, MODE_CNN_STREAM) # ensure Mode 3 is set
+            hls_ctrl.write(0x28, 200000)        # ensure 200,000 cycles per timestep
 
             # Quantize pixel values to Q8.8 fixed-point (pixel * 256)
             px_quant = np.clip(np.round(img.flatten() * 256.0), -32768, 32767).astype(np.int16)

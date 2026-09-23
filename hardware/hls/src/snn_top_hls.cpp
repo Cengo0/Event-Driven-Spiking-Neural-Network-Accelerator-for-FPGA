@@ -64,9 +64,16 @@ static ap_fixed<16,8> cnn_v_mem[CNN_CONV1_CHANNELS][CNN_IMG_HEIGHT][CNN_IMG_WIDT
 static ap_uint<4>     cnn_pool_spikes[CNN_CONV1_CHANNELS][CNN_POOL1_HEIGHT][CNN_POOL1_WIDTH];
 static ap_uint<16>    cnn_pixel_counter = 0;
 
+static hls::stream<encoder_axis_word_t> encoder_spikes("encoder_spikes");
+#pragma HLS STREAM variable=encoder_spikes depth=2048
+
 static void reset_cnn3_engine() {
     #pragma HLS INLINE
     cnn_pixel_counter = 0;
+    RESET_ENCODER_STREAM: while (!encoder_spikes.empty()) {
+        #pragma HLS PIPELINE II=1
+        encoder_spikes.read();
+    }
     for (int r = 0; r < 2; r++) {
         for (int c = 0; c < CNN_IMG_WIDTH; c++) {
             #pragma HLS UNROLL
@@ -858,7 +865,7 @@ void snn_top_hls(
     bool checkpoint_mode = (op_mode == MODE_CHECKPOINT);
     bool stdp_mode = (op_mode == MODE_TRAIN_STDP);
     bool stdp_active = learning_enable && stdp_mode;
-    ap_uint<16> time_steps = (time_steps_reg == 0) ? (ap_uint<16>)1 : (ap_uint<16>)time_steps_reg;
+    ap_uint<32> time_steps = (time_steps_reg == 0) ? (ap_uint<32>)1 : (ap_uint<32>)time_steps_reg;
     
     ap_uint<16> threshold = config_reg(15, 0);
     ap_uint<16> leak_rate = config_reg(31, 16);
@@ -1000,13 +1007,10 @@ void snn_top_hls(
         checkpoint_chunk_pos = 0;
     }
 
-    hls::stream<encoder_axis_word_t> encoder_spikes("encoder_spikes");
-    #pragma HLS STREAM variable=encoder_spikes depth=2048
-
     //=========================================================================
     // Time-Stepped Processing Loop
     //=========================================================================
-    TIME_LOOP: for (ap_uint<16> t = 0; t < time_steps; t++) {
+    TIME_LOOP: for (ap_uint<32> t = 0; t < time_steps; t++) {
         #pragma HLS LOOP_FLATTEN off
 
         // Consume pending learned-weight event when router acknowledges ready.
