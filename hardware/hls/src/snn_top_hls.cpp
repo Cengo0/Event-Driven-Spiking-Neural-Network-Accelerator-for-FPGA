@@ -64,16 +64,9 @@ static ap_fixed<16,8> cnn_v_mem[CNN_CONV1_CHANNELS][CNN_IMG_HEIGHT][CNN_IMG_WIDT
 static ap_uint<4>     cnn_pool_spikes[CNN_CONV1_CHANNELS][CNN_POOL1_HEIGHT][CNN_POOL1_WIDTH];
 static ap_uint<16>    cnn_pixel_counter = 0;
 
-static hls::stream<encoder_axis_word_t> encoder_spikes("encoder_spikes");
-#pragma HLS STREAM variable=encoder_spikes depth=2048
-
 static void reset_cnn3_engine() {
     #pragma HLS INLINE
     cnn_pixel_counter = 0;
-    RESET_ENCODER_STREAM: while (!encoder_spikes.empty()) {
-        #pragma HLS PIPELINE II=1
-        encoder_spikes.read();
-    }
     for (int r = 0; r < 2; r++) {
         for (int c = 0; c < CNN_IMG_WIDTH; c++) {
             #pragma HLS UNROLL
@@ -845,6 +838,8 @@ void snn_top_hls(
     // ap_none outputs are level signals across invocations, so using a toggle
     // avoids "stuck-high" ready that can break one-spike-per-ack semantics.
     static ap_uint<1> spike_out_ack_toggle = 0;
+    static hls::stream<encoder_axis_word_t> encoder_spikes("encoder_spikes");
+    #pragma HLS STREAM variable=encoder_spikes depth=2048
     
     //=========================================================================
     // Control Signal Extraction
@@ -930,6 +925,10 @@ void snn_top_hls(
         }
 
         reset_cnn3_engine();
+        RESET_STREAM: while (!encoder_spikes.empty()) {
+            #pragma HLS PIPELINE II=1
+            encoder_spikes.read();
+        }
         
         // Initialize weights (flat buffer)
         if (!initialized) {
