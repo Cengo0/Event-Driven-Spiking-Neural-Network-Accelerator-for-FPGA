@@ -127,6 +127,8 @@ def main():
                         help='Number of test images to evaluate (default: 10000)')
     parser.add_argument('--timesteps', type=int, default=4,
                         help='Number of SNN timesteps (default: 4)')
+    parser.add_argument('--threshold', type=int, default=None,
+                        help='Optional override for global firing threshold (default: use payload value)')
     parser.add_argument('--output-json',   default='mnist_cnn3_inference_results.json',
                         help='Results output JSON path')
     parser.add_argument('--skip-bitstream', action='store_true',
@@ -139,10 +141,10 @@ def main():
     q_fc_w       = payload['q_fc_w']        # (10, 784) int8
     test_imgs    = payload['test_imgs']     # (10000, 28, 28) pre-normalized float32
     test_lbls    = payload['test_lbls']     # (10000,)
-    hw_threshold = int(payload['hw_threshold'])
+    hw_threshold = args.threshold if args.threshold is not None else int(payload['hw_threshold'])
 
     print(f"  Dataset: {len(test_imgs)} test images loaded.")
-    print(f"  Hardware calibrated threshold: {hw_threshold}")
+    print(f"  Hardware global threshold: {hw_threshold}")
 
     # ── Initialise PYNQ Overlay ───────────────────────────────────────────────
     try:
@@ -199,9 +201,14 @@ def main():
             img = test_imgs[i] # 28x28 float32
             lbl = int(test_lbls[i])
 
-            # Pulse reset in HLS to clear line buffers & membrane potentials between images
+            # Reset HLS line buffer and membrane states between images
             hls_ctrl.write(0x10, 0x03)          # ctrl_reg: enable=1, reset=1
-            time.sleep(0.0001)
+            hls_ctrl.write(0x28, 1)             # 1 cycle is enough for reset
+            hls_ctrl.write(0x00, 0x01)          # pulse start to execute reset body
+            t_rst = time.time() + 0.005
+            while time.time() < t_rst:
+                if hls_ctrl.read(0x00) & 0x02:  # wait ap_done
+                    break
             hls_ctrl.write(0x10, 0x01)          # ctrl_reg: enable=1, reset=0
             hls_ctrl.write(0x20, MODE_CNN_STREAM) # ensure Mode 3 is set
             hls_ctrl.write(0x28, 200000)        # ensure 200,000 cycles per timestep
@@ -217,34 +224,48 @@ def main():
 
             # Stream across SNN timesteps (T=4)
             for t in range(args.timesteps):
-                # 1. Reset DMA channels for clean state
-                dma_mmio.write(0x00, 0x04) # MM2S reset
-                dma_mmio.write(0x30, 0x04) # S2MM reset
-                time.sleep(0.0001)
+                # Ensure DMA channels are ready and not in error
+                mm2s_sr = dma_mmio.read(0x04)
+                s2mm_sr = dma_mmio.read(0x34)
+                if (mm2s_sr & 0x4000) or (s2mm_sr & 0x4000):
+                    # Unrecoverable error: perform clean reset
+                    dma_mmio.write(0x00, 0x04)
+                    dma_mmio.write(0x30, 0x04)
+                    while (dma_mmio.read(0x00) & 0x04) or (dma_mmio.read(0x30) & 0x04):
+                        time.sleep(0.0001)
 
-                # 2. Arm S2MM DMA (FPGA -> ARM) to capture output class spikes
+                # Clear previous status flags
+                dma_mmio.write(0x04, 0x1000)
+                dma_mmio.write(0x34, 0x1000)
+
+                # 1. Arm S2MM DMA (FPGA -> ARM) to capture output class spikes
                 dest_ptr = out_buffer.device_address
-                dma_mmio.write(0x34, 0x1000) # clear IOC
                 dma_mmio.write(0x30, 0x01)   # run S2MM
                 dma_mmio.write(0x48, dest_ptr)
                 dma_mmio.write(0x58, 4)      # arm for 1st spike
 
-                # 3. Start MM2S DMA (ARM -> FPGA): send 784 pixels
+                # 2. Start MM2S DMA (ARM -> FPGA): send 784 pixels
                 src_ptr = in_buffer.device_address
                 dma_mmio.write(0x00, 0x01)   # run MM2S
                 dma_mmio.write(0x18, src_ptr)
                 dma_mmio.write(0x28, 784 * 4) # trigger transfer (3136 bytes)
 
-                # 4. Start HLS Kernel with Auto-Restart (Pin Y18 SCA Trigger goes HIGH!)
+                # 3. Start HLS Kernel with Auto-Restart (Pin Y18 SCA Trigger goes HIGH!)
                 hls_ctrl.write(0x00, 0x81)
 
-                # 5. Non-blocking poll for output spikes with tight 5ms timeout
-                spikes_received = 0
-                while spikes_received < 128:
-                    timeout = time.time() + 0.005 # 5 ms timeout
-                    got_spike = False
+                # 4. Wait for MM2S to complete sending all 784 pixels
+                t_mm2s = time.time() + 0.050 # 50 ms timeout
+                while time.time() < t_mm2s:
+                    if dma_mmio.read(0x04) & 0x1000: # MM2S IOC
+                        break
+                dma_mmio.write(0x04, 0x1000)
 
-                    while time.time() < timeout:
+                # 5. Non-blocking poll for output spikes with adequate timeout
+                spikes_received = 0
+                s2mm_timeout = time.time() + 0.020 # 20 ms after MM2S done
+                while spikes_received < 128:
+                    got_spike = False
+                    while time.time() < s2mm_timeout:
                         if dma_mmio.read(0x34) & 0x1000: # IOC flag set
                             got_spike = True
                             break
@@ -255,12 +276,17 @@ def main():
                         dma_mmio.write(0x30, 0x01)
                         dma_mmio.write(0x48, dest_ptr + (spikes_received * 4))
                         dma_mmio.write(0x58, 4)
+                        s2mm_timeout = time.time() + 0.005 # short timeout for subsequent spikes
                     else:
                         break
 
-                # 6. Stop HLS & S2MM channel for this timestep
-                hls_ctrl.write(0x00, 0x00)
-                dma_mmio.write(0x30, 0x00)
+                # 6. Stop HLS & S2MM cleanly
+                hls_ctrl.write(0x00, 0x00) # deassert auto-restart
+                t_idle = time.time() + 0.010
+                while time.time() < t_idle:
+                    if hls_ctrl.read(0x00) & 0x04: # ap_idle
+                        break
+                dma_mmio.write(0x30, 0x00) # stop S2MM
 
                 out_buffer.invalidate()
 
