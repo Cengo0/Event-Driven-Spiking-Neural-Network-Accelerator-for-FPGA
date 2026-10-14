@@ -187,8 +187,8 @@ def main():
                         help='Results output JSON path')
     parser.add_argument('--skip-bitstream', action='store_true',
                         help='Skip PL programming if overlay is already active')
-    parser.add_argument('--reset-mode', choices=['fast', 'flash'], default='fast',
-                        help='Hardware state reset mode: fast (0.33ms active BRAM leak sweep + HLS engine reset) or flash (full PL bitstream reload)')
+    parser.add_argument('--reset-mode', choices=['flash', 'fast'], default='flash',
+                        help='Hardware state reset mode: flash (330ms pristine PL bitstream reload + fast weight restore) or fast (leak sweep)')
     args = parser.parse_args()
 
     # ── Load Deployment Payload ───────────────────────────────────────────────
