@@ -238,7 +238,7 @@ def main():
     # Each incoming Layer 2 spike dynamically delivers its exact slice of the class bias
     # during active inference, while consuming zero power when idle.
     print(f"\nApplying Event-Driven Bias Folding for Layer 3 (Classifier)...")
-    BIAS_FOLD_COEFF = 0.0010
+    BIAS_FOLD_COEFF = 0.015
     w3_folded = w3_f.copy()
     for c in range(10):
         w3_folded[c, :] += (b3_f[c] * BIAS_FOLD_COEFF)
