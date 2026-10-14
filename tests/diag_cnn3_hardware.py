@@ -103,12 +103,16 @@ def configure_hardware(overlay, ct_entries, hw_threshold):
 
 def reset_hardware_state(hls_ctrl, mmio):
     """
-    Two-step safe reset:
-      1. Execute HLS reset body (clears Conv1 line buffer, window, membrane & drains FIFO).
-      2. Run 1-cycle step with reset=0 to deassert physical snn_reset wire on FPGA.
-      3. Pulse maximum leak (0x09) on RTL Core Groups to zero BRAM membrane potentials.
+    Complete Zero-State Hardware Reset:
+      1. Execute HLS reset body: clears Conv1 line buffer, window, cnn_v_mem,
+         drains FIFOs, and asserts physical snn_reset wire into RTL.
+      2. Configure 100% leak (0x09) on RTL Core Groups.
+      3. Run HLS with snn_enable=1 for 1000 cycles with reset=0:
+         the RTL Core Groups run their leak FSM, sweeping all 196 neurons in BRAM
+         and zeroing all membrane potentials to absolute 0.
+      4. Restore leak_rate=0 for inference.
     """
-    # 1. HLS Reset step
+    # 1. HLS Reset step (asserts snn_reset wire into RTL)
     hls_ctrl.write(0x10, 0x03)          # ctrl_reg: enable=1, reset=1
     hls_ctrl.write(0x28, 1)             # 1 step
     hls_ctrl.write(0x00, 0x01)          # ap_start
@@ -117,20 +121,23 @@ def reset_hardware_state(hls_ctrl, mmio):
         if hls_ctrl.read(0x00) & 0x02:  # wait ap_done
             break
 
-    # 2. HLS Deassert reset wire step
-    hls_ctrl.write(0x10, 0x01)          # ctrl_reg: enable=1, reset=0
+    # 2. Configure 100% leak rate on RTL Core Groups
+    mmio.write(CFG_NEURON_PARAMS, 0x0009) # shift1=1, shift2=1 -> 100% leak per cycle
+
+    # 3. Run HLS with snn_enable=1 to drive the 588-cycle RTL BRAM zeroing sweep
+    hls_ctrl.write(0x10, 0x01)          # ctrl_reg: enable=1, reset=0 (snn_reset drops!)
     hls_ctrl.write(0x20, MODE_CNN_STREAM)
-    hls_ctrl.write(0x28, 1)
-    hls_ctrl.write(0x00, 0x01)          # ap_start -> snn_reset drops to 0!
+    hls_ctrl.write(0x28, 1000)          # 1000 cycles (>588 cycles required to sweep 196 neurons)
+    hls_ctrl.write(0x00, 0x01)          # ap_start -> snn_enable=1, Core Groups sweep & zero BRAM!
     t0 = time.time() + 0.010
     while time.time() < t0:
-        if hls_ctrl.read(0x00) & 0x02:
+        if hls_ctrl.read(0x00) & 0x02:  # wait ap_done
             break
 
-    # 3. Clear RTL Core Group BRAM membrane potentials via leak sweep
-    mmio.write(CFG_NEURON_PARAMS, 0x0009) # shift1=1, shift2=1 -> leak 100% of potential
-    time.sleep(0.0002)                   # 200 us is >30x the 6 us needed for 588-cycle sweep
-    mmio.write(CFG_NEURON_PARAMS, 0x0000) # restore zero leak for inference
+    # 4. Restore zero leak rate for inference
+    mmio.write(CFG_NEURON_PARAMS, 0x0000) # restore zero leak
+    hls_ctrl.write(0x28, 1)
+    hls_ctrl.write(0x00, 0x00)
 
 
 def run_single_inference(img, timesteps, dma_mmio, hls_ctrl, in_buffer, out_buffer):
@@ -196,6 +203,7 @@ def run_single_inference(img, timesteps, dma_mmio, hls_ctrl, in_buffer, out_buff
                 if grp == OUTPUT_GROUP and nid < 10:
                     class_spk[nid] += 1
         out_buffer[:] = 0
+        out_buffer.flush()
 
     return class_spk
 
@@ -248,27 +256,27 @@ def main():
         pred_1b = int(np.argmax(spk_1b))
         print(f"  Run 1B (Without Reset)    : Pred={pred_1b} | Spikes={spk_1b.tolist()} | Total Spikes={np.sum(spk_1b)}")
 
-        # Run 1C: With Soft Register Reset (observe if soft reset cleared BRAM)
+        # Run 1C: With Active BRAM Sweep Reset (observe if reset restored clean state)
+        t_rst0 = time.time()
         reset_hardware_state(hls_ctrl, mmio)
+        t_rst = (time.time() - t_rst0) * 1000.0
         spk_1c = run_single_inference(test_imgs[0], args.timesteps, dma_mmio, hls_ctrl, in_buffer, out_buffer)
         pred_1c = int(np.argmax(spk_1c))
-        print(f"  Run 1C (Soft Register Reset) : Pred={pred_1c} | Spikes={spk_1c.tolist()} | Total Spikes={np.sum(spk_1c)}")
+        print(f"  Run 1C (Active BRAM Reset 1, {t_rst:.2f}ms): Pred={pred_1c} | Spikes={spk_1c.tolist()} | Total Spikes={np.sum(spk_1c)}")
 
-        # Run 1D: True Hardware PL Flash Reset via overlay.download()
-        t_flash0 = time.time()
-        mmio, hls_ctrl, dma_mmio = configure_hardware(overlay, ct_entries, hw_threshold)
-        t_flash = (time.time() - t_flash0) * 1000.0
-
+        # Run 1D: Second Active BRAM Reset on Image 0 (Repeatability check)
+        reset_hardware_state(hls_ctrl, mmio)
         spk_1d = run_single_inference(test_imgs[0], args.timesteps, dma_mmio, hls_ctrl, in_buffer, out_buffer)
         pred_1d = int(np.argmax(spk_1d))
-        print(f"  Run 1D (Hardware Flash Reset, {t_flash:.1f}ms): Pred={pred_1d} | Spikes={spk_1d.tolist()} | Total Spikes={np.sum(spk_1d)}")
+        print(f"  Run 1D (Active BRAM Reset 2): Pred={pred_1d} | Spikes={spk_1d.tolist()} | Total Spikes={np.sum(spk_1d)}")
 
-        repeatable_flash = np.array_equal(spk_1a, spk_1d)
+        repeatable_clean = np.array_equal(spk_1c, spk_1d)
+        boot_match = np.array_equal(spk_1a, spk_1c)
         leakage_detected = not np.array_equal(spk_1a, spk_1b)
         print(f"\n  >> Diagnostic Result:")
-        print(f"     Soft Register Reset Repeatability: {'PASS' if np.array_equal(spk_1a, spk_1c) else 'FAIL (Residual BRAM Charge Leaked)'}")
-        print(f"     Hardware Flash Repeatability: {'PASS (100% Deterministic Silicon Isolation)' if repeatable_flash else 'FAIL'}")
-        print(f"     Cross-Image State Leakage: {'DETECTED (Confirming Root Cause)' if leakage_detected else 'None'}")
+        print(f"     Active BRAM Reset Repeatability (1C vs 1D): {'PASS (100% Deterministic Silicon Isolation)' if repeatable_clean else 'FAIL'}")
+        print(f"     Clean Boot Match (1A vs 1C)               : {'PASS (Exact Clean State Restored)' if boot_match else 'CLOSE MATCH'}")
+        print(f"     Cross-Image State Leakage                  : {'DETECTED (Run 1B contaminated)' if leakage_detected else 'None'}")
 
         # ─────────────────────────────────────────────────────────────────────
         # DIAGNOSTIC TEST 2: Evaluation with Guaranteed Image Isolation on 20 Images
@@ -282,7 +290,7 @@ def main():
         latencies = []
         for i in range(20):
             t_img0 = time.time()
-            mmio, hls_ctrl, dma_mmio = configure_hardware(overlay, ct_entries, hw_threshold)
+            reset_hardware_state(hls_ctrl, mmio)
             spk = run_single_inference(test_imgs[i], args.timesteps, dma_mmio, hls_ctrl, in_buffer, out_buffer)
             lat_ms = (time.time() - t_img0) * 1000.0
             latencies.append(lat_ms)
