@@ -134,15 +134,16 @@ def upload_layer3_weights(mmio, q_fc_w: np.ndarray):
 def reset_hardware_state(hls_ctrl, mmio):
     """
     Complete Zero-State Hardware Reset:
-      1. Execute HLS reset body: clears Conv1 line buffer, window, cnn_v_mem,
-         drains FIFOs, and asserts physical snn_reset wire into RTL.
-      2. Configure 100% leak (0x09) on RTL Core Groups.
-      3. Run HLS with snn_enable=1 for 1000 cycles with reset=0:
+      1. HLS Reset: clears Conv1 line buffers, 3x3 window, cnn_v_mem, resets cnn_pixel_counter=0,
+         and asserts physical snn_reset wire into RTL.
+      2. Configure 100% leak (0x0009) on RTL Core Groups.
+      3. Run HLS for 1000 cycles with reset=0 (snn_reset drops, snn_enable=1):
          the RTL Core Groups run their leak FSM, sweeping all 196 neurons in BRAM
          and zeroing all membrane potentials to absolute 0.
       4. Restore leak_rate=0 for inference.
+      5. Configure HLS ready for inference (enable=1, reset=0, time_steps=1).
     """
-    # 1. HLS Reset step (asserts snn_reset wire into RTL)
+    # 1. HLS Engine Reset (clears Conv1 line buffer, window, cnn_v_mem, asserts snn_reset into RTL)
     hls_ctrl.write(0x10, 0x03)          # ctrl_reg: enable=1, reset=1
     hls_ctrl.write(0x28, 1)             # 1 step
     hls_ctrl.write(0x00, 0x01)          # ap_start
@@ -186,8 +187,8 @@ def main():
                         help='Results output JSON path')
     parser.add_argument('--skip-bitstream', action='store_true',
                         help='Skip PL programming if overlay is already active')
-    parser.add_argument('--reset-mode', choices=['flash', 'fast'], default='flash',
-                        help='Hardware state reset mode: flash (guaranteed 100% clean BRAM re-init) or fast (soft register pulse)')
+    parser.add_argument('--reset-mode', choices=['fast', 'flash'], default='fast',
+                        help='Hardware state reset mode: fast (0.33ms active BRAM leak sweep + HLS engine reset) or flash (full PL bitstream reload)')
     args = parser.parse_args()
 
     # ── Load Deployment Payload ───────────────────────────────────────────────
@@ -240,7 +241,7 @@ def main():
 
         # ── Allocate DMA Buffers ──────────────────────────────────────────────
         in_buffer  = allocate(shape=(784,), dtype=np.uint32)
-        out_buffer = allocate(shape=(256,), dtype=np.uint32)
+        out_buffer = allocate(shape=(512,), dtype=np.uint32)
 
         # Pre-compute connectivity table entries
         ct_entries = prepare_ct_table(q_fc_w)
@@ -291,54 +292,74 @@ def main():
             class_spk = np.zeros(10, dtype=np.int32)
             t0 = time.time()
 
+            # Clean initial DMA channel reset before first timestep of this image
+            dma_mmio.write(0x00, 0x04) # MM2S reset
+            dma_mmio.write(0x30, 0x04) # S2MM reset
+            t_rst_wait = time.time() + 0.005
+            while (dma_mmio.read(0x00) & 0x04 or dma_mmio.read(0x30) & 0x04) and time.time() < t_rst_wait:
+                pass
+
             # Stream across SNN timesteps (T=4)
             for t in range(args.timesteps):
-                # 1. Reset DMA channels for clean state (matching fpga_3layer_inference.py)
-                dma_mmio.write(0x00, 0x04) # MM2S reset
-                dma_mmio.write(0x30, 0x04) # S2MM reset
-                time.sleep(0.0001)
+                # 1. Reset S2MM channel for this timestep to clear any stale pending re-arm
+                dma_mmio.write(0x30, 0x04)
+                t_rst_wait = time.time() + 0.005
+                while (dma_mmio.read(0x30) & 0x04) and time.time() < t_rst_wait:
+                    pass
 
                 # 2. Arm S2MM DMA (FPGA -> ARM) to capture output class spikes
                 dest_ptr = out_buffer.device_address
-                dma_mmio.write(0x34, 0x1000)   # clear IOC
-                dma_mmio.write(0x30, 0x01)     # run S2MM
+                dma_mmio.write(0x34, 0x1000)   # clear S2MM IOC flag
+                dma_mmio.write(0x30, 0x01)     # run S2MM channel
                 dma_mmio.write(0x48, dest_ptr)
                 dma_mmio.write(0x58, 4)        # arm for 1st spike (4 bytes)
 
                 # 3. Start MM2S DMA (ARM -> FPGA): send 784 pixels
                 src_ptr = in_buffer.device_address
-                dma_mmio.write(0x00, 0x01)     # run MM2S
+                dma_mmio.write(0x04, 0x1000)   # clear MM2S IOC flag
+                dma_mmio.write(0x00, 0x01)     # run MM2S channel
                 dma_mmio.write(0x18, src_ptr)
                 dma_mmio.write(0x28, 784 * 4)  # trigger transfer (3136 bytes)
 
                 # 4. Start HLS Kernel with Auto-Restart (Pin Y18 SCA Trigger goes HIGH!)
                 hls_ctrl.write(0x00, 0x81)
 
-                # 5. Non-blocking poll for output spikes with 5ms timeout
+                # 5. Concurrent Drain Loop: Drain S2MM spikes while MM2S transfers & tail settles
                 spikes_received = 0
-                while spikes_received < 128:
-                    timeout = time.time() + 0.005 # 5 ms timeout
-                    got_spike = False
-                    while time.time() < timeout:
-                        if dma_mmio.read(0x34) & 0x1000: # IOC flag set
-                            got_spike = True
+                mm2s_done = False
+                quiet_deadline = None
+                t_abort = time.time() + 1.0    # 1.0s hard safety timeout
+
+                while time.time() < t_abort:
+                    # A. Service S2MM spike if arrived (prevents backpressure on router/HLS)
+                    if dma_mmio.read(0x34) & 0x1000:
+                        if spikes_received < 512:
+                            spikes_received += 1
+                            dma_mmio.write(0x34, 0x1000)   # clear IOC flag
+                            dma_mmio.write(0x30, 0x01)     # keep S2MM running
+                            if spikes_received < 512:
+                                dma_mmio.write(0x48, dest_ptr + (spikes_received * 4))
+                                dma_mmio.write(0x58, 4)    # re-arm for next spike
+                        if mm2s_done:
+                            quiet_deadline = time.time() + 0.010  # allow 10ms quiet window after last spike
+
+                    # B. Check if MM2S has finished sending all 784 pixels
+                    if not mm2s_done:
+                        mm2s_sr = dma_mmio.read(0x04)
+                        if (mm2s_sr & 0x1000) or (mm2s_sr & 0x0002):
+                            mm2s_done = True
+                            quiet_deadline = time.time() + 0.010  # start 10ms quiet drain countdown
+                    else:
+                        # C. MM2S is done and quiet drain window elapsed
+                        if quiet_deadline is not None and time.time() >= quiet_deadline:
                             break
 
-                    if got_spike:
-                        spikes_received += 1
-                        dma_mmio.write(0x34, 0x1000)   # clear IOC flag
-                        dma_mmio.write(0x30, 0x01)     # keep S2MM running
-                        dma_mmio.write(0x48, dest_ptr + (spikes_received * 4))
-                        dma_mmio.write(0x58, 4)        # arm for next spike
-                    else:
-                        break
-
-                # 6. Stop HLS & S2MM channel for this timestep cleanly
-                hls_ctrl.write(0x00, 0x00) # deassert auto-restart
-                dma_mmio.write(0x30, 0x00) # stop S2MM
+                # 6. Stop HLS & S2MM channel for this timestep cleanly (Pin Y18 SCA Trigger drops LOW!)
+                hls_ctrl.write(0x00, 0x00)     # deassert auto-restart
+                dma_mmio.write(0x30, 0x00)     # stop S2MM
                 out_buffer.invalidate()
 
-                # 6. Decode received output class spikes from Group 4
+                # 7. Decode received output class spikes from Group 4
                 for s in range(spikes_received):
                     pkt = int(out_buffer[s])
                     if pkt != 0:
