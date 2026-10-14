@@ -180,7 +180,7 @@ def main():
         hls_ctrl.write(0x10, 0x01)              # 0x10: ctrl_reg: enable=1, reset=0
         hls_ctrl.write(0x18, hw_threshold)      # 0x18: config_reg: threshold
         hls_ctrl.write(0x20, MODE_CNN_STREAM)   # 0x20: mode_reg: Mode 3 (Streaming 2D Conv)
-        hls_ctrl.write(0x28, 200000)            # 0x28: time_steps_reg: 200,000 cycles (drain 784 pixels + ~40k L2 fanout spikes)
+        hls_ctrl.write(0x28, 1)                 # 0x28: time_steps_reg: 1 (kernel streams continuously via auto-restart)
         hls_ctrl.write(0x00, 0x00)              # 0x00: ap_ctrl: idle
 
         # ── Allocate DMA Buffers ──────────────────────────────────────────────
@@ -196,24 +196,16 @@ def main():
         latencies_ms = []
         log = []
 
+        # Read initial hardware diagnostic counter values
+        last_r_spks = int(mmio.read(CFG_ROUTER_SPKS))
+        last_n_spks = int(mmio.read(CFG_NEURON_SPKS))
+
         print(f"\nStarting 100% on-FPGA inference on {n_test} images (Pin Y18 SCA Trigger active)...")
         t_start_all = time.time()
 
         for i in range(n_test):
             img = test_imgs[i] # 28x28 float32
             lbl = int(test_lbls[i])
-
-            # Reset HLS line buffer and membrane states between images
-            hls_ctrl.write(0x10, 0x03)          # ctrl_reg: enable=1, reset=1
-            hls_ctrl.write(0x28, 1)             # 1 cycle is enough for reset
-            hls_ctrl.write(0x00, 0x01)          # pulse start to execute reset body
-            t_rst = time.time() + 0.005
-            while time.time() < t_rst:
-                if hls_ctrl.read(0x00) & 0x02:  # wait ap_done
-                    break
-            hls_ctrl.write(0x10, 0x01)          # ctrl_reg: enable=1, reset=0
-            hls_ctrl.write(0x20, MODE_CNN_STREAM) # ensure Mode 3 is set
-            hls_ctrl.write(0x28, 200000)        # ensure 200,000 cycles per timestep
 
             # Quantize pixel values to Q8.8 fixed-point (pixel * 256)
             px_quant = np.clip(np.round(img.flatten() * 256.0), -32768, 32767).astype(np.int16)
@@ -226,64 +218,49 @@ def main():
 
             # Stream across SNN timesteps (T=4)
             for t in range(args.timesteps):
-                # Ensure DMA channels are ready and not in error
-                mm2s_sr = dma_mmio.read(0x04)
-                s2mm_sr = dma_mmio.read(0x34)
-                if (mm2s_sr & 0x4000) or (s2mm_sr & 0x4000):
-                    # Unrecoverable error: perform clean reset
-                    dma_mmio.write(0x00, 0x04)
-                    dma_mmio.write(0x30, 0x04)
-                    while (dma_mmio.read(0x00) & 0x04) or (dma_mmio.read(0x30) & 0x04):
-                        time.sleep(0.0001)
+                # 1. Reset DMA channels for clean state (matching fpga_3layer_inference.py)
+                dma_mmio.write(0x00, 0x04) # MM2S reset
+                dma_mmio.write(0x30, 0x04) # S2MM reset
+                time.sleep(0.0001)
 
-                # Clear previous status flags
-                dma_mmio.write(0x04, 0x1000)
-                dma_mmio.write(0x34, 0x1000)
-
-                # 1. Arm S2MM DMA (FPGA -> ARM) to capture output class spikes
+                # 2. Arm S2MM DMA (FPGA -> ARM) to capture output class spikes
                 dest_ptr = out_buffer.device_address
-                dma_mmio.write(0x30, 0x1001)   # run S2MM + enable IOC interrupt
+                dma_mmio.write(0x34, 0x1000)   # clear IOC
+                dma_mmio.write(0x30, 0x01)     # run S2MM
                 dma_mmio.write(0x48, dest_ptr)
                 dma_mmio.write(0x58, 4)        # arm for 1st spike (4 bytes)
 
-                # 2. Start MM2S DMA (ARM -> FPGA): send 784 pixels
+                # 3. Start MM2S DMA (ARM -> FPGA): send 784 pixels
                 src_ptr = in_buffer.device_address
-                dma_mmio.write(0x00, 0x1001)   # run MM2S + enable IOC interrupt
+                dma_mmio.write(0x00, 0x01)     # run MM2S
                 dma_mmio.write(0x18, src_ptr)
                 dma_mmio.write(0x28, 784 * 4)  # trigger transfer (3136 bytes)
 
-                # 3. Start HLS Kernel with Auto-Restart (Pin Y18 SCA Trigger goes HIGH!)
+                # 4. Start HLS Kernel with Auto-Restart (Pin Y18 SCA Trigger goes HIGH!)
                 hls_ctrl.write(0x00, 0x81)
 
-                # 4. Concurrent non-blocking poll for output spikes
+                # 5. Non-blocking poll for output spikes with 5ms timeout
                 spikes_received = 0
-                s2mm_timeout = time.time() + 0.015 # 15 ms timeout for 1st spike
                 while spikes_received < 128:
+                    timeout = time.time() + 0.005 # 5 ms timeout
                     got_spike = False
-                    while time.time() < s2mm_timeout:
-                        # Check either IOC (bit 12) or Idle (bit 1)
-                        if dma_mmio.read(0x34) & 0x1002:
+                    while time.time() < timeout:
+                        if dma_mmio.read(0x34) & 0x1000: # IOC flag set
                             got_spike = True
                             break
 
                     if got_spike:
                         spikes_received += 1
                         dma_mmio.write(0x34, 0x1000)   # clear IOC flag
-                        dma_mmio.write(0x30, 0x1001)   # keep S2MM running
+                        dma_mmio.write(0x30, 0x01)     # keep S2MM running
                         dma_mmio.write(0x48, dest_ptr + (spikes_received * 4))
                         dma_mmio.write(0x58, 4)        # arm for next spike
-                        s2mm_timeout = time.time() + 0.003 # tight 3 ms timeout for subsequent spikes
                     else:
                         break
 
-                # 5. Stop HLS & S2MM cleanly
+                # 6. Stop HLS & S2MM channel for this timestep cleanly
                 hls_ctrl.write(0x00, 0x00) # deassert auto-restart
-                t_idle = time.time() + 0.005
-                while time.time() < t_idle:
-                    if hls_ctrl.read(0x00) & 0x04: # ap_idle
-                        break
                 dma_mmio.write(0x30, 0x00) # stop S2MM
-
                 out_buffer.invalidate()
 
                 # 6. Decode received output class spikes from Group 4
@@ -302,11 +279,15 @@ def main():
             lat_ms = (t1 - t0) * 1000.0
             latencies_ms.append(lat_ms)
 
-            # Read hardware diagnostic counters for this image
-            img_r_spks = int(mmio.read(CFG_ROUTER_SPKS))
-            img_n_spks = int(mmio.read(CFG_NEURON_SPKS))
-            accum_router_spk += img_r_spks
-            accum_neuron_spk += img_n_spks
+            # Read hardware diagnostic counters for this image (delta from free-running registers)
+            curr_r_spks = int(mmio.read(CFG_ROUTER_SPKS))
+            curr_n_spks = int(mmio.read(CFG_NEURON_SPKS))
+            delta_r_spks = curr_r_spks - last_r_spks
+            delta_n_spks = curr_n_spks - last_n_spks
+            last_r_spks = curr_r_spks
+            last_n_spks = curr_n_spks
+            accum_router_spk += delta_r_spks
+            accum_neuron_spk += delta_n_spks
 
             total_spikes += np.sum(class_spk)
             pred = int(np.argmax(class_spk))
@@ -318,8 +299,8 @@ def main():
                 "true_label":      lbl,
                 "predicted_label": pred,
                 "spikes":          class_spk.tolist(),
-                "router_spikes":   img_r_spks,
-                "neuron_spikes":   img_n_spks,
+                "router_spikes":   delta_r_spks,
+                "neuron_spikes":   delta_n_spks,
                 "latency_ms":      round(lat_ms, 2)
             })
 
