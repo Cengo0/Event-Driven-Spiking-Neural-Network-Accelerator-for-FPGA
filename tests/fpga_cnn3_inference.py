@@ -109,12 +109,41 @@ def upload_layer3_weights(mmio, q_fc_w: np.ndarray):
                 fanout += 1
 
         # Invalidate remaining fanout slots up to 16
-        if fanout < 16:
-            addr, _ = encode_ct_write(src_grp, src_nid, fanout, 0, 0, 0, False)
-            ct_write(mmio, addr, 0)
         total_entries += fanout
 
     print(f"  Layer 3: Successfully wrote {total_entries} active synaptic connections into BRAM table.")
+
+
+def reset_hardware_state(hls_ctrl, mmio):
+    """
+    Two-step safe reset:
+      1. Execute HLS reset body (clears Conv1 line buffer, window, membrane & drains FIFO).
+      2. Run 1-cycle step with reset=0 to deassert physical snn_reset wire on FPGA.
+      3. Pulse maximum leak (0x09) on RTL Core Groups to zero BRAM membrane potentials.
+    """
+    # 1. HLS Reset step
+    hls_ctrl.write(0x10, 0x03)          # ctrl_reg: enable=1, reset=1
+    hls_ctrl.write(0x28, 1)             # 1 step
+    hls_ctrl.write(0x00, 0x01)          # ap_start
+    t0 = time.time() + 0.010
+    while time.time() < t0:
+        if hls_ctrl.read(0x00) & 0x02:  # wait ap_done
+            break
+
+    # 2. HLS Deassert reset wire step
+    hls_ctrl.write(0x10, 0x01)          # ctrl_reg: enable=1, reset=0
+    hls_ctrl.write(0x20, MODE_CNN_STREAM)
+    hls_ctrl.write(0x28, 1)
+    hls_ctrl.write(0x00, 0x01)          # ap_start -> snn_reset drops to 0!
+    t0 = time.time() + 0.010
+    while time.time() < t0:
+        if hls_ctrl.read(0x00) & 0x02:
+            break
+
+    # 3. Clear RTL Core Group BRAM membrane potentials via leak sweep
+    mmio.write(CFG_NEURON_PARAMS, 0x0009) # shift1=1, shift2=1 -> leak 100% of potential
+    time.sleep(0.0002)                   # 200 us is >30x the 6 us needed for 588-cycle sweep
+    mmio.write(CFG_NEURON_PARAMS, 0x0000) # restore zero leak for inference
 
 
 def main():
@@ -206,6 +235,9 @@ def main():
         for i in range(n_test):
             img = test_imgs[i] # 28x28 float32
             lbl = int(test_lbls[i])
+
+            # Zero hardware state & membrane potentials between images
+            reset_hardware_state(hls_ctrl, mmio)
 
             # Quantize pixel values to Q8.8 fixed-point (pixel * 256)
             px_quant = np.clip(np.round(img.flatten() * 256.0), -32768, 32767).astype(np.int16)
