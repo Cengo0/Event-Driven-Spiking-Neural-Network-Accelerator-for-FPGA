@@ -170,8 +170,8 @@ def run_single_inference(img, timesteps, dma_mmio, hls_ctrl, in_buffer, out_buff
 
 def main():
     parser = argparse.ArgumentParser(description="CNN3 SNN Accelerator Diagnostic Suite")
-    parser.add_argument('--bitstream', default='outputs_v3/snn_core_group_v3.bit')
-    parser.add_argument('--data',      default='data/cache/mnist_cnn3_deployment.npz')
+    parser.add_argument('--bitstream', default='snn_core_group_v3.bit')
+    parser.add_argument('--data',      default='mnist_cnn3_deployment.npz')
     parser.add_argument('--timesteps', type=int, default=4)
     args = parser.parse_args()
 
