@@ -162,6 +162,8 @@ def main():
                         help='Results output JSON path')
     parser.add_argument('--skip-bitstream', action='store_true',
                         help='Skip PL programming if overlay is already active')
+    parser.add_argument('--reset-mode', choices=['flash', 'fast'], default='flash',
+                        help='Hardware state reset mode: flash (guaranteed 100% clean BRAM re-init) or fast (soft register pulse)')
     args = parser.parse_args()
 
     # ── Load Deployment Payload ───────────────────────────────────────────────
@@ -237,7 +239,21 @@ def main():
             lbl = int(test_lbls[i])
 
             # Zero hardware state & membrane potentials between images
-            reset_hardware_state(hls_ctrl, mmio)
+            if args.reset_mode == 'flash':
+                overlay.download()
+                mmio     = overlay.snn_config_regs_0.mmio
+                hls_ctrl = overlay.snn_top_hls_0.mmio
+                dma_mmio = overlay.axi_dma_0.mmio
+                upload_layer3_weights(mmio, q_fc_w)
+                mmio.write(CFG_THRESHOLD, hw_threshold & 0xFFFF)
+                mmio.write(CFG_NEURON_PARAMS, 0x0000)
+                hls_ctrl.write(0x10, 0x01)
+                hls_ctrl.write(0x18, hw_threshold)
+                hls_ctrl.write(0x20, MODE_CNN_STREAM)
+                hls_ctrl.write(0x28, 1)
+                hls_ctrl.write(0x00, 0x00)
+            else:
+                reset_hardware_state(hls_ctrl, mmio)
 
             # Quantize pixel values to Q8.8 fixed-point (pixel * 256)
             px_quant = np.clip(np.round(img.flatten() * 256.0), -32768, 32767).astype(np.int16)

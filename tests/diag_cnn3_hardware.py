@@ -219,39 +219,67 @@ def main():
         pred_1b = int(np.argmax(spk_1b))
         print(f"  Run 1B (Without Reset)    : Pred={pred_1b} | Spikes={spk_1b.tolist()} | Total Spikes={np.sum(spk_1b)}")
 
-        # Run 1C: With Clean Reset again (should match 1A perfectly)
+        # Run 1C: With Clean Reset again (observe if register reset succeeded)
         reset_hardware_state(hls_ctrl, mmio)
         spk_1c = run_single_inference(test_imgs[0], args.timesteps, dma_mmio, hls_ctrl, in_buffer, out_buffer)
         pred_1c = int(np.argmax(spk_1c))
-        print(f"  Run 1C (Clean State Again): Pred={pred_1c} | Spikes={spk_1c.tolist()} | Total Spikes={np.sum(spk_1c)}")
+        print(f"  Run 1C (Register Reset Again): Pred={pred_1c} | Spikes={spk_1c.tolist()} | Total Spikes={np.sum(spk_1c)}")
 
-        repeatable = np.array_equal(spk_1a, spk_1c)
+        # Run 1D: True Hardware PL Flash Reset via overlay.download()
+        t_flash0 = time.time()
+        overlay.download()
+        mmio     = overlay.snn_config_regs_0.mmio
+        hls_ctrl = overlay.snn_top_hls_0.mmio
+        dma_mmio = overlay.axi_dma_0.mmio
+        upload_layer3_weights(mmio, q_fc_w)
+        mmio.write(CFG_THRESHOLD, hw_threshold & 0xFFFF)
+        mmio.write(CFG_NEURON_PARAMS, 0x0000)
+        t_flash = (time.time() - t_flash0) * 1000.0
+
+        spk_1d = run_single_inference(test_imgs[0], args.timesteps, dma_mmio, hls_ctrl, in_buffer, out_buffer)
+        pred_1d = int(np.argmax(spk_1d))
+        print(f"  Run 1D (Hardware Flash Reset, {t_flash:.1f}ms): Pred={pred_1d} | Spikes={spk_1d.tolist()} | Total Spikes={np.sum(spk_1d)}")
+
+        repeatable_flash = np.array_equal(spk_1a, spk_1d)
         leakage_detected = not np.array_equal(spk_1a, spk_1b)
         print(f"\n  >> Diagnostic Result:")
-        print(f"     Hardware Repeatability: {'PASS (100% Deterministic)' if repeatable else 'FAIL (Non-deterministic)'}")
+        print(f"     Register Reset Repeatability: {'PASS' if np.array_equal(spk_1a, spk_1c) else 'FAIL (Residual BRAM Charge Leaked)'}")
+        print(f"     Hardware Flash Repeatability: {'PASS (100% Deterministic Silicon Isolation)' if repeatable_flash else 'FAIL'}")
         print(f"     Cross-Image State Leakage: {'DETECTED (Confirming Root Cause)' if leakage_detected else 'None'}")
 
         # ─────────────────────────────────────────────────────────────────────
-        # DIAGNOSTIC TEST 2: Evaluation with Image Isolation on First 20 Images
+        # DIAGNOSTIC TEST 2: Evaluation with Guaranteed Image Isolation on 20 Images
         # ─────────────────────────────────────────────────────────────────────
         print("\n" + "=" * 65)
-        print("TEST 2: Clean Image-Isolated Inference on First 20 Images (Threshold = %d)" % hw_threshold)
+        print("TEST 2: Clean Hardware-Isolated Inference on First 20 Images (Threshold = %d)" % hw_threshold)
         print("=" * 65)
 
         correct = 0
         total_spks = 0
+        latencies = []
         for i in range(20):
-            reset_hardware_state(hls_ctrl, mmio)
+            t_img0 = time.time()
+            overlay.download()
+            mmio     = overlay.snn_config_regs_0.mmio
+            hls_ctrl = overlay.snn_top_hls_0.mmio
+            dma_mmio = overlay.axi_dma_0.mmio
+            upload_layer3_weights(mmio, q_fc_w)
+            mmio.write(CFG_THRESHOLD, hw_threshold & 0xFFFF)
+            mmio.write(CFG_NEURON_PARAMS, 0x0000)
+
             spk = run_single_inference(test_imgs[i], args.timesteps, dma_mmio, hls_ctrl, in_buffer, out_buffer)
+            lat_ms = (time.time() - t_img0) * 1000.0
+            latencies.append(lat_ms)
+
             pred = int(np.argmax(spk)) if np.sum(spk) > 0 else 0
             is_corr = (pred == test_lbls[i])
             if is_corr:
                 correct += 1
             total_spks += np.sum(spk)
             mark = "✓" if is_corr else "✗"
-            print(f"  Img [{i:2d}/20] | True: {test_lbls[i]} | Pred: {pred} {mark} | Spikes: {spk.tolist()}")
+            print(f"  Img [{i:2d}/20] | True: {test_lbls[i]} | Pred: {pred} {mark} | Spikes: {spk.tolist()} | Lat: {lat_ms:.1f}ms")
 
-        print(f"\n  >> Test 2 Accuracy: {correct}/20 ({correct/20*100:.1f}%) | Avg Spikes/Img: {total_spks/20:.1f}")
+        print(f"\n  >> Test 2 Clean Accuracy: {correct}/20 ({correct/20*100:.1f}%) | Avg Spikes/Img: {total_spks/20:.1f} | Avg Latency: {np.mean(latencies):.1f}ms/img")
 
         # ─────────────────────────────────────────────────────────────────────
         # DIAGNOSTIC TEST 3: Hardware Firing Threshold Sweep on 20 Images
