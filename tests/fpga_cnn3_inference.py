@@ -191,6 +191,8 @@ def main():
         n_test  = min(args.samples, len(test_imgs))
         correct = 0
         total_spikes = 0
+        accum_router_spk = 0
+        accum_neuron_spk = 0
         latencies_ms = []
         log = []
 
@@ -240,49 +242,43 @@ def main():
 
                 # 1. Arm S2MM DMA (FPGA -> ARM) to capture output class spikes
                 dest_ptr = out_buffer.device_address
-                dma_mmio.write(0x30, 0x01)   # run S2MM
+                dma_mmio.write(0x30, 0x1001)   # run S2MM + enable IOC interrupt
                 dma_mmio.write(0x48, dest_ptr)
-                dma_mmio.write(0x58, 4)      # arm for 1st spike
+                dma_mmio.write(0x58, 4)        # arm for 1st spike (4 bytes)
 
                 # 2. Start MM2S DMA (ARM -> FPGA): send 784 pixels
                 src_ptr = in_buffer.device_address
-                dma_mmio.write(0x00, 0x01)   # run MM2S
+                dma_mmio.write(0x00, 0x1001)   # run MM2S + enable IOC interrupt
                 dma_mmio.write(0x18, src_ptr)
-                dma_mmio.write(0x28, 784 * 4) # trigger transfer (3136 bytes)
+                dma_mmio.write(0x28, 784 * 4)  # trigger transfer (3136 bytes)
 
                 # 3. Start HLS Kernel with Auto-Restart (Pin Y18 SCA Trigger goes HIGH!)
                 hls_ctrl.write(0x00, 0x81)
 
-                # 4. Wait for MM2S to complete sending all 784 pixels
-                t_mm2s = time.time() + 0.050 # 50 ms timeout
-                while time.time() < t_mm2s:
-                    if dma_mmio.read(0x04) & 0x1000: # MM2S IOC
-                        break
-                dma_mmio.write(0x04, 0x1000)
-
-                # 5. Non-blocking poll for output spikes with adequate timeout
+                # 4. Concurrent non-blocking poll for output spikes
                 spikes_received = 0
-                s2mm_timeout = time.time() + 0.020 # 20 ms after MM2S done
+                s2mm_timeout = time.time() + 0.015 # 15 ms timeout for 1st spike
                 while spikes_received < 128:
                     got_spike = False
                     while time.time() < s2mm_timeout:
-                        if dma_mmio.read(0x34) & 0x1000: # IOC flag set
+                        # Check either IOC (bit 12) or Idle (bit 1)
+                        if dma_mmio.read(0x34) & 0x1002:
                             got_spike = True
                             break
 
                     if got_spike:
                         spikes_received += 1
-                        dma_mmio.write(0x34, 0x1000)
-                        dma_mmio.write(0x30, 0x01)
+                        dma_mmio.write(0x34, 0x1000)   # clear IOC flag
+                        dma_mmio.write(0x30, 0x1001)   # keep S2MM running
                         dma_mmio.write(0x48, dest_ptr + (spikes_received * 4))
-                        dma_mmio.write(0x58, 4)
-                        s2mm_timeout = time.time() + 0.005 # short timeout for subsequent spikes
+                        dma_mmio.write(0x58, 4)        # arm for next spike
+                        s2mm_timeout = time.time() + 0.003 # tight 3 ms timeout for subsequent spikes
                     else:
                         break
 
-                # 6. Stop HLS & S2MM cleanly
+                # 5. Stop HLS & S2MM cleanly
                 hls_ctrl.write(0x00, 0x00) # deassert auto-restart
-                t_idle = time.time() + 0.010
+                t_idle = time.time() + 0.005
                 while time.time() < t_idle:
                     if hls_ctrl.read(0x00) & 0x04: # ap_idle
                         break
@@ -290,7 +286,7 @@ def main():
 
                 out_buffer.invalidate()
 
-                # 7. Decode received output class spikes from Group 4
+                # 6. Decode received output class spikes from Group 4
                 for s in range(spikes_received):
                     pkt = int(out_buffer[s])
                     if pkt != 0:
@@ -303,7 +299,14 @@ def main():
                 out_buffer[:] = 0
 
             t1 = time.time()
-            latencies_ms.append((t1 - t0) * 1000.0)
+            lat_ms = (t1 - t0) * 1000.0
+            latencies_ms.append(lat_ms)
+
+            # Read hardware diagnostic counters for this image
+            img_r_spks = int(mmio.read(CFG_ROUTER_SPKS))
+            img_n_spks = int(mmio.read(CFG_NEURON_SPKS))
+            accum_router_spk += img_r_spks
+            accum_neuron_spk += img_n_spks
 
             total_spikes += np.sum(class_spk)
             pred = int(np.argmax(class_spk))
@@ -314,7 +317,10 @@ def main():
                 "image_index":     i,
                 "true_label":      lbl,
                 "predicted_label": pred,
-                "spikes":          class_spk.tolist()
+                "spikes":          class_spk.tolist(),
+                "router_spikes":   img_r_spks,
+                "neuron_spikes":   img_n_spks,
+                "latency_ms":      round(lat_ms, 2)
             })
 
             # Print initial images and periodic progress
@@ -328,9 +334,6 @@ def main():
         avg_lat = np.mean(latencies_ms)
         fps = n_test / total_time
 
-        final_router_spks = int(mmio.read(CFG_ROUTER_SPKS))
-        final_neuron_spks = int(mmio.read(CFG_NEURON_SPKS))
-
         print(f"\n========================================================")
         print(f"  CNN3 Hardware Inference Results (All-on-FPGA)")
         print(f"========================================================")
@@ -340,8 +343,8 @@ def main():
         print(f"  Throughput     : {fps:.1f} FPS")
         print(f"  Avg Spk/Img    : {total_spikes / n_test:.1f}")
         print(f"\n  Hardware Diagnostics:")
-        print(f"    Router Spikes: {final_router_spks}")
-        print(f"    Neuron Spikes: {final_neuron_spks}")
+        print(f"    Router Spikes: {accum_router_spk}")
+        print(f"    Neuron Spikes: {accum_neuron_spk}")
         print(f"========================================================")
 
         # Save summary and detailed JSON matching v3 schema
@@ -365,8 +368,8 @@ def main():
                 "fps":                round(fps, 1),
                 "avg_spikes_per_image": round(total_spikes / n_test, 2),
                 "diagnostics": {
-                    "router_spikes": final_router_spks,
-                    "neuron_spikes": final_neuron_spks
+                    "router_spikes": accum_router_spk,
+                    "neuron_spikes": accum_neuron_spk
                 }
             },
             "predictions": log
