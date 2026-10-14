@@ -377,10 +377,11 @@ def main():
         w1_f=w1_f,
         b1_f=b1_f,
         # FPGA Quantized Payload (Layer 2 & Layer 3)
+        # Divide by 4 to account for AvgPool2d(2, 2) scale factor (0.25) in event-driven streaming
         q_conv2_w=np.clip(np.round(q_conv2_int.astype(np.float32) / 4.0), -127, 127).astype(np.int8),
         q_conv2_b=np.clip(np.round(b2_f * SCALE2), -127, 127).astype(np.int8),
-        q_fc_w=q_fc_int,
-        q_fc_b=np.clip(np.round(b3_f * final_scale3), -127, 127).astype(np.int8),
+        q_fc_w=np.clip(np.round(q_fc_int.astype(np.float32) / 4.0), -127, 127).astype(np.int8),
+        q_fc_b=np.clip(np.round((b3_f * final_scale3) / 4.0), -127, 127).astype(np.int8),
         # Test Data & Ground Truth
         test_imgs=test_imgs,
         test_lbls=test_lbls,
