@@ -78,21 +78,13 @@ def ct_write(mmio, addr: int, data: int):
     mmio.write(CFG_WDATA, data)   # triggers config_we pulse
 
 
-def upload_layer3_weights(mmio, q_fc_w: np.ndarray):
-    """
-    Upload Layer 2 -> Layer 3 dense weights to hardware connectivity table.
-      - Source neurons: 784 Layer 2 neurons mapped across Groups 0..3 (196 each)
-      - Destination neurons: 10 Class neurons in Group 4
-    """
-    n_classes, n_l2 = q_fc_w.shape  # (10, 784)
-    print(f"Uploading Layer 3 weights to hardware connectivity table (784 -> 10, {n_l2 * n_classes} synapses)...")
-    total_entries = 0
-
+def prepare_ct_table(q_fc_w: np.ndarray) -> list:
+    n_classes, n_l2 = q_fc_w.shape
+    entries = []
     for global_src in range(n_l2):
         src_grp = global_src // GROUP_SIZE_L2
         src_nid = global_src % GROUP_SIZE_L2
         fanout = 0
-
         for dst in range(n_classes):
             w = int(q_fc_w[dst, global_src])
             if w != 0:
@@ -105,13 +97,38 @@ def upload_layer3_weights(mmio, q_fc_w: np.ndarray):
                     weight=abs(w),
                     exc=(w > 0)
                 )
-                ct_write(mmio, addr, data)
+                entries.append((addr, data))
                 fanout += 1
+        if fanout < 16:
+            addr, _ = encode_ct_write(
+                src_group=src_grp,
+                src_neuron=src_nid,
+                fanout_idx=fanout,
+                dst_group=0,
+                dst_neuron=0,
+                weight=0,
+                exc=False
+            )
+            entries.append((addr, 0))
+    return entries
 
-        # Invalidate remaining fanout slots up to 16
-        total_entries += fanout
 
-    print(f"  Layer 3: Successfully wrote {total_entries} active synaptic connections into BRAM table.")
+def fast_upload_layer3_weights(mmio, entries: list):
+    mmio.write(CFG_CTRL, 0)
+    for addr, data in entries:
+        mmio.write(CFG_ADDR, addr)
+        mmio.write(CFG_WDATA, data)
+
+
+def upload_layer3_weights(mmio, q_fc_w: np.ndarray):
+    """
+    Upload Layer 2 -> Layer 3 dense weights to hardware connectivity table.
+      - Source neurons: 784 Layer 2 neurons mapped across Groups 0..3 (196 each)
+      - Destination neurons: 10 Class neurons in Group 4
+    """
+    entries = prepare_ct_table(q_fc_w)
+    fast_upload_layer3_weights(mmio, entries)
+    print(f"  Layer 3: Successfully wrote {len(entries)} active synaptic connections into BRAM table.")
 
 
 def reset_hardware_state(hls_ctrl, mmio):
@@ -218,6 +235,9 @@ def main():
         in_buffer  = allocate(shape=(784,), dtype=np.uint32)
         out_buffer = allocate(shape=(256,), dtype=np.uint32)
 
+        # Pre-compute connectivity table entries
+        ct_entries = prepare_ct_table(q_fc_w)
+
         # ── Run Hardware Inference Loop ───────────────────────────────────────
         n_test  = min(args.samples, len(test_imgs))
         correct = 0
@@ -244,7 +264,7 @@ def main():
                 mmio     = overlay.snn_config_regs_0.mmio
                 hls_ctrl = overlay.snn_top_hls_0.mmio
                 dma_mmio = overlay.axi_dma_0.mmio
-                upload_layer3_weights(mmio, q_fc_w)
+                fast_upload_layer3_weights(mmio, ct_entries)
                 mmio.write(CFG_THRESHOLD, hw_threshold & 0xFFFF)
                 mmio.write(CFG_NEURON_PARAMS, 0x0000)
                 hls_ctrl.write(0x10, 0x01)

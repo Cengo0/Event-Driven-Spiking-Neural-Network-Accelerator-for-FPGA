@@ -49,9 +49,9 @@ def ct_write(mmio, addr, data):
     mmio.write(CFG_WDATA, data)
 
 
-def upload_layer3_weights(mmio, q_fc_w):
+def prepare_ct_table(q_fc_w):
     n_classes, n_l2 = q_fc_w.shape
-    total_entries = 0
+    entries = []
     for global_src in range(n_l2):
         src_grp = global_src // GROUP_SIZE_L2
         src_nid = global_src % GROUP_SIZE_L2
@@ -60,13 +60,45 @@ def upload_layer3_weights(mmio, q_fc_w):
             w = int(q_fc_w[dst, global_src])
             if w != 0:
                 addr, data = encode_ct_write(src_grp, src_nid, fanout, OUTPUT_GROUP, dst, abs(w), (w > 0))
-                ct_write(mmio, addr, data)
+                entries.append((addr, data))
                 fanout += 1
         if fanout < 16:
             addr, _ = encode_ct_write(src_grp, src_nid, fanout, 0, 0, 0, False)
-            ct_write(mmio, addr, 0)
-        total_entries += fanout
-    print(f"  [Init] Uploaded {total_entries} Layer 3 synapses into BRAM table.")
+            entries.append((addr, 0))
+    return entries
+
+
+def fast_upload_layer3_weights(mmio, entries):
+    mmio.write(CFG_CTRL, 0)
+    for addr, data in entries:
+        mmio.write(CFG_ADDR, addr)
+        mmio.write(CFG_WDATA, data)
+
+
+def upload_layer3_weights(mmio, q_fc_w):
+    entries = prepare_ct_table(q_fc_w)
+    fast_upload_layer3_weights(mmio, entries)
+    print(f"  [Init] Uploaded {len(entries)} Layer 3 synapses into BRAM table.")
+
+
+def configure_hardware(overlay, ct_entries, hw_threshold):
+    overlay.download()
+    mmio     = overlay.snn_config_regs_0.mmio
+    hls_ctrl = overlay.snn_top_hls_0.mmio
+    dma_mmio = overlay.axi_dma_0.mmio
+
+    fast_upload_layer3_weights(mmio, ct_entries)
+    mmio.write(CFG_THRESHOLD, hw_threshold & 0xFFFF)
+    mmio.write(CFG_NEURON_PARAMS, 0x0000)
+
+    # Configure HLS Kernel for Mode 3 (CNN Stream)
+    hls_ctrl.write(0x10, 0x01)              # enable=1, reset=0
+    hls_ctrl.write(0x18, hw_threshold)      # threshold
+    hls_ctrl.write(0x20, MODE_CNN_STREAM)   # Mode 3 (Streaming 2D Conv)
+    hls_ctrl.write(0x28, 1)                 # 1 step
+    hls_ctrl.write(0x00, 0x00)              # ap_ctrl: idle
+
+    return mmio, hls_ctrl, dma_mmio
 
 
 def reset_hardware_state(hls_ctrl, mmio):
@@ -189,14 +221,12 @@ def main():
     try:
         from pynq import Overlay, allocate
         overlay = Overlay(args.bitstream)
-        mmio     = overlay.snn_config_regs_0.mmio
-        hls_ctrl = overlay.snn_top_hls_0.mmio
-        dma_mmio = overlay.axi_dma_0.mmio
 
-        # Upload weights once
-        upload_layer3_weights(mmio, q_fc_w)
-        mmio.write(CFG_THRESHOLD, hw_threshold & 0xFFFF)
-        mmio.write(CFG_NEURON_PARAMS, 0x0000)
+        # Pre-compile Layer 3 Connectivity Table entries
+        ct_entries = prepare_ct_table(q_fc_w)
+
+        # Initial full hardware configuration
+        mmio, hls_ctrl, dma_mmio = configure_hardware(overlay, ct_entries, hw_threshold)
 
         in_buffer  = allocate(shape=(784,), dtype=np.uint32)
         out_buffer = allocate(shape=(256,), dtype=np.uint32)
@@ -208,8 +238,7 @@ def main():
         print("TEST 1: State Isolation & Repeatability Test (Image 0: True Label = %d)" % int(test_lbls[0]))
         print("=" * 65)
 
-        # Run 1A: With Clean Reset
-        reset_hardware_state(hls_ctrl, mmio)
+        # Run 1A: Clean Initial State (cold boot)
         spk_1a = run_single_inference(test_imgs[0], args.timesteps, dma_mmio, hls_ctrl, in_buffer, out_buffer)
         pred_1a = int(np.argmax(spk_1a))
         print(f"  Run 1A (Clean State)      : Pred={pred_1a} | Spikes={spk_1a.tolist()} | Total Spikes={np.sum(spk_1a)}")
@@ -219,21 +248,15 @@ def main():
         pred_1b = int(np.argmax(spk_1b))
         print(f"  Run 1B (Without Reset)    : Pred={pred_1b} | Spikes={spk_1b.tolist()} | Total Spikes={np.sum(spk_1b)}")
 
-        # Run 1C: With Clean Reset again (observe if register reset succeeded)
+        # Run 1C: With Soft Register Reset (observe if soft reset cleared BRAM)
         reset_hardware_state(hls_ctrl, mmio)
         spk_1c = run_single_inference(test_imgs[0], args.timesteps, dma_mmio, hls_ctrl, in_buffer, out_buffer)
         pred_1c = int(np.argmax(spk_1c))
-        print(f"  Run 1C (Register Reset Again): Pred={pred_1c} | Spikes={spk_1c.tolist()} | Total Spikes={np.sum(spk_1c)}")
+        print(f"  Run 1C (Soft Register Reset) : Pred={pred_1c} | Spikes={spk_1c.tolist()} | Total Spikes={np.sum(spk_1c)}")
 
         # Run 1D: True Hardware PL Flash Reset via overlay.download()
         t_flash0 = time.time()
-        overlay.download()
-        mmio     = overlay.snn_config_regs_0.mmio
-        hls_ctrl = overlay.snn_top_hls_0.mmio
-        dma_mmio = overlay.axi_dma_0.mmio
-        upload_layer3_weights(mmio, q_fc_w)
-        mmio.write(CFG_THRESHOLD, hw_threshold & 0xFFFF)
-        mmio.write(CFG_NEURON_PARAMS, 0x0000)
+        mmio, hls_ctrl, dma_mmio = configure_hardware(overlay, ct_entries, hw_threshold)
         t_flash = (time.time() - t_flash0) * 1000.0
 
         spk_1d = run_single_inference(test_imgs[0], args.timesteps, dma_mmio, hls_ctrl, in_buffer, out_buffer)
@@ -243,7 +266,7 @@ def main():
         repeatable_flash = np.array_equal(spk_1a, spk_1d)
         leakage_detected = not np.array_equal(spk_1a, spk_1b)
         print(f"\n  >> Diagnostic Result:")
-        print(f"     Register Reset Repeatability: {'PASS' if np.array_equal(spk_1a, spk_1c) else 'FAIL (Residual BRAM Charge Leaked)'}")
+        print(f"     Soft Register Reset Repeatability: {'PASS' if np.array_equal(spk_1a, spk_1c) else 'FAIL (Residual BRAM Charge Leaked)'}")
         print(f"     Hardware Flash Repeatability: {'PASS (100% Deterministic Silicon Isolation)' if repeatable_flash else 'FAIL'}")
         print(f"     Cross-Image State Leakage: {'DETECTED (Confirming Root Cause)' if leakage_detected else 'None'}")
 
@@ -259,14 +282,7 @@ def main():
         latencies = []
         for i in range(20):
             t_img0 = time.time()
-            overlay.download()
-            mmio     = overlay.snn_config_regs_0.mmio
-            hls_ctrl = overlay.snn_top_hls_0.mmio
-            dma_mmio = overlay.axi_dma_0.mmio
-            upload_layer3_weights(mmio, q_fc_w)
-            mmio.write(CFG_THRESHOLD, hw_threshold & 0xFFFF)
-            mmio.write(CFG_NEURON_PARAMS, 0x0000)
-
+            mmio, hls_ctrl, dma_mmio = configure_hardware(overlay, ct_entries, hw_threshold)
             spk = run_single_inference(test_imgs[i], args.timesteps, dma_mmio, hls_ctrl, in_buffer, out_buffer)
             lat_ms = (time.time() - t_img0) * 1000.0
             latencies.append(lat_ms)
