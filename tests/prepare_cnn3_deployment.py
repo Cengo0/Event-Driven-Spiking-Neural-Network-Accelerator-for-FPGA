@@ -243,7 +243,7 @@ def main():
     for c in range(10):
         w3_folded[c, :] += (b3_f[c] * BIAS_FOLD_COEFF)
 
-    best_scale3_ratio = 0.15
+    best_scale3_ratio = 0.04
     best_th = 120
     final_scale3 = best_scale3_ratio * (127.0 / np.max(np.abs(w3_folded)))
 
@@ -293,7 +293,8 @@ def main():
                 s2 = (v2 >= best_th).float()
                 v2 -= s2 * best_th
 
-                p2 = pool2(s2)
+                # In hardware, Core Groups 0..3 deliver spikes directly into Group 4 without post-pool division
+                p2 = pool2(s2) * 4.0
                 cur3 = nn.functional.linear(p2.view(B, -1), q_fc_final_t)
                 v3 += cur3
                 v3 = torch.clamp(v3, min=0)

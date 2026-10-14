@@ -329,23 +329,35 @@ def main():
                 mm2s_done = False
                 quiet_deadline = None
                 t_abort = time.time() + 1.0    # 1.0s hard safety timeout
+                dma_arr = getattr(dma_mmio, 'array', None)
 
                 while time.time() < t_abort:
                     # A. Service S2MM spike if arrived (prevents backpressure on router/HLS)
-                    if dma_mmio.read(0x34) & 0x1000:
-                        if spikes_received < 512:
-                            spikes_received += 1
-                            dma_mmio.write(0x34, 0x1000)   # clear IOC flag
-                            dma_mmio.write(0x30, 0x01)     # keep S2MM running
+                    if dma_arr is not None:
+                        if dma_arr[13] & 0x1000: # 0x34 S2MM_DMASR
                             if spikes_received < 512:
-                                dma_mmio.write(0x48, dest_ptr + (spikes_received * 4))
-                                dma_mmio.write(0x58, 4)    # re-arm for next spike
-                        if mm2s_done:
-                            quiet_deadline = time.time() + 0.010  # allow 10ms quiet window after last spike
+                                spikes_received += 1
+                                dma_arr[13] = 0x1000   # clear IOC flag
+                                if spikes_received < 512:
+                                    dma_arr[18] = dest_ptr + (spikes_received * 4) # 0x48 S2MM_DA
+                                    dma_arr[22] = 4    # 0x58 S2MM_LENGTH
+                            if mm2s_done:
+                                quiet_deadline = time.time() + 0.010
+                    else:
+                        if dma_mmio.read(0x34) & 0x1000:
+                            if spikes_received < 512:
+                                spikes_received += 1
+                                dma_mmio.write(0x34, 0x1000)   # clear IOC flag
+                                dma_mmio.write(0x30, 0x01)     # keep S2MM running
+                                if spikes_received < 512:
+                                    dma_mmio.write(0x48, dest_ptr + (spikes_received * 4))
+                                    dma_mmio.write(0x58, 4)    # re-arm for next spike
+                            if mm2s_done:
+                                quiet_deadline = time.time() + 0.010  # allow 10ms quiet window after last spike
 
                     # B. Check if MM2S has finished sending all 784 pixels
                     if not mm2s_done:
-                        mm2s_sr = dma_mmio.read(0x04)
+                        mm2s_sr = dma_arr[1] if dma_arr is not None else dma_mmio.read(0x04)
                         if (mm2s_sr & 0x1000) or (mm2s_sr & 0x0002):
                             mm2s_done = True
                             quiet_deadline = time.time() + 0.010  # start 10ms quiet drain countdown
