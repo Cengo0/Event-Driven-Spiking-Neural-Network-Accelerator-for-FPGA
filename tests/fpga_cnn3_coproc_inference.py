@@ -5,9 +5,13 @@ fpga_cnn3_coproc_inference.py
 Hardware Co-Processing Inference for 3-Layer Convolutional SNN (CNN3).
 Mirrors the proven architectural blueprint of the FC3 accelerator (>97% on-board accuracy).
 
+Dependencies:
+  - numpy only (NO PyTorch / torchvision required — 100% PYNQ-Z2 compatible)
+  - pynq (when running on physical board)
+
 Partitioning:
-  - Layer 1 (Conv1 + Pool1): Executed on ARM Cortex-A9 host in Float32 (~0.12 ms)
-  - Layer 2 (Conv2 + Pool2): Executed on ARM Cortex-A9 host using Int8 quantized weights (~0.35 ms)
+  - Layer 1 (Conv1 + Pool1): Executed on ARM Cortex-A9 host in Float32 via NumPy (~0.12 ms)
+  - Layer 2 (Conv2 + Pool2): Executed on ARM Cortex-A9 host using Int8 weights via NumPy (~0.35 ms)
   - Layer 3 (Classifier)   : Executed on FPGA Hardware (Core Group 4 LIF Neurons)
                              Inter-layer weights mapped via BRAM Connectivity Table.
 
@@ -23,8 +27,6 @@ import time
 import json
 import argparse
 import numpy as np
-import torch
-import torch.nn as nn
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Hardware Architecture Constants (snn_core_group_v3)
@@ -50,6 +52,55 @@ MODE_INFERENCE     = 0x00 # Forward spike streaming directly into Event Router
 MODE_CNN_STREAM    = 0x03
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Pure NumPy 2D Convolution & Average Pooling (Zero PyTorch Dependency)
+# ─────────────────────────────────────────────────────────────────────────────
+def conv2d_np(x: np.ndarray, w: np.ndarray, b: np.ndarray = None) -> np.ndarray:
+    """
+    Fast 2D convolution in pure NumPy via strided im2col and BLAS dot product.
+      x: shape (C_in, H, W)
+      w: shape (C_out, C_in, Kh, Kw)
+      b: shape (C_out,) or None
+    Returns:
+      out: shape (C_out, H, W)
+    """
+    c_in, h, w_in = x.shape
+    c_out, _, kh, kw = w.shape
+    pad_h, pad_w = kh // 2, kw // 2
+    x_pad = np.pad(x, ((0, 0), (pad_h, pad_h), (pad_w, pad_w)), mode='constant')
+
+    # Create strided sliding window: (H, W, C_in, Kh, Kw)
+    s0, s1, s2 = x_pad.strides
+    patches = np.lib.stride_tricks.as_strided(
+        x_pad,
+        shape=(h, w_in, c_in, kh, kw),
+        strides=(s1, s2, s0, s1, s2)
+    )
+    col = patches.reshape(h * w_in, c_in * kh * kw)
+    w_mat = w.reshape(c_out, -1)
+    out = np.dot(col, w_mat.T)
+    if b is not None:
+        out += b
+    return out.T.reshape(c_out, h, w_in)
+
+
+def avgpool2d_np(x: np.ndarray, scale: float = 1.0) -> np.ndarray:
+    """
+    2x2 average pooling on (C, H, W) where H and W are even.
+    scale: 0.25 for standard average pooling (Layer 1), 1.0 for sum-pooling (Layer 2).
+    """
+    c, h, w = x.shape
+    # Reshape to (C, H/2, 2, W/2, 2)
+    blocks = x.reshape(c, h // 2, 2, w // 2, 2)
+    if scale == 1.0:
+        return blocks.sum(axis=(2, 4))
+    else:
+        return blocks.mean(axis=(2, 4))
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Connectivity Table Encoding & Upload
+# ─────────────────────────────────────────────────────────────────────────────
 def encode_ct_write(src_group: int, src_neuron: int, fanout_idx: int,
                     dst_group: int, dst_neuron: int, weight: int,
                     exc: bool) -> tuple:
@@ -116,7 +167,6 @@ def upload_layer3_weights(mmio, entries: list):
 
 def reset_hardware_state(hls_ctrl, mmio):
     """Zero hardware membrane potentials using leak sweep FSM."""
-    # Configure 100% leak rate on RTL Core Groups
     mmio.write(CFG_NEURON_PARAMS, 0x0009) # shift1=1, shift2=1 -> 100% leak
     hls_ctrl.write(0x10, 0x01)            # enable=1, reset=0
     hls_ctrl.write(0x28, 1000)            # 1000 cycles (>588 cycles required to sweep 196 neurons)
@@ -132,45 +182,40 @@ def reset_hardware_state(hls_ctrl, mmio):
 
 
 def run_software_simulation(test_imgs, test_lbls, w1_f, b1_f, q_conv2_w, q_fc_w, hw_threshold, timesteps, samples):
-    """Bit-accurate software verification of the co-processing pipeline."""
+    """Bit-accurate pure NumPy software verification of the co-processing pipeline."""
     print("\n" + "=" * 65)
-    print(f"  RUNNING SOFTWARE SIMULATION (OPTION A) ON {samples} IMAGES")
+    print(f"  RUNNING SOFTWARE SIMULATION (PURE NUMPY) ON {samples} IMAGES")
     print("=" * 65)
 
-    conv1 = nn.Conv2d(1, w1_f.shape[0], 3, padding=1)
-    conv1.weight.data = torch.from_numpy(w1_f)
-    conv1.bias.data = torch.from_numpy(b1_f)
-    pool1 = nn.AvgPool2d(2, 2)
-    pool2 = nn.AvgPool2d(2, 2)
-    q_conv2_t = torch.from_numpy(q_conv2_w.astype(np.float32))
-
+    w2_f = q_conv2_w.astype(np.float32)
     correct = 0
     total_spikes = np.zeros(10, dtype=np.int32)
     t_start = time.time()
 
     for i in range(samples):
-        img_t = torch.from_numpy(test_imgs[i]).unsqueeze(0).unsqueeze(0) # (1, 1, 28, 28)
+        img = test_imgs[i].reshape(1, 28, 28)
         lbl = int(test_lbls[i])
 
-        v1 = torch.zeros(1, 8, 28, 28)
-        v2 = torch.zeros(1, 16, 14, 14)
+        v1 = np.zeros((8, 28, 28), dtype=np.float32)
+        v2 = np.zeros((16, 14, 14), dtype=np.float32)
         v4 = np.zeros(10, dtype=np.int32)
         spk_out = np.zeros(10, dtype=np.int32)
 
-        cur1 = conv1(img_t)
-        for t in range(timesteps):
-            # Layer 1
-            v1 += cur1
-            s1 = (v1 >= 1.0).float()
-            v1 -= s1 * 1.0
-            p1 = pool1(s1)
+        cur1 = conv2d_np(img, w1_f, b1_f)
 
-            # Layer 2
-            cur2 = nn.functional.conv2d(p1, q_conv2_t, padding=1)
+        for t in range(timesteps):
+            # Layer 1 (Conv1 + Pool1)
+            v1 += cur1
+            s1 = (v1 >= 1.0).astype(np.float32)
+            v1 -= s1 * 1.0
+            p1 = avgpool2d_np(s1, scale=0.25)
+
+            # Layer 2 (Conv2 + Pool2)
+            cur2 = conv2d_np(p1, w2_f, None)
             v2 += cur2
-            s2 = (v2 >= hw_threshold).float()
+            s2 = (v2 >= hw_threshold).astype(np.float32)
             v2 -= s2 * hw_threshold
-            p2 = (pool2(s2) * 4.0).view(784).numpy()
+            p2 = avgpool2d_np(s2, scale=1.0).reshape(784)
 
             # Active Layer 2 spikes
             active_srcs = np.nonzero(p2 > 0)[0]
@@ -201,10 +246,10 @@ def run_software_simulation(test_imgs, test_lbls, w1_f, b1_f, q_conv2_w, q_fc_w,
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Co-Processing CNN3 SNN Hardware Inference on PYNQ-Z2")
-    parser.add_argument('--bitstream',     default='snn_core_group_v3.bit',
+    parser = argparse.ArgumentParser(description="Co-Processing CNN3 SNN Hardware Inference on PYNQ-Z2 (Pure NumPy)")
+    parser.add_argument('--bitstream',     default='outputs_v3/snn_core_group_v3.bit',
                         help='Path to snn_core_group_v3 bitstream')
-    parser.add_argument('--data',          default='mnist_cnn3_deployment.npz',
+    parser.add_argument('--data',          default='data/cache/mnist_cnn3_deployment.npz',
                         help='Deployment payload path (.npz)')
     parser.add_argument('--samples',  type=int, default=1000,
                         help='Number of test images to evaluate (default: 1000)')
@@ -241,16 +286,17 @@ def main():
     print(f"  Dataset: {len(test_imgs)} test images loaded (evaluating {n_test}).")
     print(f"  Hardware global threshold: {hw_threshold}")
 
-    # If sim-only requested or running on non-PYNQ host without pynq module
+    # If sim-only requested
     if args.sim_only:
         run_software_simulation(test_imgs, test_lbls, w1_f, b1_f, q_conv2_w, q_fc_w, hw_threshold, args.timesteps, n_test)
         return
 
+    # Attempt to import PYNQ
     try:
         from pynq import Overlay, allocate
     except ImportError:
         print("\n[INFO] PYNQ library not found on this machine.")
-        print("[INFO] Executing bit-accurate software simulation of Option A instead...\n")
+        print("[INFO] Executing bit-accurate pure NumPy software simulation of Option A instead...\n")
         run_software_simulation(test_imgs, test_lbls, w1_f, b1_f, q_conv2_w, q_fc_w, hw_threshold, args.timesteps, n_test)
         return
 
@@ -293,14 +339,7 @@ def main():
     # ── 5. Allocate DMA Buffers ───────────────────────────────────────────────
     in_buffer  = allocate(shape=(1024,), dtype=np.uint32)
     out_buffer = allocate(shape=(128,), dtype=np.uint32)
-
-    # Setup PyTorch host modules for Layer 1 and Layer 2
-    conv1 = nn.Conv2d(1, w1_f.shape[0], 3, padding=1)
-    conv1.weight.data = torch.from_numpy(w1_f)
-    conv1.bias.data = torch.from_numpy(b1_f)
-    pool1 = nn.AvgPool2d(2, 2)
-    pool2 = nn.AvgPool2d(2, 2)
-    q_conv2_t = torch.from_numpy(q_conv2_w.astype(np.float32))
+    w2_f       = q_conv2_w.astype(np.float32)
 
     # ── 6. Run Co-Processing Inference Loop ───────────────────────────────────
     correct = 0
@@ -312,7 +351,7 @@ def main():
     t_start_all = time.time()
 
     for i in range(n_test):
-        img_np = test_imgs[i]
+        img_np = test_imgs[i].reshape(1, 28, 28)
         lbl    = int(test_lbls[i])
 
         # Zero hardware state between images
@@ -333,27 +372,26 @@ def main():
             reset_hardware_state(hls_ctrl, mmio)
 
         # Host-side LIF membrane state for Layer 1 & 2
-        v1 = torch.zeros(1, 8, 28, 28)
-        v2 = torch.zeros(1, 16, 14, 14)
+        v1 = np.zeros((8, 28, 28), dtype=np.float32)
+        v2 = np.zeros((16, 14, 14), dtype=np.float32)
         class_spikes = np.zeros(10, dtype=np.int32)
         t_img_start = time.time()
 
-        img_t = torch.from_numpy(img_np).unsqueeze(0).unsqueeze(0)
-        cur1 = conv1(img_t)
+        cur1 = conv2d_np(img_np, w1_f, b1_f)
 
         for t in range(args.timesteps):
-            # A. Layer 1 (Conv1 + Pool1) on Host CPU
+            # A. Layer 1 (Conv1 + Pool1) in pure NumPy
             v1 += cur1
-            s1 = (v1 >= 1.0).float()
+            s1 = (v1 >= 1.0).astype(np.float32)
             v1 -= s1 * 1.0
-            p1 = pool1(s1)
+            p1 = avgpool2d_np(s1, scale=0.25)
 
-            # B. Layer 2 (Conv2 + Pool2) on Host CPU
-            cur2 = nn.functional.conv2d(p1, q_conv2_t, padding=1)
+            # B. Layer 2 (Conv2 + Pool2) in pure NumPy
+            cur2 = conv2d_np(p1, w2_f, None)
             v2 += cur2
-            s2 = (v2 >= hw_threshold).float()
+            s2 = (v2 >= hw_threshold).astype(np.float32)
             v2 -= s2 * hw_threshold
-            p2 = (pool2(s2) * 4.0).view(784).numpy()
+            p2 = avgpool2d_np(s2, scale=1.0).reshape(784)
 
             # C. Pack active Layer 2 spikes for FPGA
             active_srcs = np.nonzero(p2 > 0)[0]
@@ -481,7 +519,7 @@ def main():
             "samples": n_test,
             "timesteps": args.timesteps,
             "hw_threshold": hw_threshold,
-            "pipeline": "Option A Co-Processing (CPU Conv1+Conv2 -> FPGA Group 4)"
+            "pipeline": "Option A Co-Processing (Pure NumPy CPU Conv1+Conv2 -> FPGA Group 4)"
         },
         "metrics": {
             "accuracy_percent": round(final_acc, 2),
@@ -500,4 +538,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
