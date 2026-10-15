@@ -59,18 +59,9 @@ static void encoder_write_axis_spike(
 // CNN3 Streaming 2D Line-Buffer Convolution & LIF Engine
 //=============================================================================
 static ap_fixed<16,8> cnn_frame[CNN_IMG_HEIGHT][CNN_IMG_WIDTH];
-#pragma HLS BIND_STORAGE variable=cnn_frame type=RAM_2P impl=LUTRAM
-
 static ap_fixed<16,8> cnn_v_mem[CNN_CONV1_CHANNELS][CNN_IMG_HEIGHT][CNN_IMG_WIDTH];
-#pragma HLS BIND_STORAGE variable=cnn_v_mem type=RAM_2P impl=BRAM
-
 static ap_int<16>     cnn_l2_v_mem[CNN_CONV2_CHANNELS][CNN_POOL2_HEIGHT][CNN_POOL2_WIDTH];
-#pragma HLS BIND_STORAGE variable=cnn_l2_v_mem type=RAM_2P impl=LUTRAM
-#pragma HLS ARRAY_PARTITION variable=cnn_l2_v_mem complete dim=1
-
 static ap_uint<12>    conv1_spike_buf[2048];
-#pragma HLS BIND_STORAGE variable=conv1_spike_buf type=RAM_2P impl=BRAM
-
 static ap_uint<16>    cnn_pixel_counter = 0;
 static ap_uint<1>     cnn_spike_toggle = 0;
 
@@ -840,6 +831,13 @@ void snn_top_hls(
     // on integrated builds (Z-7020 is BRAM-constrained at 50 MHz+).
     #pragma HLS BIND_STORAGE variable=encoder_phase_acc type=RAM_2P impl=LUTRAM
     #pragma HLS ARRAY_PARTITION variable=encoder_phase_acc cyclic factor=2
+
+    // CNN3 streaming engine arrays
+    #pragma HLS BIND_STORAGE variable=cnn_frame type=RAM_2P impl=LUTRAM
+    #pragma HLS BIND_STORAGE variable=cnn_v_mem type=RAM_2P impl=BRAM
+    #pragma HLS BIND_STORAGE variable=cnn_l2_v_mem type=RAM_2P impl=LUTRAM
+    #pragma HLS ARRAY_PARTITION variable=cnn_l2_v_mem complete dim=1
+    #pragma HLS BIND_STORAGE variable=conv1_spike_buf type=RAM_2P impl=BRAM
     
     //=========================================================================
     // Internal State
