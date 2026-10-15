@@ -58,25 +58,20 @@ static void encoder_write_axis_spike(
 //=============================================================================
 // CNN3 Streaming 2D Line-Buffer Convolution & LIF Engine
 //=============================================================================
-static ap_fixed<16,8> cnn_line_buf[2][CNN_IMG_WIDTH];
-static ap_fixed<16,8> cnn_win[3][3];
+static ap_fixed<16,8> cnn_frame[CNN_IMG_HEIGHT][CNN_IMG_WIDTH];
 static ap_fixed<16,8> cnn_v_mem[CNN_CONV1_CHANNELS][CNN_IMG_HEIGHT][CNN_IMG_WIDTH];
-static ap_uint<4>     cnn_pool_spikes[CNN_CONV1_CHANNELS][CNN_POOL1_HEIGHT][CNN_POOL1_WIDTH];
+static ap_int<16>     cnn_l2_v_mem[CNN_CONV2_CHANNELS][CNN_POOL2_HEIGHT][CNN_POOL2_WIDTH];
 static ap_uint<16>    cnn_pixel_counter = 0;
+static ap_uint<1>     cnn_spike_toggle = 0;
 
 static void reset_cnn3_engine() {
     #pragma HLS INLINE
     cnn_pixel_counter = 0;
-    for (int r = 0; r < 2; r++) {
+    cnn_spike_toggle = 0;
+    for (int r = 0; r < CNN_IMG_HEIGHT; r++) {
         for (int c = 0; c < CNN_IMG_WIDTH; c++) {
             #pragma HLS UNROLL
-            cnn_line_buf[r][c] = 0;
-        }
-    }
-    for (int r = 0; r < 3; r++) {
-        for (int c = 0; c < 3; c++) {
-            #pragma HLS UNROLL
-            cnn_win[r][c] = 0;
+            cnn_frame[r][c] = 0;
         }
     }
     for (int k = 0; k < CNN_CONV1_CHANNELS; k++) {
@@ -85,9 +80,11 @@ static void reset_cnn3_engine() {
                 cnn_v_mem[k][y][x] = 0;
             }
         }
-        for (int py = 0; py < CNN_POOL1_HEIGHT; py++) {
-            for (int px = 0; px < CNN_POOL1_WIDTH; px++) {
-                cnn_pool_spikes[k][py][px] = 0;
+    }
+    for (int co = 0; co < CNN_CONV2_CHANNELS; co++) {
+        for (int py = 0; py < CNN_POOL2_HEIGHT; py++) {
+            for (int px = 0; px < CNN_POOL2_WIDTH; px++) {
+                cnn_l2_v_mem[co][py][px] = 0;
             }
         }
     }
@@ -95,74 +92,78 @@ static void reset_cnn3_engine() {
 
 static void run_cnn3_streaming_pixel(
     ap_fixed<16,8> pixel_val,
+    ap_uint<16> threshold,
     hls::stream<encoder_axis_word_t> &spike_fifo
 ) {
     #pragma HLS INLINE
     int r = cnn_pixel_counter / CNN_IMG_WIDTH;
     int c = cnn_pixel_counter % CNN_IMG_WIDTH;
+    cnn_frame[r][c] = pixel_val;
+    cnn_pixel_counter++;
 
-    // Shift 3x3 window registers
-    for (int i = 0; i < 3; i++) {
-        #pragma HLS UNROLL
-        cnn_win[i][0] = cnn_win[i][1];
-        cnn_win[i][1] = cnn_win[i][2];
-    }
-    cnn_win[0][2] = (r >= 2) ? cnn_line_buf[0][c] : (ap_fixed<16,8>)0;
-    cnn_win[1][2] = (r >= 1) ? cnn_line_buf[1][c] : (ap_fixed<16,8>)0;
-    cnn_win[2][2] = pixel_val;
+    if (cnn_pixel_counter >= CNN_IMG_PIXELS) {
+        cnn_pixel_counter = 0;
 
-    cnn_line_buf[0][c] = cnn_line_buf[1][c];
-    cnn_line_buf[1][c] = pixel_val;
+        // Execute full Conv1 + LIF on buffered frame with exact zero-padding
+        CONV1_Y: for (int y = 0; y < CNN_IMG_HEIGHT; y++) {
+            CONV1_X: for (int x = 0; x < CNN_IMG_WIDTH; x++) {
+                CONV1_FILTERS: for (int k = 0; k < CNN_CONV1_CHANNELS; k++) {
+                    #pragma HLS PIPELINE II=1
+                    ap_fixed<16,8> acc = (ap_fixed<16,8>)CONV1_BIAS[k];
+                    CONV1_DY: for (int dy = -1; dy <= 1; dy++) {
+                        CONV1_DX: for (int dx = -1; dx <= 1; dx++) {
+                            int iy = y + dy;
+                            int ix = x + dx;
+                            ap_fixed<16,8> px = (iy >= 0 && iy < CNN_IMG_HEIGHT && ix >= 0 && ix < CNN_IMG_WIDTH) 
+                                               ? cnn_frame[iy][ix] : (ap_fixed<16,8>)0;
+                            acc += (ap_fixed<16,8>)CONV1_WEIGHTS[k][dy+1][dx+1] * px;
+                        }
+                    }
 
-    // Center convolution tap at (y, x) = (r-1, c-1)
-    if (r >= 1 && c >= 1) {
-        int y = r - 1;
-        int x = c - 1;
+                    // LIF Membrane Potential Update with Hard Reset
+                    cnn_v_mem[k][y][x] += acc;
+                    if (cnn_v_mem[k][y][x] >= (ap_fixed<16,8>)1.0) {
+                        cnn_v_mem[k][y][x] -= (ap_fixed<16,8>)1.0;
+                        int py = y >> 1; // 2x2 average pool bin: 0..13
+                        int px = x >> 1;
 
-        CONV1_FILTERS: for (int k = 0; k < CNN_CONV1_CHANNELS; k++) {
-            #pragma HLS UNROLL
-            ap_fixed<16,8> acc = (ap_fixed<16,8>)CONV1_BIAS[k];
-            for (int dy = 0; dy < 3; dy++) {
-                #pragma HLS UNROLL
-                for (int dx = 0; dx < 3; dx++) {
-                    #pragma HLS UNROLL
-                    acc += (ap_fixed<16,8>)CONV1_WEIGHTS[k][dy][dx] * cnn_win[dy][dx];
-                }
-            }
+                        // Conv2 Accumulation into Layer 2 Neurons
+                        FANOUT_CO: for (int co = 0; co < CNN_CONV2_CHANNELS; co++) {
+                            #pragma HLS UNROLL
+                            for (int dy2 = -1; dy2 <= 1; dy2++) {
+                                for (int dx2 = -1; dx2 <= 1; dx2++) {
+                                    int oy = py + dy2;
+                                    int ox = px + dx2;
+                                    if (oy >= 0 && oy < CNN_POOL1_HEIGHT && ox >= 0 && ox < CNN_POOL1_WIDTH) {
+                                        int y2 = oy >> 1; // 0..6
+                                        int x2 = ox >> 1; // 0..6
+                                        signed char wt = CONV2_WEIGHTS[co][k][1 - dy2][1 - dx2];
+                                        cnn_l2_v_mem[co][y2][x2] += (ap_int<16>)wt;
+                                        if (cnn_l2_v_mem[co][y2][x2] >= (ap_int<16>)threshold) {
+                                            cnn_l2_v_mem[co][y2][x2] -= (ap_int<16>)threshold;
 
-            // LIF Membrane Potential Update with Hard Reset
-            cnn_v_mem[k][y][x] += acc;
-            if (cnn_v_mem[k][y][x] >= (ap_fixed<16,8>)1.0) {
-                cnn_v_mem[k][y][x] -= (ap_fixed<16,8>)1.0;
-                int py = y >> 1; // 2x2 average pool bin
-                int px = x >> 1;
-                cnn_pool_spikes[k][py][px]++;
+                                            // Emit Layer 2 spike into Core Groups 0..3
+                                            int dst_grp = co >> 2;   // 4 groups of 4 channels: co / 4
+                                            int local_ch = co & 3;   // co % 4
+                                            int local_nid = local_ch * CNN_POOL2_SIZE + y2 * CNN_POOL2_WIDTH + x2;
+                                            ap_uint<11> global_nid = ((ap_uint<3>)dst_grp << 8) | (ap_uint<8>)local_nid;
 
-                // Fan out to Layer 2 Core Groups
-                FANOUT_CO: for (int co = 0; co < CNN_CONV2_CHANNELS; co++) {
-                    #pragma HLS UNROLL
-                    int dst_grp = co >> 2;   // 4 groups of 4 channels: co / 4
-                    int local_ch = co & 3;   // co % 4
+                                            // Toggle weight between 127 and 126 to ensure RTL payload_changed detects consecutive spikes
+                                            ap_uint<8> emit_wt = cnn_spike_toggle ? (ap_uint<8>)127 : (ap_uint<8>)126;
+                                            cnn_spike_toggle = !cnn_spike_toggle;
 
-                    for (int dy2 = -1; dy2 <= 1; dy2++) {
-                        for (int dx2 = -1; dx2 <= 1; dx2++) {
-                            int oy = py + dy2;
-                            int ox = px + dx2;
-                            if (oy >= 0 && oy < CNN_POOL1_HEIGHT && ox >= 0 && ox < CNN_POOL1_WIDTH) {
-                                int y2 = oy >> 1;
-                                int x2 = ox >> 1;
-                                int local_nid = local_ch * CNN_POOL2_SIZE + y2 * CNN_POOL2_WIDTH + x2;
-                                signed char wt = CONV2_WEIGHTS[co][k][1 - dy2][1 - dx2];
-                                if (wt != 0 && !spike_fifo.full()) {
-                                    encoder_axis_word_t pkt;
-                                    ap_uint<11> global_nid = ((ap_uint<3>)dst_grp << 8) | (ap_uint<8>)local_nid;
-                                    pkt.data = 0;
-                                    pkt.data(SPIKE_PKT_ID_HI, SPIKE_PKT_ID_LO) = global_nid;
-                                    pkt.data(SPIKE_PKT_WGT_HI, SPIKE_PKT_WGT_LO) = (ap_uint<8>)wt;
-                                    pkt.keep = 0xF;
-                                    pkt.strb = 0xF;
-                                    pkt.last = 1;
-                                    spike_fifo.write(pkt);
+                                            if (!spike_fifo.full()) {
+                                                encoder_axis_word_t pkt;
+                                                pkt.data = 0;
+                                                pkt.data(SPIKE_PKT_ID_HI, SPIKE_PKT_ID_LO) = global_nid;
+                                                pkt.data(SPIKE_PKT_WGT_HI, SPIKE_PKT_WGT_LO) = emit_wt;
+                                                pkt.keep = 0xF;
+                                                pkt.strb = 0xF;
+                                                pkt.last = 1;
+                                                spike_fifo.write(pkt);
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -170,11 +171,6 @@ static void run_cnn3_streaming_pixel(
                 }
             }
         }
-    }
-
-    cnn_pixel_counter++;
-    if (cnn_pixel_counter >= CNN_IMG_PIXELS) {
-        cnn_pixel_counter = 0;
     }
 }
 
@@ -1042,7 +1038,7 @@ void snn_top_hls(
                 axis_spike_t px_pkt = s_axis_spikes.read();
                 ap_fixed<16,8> pixel_val;
                 pixel_val.range(15, 0) = (ap_uint<16>)px_pkt.data(15, 0);
-                run_cnn3_streaming_pixel(pixel_val, encoder_spikes);
+                run_cnn3_streaming_pixel(pixel_val, threshold, encoder_spikes);
             }
 
             if (!encoder_spikes.empty()) {

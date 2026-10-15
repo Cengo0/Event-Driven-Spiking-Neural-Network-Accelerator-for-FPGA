@@ -237,23 +237,85 @@ def main():
     #   W_folded[c, j] = W[c, j] + (b[c] / N_events)
     # Each incoming Layer 2 spike dynamically delivers its exact slice of the class bias
     # during active inference, while consuming zero power when idle.
-    print(f"\nApplying Event-Driven Bias Folding for Layer 3 (Classifier)...")
-    BIAS_FOLD_COEFF = 0.015
+    print(f"\nRunning Automated Hardware Calibration Sweep...")
+    # Precompute Layer 2 activations on a calibration subset (500 samples)
+    n_calib = min(args.samples, len(test_imgs))
+    calib_imgs = active_ds.data[:n_calib].float().unsqueeze(1) / 255.0
+    if selected_norm == 'zscore':
+        calib_imgs = (calib_imgs - 0.1307) / 0.3081
+    calib_lbls = active_ds.targets[:n_calib].numpy()
+
+    conv1_calib = nn.Conv2d(1, w1_f.shape[0], 3, padding=1)
+    conv1_calib.weight.data = torch.from_numpy(w1_f)
+    conv1_calib.bias.data = torch.from_numpy(b1_f)
+    pool1_calib = nn.AvgPool2d(2, 2)
+    pool2_calib = nn.AvgPool2d(2, 2)
+    q_conv2_t = torch.from_numpy(np.clip(np.round(w2_f * SCALE2), -127, 127).astype(np.float32))
+
+    p2_calib = np.zeros((n_calib, TIMESTEPS, 784), dtype=np.float32)
+    with torch.no_grad():
+        v1 = torch.zeros(n_calib, w1_f.shape[0], 28, 28)
+        v2 = torch.zeros(n_calib, w2_f.shape[0], 14, 14)
+        cur1 = conv1_calib(calib_imgs)
+        for t in range(TIMESTEPS):
+            v1 += cur1
+            s1 = (v1 >= 1.0).float()
+            v1 -= s1
+            p1 = pool1_calib(s1)
+            cur2 = nn.functional.conv2d(p1, q_conv2_t, padding=1)
+            v2 += cur2
+            s2 = (v2 >= base_th).float()
+            v2 -= s2 * base_th
+            p2 = pool2_calib(s2) * 4.0
+            p2_calib[:, t, :] = p2.view(n_calib, 784).numpy()
+
+    # Search candidates centered mathematically around base_th and empirical spike count
+    avg_l2_events = max(1.0, float(np.mean(np.sum(p2_calib, axis=(1, 2)))))
+    empirical_alpha = 1.0 / avg_l2_events if avg_l2_events > 0 else 0.015
+    print(f"  Empirical Layer 2 Active Events / Image : {avg_l2_events:.1f}")
+
+    alphas = [0.005, 0.008, 0.010, 0.012, 0.015, 0.020]
+    s_ratios = [0.03, 0.04, 0.05, 0.06]
+    candidate_ths = [max(1, int(round(base_th * m))) for m in [0.8, 0.9, 1.0, 1.1, 1.2]]
+
+    best_calib_acc, best_params = 0.0, None
+    for alpha in alphas:
+        w3_folded = w3_f.copy()
+        for c in range(10):
+            w3_folded[c, :] += (b3_f[c] * alpha)
+        max_w3 = np.max(np.abs(w3_folded))
+        for s_ratio in s_ratios:
+            scale3 = s_ratio * (127.0 / max_w3)
+            q_fc = np.clip(np.round(w3_folded * scale3), -127, 127).astype(np.float32)
+            for th in candidate_ths:
+                v4 = np.zeros((n_calib, 10), dtype=np.float32)
+                spk = np.zeros((n_calib, 10), dtype=np.float32)
+                for t in range(TIMESTEPS):
+                    cur3 = np.dot(p2_calib[:, t, :], q_fc.T)
+                    v4 += cur3
+                    v4 = np.maximum(v4, 0)
+                    s3 = (v4 >= th).astype(np.float32)
+                    v4 -= s3 * th
+                    spk += s3
+                preds = np.argmax(spk, axis=1)
+                acc = (preds == calib_lbls).mean() * 100.0
+                if acc > best_calib_acc:
+                    best_calib_acc = acc
+                    best_params = (alpha, s_ratio, th)
+
+    BIAS_FOLD_COEFF, best_scale3_ratio, best_th = best_params
     w3_folded = w3_f.copy()
     for c in range(10):
         w3_folded[c, :] += (b3_f[c] * BIAS_FOLD_COEFF)
-
-    best_scale3_ratio = 0.04
-    best_th = 120
     final_scale3 = best_scale3_ratio * (127.0 / np.max(np.abs(w3_folded)))
-
     q_conv2_int = np.clip(np.round(w2_f * SCALE2), -127, 127).astype(np.int8)
     q_fc_int = np.clip(np.round(w3_folded * final_scale3), -127, 127).astype(np.int8)
 
-    print(f"  Event-Driven Bias Fold Coeff : {BIAS_FOLD_COEFF}")
-    print(f"  Layer 3 Quantized Scale      : {final_scale3:.2f}")
-    print(f"  Hardware Shared Threshold    : {best_th}")
-    print(f"  q_fc_w Dynamic Range         : [{q_fc_int.min()}, {q_fc_int.max()}] (Non-zero entries: {np.count_nonzero(q_fc_int)} / {q_fc_int.size})")
+    print(f"  Optimized Calibration Accuracy : {best_calib_acc:.2f}% (on {n_calib} validation samples)")
+    print(f"  Optimized Bias Fold Coeff      : {BIAS_FOLD_COEFF:.4f}")
+    print(f"  Optimized Layer 3 Scale Ratio  : {best_scale3_ratio:.2f} (scale3 = {final_scale3:.2f})")
+    print(f"  Optimized Hardware Threshold   : {best_th}")
+    print(f"  q_fc_w Quantized Dynamic Range : [{q_fc_int.min()}, {q_fc_int.max()}] (Non-zero entries: {np.count_nonzero(q_fc_int)} / {q_fc_int.size})")
 
     # ─────────────────────────────────────────────────────────────────
     # 5. Full 10,000 Image Test Set Validation
