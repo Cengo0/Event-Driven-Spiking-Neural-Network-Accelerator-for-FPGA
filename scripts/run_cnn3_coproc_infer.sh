@@ -20,7 +20,7 @@ echo "  Threshold : $THRESHOLD"
 echo "  Output    : $OUTPUT"
 echo "================================================================="
 
-python3 tests/fpga_cnn3_coproc_inference.py \
+python3 fpga_cnn3_coproc_inference.py \
     --bitstream "$BITSTREAM" \
     --data "$DATA" \
     --samples "$SAMPLES" \
