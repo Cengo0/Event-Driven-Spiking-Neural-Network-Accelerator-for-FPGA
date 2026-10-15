@@ -3,13 +3,9 @@
 prepare_cnn3_deployment.py
 ==========================
 Prepares deployment payload for 3-layer Convolutional SNN (CNN3) on PYNQ-Z2 FPGA.
-Supports dynamic threshold calibration, automatic normalization detection,
-automatic bias detection, and hardware-faithful event-driven emulation.
-
-Model Architecture:
-  - Layer 1 (CPU Host): Conv2d(1->8, 3x3) -> LIF (v_th=1.0) -> AvgPool2d(2x2) [Float32]
-  - Layer 2 (FPGA Grp 1): Conv2d(8->16, 3x3) -> LIF -> AvgPool2d(2x2)          [Int8]
-  - Layer 3 (FPGA Grp 2): Linear(784->10) -> LIF                               [Int8]
+Restores full 8-bit [-127, +127] dynamic range for Layer 3 (q_fc_w) by calibrating
+an independent 16-bit Layer 3 hardware threshold (hw_threshold_l3) for RTL Core Group 4
+using exact sequential, zero-clamped, hard-reset hardware emulation.
 """
 
 import os
@@ -18,6 +14,7 @@ import argparse
 import numpy as np
 import torch
 import torch.nn as nn
+
 
 def fuse_batchnorm_conv(w, b, bn_gamma, bn_beta, bn_mean, bn_var, eps=1e-5):
     """Fold 2D BatchNorm parameters into Conv2d weights and biases."""
@@ -60,7 +57,6 @@ def export_hls_weights_header(w1_f, b1_f, q_conv2_int, header_path):
         f.write("\n};\n\n")
 
         # CONV2_WEIGHTS [16][8][3][3] - Full precision integer weights
-        # Note: AvgPool2d(2, 2) 0.25 scale factor is accounted for in hardware by scaling the L2 threshold (threshold * 4)
         f.write(f"static const signed char CONV2_WEIGHTS[{q_conv2_int.shape[0]}][{q_conv2_int.shape[1]}][{q_conv2_int.shape[2]}][{q_conv2_int.shape[3]}] = {{\n")
         for co in range(q_conv2_int.shape[0]):
             f.write(f"    {{ // Out Channel {co}\n")
@@ -77,7 +73,6 @@ def export_hls_weights_header(w1_f, b1_f, q_conv2_int, header_path):
     print(f"Auto-generated HLS C++ weights header: {header_path}")
 
 
-
 def parse_args():
     parser = argparse.ArgumentParser(description="Prepare CNN3 SNN Deployment Payload for FPGA")
     parser.add_argument('--model', default='models/cnn3_T_4_clean_l2[0.000500].pth',
@@ -92,6 +87,9 @@ def parse_args():
                         help='Input normalization strategy (default: auto)')
     parser.add_argument('--samples', type=int, default=1000,
                         help='Number of validation images for threshold calibration (default: 1000)')
+    parser.add_argument('--l2-pool-mode', choices=['coalesced', 'sum'], default='coalesced',
+                        help='Layer 2 2x2 pool event mode: coalesced (1bit bitmap on current v3 bitstream) '
+                             'or sum (up to 4 spikes/bin for Option A or rebuilt HLS)')
     return parser.parse_args()
 
 
@@ -159,7 +157,6 @@ def main():
     ])
     zscore_ds = datasets.MNIST('./data', train=False, download=False, transform=zscore_transform)
 
-    # Auto-detect normalization via probe if requested
     if args.normalization == 'auto':
         probe_loader_z = torch.utils.data.DataLoader(zscore_ds, batch_size=100, shuffle=False)
         probe_loader_r = torch.utils.data.DataLoader(raw_ds, batch_size=100, shuffle=False)
@@ -216,28 +213,18 @@ def main():
     print(f"  Loaded {len(test_imgs)} MNIST test images, shape: {test_imgs.shape}")
 
     # ─────────────────────────────────────────────────────────────────
-    # 3. Dynamic Weight Scaling for FPGA Layers (Layer 2 & Layer 3)
+    # 3. Dynamic Weight Scaling for Layer 2 (HLS Conv2 Engine)
     # ─────────────────────────────────────────────────────────────────
-    # Layer 1 stays Float32 on the CPU.
-    # Conv2 is scaled to utilize the full signed Int8 dynamic range [-127, 127].
     max_abs_conv2 = np.max(np.abs(w2_f))
-    max_abs_fc = np.max(np.abs(w3_f))
     SCALE2 = 127.0 / max_abs_conv2
     base_th = max(1, int(round(SCALE2)))
-    print(f"\nFPGA Layer 2 Dynamic Weight Scale: {SCALE2:.2f} (Base Threshold = {base_th})")
+    q_conv2_int = np.clip(np.round(w2_f * SCALE2), -127, 127).astype(np.int8)
+    print(f"\nFPGA Layer 2 Dynamic Weight Scale: {SCALE2:.2f} (HLS Layer 2 Threshold = {base_th})")
 
     # ─────────────────────────────────────────────────────────────────
-    # 4. Hardware-Faithful Event-Driven Bias Folding & Calibration
+    # 4. Full 8-Bit Layer 3 Quantization & Sequential Hardware Calibration
     # ─────────────────────────────────────────────────────────────────
-    # In pure neuromorphic architectures (especially for Side-Channel Analysis),
-    # static DC bias currents are eliminated to ensure 100% event-driven dynamic activity.
-    # To retain the software network's bias suppression (e.g. inhibiting Class 8 and
-    # boosting Class 1), we apply Event-Driven Bias Folding:
-    #   W_folded[c, j] = W[c, j] + (b[c] / N_events)
-    # Each incoming Layer 2 spike dynamically delivers its exact slice of the class bias
-    # during active inference, while consuming zero power when idle.
-    print(f"\nRunning Automated Hardware Calibration Sweep...")
-    # Precompute Layer 2 activations on a calibration subset (500 samples)
+    print(f"\nRunning Hardware-Faithful Sequential Calibration Sweep (Full 8-Bit Layer 3, mode={args.l2_pool_mode})...")
     n_calib = min(args.samples, len(test_imgs))
     calib_imgs = active_ds.data[:n_calib].float().unsqueeze(1) / 255.0
     if selected_norm == 'zscore':
@@ -249,9 +236,9 @@ def main():
     conv1_calib.bias.data = torch.from_numpy(b1_f)
     pool1_calib = nn.AvgPool2d(2, 2)
     pool2_calib = nn.AvgPool2d(2, 2)
-    q_conv2_t = torch.from_numpy(np.clip(np.round(w2_f * SCALE2), -127, 127).astype(np.float32))
+    q_conv2_t = torch.from_numpy(q_conv2_int.astype(np.float32))
 
-    p2_calib = np.zeros((n_calib, TIMESTEPS, 784), dtype=np.float32)
+    p2_calib = np.zeros((n_calib, TIMESTEPS, 784), dtype=np.int32)
     with torch.no_grad():
         v1 = torch.zeros(n_calib, w1_f.shape[0], 28, 28)
         v2 = torch.zeros(n_calib, w2_f.shape[0], 14, 14)
@@ -265,63 +252,134 @@ def main():
             v2 += cur2
             s2 = (v2 >= base_th).float()
             v2 -= s2 * base_th
-            p2 = pool2_calib(s2) * 4.0
-            p2_calib[:, t, :] = p2.view(n_calib, 784).numpy()
+            p2 = (pool2_calib(s2) * 4.0).view(n_calib, 784).numpy()
+            if args.l2_pool_mode == 'coalesced':
+                p2_calib[:, t, :] = (p2 > 0).astype(np.int32)
+            else:
+                p2_calib[:, t, :] = np.round(p2).astype(np.int32)
 
-    # Search candidates centered mathematically around base_th and empirical spike count
     avg_l2_events = max(1.0, float(np.mean(np.sum(p2_calib, axis=(1, 2)))))
-    empirical_alpha = 1.0 / avg_l2_events if avg_l2_events > 0 else 0.015
-    print(f"  Empirical Layer 2 Active Events / Image : {avg_l2_events:.1f}")
+    print(f"  Empirical Layer 2 Routed Events / Image : {avg_l2_events:.1f}")
 
-    alphas = [0.005, 0.008, 0.010, 0.012, 0.015, 0.020]
-    s_ratios = [0.03, 0.04, 0.05, 0.06]
-    candidate_ths = [max(1, int(round(base_th * m))) for m in [0.8, 0.9, 1.0, 1.1, 1.2]]
+    # Pre-build ordered spike event lists per (sample, timestep) matching router sequential arrival
+    event_streams = []
+    for i in range(n_calib):
+        sample_ts = []
+        for t in range(TIMESTEPS):
+            active_srcs = np.nonzero(p2_calib[i, t] > 0)[0]
+            if args.l2_pool_mode == 'coalesced':
+                sample_ts.append(active_srcs)
+            else:
+                expanded = []
+                for src in active_srcs:
+                    expanded.extend([src] * int(p2_calib[i, t, src]))
+                sample_ts.append(np.array(expanded, dtype=np.int32))
+        event_streams.append(sample_ts)
 
-    best_calib_acc, best_params = 0.0, None
+    alphas = [0.0, 0.002, 0.005, 0.008, 0.010, 0.012, 0.015]
+    s_ratios = [1.0]  # Full 8-bit [-127, +127] dynamic range for Layer 3
+    candidate_l3_ths = [350, 450, 550, 650, 750, 850, 950, 1100, 1250, 1400, 1600, 1800, 2000]
+
+    best_calib_acc = -1.0
+    best_params = (0.008, 1.0, 950)
+
     for alpha in alphas:
         w3_folded = w3_f.copy()
         for c in range(10):
             w3_folded[c, :] += (b3_f[c] * alpha)
         max_w3 = np.max(np.abs(w3_folded))
+
         for s_ratio in s_ratios:
             scale3 = s_ratio * (127.0 / max_w3)
-            q_fc = np.clip(np.round(w3_folded * scale3), -127, 127).astype(np.float32)
-            for th in candidate_ths:
-                v4 = np.zeros((n_calib, 10), dtype=np.float32)
-                spk = np.zeros((n_calib, 10), dtype=np.float32)
-                for t in range(TIMESTEPS):
-                    cur3 = np.dot(p2_calib[:, t, :], q_fc.T)
-                    v4 += cur3
-                    v4 = np.maximum(v4, 0)
-                    s3 = (v4 >= th).astype(np.float32)
-                    v4 -= s3 * th
-                    spk += s3
-                preds = np.argmax(spk, axis=1)
-                acc = (preds == calib_lbls).mean() * 100.0
-                if acc > best_calib_acc:
-                    best_calib_acc = acc
-                    best_params = (alpha, s_ratio, th)
+            q_fc = np.clip(np.round(w3_folded * scale3), -127, 127).astype(np.int32)
 
-    BIAS_FOLD_COEFF, best_scale3_ratio, best_th = best_params
+            for th_l3 in candidate_l3_ths:
+                correct = 0
+                total_spk = 0
+                max_ts_spk = 0
+
+                for i in range(n_calib):
+                    v4 = np.zeros(10, dtype=np.int32)
+                    spk_out = np.zeros(10, dtype=np.int32)
+
+                    for t in range(TIMESTEPS):
+                        ts_spk = 0
+                        # Exact core_group.v sequential spike integration:
+                        for src in event_streams[i][t]:
+                            v4 += q_fc[:, src]
+                            v4 = np.maximum(v4, 0)     # Clamped at 0 on inhibition (core_group.v line 345)
+                            fired = (v4 >= th_l3)
+                            if np.any(fired):
+                                spk_out[fired] += 1
+                                ts_spk += int(np.sum(fired))
+                                v4[fired] = 0          # Hard reset to 0 on firing (core_group.v line 320)
+                        if ts_spk > max_ts_spk:
+                            max_ts_spk = ts_spk
+
+                    total_spk += int(np.sum(spk_out))
+                    # Strict spike-count argmax (NO fallback to internal v4 membrane voltage)
+                    if np.sum(spk_out) > 0 and int(np.argmax(spk_out)) == calib_lbls[i]:
+                        correct += 1
+
+                acc = correct / n_calib * 100.0
+                avg_spk = total_spk / n_calib
+                # Keep max spikes per single timestep < 28 so 32-entry spike_out_fifo never overflows
+                if max_ts_spk < 28 and 2.5 <= avg_spk <= 40.0 and acc > best_calib_acc:
+                    best_calib_acc = acc
+                    best_params = (alpha, s_ratio, th_l3)
+
+    # Fallback if max_ts_spk constraint was too tight on an outlier image
+    if best_calib_acc < 0:
+        print("  [Note] Relaxing per-timestep peak constraint to < 32 spikes...")
+        for alpha in [0.005, 0.008, 0.010]:
+            w3_folded = w3_f.copy()
+            for c in range(10):
+                w3_folded[c, :] += (b3_f[c] * alpha)
+            scale3 = 127.0 / np.max(np.abs(w3_folded))
+            q_fc = np.clip(np.round(w3_folded * scale3), -127, 127).astype(np.int32)
+            for th_l3 in candidate_l3_ths:
+                correct = 0
+                total_spk = 0
+                for i in range(n_calib):
+                    v4 = np.zeros(10, dtype=np.int32)
+                    spk_out = np.zeros(10, dtype=np.int32)
+                    for t in range(TIMESTEPS):
+                        for src in event_streams[i][t]:
+                            v4 += q_fc[:, src]
+                            v4 = np.maximum(v4, 0)
+                            fired = (v4 >= th_l3)
+                            if np.any(fired):
+                                spk_out[fired] += 1
+                                v4[fired] = 0
+                    total_spk += int(np.sum(spk_out))
+                    if np.sum(spk_out) > 0 and int(np.argmax(spk_out)) == calib_lbls[i]:
+                        correct += 1
+                acc = correct / n_calib * 100.0
+                avg_spk = total_spk / n_calib
+                if 2.5 <= avg_spk <= 32.0 and acc > best_calib_acc:
+                    best_calib_acc = acc
+                    best_params = (alpha, 1.0, th_l3)
+
+    BIAS_FOLD_COEFF, best_scale3_ratio, best_th_l3 = best_params
     w3_folded = w3_f.copy()
     for c in range(10):
         w3_folded[c, :] += (b3_f[c] * BIAS_FOLD_COEFF)
     final_scale3 = best_scale3_ratio * (127.0 / np.max(np.abs(w3_folded)))
-    q_conv2_int = np.clip(np.round(w2_f * SCALE2), -127, 127).astype(np.int8)
     q_fc_int = np.clip(np.round(w3_folded * final_scale3), -127, 127).astype(np.int8)
 
-    print(f"  Optimized Calibration Accuracy : {best_calib_acc:.2f}% (on {n_calib} validation samples)")
-    print(f"  Optimized Bias Fold Coeff      : {BIAS_FOLD_COEFF:.4f}")
-    print(f"  Optimized Layer 3 Scale Ratio  : {best_scale3_ratio:.2f} (scale3 = {final_scale3:.2f})")
-    print(f"  Optimized Hardware Threshold   : {best_th}")
-    print(f"  q_fc_w Quantized Dynamic Range : [{q_fc_int.min()}, {q_fc_int.max()}] (Non-zero entries: {np.count_nonzero(q_fc_int)} / {q_fc_int.size})")
+    print(f"  Optimized Calibration Accuracy   : {best_calib_acc:.2f}% (on {n_calib} validation samples)")
+    print(f"  Optimized Bias Fold Coeff        : {BIAS_FOLD_COEFF:.4f}")
+    print(f"  Optimized Layer 3 Scale Ratio    : {best_scale3_ratio:.2f} (scale3 = {final_scale3:.2f})")
+    print(f"  Layer 2 Threshold (HLS 0x18)     : {base_th}")
+    print(f"  Layer 3 Threshold (RTL 0x10)     : {best_th_l3}")
+    print(f"  q_fc_w Quantized Dynamic Range   : [{q_fc_int.min()}, {q_fc_int.max()}] "
+          f"(Non-zero entries: {np.count_nonzero(q_fc_int)} / {q_fc_int.size})")
 
     # ─────────────────────────────────────────────────────────────────
-    # 5. Full 10,000 Image Test Set Validation
+    # 5. Full 10,000 Image Hardware-Faithful Sequential Validation
     # ─────────────────────────────────────────────────────────────────
-    print(f"\nValidating on test dataset ({len(test_imgs)} images)...")
-    q_conv2_final_t = torch.from_numpy(q_conv2_int.astype(np.float32))
-    q_fc_final_t = torch.from_numpy(q_fc_int.astype(np.float32))
+    print(f"\nValidating on full test dataset ({len(test_imgs)} images, sequential spike integration)...")
+    q_fc_i32 = q_fc_int.astype(np.int32)
 
     conv1 = nn.Conv2d(1, w1_f.shape[0], 3, padding=1)
     conv1.weight.data = torch.from_numpy(w1_f)
@@ -333,15 +391,16 @@ def main():
     correct_full = 0
     total_spikes_full = 0
     total_samples = 0
+    class_pred_hist = np.zeros(10, dtype=np.int32)
 
     with torch.no_grad():
         for b_imgs, b_lbls in eval_loader:
             B = b_imgs.size(0)
+            b_lbls_np = b_lbls.numpy()
             v1 = torch.zeros(B, w1_f.shape[0], 28, 28)
             v2 = torch.zeros(B, w2_f.shape[0], 14, 14)
-            v3 = torch.zeros(B, 10)
-            spk3 = torch.zeros(B, 10)
 
+            p2_batch = np.zeros((B, TIMESTEPS, 784), dtype=np.int32)
             cur1_b = conv1(b_imgs)
             for t in range(TIMESTEPS):
                 v1 += cur1_b
@@ -349,35 +408,48 @@ def main():
                 v1 -= s1 * 1.0
 
                 p1 = pool1(s1)
-                cur2 = nn.functional.conv2d(p1, q_conv2_final_t, padding=1)
+                cur2 = nn.functional.conv2d(p1, q_conv2_t, padding=1)
                 v2 += cur2
-                s2 = (v2 >= best_th).float()
-                v2 -= s2 * best_th
+                s2 = (v2 >= base_th).float()
+                v2 -= s2 * base_th
 
-                # In hardware, Core Groups 0..3 deliver spikes directly into Group 4 without post-pool division
-                p2 = pool2(s2) * 4.0
-                cur3 = nn.functional.linear(p2.view(B, -1), q_fc_final_t)
-                v3 += cur3
-                v3 = torch.clamp(v3, min=0)
-                s3 = (v3 >= best_th).float()
-                v3 = v3 * (1.0 - s3)
-                spk3 += s3
+                p2 = (pool2(s2) * 4.0).view(B, 784).numpy()
+                if args.l2_pool_mode == 'coalesced':
+                    p2_batch[:, t, :] = (p2 > 0).astype(np.int32)
+                else:
+                    p2_batch[:, t, :] = np.round(p2).astype(np.int32)
 
-            pred = spk3.argmax(dim=1)
-            no_spk = (spk3.sum(dim=1) == 0)
-            pred[no_spk] = v3[no_spk].argmax(dim=1)
-            correct_full += (pred == b_lbls).sum().item()
-            total_samples += B
-            total_spikes_full += spk3.sum().item()
+            for bi in range(B):
+                v4 = np.zeros(10, dtype=np.int32)
+                spk_out = np.zeros(10, dtype=np.int32)
+                for t in range(TIMESTEPS):
+                    active_srcs = np.nonzero(p2_batch[bi, t] > 0)[0]
+                    for src in active_srcs:
+                        cnt = 1 if args.l2_pool_mode == 'coalesced' else int(p2_batch[bi, t, src])
+                        for _ in range(cnt):
+                            v4 += q_fc_i32[:, src]
+                            v4 = np.maximum(v4, 0)
+                            fired = (v4 >= best_th_l3)
+                            if np.any(fired):
+                                spk_out[fired] += 1
+                                v4[fired] = 0
 
-    full_acc = correct_full / total_samples * 100
+                pred = int(np.argmax(spk_out))
+                class_pred_hist[pred] += 1
+                if np.sum(spk_out) > 0 and pred == int(b_lbls_np[bi]):
+                    correct_full += 1
+                total_spikes_full += int(np.sum(spk_out))
+                total_samples += 1
+
+    full_acc = correct_full / total_samples * 100.0
     avg_spikes = total_spikes_full / total_samples
-    print(f"Full Test Set Accuracy: {full_acc:.2f}% ({correct_full}/{total_samples}) | Avg Spikes/Img: {avg_spikes:.1f}")
+    print(f"Full Test Set Accuracy: {full_acc:.2f}% ({correct_full}/{total_samples}) | Avg Spikes/Img: {avg_spikes:.2f}")
+    print(f"Prediction Distribution across Classes 0..9: {class_pred_hist.tolist()}")
 
     # ─────────────────────────────────────────────────────────────────
     # 6. Save Deployment Payload
     # ─────────────────────────────────────────────────────────────────
-    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+    os.makedirs(os.path.dirname(os.path.abspath(OUTPUT_PATH)), exist_ok=True)
     np.savez_compressed(
         OUTPUT_PATH,
         # CPU Payload (Layer 1)
@@ -391,8 +463,10 @@ def main():
         # Test Data & Ground Truth
         test_imgs=test_imgs,
         test_lbls=test_lbls,
-        # Hardware Parameters & Metadata
-        hw_threshold=np.array(best_th, dtype=np.int32),
+        # Hardware Parameters & Metadata (Decoupled Layer 2 & Layer 3 Thresholds)
+        hw_threshold=np.array(base_th, dtype=np.int32),          # Layer 2 HLS threshold (143)
+        hw_threshold_l2=np.array(base_th, dtype=np.int32),       # Explicit alias for Layer 2
+        hw_threshold_l3=np.array(best_th_l3, dtype=np.int32),    # Layer 3 RTL Group 4 threshold
         scale2=np.array(SCALE2, dtype=np.float32),
         scale3=np.array(final_scale3, dtype=np.float32),
         normalization=np.array(selected_norm),
@@ -401,12 +475,10 @@ def main():
     print(f"\nSaved CNN3 Deployment Payload: {OUTPUT_PATH}")
 
     # ─────────────────────────────────────────────────────────────────
-    # 7. Export HLS C++ Weights Header (for All-on-FPGA Layer 1 Engine)
+    # 7. Export HLS C++ Weights Header (for All-on-FPGA Layer 1 & 2 Engine)
     # ─────────────────────────────────────────────────────────────────
     export_hls_weights_header(w1_f, b1_f, q_conv2_int, args.hls_header)
 
 
-
 if __name__ == '__main__':
     main()
-

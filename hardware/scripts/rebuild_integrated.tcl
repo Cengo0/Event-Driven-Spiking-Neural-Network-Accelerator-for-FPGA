@@ -1,6 +1,6 @@
 #-----------------------------------------------------------------------------
-# Rebuild snn_integrated bitstream with RTL fixes
-# Edge detector on spike_in_valid + hold register on spike_out
+# Rebuild snn_core_group_v3 bitstream with Core Group Architecture
+# Top Module: snn_core_group_top.v
 #
 # Usage: vivado -mode batch -source hardware/scripts/rebuild_integrated.tcl
 #-----------------------------------------------------------------------------
@@ -271,7 +271,7 @@ connect_bd_net [get_bd_pins const_zero_1bit/dout]  [get_bd_pins snn_top_hls_0/s_
 # Reward signal is s_axilite register (not standalone port), no tie-off needed
 
 # =============================================================================
-# HLS ↔ RTL External Ports  (connected in snn_integrated_top.v wrapper)
+# HLS ↔ RTL External Ports  (connected in snn_core_group_top.v wrapper)
 # =============================================================================
 # Make these external so the top wrapper can connect them
 
@@ -399,7 +399,7 @@ connect_bd_net [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_ports clk_10
 connect_bd_net [get_bd_pins proc_sys_reset_0/peripheral_aresetn] [get_bd_ports rst_n_sync]
 connect_bd_net [get_bd_pins const_zero_1bit/dout] [get_bd_ports debug_learning_active]
 
-# HLS threshold/leak connected via snn_integrated_top.v wrapper, not via config_regs
+# HLS threshold/leak connected via snn_core_group_top.v wrapper, not via config_regs
 # (config_regs doesn't have hls_snn_enable/hls_threshold/hls_leak_rate ports)
 
 # Interrupt

@@ -6,10 +6,10 @@ Multi-Layer Convolutional SNN (CNN3) 100% On-FPGA Inference with Pin Y18 SCA Tri
 Architecture: snn_core_group_top.v (v3) + HLS Streaming 2D Convolution Engine
 
 Pipeline on Hardware:
-  - Layer 1 (HLS 2D Conv Engine) : Conv2d(1->8, 3x3) -> LIF -> AvgPool2d(2x2) [On-Chip DSP & Line Buffers]
-  - Layer 2 (RTL Core Groups 0..3): 784 LIF Neurons across 4 Core Groups (196 each) [On-Chip Int8]
-  - Layer 3 (RTL Core Group 4)   : 10 Class LIF Neurons in Group 4 [On-Chip Int8]
-  - Inter-Group Routing Table    : Hardware BRAM (12,544 rows mapping Layer 2 -> Layer 3)
+  - Layer 1 & 2 (HLS Engine)     : Conv1 -> LIF(1.0) -> Pool1 -> Conv2 -> LIF(hw_threshold_l2) -> Pool2
+  - Layer 2 Relay (RTL Grps 0..3): 784 Instant-Relay Neurons across 4 Core Groups (Vth = 1)
+  - Layer 3 (RTL Core Group 4)   : 10 Class LIF Neurons in Group 4 (Vth = hw_threshold_l3, Full Int8)
+  - Inter-Group Routing Table    : Hardware BRAM (12,544 rows mapping Groups 0..3 -> Group 4)
   - Dedicated Hardware Trigger   : Pin Y18 (snn_busy) pulses HIGH during full on-chip inference
 
 Usage:
@@ -28,7 +28,7 @@ from datetime import datetime
 # Hardware Parameters (matching snn_params.vh generated from snn_params.yaml)
 # ─────────────────────────────────────────────────────────────────────────────
 NUM_GROUPS         = 5
-GROUP_SIZE_L2      = 196  # Groups 0..3: Layer 2 hidden LIF neurons (4 x 196 = 784)
+GROUP_SIZE_L2      = 196  # Groups 0..3: Layer 2 relay neurons (4 x 196 = 784)
 GROUP_SIZE_L3      = 16   # Group 4: Layer 3 output class neurons (10 classes: 0..9)
 OUTPUT_GROUP       = 4    # Output classification layer
 
@@ -134,16 +134,16 @@ def upload_layer3_weights(mmio, q_fc_w: np.ndarray):
 def reset_hardware_state(hls_ctrl, mmio):
     """
     Complete Zero-State Hardware Reset:
-      1. HLS Reset: clears Conv1 line buffers, 3x3 window, cnn_v_mem, resets cnn_pixel_counter=0,
+      1. HLS Reset: clears Conv1/Conv2 buffers, cnn_v_mem, cnn_l2_v_mem, resets cnn_pixel_counter=0,
          and asserts physical snn_reset wire into RTL.
       2. Configure 100% leak (0x0009) on RTL Core Groups.
-      3. Run HLS for 1000 cycles with reset=0 (snn_reset drops, snn_enable=1):
-         the RTL Core Groups run their leak FSM, sweeping all 196 neurons in BRAM
-         and zeroing all membrane potentials to absolute 0.
+      3. Run HLS for 1500 cycles with reset=0 (snn_reset drops, snn_enable=1):
+         the RTL Core Groups run their leak FSM (>2 full 588-cycle sweeps across 196 neurons)
+         so even odd membrane potentials ((mem >> 1) + (mem >> 1)) decay completely to 0.
       4. Restore leak_rate=0 for inference.
       5. Configure HLS ready for inference (enable=1, reset=0, time_steps=1).
     """
-    # 1. HLS Engine Reset (clears Conv1 line buffer, window, cnn_v_mem, asserts snn_reset into RTL)
+    # 1. HLS Engine Reset (clears cnn_frame, cnn_v_mem, cnn_l2_v_mem, asserts snn_reset into RTL)
     hls_ctrl.write(0x10, 0x03)          # ctrl_reg: enable=1, reset=1
     hls_ctrl.write(0x28, 1)             # 1 step
     hls_ctrl.write(0x00, 0x01)          # ap_start
@@ -153,14 +153,14 @@ def reset_hardware_state(hls_ctrl, mmio):
             break
 
     # 2. Configure 100% leak rate on RTL Core Groups
-    mmio.write(CFG_NEURON_PARAMS, 0x0009) # shift1=1, shift2=1 -> 100% leak per cycle
+    mmio.write(CFG_NEURON_PARAMS, 0x0009) # shift1=1, shift2=1 -> 100% leak per sweep
 
-    # 3. Run HLS with snn_enable=1 to drive the 588-cycle RTL BRAM zeroing sweep
+    # 3. Run HLS with snn_enable=1 for 1500 cycles (>2 full 588-cycle BRAM sweeps)
     hls_ctrl.write(0x10, 0x01)          # ctrl_reg: enable=1, reset=0 (snn_reset drops!)
     hls_ctrl.write(0x20, MODE_CNN_STREAM)
-    hls_ctrl.write(0x28, 1000)          # 1000 cycles (>588 cycles required to sweep 196 neurons)
-    hls_ctrl.write(0x00, 0x01)          # ap_start -> snn_enable=1, Core Groups sweep & zero BRAM!
-    t0 = time.time() + 0.010
+    hls_ctrl.write(0x28, 1500)          # 1500 cycles (>1176 cycles required for 2 full sweeps)
+    hls_ctrl.write(0x00, 0x01)          # ap_start -> snn_enable=1, Core Groups zero BRAM!
+    t0 = time.time() + 0.015
     while time.time() < t0:
         if hls_ctrl.read(0x00) & 0x02:  # wait ap_done
             break
@@ -181,14 +181,16 @@ def main():
                         help='Number of test images to evaluate (default: 10000)')
     parser.add_argument('--timesteps', type=int, default=4,
                         help='Number of SNN timesteps (default: 4)')
+    parser.add_argument('--threshold-l2', type=int, default=None,
+                        help='Optional override for HLS Layer 2 threshold (default: payload hw_threshold)')
     parser.add_argument('--threshold', type=int, default=None,
-                        help='Optional override for global firing threshold (default: use payload value)')
+                        help='Optional override for RTL Layer 3 classifier threshold (default: payload hw_threshold_l3)')
     parser.add_argument('--output-json',   default='mnist_cnn3_inference_results.json',
                         help='Results output JSON path')
     parser.add_argument('--skip-bitstream', action='store_true',
                         help='Skip PL programming if overlay is already active')
     parser.add_argument('--reset-mode', choices=['flash', 'fast'], default='flash',
-                        help='Hardware state reset mode: flash (330ms pristine PL bitstream reload + fast weight restore) or fast (leak sweep)')
+                        help='Hardware state reset mode: flash (bitstream reload) or fast (leak sweep)')
     args = parser.parse_args()
 
     # ── Load Deployment Payload ───────────────────────────────────────────────
@@ -197,10 +199,19 @@ def main():
     q_fc_w       = payload['q_fc_w']        # (10, 784) int8
     test_imgs    = payload['test_imgs']     # (10000, 28, 28) pre-normalized float32
     test_lbls    = payload['test_lbls']     # (10000,)
-    hw_threshold = args.threshold if args.threshold is not None else int(payload['hw_threshold'])
+
+    hw_threshold_l2 = args.threshold_l2 if args.threshold_l2 is not None else int(
+        payload['hw_threshold_l2'] if 'hw_threshold_l2' in payload else payload['hw_threshold']
+    )
+    hw_threshold_l3 = args.threshold if args.threshold is not None else int(
+        payload['hw_threshold_l3'] if 'hw_threshold_l3' in payload else payload['hw_threshold']
+    )
 
     print(f"  Dataset: {len(test_imgs)} test images loaded.")
-    print(f"  Hardware global threshold: {hw_threshold}")
+    print(f"  Layer 2 Threshold (HLS 0x18)        : {hw_threshold_l2}")
+    print(f"  Layer 3 Threshold (RTL Group 4 0x10): {hw_threshold_l3}")
+    print(f"  Layer 3 Weight Range (q_fc_w)       : [{q_fc_w.min()}, {q_fc_w.max()}] "
+          f"(Non-zero: {int(np.count_nonzero(q_fc_w))}/{q_fc_w.size})")
 
     # ── Initialise PYNQ Overlay ───────────────────────────────────────────────
     try:
@@ -227,17 +238,18 @@ def main():
         # ── Upload Weights to Connectivity Table ──────────────────────────────
         upload_layer3_weights(mmio, q_fc_w)
 
-        # ── Configure Hardware Neurons & Registers ─────────────────────────────
-        mmio.write(CFG_THRESHOLD, hw_threshold & 0xFFFF)
+        # ── Configure Hardware Neurons & Registers (RTL Group 4 Classifier) ───
+        mmio.write(CFG_THRESHOLD, hw_threshold_l3 & 0xFFFF)
         mmio.write(CFG_NEURON_PARAMS, 0x0000)  # leak=0, refrac=0
-        print(f"  Hardware global threshold configured: {hw_threshold}")
+        print(f"  RTL Group 4 (Layer 3) threshold configured: {hw_threshold_l3}")
 
-        # ── Configure HLS for CNN Streaming Mode ───────────────────────────────
+        # ── Configure HLS for CNN Streaming Mode (HLS Layer 2 Engine) ─────────
         hls_ctrl.write(0x10, 0x01)              # 0x10: ctrl_reg: enable=1, reset=0
-        hls_ctrl.write(0x18, hw_threshold)      # 0x18: config_reg: threshold
+        hls_ctrl.write(0x18, hw_threshold_l2)   # 0x18: config_reg: Layer 2 threshold
         hls_ctrl.write(0x20, MODE_CNN_STREAM)   # 0x20: mode_reg: Mode 3 (Streaming 2D Conv)
-        hls_ctrl.write(0x28, 1)                 # 0x28: time_steps_reg: 1 (kernel streams continuously via auto-restart)
+        hls_ctrl.write(0x28, 1)                 # 0x28: time_steps_reg: 1 (auto-restart)
         hls_ctrl.write(0x00, 0x00)              # 0x00: ap_ctrl: idle
+        print(f"  HLS Layer 2 threshold configured          : {hw_threshold_l2}")
 
         # ── Allocate DMA Buffers ──────────────────────────────────────────────
         in_buffer  = allocate(shape=(784,), dtype=np.uint32)
@@ -273,10 +285,10 @@ def main():
                 hls_ctrl = overlay.snn_top_hls_0.mmio
                 dma_mmio = overlay.axi_dma_0.mmio
                 fast_upload_layer3_weights(mmio, ct_entries)
-                mmio.write(CFG_THRESHOLD, hw_threshold & 0xFFFF)
+                mmio.write(CFG_THRESHOLD, hw_threshold_l3 & 0xFFFF)
                 mmio.write(CFG_NEURON_PARAMS, 0x0000)
                 hls_ctrl.write(0x10, 0x01)
-                hls_ctrl.write(0x18, hw_threshold)
+                hls_ctrl.write(0x18, hw_threshold_l2)
                 hls_ctrl.write(0x20, MODE_CNN_STREAM)
                 hls_ctrl.write(0x28, 1)
                 hls_ctrl.write(0x00, 0x00)
@@ -353,7 +365,7 @@ def main():
                                     dma_mmio.write(0x48, dest_ptr + (spikes_received * 4))
                                     dma_mmio.write(0x58, 4)    # re-arm for next spike
                             if mm2s_done:
-                                quiet_deadline = time.time() + 0.010  # allow 10ms quiet window after last spike
+                                quiet_deadline = time.time() + 0.010
 
                     # B. Check if MM2S has finished sending all 784 pixels
                     if not mm2s_done:
@@ -398,7 +410,7 @@ def main():
             accum_router_spk += delta_r_spks
             accum_neuron_spk += delta_n_spks
 
-            total_spikes += np.sum(class_spk)
+            total_spikes += int(np.sum(class_spk))
             pred = int(np.argmax(class_spk))
             if pred == lbl:
                 correct += 1
@@ -414,10 +426,11 @@ def main():
             })
 
             # Print initial images and periodic progress
-            if (i + 1) <= 10 or (i + 1) % 500 == 0 or (i + 1) == n_test:
+            if (i + 1) <= 10 or (i + 1) % 100 == 0 or (i + 1) == n_test:
                 acc_so_far = correct / (i + 1) * 100
                 avg_spk_so_far = total_spikes / (i + 1)
-                print(f"  Processed [{i+1:5d}/{n_test:5d}] | Pred: {pred} (True: {lbl}) | Acc: {acc_so_far:.2f}% | Avg Spk/Img: {avg_spk_so_far:.1f}")
+                print(f"  Processed [{i+1:5d}/{n_test:5d}] | Pred: {pred} (True: {lbl}) | "
+                      f"Spk: {class_spk.tolist()} | Acc: {acc_so_far:.2f}% | Avg Spk/Img: {avg_spk_so_far:.1f}")
 
         total_time = time.time() - t_start_all
         accuracy = correct / n_test * 100
@@ -437,18 +450,18 @@ def main():
         print(f"    Neuron Spikes: {accum_neuron_spk}")
         print(f"========================================================")
 
-        # Save summary and detailed JSON matching v3 schema
         out_dir = os.path.dirname(args.output_json)
         if out_dir:
             os.makedirs(out_dir, exist_ok=True)
         results = {
             "metadata": {
-                "timestamp":    datetime.now().isoformat(),
-                "model":        "cnn3_T_4_clean_l2",
-                "samples":      n_test,
-                "timesteps":    args.timesteps,
-                "hw_threshold": hw_threshold,
-                "trigger_pin":  "Y18"
+                "timestamp":       datetime.now().isoformat(),
+                "model":           "cnn3_T_4_clean_l2",
+                "samples":         n_test,
+                "timesteps":       args.timesteps,
+                "hw_threshold_l2": hw_threshold_l2,
+                "hw_threshold_l3": hw_threshold_l3,
+                "trigger_pin":     "Y18"
             },
             "metrics": {
                 "accuracy_percent":   round(accuracy, 2),
@@ -474,4 +487,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
