@@ -52,7 +52,7 @@
 <IterationLatency>
 <range>
 <min>8</min>
-<max>39978</max>
+<max>689030</max>
 </range>
 </IterationLatency>
 <PerformancePragma>-</PerformancePragma>
@@ -63,13 +63,13 @@
 <SummaryOfViolations>
 <IssueType>Timing Violation</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:669</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:683</SourceLocation>
 <SummaryOfLoopViolations>
 <TIME_LOOP>
 <Name>TIME_LOOP</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:1012</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:1033</SourceLocation>
 </TIME_LOOP>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>
@@ -77,10 +77,10 @@
 
 <AreaEstimates>
 <Resources>
-<BRAM_18K>23</BRAM_18K>
-<DSP>59</DSP>
-<FF>15087</FF>
-<LUT>52511</LUT>
+<BRAM_18K>25</BRAM_18K>
+<DSP>40</DSP>
+<FF>11965</FF>
+<LUT>20763</LUT>
 <URAM>0</URAM>
 </Resources>
 <AvailableResources>

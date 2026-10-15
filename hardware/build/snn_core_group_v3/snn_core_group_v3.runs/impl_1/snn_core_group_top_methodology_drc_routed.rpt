@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
-| Date         : Thu Sep 24 00:46:49 2026
+| Date         : Thu Oct 15 14:40:39 2026
 | Host         : Mariana running 64-bit Ubuntu 22.04.5 LTS
 | Command      : report_methodology -file snn_core_group_top_methodology_drc_routed.rpt -pb snn_core_group_top_methodology_drc_routed.pb -rpx snn_core_group_top_methodology_drc_routed.rpx
 | Design       : snn_core_group_top
@@ -23,15 +23,14 @@ Table of Contents
           Floorplan: design_1
       Design limits: <entire design considered>
              Max checks: <unlimited>
-             Checks found: 12
-+-----------+----------+---------------------------------------------+--------+
-| Rule      | Severity | Description                                 | Checks |
-+-----------+----------+---------------------------------------------+--------+
-| LUTAR-1   | Warning  | LUT drives async reset alert                | 6      |
-| SYNTH-6   | Warning  | Timing of a RAM block might be sub-optimal  | 4      |
-| TIMING-18 | Warning  | Missing input or output delay               | 1      |
-| ULMTCS-1  | Warning  | Control Sets use limits recommend reduction | 1      |
-+-----------+----------+---------------------------------------------+--------+
+             Checks found: 11
++-----------+----------+--------------------------------------------+--------+
+| Rule      | Severity | Description                                | Checks |
++-----------+----------+--------------------------------------------+--------+
+| LUTAR-1   | Warning  | LUT drives async reset alert               | 6      |
+| SYNTH-6   | Warning  | Timing of a RAM block might be sub-optimal | 4      |
+| TIMING-18 | Warning  | Missing input or output delay              | 1      |
++-----------+----------+--------------------------------------------+--------+
 
 2. REPORT DETAILS
 -----------------
@@ -178,11 +177,6 @@ Related violations: <none>
 TIMING-18#1 Warning
 Missing input or output delay  
 An output delay is missing on snn_busy relative to the rising and/or falling clock edge(s) of clk_fpga_0.
-Related violations: <none>
-
-ULMTCS-1#1 Warning
-Control Sets use limits recommend reduction  
-This design uses 1155 control sets (vs. available limit of 13300, determined by 1 control set per CLB). This exceeds the control set use guideline of 7.5 percent. This is at a level where reduction is RECOMMENDED (see UG949). Use report_control_sets to get more details.
 Related violations: <none>
 
 

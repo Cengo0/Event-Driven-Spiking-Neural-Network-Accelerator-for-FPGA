@@ -4,12 +4,18 @@
 # IP: /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v3/snn_core_group_v3.srcs/sources_1/bd/design_1/ip/design_1_snn_top_hls_0_0/design_1_snn_top_hls_0_0.xci
 # IP: The module: 'design_1_snn_top_hls_0_0' is the root of the design. Do not add the DONT_TOUCH constraint.
 
+# IP: /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v3/snn_core_group_v3.gen/sources_1/bd/design_1/ip/design_1_snn_top_hls_0_0/hdl/ip/snn_top_hls_fpext_32ns_64_2_no_dsp_1_ip/snn_top_hls_fpext_32ns_64_2_no_dsp_1_ip.xci
+set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==snn_top_hls_fpext_32ns_64_2_no_dsp_1_ip || ORIG_REF_NAME==snn_top_hls_fpext_32ns_64_2_no_dsp_1_ip} -quiet] -quiet
+
 # XDC: /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v3/snn_core_group_v3.gen/sources_1/bd/design_1/ip/design_1_snn_top_hls_0_0/constraints/snn_top_hls_ooc.xdc
 # XDC: The top module name and the constraint reference have the same name: 'design_1_snn_top_hls_0_0'. Do not add the DONT_TOUCH constraint.
 set_property KEEP_HIERARCHY SOFT [get_cells inst -quiet] -quiet
 
 # IP: /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v3/snn_core_group_v3.srcs/sources_1/bd/design_1/ip/design_1_snn_top_hls_0_0/design_1_snn_top_hls_0_0.xci
 # IP: The module: 'design_1_snn_top_hls_0_0' is the root of the design. Do not add the DONT_TOUCH constraint.
+
+# IP: /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v3/snn_core_group_v3.gen/sources_1/bd/design_1/ip/design_1_snn_top_hls_0_0/hdl/ip/snn_top_hls_fpext_32ns_64_2_no_dsp_1_ip/snn_top_hls_fpext_32ns_64_2_no_dsp_1_ip.xci
+#dup# set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==snn_top_hls_fpext_32ns_64_2_no_dsp_1_ip || ORIG_REF_NAME==snn_top_hls_fpext_32ns_64_2_no_dsp_1_ip} -quiet] -quiet
 
 # XDC: /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v3/snn_core_group_v3.gen/sources_1/bd/design_1/ip/design_1_snn_top_hls_0_0/constraints/snn_top_hls_ooc.xdc
 # XDC: The top module name and the constraint reference have the same name: 'design_1_snn_top_hls_0_0'. Do not add the DONT_TOUCH constraint.
