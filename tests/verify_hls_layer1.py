@@ -70,7 +70,8 @@ class HLSLayer1Engine:
         if self.pixel_counter >= 784:
             self.pixel_counter = 0
 
-            # Execute full Conv1 + LIF on buffered frame with exact zero-padding
+            # Phase 1: Execute full Conv1 + LIF on buffered frame with exact zero-padding
+            conv1_spikes = []
             for y in range(28):
                 for x in range(28):
                     for k in range(8):
@@ -88,28 +89,30 @@ class HLSLayer1Engine:
                             py = y >> 1
                             px = x >> 1
                             self.pool_spikes[k, py, px] += 1
+                            conv1_spikes.append((k, py, px))
 
-                            # Conv2 Accumulation into Layer 2 Neurons
+            # Phase 2: Sequential Conv2 Accumulation into Layer 2 Neurons
+            for (k, py, px) in conv1_spikes:
+                for dy2 in (-1, 0, 1):
+                    for dx2 in (-1, 0, 1):
+                        oy = py + dy2
+                        ox = px + dx2
+                        if 0 <= oy < 14 and 0 <= ox < 14:
+                            y2 = oy >> 1
+                            x2 = ox >> 1
                             for co in range(16):
-                                for dy2 in (-1, 0, 1):
-                                    for dx2 in (-1, 0, 1):
-                                        oy = py + dy2
-                                        ox = px + dx2
-                                        if 0 <= oy < 14 and 0 <= ox < 14:
-                                            y2 = oy >> 1
-                                            x2 = ox >> 1
-                                            wt = int(self.q_conv2_w[co, k, 1 - dy2, 1 - dx2])
-                                            self.l2_v_mem[co, y2, x2] += wt
-                                            if self.l2_v_mem[co, y2, x2] >= self.th:
-                                                self.l2_v_mem[co, y2, x2] -= self.th
+                                wt = int(self.q_conv2_w[co, k, 1 - dy2, 1 - dx2])
+                                self.l2_v_mem[co, y2, x2] += wt
+                                if self.l2_v_mem[co, y2, x2] >= self.th:
+                                    self.l2_v_mem[co, y2, x2] -= self.th
 
-                                                dst_grp = co >> 2
-                                                local_ch = co & 3
-                                                local_nid = local_ch * 49 + y2 * 7 + x2
-                                                global_nid = (dst_grp << 8) | local_nid
-                                                emit_wt = 127 if not self.spike_toggle else 126
-                                                self.spike_toggle = not self.spike_toggle
-                                                fanout_packets.append((global_nid, emit_wt))
+                                    dst_grp = co >> 2
+                                    local_ch = co & 3
+                                    local_nid = local_ch * 49 + y2 * 7 + x2
+                                    global_nid = (dst_grp << 8) | local_nid
+                                    emit_wt = 127 if not self.spike_toggle else 126
+                                    self.spike_toggle = not self.spike_toggle
+                                    fanout_packets.append((global_nid, emit_wt))
 
         return fanout_packets
 

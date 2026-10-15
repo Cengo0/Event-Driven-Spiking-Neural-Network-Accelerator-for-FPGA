@@ -59,8 +59,18 @@ static void encoder_write_axis_spike(
 // CNN3 Streaming 2D Line-Buffer Convolution & LIF Engine
 //=============================================================================
 static ap_fixed<16,8> cnn_frame[CNN_IMG_HEIGHT][CNN_IMG_WIDTH];
+#pragma HLS BIND_STORAGE variable=cnn_frame type=RAM_2P impl=LUTRAM
+
 static ap_fixed<16,8> cnn_v_mem[CNN_CONV1_CHANNELS][CNN_IMG_HEIGHT][CNN_IMG_WIDTH];
+#pragma HLS BIND_STORAGE variable=cnn_v_mem type=RAM_2P impl=BRAM
+
 static ap_int<16>     cnn_l2_v_mem[CNN_CONV2_CHANNELS][CNN_POOL2_HEIGHT][CNN_POOL2_WIDTH];
+#pragma HLS BIND_STORAGE variable=cnn_l2_v_mem type=RAM_2P impl=LUTRAM
+#pragma HLS ARRAY_PARTITION variable=cnn_l2_v_mem complete dim=1
+
+static ap_uint<12>    conv1_spike_buf[2048];
+#pragma HLS BIND_STORAGE variable=conv1_spike_buf type=RAM_2P impl=BRAM
+
 static ap_uint<16>    cnn_pixel_counter = 0;
 static ap_uint<1>     cnn_spike_toggle = 0;
 
@@ -68,22 +78,24 @@ static void reset_cnn3_engine() {
     #pragma HLS INLINE
     cnn_pixel_counter = 0;
     cnn_spike_toggle = 0;
-    for (int r = 0; r < CNN_IMG_HEIGHT; r++) {
-        for (int c = 0; c < CNN_IMG_WIDTH; c++) {
-            #pragma HLS UNROLL
+    RESET_FRAME_R: for (int r = 0; r < CNN_IMG_HEIGHT; r++) {
+        RESET_FRAME_C: for (int c = 0; c < CNN_IMG_WIDTH; c++) {
+            #pragma HLS PIPELINE II=1
             cnn_frame[r][c] = 0;
         }
     }
-    for (int k = 0; k < CNN_CONV1_CHANNELS; k++) {
-        for (int y = 0; y < CNN_IMG_HEIGHT; y++) {
-            for (int x = 0; x < CNN_IMG_WIDTH; x++) {
+    RESET_V_K: for (int k = 0; k < CNN_CONV1_CHANNELS; k++) {
+        RESET_V_Y: for (int y = 0; y < CNN_IMG_HEIGHT; y++) {
+            RESET_V_X: for (int x = 0; x < CNN_IMG_WIDTH; x++) {
+                #pragma HLS PIPELINE II=1
                 cnn_v_mem[k][y][x] = 0;
             }
         }
     }
-    for (int co = 0; co < CNN_CONV2_CHANNELS; co++) {
-        for (int py = 0; py < CNN_POOL2_HEIGHT; py++) {
-            for (int px = 0; px < CNN_POOL2_WIDTH; px++) {
+    RESET_L2_CO: for (int co = 0; co < CNN_CONV2_CHANNELS; co++) {
+        RESET_L2_Y: for (int py = 0; py < CNN_POOL2_HEIGHT; py++) {
+            RESET_L2_X: for (int px = 0; px < CNN_POOL2_WIDTH; px++) {
+                #pragma HLS PIPELINE II=1
                 cnn_l2_v_mem[co][py][px] = 0;
             }
         }
@@ -95,7 +107,7 @@ static void run_cnn3_streaming_pixel(
     ap_uint<16> threshold,
     hls::stream<encoder_axis_word_t> &spike_fifo
 ) {
-    #pragma HLS INLINE
+    #pragma HLS INLINE off
     int r = cnn_pixel_counter / CNN_IMG_WIDTH;
     int c = cnn_pixel_counter % CNN_IMG_WIDTH;
     cnn_frame[r][c] = pixel_val;
@@ -104,11 +116,12 @@ static void run_cnn3_streaming_pixel(
     if (cnn_pixel_counter >= CNN_IMG_PIXELS) {
         cnn_pixel_counter = 0;
 
-        // Execute full Conv1 + LIF on buffered frame with exact zero-padding
+        // Phase 1: Execute full Conv1 + LIF on buffered frame with exact zero-padding
+        ap_uint<12> conv1_spike_count = 0;
+
         CONV1_Y: for (int y = 0; y < CNN_IMG_HEIGHT; y++) {
             CONV1_X: for (int x = 0; x < CNN_IMG_WIDTH; x++) {
                 CONV1_FILTERS: for (int k = 0; k < CNN_CONV1_CHANNELS; k++) {
-                    #pragma HLS PIPELINE II=1
                     ap_fixed<16,8> acc = (ap_fixed<16,8>)CONV1_BIAS[k];
                     CONV1_DY: for (int dy = -1; dy <= 1; dy++) {
                         CONV1_DX: for (int dx = -1; dx <= 1; dx++) {
@@ -124,46 +137,60 @@ static void run_cnn3_streaming_pixel(
                     cnn_v_mem[k][y][x] += acc;
                     if (cnn_v_mem[k][y][x] >= (ap_fixed<16,8>)1.0) {
                         cnn_v_mem[k][y][x] -= (ap_fixed<16,8>)1.0;
-                        int py = y >> 1; // 2x2 average pool bin: 0..13
-                        int px = x >> 1;
+                        ap_uint<4> py = y >> 1; // 2x2 average pool bin: 0..13
+                        ap_uint<4> px = x >> 1;
 
-                        // Conv2 Accumulation into Layer 2 Neurons
-                        FANOUT_CO: for (int co = 0; co < CNN_CONV2_CHANNELS; co++) {
-                            #pragma HLS UNROLL
-                            for (int dy2 = -1; dy2 <= 1; dy2++) {
-                                for (int dx2 = -1; dx2 <= 1; dx2++) {
-                                    int oy = py + dy2;
-                                    int ox = px + dx2;
-                                    if (oy >= 0 && oy < CNN_POOL1_HEIGHT && ox >= 0 && ox < CNN_POOL1_WIDTH) {
-                                        int y2 = oy >> 1; // 0..6
-                                        int x2 = ox >> 1; // 0..6
-                                        signed char wt = CONV2_WEIGHTS[co][k][1 - dy2][1 - dx2];
-                                        cnn_l2_v_mem[co][y2][x2] += (ap_int<16>)wt;
-                                        if (cnn_l2_v_mem[co][y2][x2] >= (ap_int<16>)threshold) {
-                                            cnn_l2_v_mem[co][y2][x2] -= (ap_int<16>)threshold;
+                        if (conv1_spike_count < 2048) {
+                            conv1_spike_buf[conv1_spike_count] = ((ap_uint<12>)k << 8) | ((ap_uint<12>)py << 4) | (ap_uint<12>)px;
+                            conv1_spike_count++;
+                        }
+                    }
+                }
+            }
+        }
 
-                                            // Emit Layer 2 spike into Core Groups 0..3
-                                            int dst_grp = co >> 2;   // 4 groups of 4 channels: co / 4
-                                            int local_ch = co & 3;   // co % 4
-                                            int local_nid = local_ch * CNN_POOL2_SIZE + y2 * CNN_POOL2_WIDTH + x2;
-                                            ap_uint<11> global_nid = ((ap_uint<3>)dst_grp << 8) | (ap_uint<8>)local_nid;
+        // Phase 2: Sequential Conv2 Accumulation into Layer 2 Neurons
+        CONV2_SPIKE_LOOP: for (int s = 0; s < conv1_spike_count; s++) {
+            #pragma HLS LOOP_TRIPCOUNT min=200 max=1650 avg=850
+            ap_uint<12> spk = conv1_spike_buf[s];
+            int k = (spk >> 8) & 7;
+            int py = (spk >> 4) & 15;
+            int px = spk & 15;
 
-                                            // Toggle weight between 127 and 126 to ensure RTL payload_changed detects consecutive spikes
-                                            ap_uint<8> emit_wt = cnn_spike_toggle ? (ap_uint<8>)127 : (ap_uint<8>)126;
-                                            cnn_spike_toggle = !cnn_spike_toggle;
+            CONV2_DY: for (int dy2 = -1; dy2 <= 1; dy2++) {
+                CONV2_DX: for (int dx2 = -1; dx2 <= 1; dx2++) {
+                    int oy = py + dy2;
+                    int ox = px + dx2;
+                    if (oy >= 0 && oy < CNN_POOL1_HEIGHT && ox >= 0 && ox < CNN_POOL1_WIDTH) {
+                        int y2 = oy >> 1; // 0..6
+                        int x2 = ox >> 1; // 0..6
 
-                                            if (!spike_fifo.full()) {
-                                                encoder_axis_word_t pkt;
-                                                pkt.data = 0;
-                                                pkt.data(SPIKE_PKT_ID_HI, SPIKE_PKT_ID_LO) = global_nid;
-                                                pkt.data(SPIKE_PKT_WGT_HI, SPIKE_PKT_WGT_LO) = emit_wt;
-                                                pkt.keep = 0xF;
-                                                pkt.strb = 0xF;
-                                                pkt.last = 1;
-                                                spike_fifo.write(pkt);
-                                            }
-                                        }
-                                    }
+                        CONV2_CO: for (int co = 0; co < CNN_CONV2_CHANNELS; co++) {
+                            #pragma HLS PIPELINE II=1
+                            signed char wt = CONV2_WEIGHTS[co][k][1 - dy2][1 - dx2];
+                            cnn_l2_v_mem[co][y2][x2] += (ap_int<16>)wt;
+                            if (cnn_l2_v_mem[co][y2][x2] >= (ap_int<16>)threshold) {
+                                cnn_l2_v_mem[co][y2][x2] -= (ap_int<16>)threshold;
+
+                                // Emit Layer 2 spike into Core Groups 0..3
+                                int dst_grp = co >> 2;   // 4 groups of 4 channels: co / 4
+                                int local_ch = co & 3;   // co % 4
+                                int local_nid = local_ch * CNN_POOL2_SIZE + y2 * CNN_POOL2_WIDTH + x2;
+                                ap_uint<11> global_nid = ((ap_uint<3>)dst_grp << 8) | (ap_uint<8>)local_nid;
+
+                                // Toggle weight between 127 and 126 to ensure RTL payload_changed detects consecutive spikes
+                                ap_uint<8> emit_wt = cnn_spike_toggle ? (ap_uint<8>)127 : (ap_uint<8>)126;
+                                cnn_spike_toggle = !cnn_spike_toggle;
+
+                                if (!spike_fifo.full()) {
+                                    encoder_axis_word_t pkt;
+                                    pkt.data = 0;
+                                    pkt.data(SPIKE_PKT_ID_HI, SPIKE_PKT_ID_LO) = global_nid;
+                                    pkt.data(SPIKE_PKT_WGT_HI, SPIKE_PKT_WGT_LO) = emit_wt;
+                                    pkt.keep = 0xF;
+                                    pkt.strb = 0xF;
+                                    pkt.last = 1;
+                                    spike_fifo.write(pkt);
                                 }
                             }
                         }
