@@ -50,7 +50,7 @@ class HLSLayer1Engine:
     def reset(self):
         self.frame = np.zeros((28, 28), dtype=np.float32)
         self.v_mem = np.zeros((8, 28, 28), dtype=np.float32)
-        self.l2_v_mem = np.zeros((16, 7, 7), dtype=np.int32)
+        self.l2_v_mem = np.zeros((16, 14, 14), dtype=np.int32)
         self.pool_spikes = np.zeros((8, 14, 14), dtype=np.int32)
         self.pixel_counter = 0
         self.spike_toggle = False
@@ -91,28 +91,34 @@ class HLSLayer1Engine:
                             self.pool_spikes[k, py, px] += 1
                             conv1_spikes.append((k, py, px))
 
-            # Phase 2: Sequential Conv2 Accumulation into Layer 2 Neurons
+            # Phase 2: Conv2 event-driven scatter into 16x14x14 Layer 2 neurons
             for (k, py, px) in conv1_spikes:
                 for dy2 in (-1, 0, 1):
                     for dx2 in (-1, 0, 1):
                         oy = py + dy2
                         ox = px + dx2
                         if 0 <= oy < 14 and 0 <= ox < 14:
-                            y2 = oy >> 1
-                            x2 = ox >> 1
                             for co in range(16):
                                 wt = int(self.q_conv2_w[co, k, 1 - dy2, 1 - dx2])
-                                self.l2_v_mem[co, y2, x2] += wt
-                                if self.l2_v_mem[co, y2, x2] >= self.th:
-                                    self.l2_v_mem[co, y2, x2] -= self.th
+                                self.l2_v_mem[co, oy, ox] += wt
 
-                                    dst_grp = co >> 2
-                                    local_ch = co & 3
-                                    local_nid = local_ch * 49 + y2 * 7 + x2
-                                    global_nid = (dst_grp << 8) | local_nid
-                                    emit_wt = 127 if not self.spike_toggle else 126
-                                    self.spike_toggle = not self.spike_toggle
-                                    fanout_packets.append((global_nid, emit_wt))
+            # Phase 3: Layer 2 LIF sweep (th*4) and 2x2 sum-pooling into Layer 3
+            th4 = self.th * 4
+            for co in range(16):
+                dst_grp = co >> 2
+                local_ch = co & 3
+                for y2 in range(7):
+                    for x2 in range(7):
+                        local_nid = local_ch * 49 + y2 * 7 + x2
+                        global_nid = (dst_grp << 8) | local_nid
+                        for s in range(4):
+                            oy = (y2 << 1) + (s >> 1)
+                            ox = (x2 << 1) + (s & 1)
+                            if self.l2_v_mem[co, oy, ox] >= th4:
+                                self.l2_v_mem[co, oy, ox] -= th4
+                                emit_wt = 127 if not self.spike_toggle else 126
+                                self.spike_toggle = not self.spike_toggle
+                                fanout_packets.append((global_nid, emit_wt))
 
         return fanout_packets
 

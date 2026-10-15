@@ -60,7 +60,7 @@ static void encoder_write_axis_spike(
 //=============================================================================
 static ap_fixed<16,8> cnn_frame[CNN_IMG_HEIGHT][CNN_IMG_WIDTH];
 static ap_fixed<16,8> cnn_v_mem[CNN_CONV1_CHANNELS][CNN_IMG_HEIGHT][CNN_IMG_WIDTH];
-static ap_int<16>     cnn_l2_v_mem[CNN_CONV2_CHANNELS][CNN_POOL2_HEIGHT][CNN_POOL2_WIDTH];
+static ap_int<16>     cnn_l2_v_mem[CNN_CONV2_CHANNELS][CNN_POOL1_HEIGHT][CNN_POOL1_WIDTH];
 static ap_uint<12>    conv1_spike_buf[2048];
 static ap_uint<16>    cnn_pixel_counter = 0;
 static ap_uint<1>     cnn_spike_toggle = 0;
@@ -84,8 +84,8 @@ static void reset_cnn3_engine() {
         }
     }
     RESET_L2_CO: for (int co = 0; co < CNN_CONV2_CHANNELS; co++) {
-        RESET_L2_Y: for (int py = 0; py < CNN_POOL2_HEIGHT; py++) {
-            RESET_L2_X: for (int px = 0; px < CNN_POOL2_WIDTH; px++) {
+        RESET_L2_Y: for (int py = 0; py < CNN_POOL1_HEIGHT; py++) {
+            RESET_L2_X: for (int px = 0; px < CNN_POOL1_WIDTH; px++) {
                 #pragma HLS PIPELINE II=1
                 cnn_l2_v_mem[co][py][px] = 0;
             }
@@ -140,7 +140,7 @@ static void run_cnn3_streaming_pixel(
             }
         }
 
-        // Phase 2: Sequential Conv2 Accumulation into Layer 2 Neurons
+        // Phase 2: Conv2 event-driven scatter into 16x14x14 Layer 2 neurons
         CONV2_SPIKE_LOOP: for (int s = 0; s < conv1_spike_count; s++) {
             #pragma HLS LOOP_TRIPCOUNT min=200 max=1650 avg=850
             ap_uint<12> spk = conv1_spike_buf[s];
@@ -153,36 +153,48 @@ static void run_cnn3_streaming_pixel(
                     int oy = py + dy2;
                     int ox = px + dx2;
                     if (oy >= 0 && oy < CNN_POOL1_HEIGHT && ox >= 0 && ox < CNN_POOL1_WIDTH) {
-                        int y2 = oy >> 1; // 0..6
-                        int x2 = ox >> 1; // 0..6
-
                         CONV2_CO: for (int co = 0; co < CNN_CONV2_CHANNELS; co++) {
                             #pragma HLS PIPELINE II=1
                             signed char wt = CONV2_WEIGHTS[co][k][1 - dy2][1 - dx2];
-                            cnn_l2_v_mem[co][y2][x2] += (ap_int<16>)wt;
-                            if (cnn_l2_v_mem[co][y2][x2] >= (ap_int<16>)threshold) {
-                                cnn_l2_v_mem[co][y2][x2] -= (ap_int<16>)threshold;
+                            cnn_l2_v_mem[co][oy][ox] += (ap_int<16>)wt;
+                        }
+                    }
+                }
+            }
+        }
 
-                                // Emit Layer 2 spike into Core Groups 0..3
-                                int dst_grp = co >> 2;   // 4 groups of 4 channels: co / 4
-                                int local_ch = co & 3;   // co % 4
-                                int local_nid = local_ch * CNN_POOL2_SIZE + y2 * CNN_POOL2_WIDTH + x2;
-                                ap_uint<11> global_nid = ((ap_uint<3>)dst_grp << 8) | (ap_uint<8>)local_nid;
+        // Phase 3: Layer 2 LIF sweep (th*4) and 2x2 sum-pooling into Layer 3 (16x7x7)
+        ap_int<16> threshold_l2 = (ap_int<16>)(threshold << 2);
 
-                                // Toggle weight between 127 and 126 to ensure RTL payload_changed detects consecutive spikes
-                                ap_uint<8> emit_wt = cnn_spike_toggle ? (ap_uint<8>)127 : (ap_uint<8>)126;
-                                cnn_spike_toggle = !cnn_spike_toggle;
+        L2_SWEEP_CO: for (int co = 0; co < CNN_CONV2_CHANNELS; co++) {
+            int dst_grp = co >> 2;   // 4 groups of 4 channels: co / 4
+            int local_ch = co & 3;   // co % 4
+            L2_SWEEP_Y2: for (int y2 = 0; y2 < CNN_POOL2_HEIGHT; y2++) {
+                L2_SWEEP_X2: for (int x2 = 0; x2 < CNN_POOL2_WIDTH; x2++) {
+                    int local_nid = local_ch * CNN_POOL2_SIZE + y2 * CNN_POOL2_WIDTH + x2;
+                    ap_uint<11> global_nid = ((ap_uint<3>)dst_grp << 8) | (ap_uint<8>)local_nid;
 
-                                if (!spike_fifo.full()) {
-                                    encoder_axis_word_t pkt;
-                                    pkt.data = 0;
-                                    pkt.data(SPIKE_PKT_ID_HI, SPIKE_PKT_ID_LO) = global_nid;
-                                    pkt.data(SPIKE_PKT_WGT_HI, SPIKE_PKT_WGT_LO) = emit_wt;
-                                    pkt.keep = 0xF;
-                                    pkt.strb = 0xF;
-                                    pkt.last = 1;
-                                    spike_fifo.write(pkt);
-                                }
+                    L2_SUB_POS: for (int s = 0; s < 4; s++) {
+                        #pragma HLS PIPELINE II=1
+                        int oy = (y2 << 1) + (s >> 1);
+                        int ox = (x2 << 1) + (s & 1);
+
+                        if (cnn_l2_v_mem[co][oy][ox] >= threshold_l2) {
+                            cnn_l2_v_mem[co][oy][ox] -= threshold_l2;
+
+                            // Emit Layer 2 spike into Core Groups 0..3
+                            ap_uint<8> emit_wt = cnn_spike_toggle ? (ap_uint<8>)127 : (ap_uint<8>)126;
+                            cnn_spike_toggle = !cnn_spike_toggle;
+
+                            if (!spike_fifo.full()) {
+                                encoder_axis_word_t pkt;
+                                pkt.data = 0;
+                                pkt.data(SPIKE_PKT_ID_HI, SPIKE_PKT_ID_LO) = global_nid;
+                                pkt.data(SPIKE_PKT_WGT_HI, SPIKE_PKT_WGT_LO) = emit_wt;
+                                pkt.keep = 0xF;
+                                pkt.strb = 0xF;
+                                pkt.last = 1;
+                                spike_fifo.write(pkt);
                             }
                         }
                     }
