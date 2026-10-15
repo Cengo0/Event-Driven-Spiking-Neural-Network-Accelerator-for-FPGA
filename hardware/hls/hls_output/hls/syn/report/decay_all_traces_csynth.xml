@@ -35,7 +35,7 @@
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:344</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:356</SourceLocation>
 </SummaryOfViolations>
 </PerformanceEstimates>
 

@@ -18,7 +18,7 @@
 <PipelineType>no</PipelineType>
 <SummaryOfTimingAnalysis>
 <unit>ns</unit>
-<EstimatedClockPeriod>8.331</EstimatedClockPeriod>
+<EstimatedClockPeriod>8.785</EstimatedClockPeriod>
 </SummaryOfTimingAnalysis>
 <SummaryOfOverallLatency>
 <unit>clock cycles</unit>
@@ -52,7 +52,7 @@
 <IterationLatency>
 <range>
 <min>8</min>
-<max>689030</max>
+<max>413156</max>
 </range>
 </IterationLatency>
 <PerformancePragma>-</PerformancePragma>
@@ -63,13 +63,13 @@
 <SummaryOfViolations>
 <IssueType>Timing Violation</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:683</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:695</SourceLocation>
 <SummaryOfLoopViolations>
 <TIME_LOOP>
 <Name>TIME_LOOP</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:1033</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:1045</SourceLocation>
 </TIME_LOOP>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>
@@ -79,8 +79,8 @@
 <Resources>
 <BRAM_18K>25</BRAM_18K>
 <DSP>40</DSP>
-<FF>11965</FF>
-<LUT>20763</LUT>
+<FF>12270</FF>
+<LUT>22890</LUT>
 <URAM>0</URAM>
 </Resources>
 <AvailableResources>

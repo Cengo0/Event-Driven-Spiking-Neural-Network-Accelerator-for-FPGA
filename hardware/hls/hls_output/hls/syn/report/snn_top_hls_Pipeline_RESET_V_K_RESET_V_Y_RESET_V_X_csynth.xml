@@ -49,13 +49,13 @@
 <SummaryOfViolations>
 <IssueType>Timing Violation</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:80~src/snn_top_hls.cpp:948</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:80~src/snn_top_hls.cpp:960</SourceLocation>
 <SummaryOfLoopViolations>
 <RESET_V_K_RESET_V_Y_RESET_V_X>
 <Name>RESET_V_K_RESET_V_Y_RESET_V_X</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:78~src/snn_top_hls.cpp:948</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:78~src/snn_top_hls.cpp:960</SourceLocation>
 </RESET_V_K_RESET_V_Y_RESET_V_X>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>

@@ -209,38 +209,39 @@ module snn_top_hls_run_cnn3_streaming_pixel (
         encoder_spikes_write
 );
 
-parameter    ap_ST_fsm_state1 = 32'd1;
-parameter    ap_ST_fsm_state2 = 32'd2;
-parameter    ap_ST_fsm_state3 = 32'd4;
-parameter    ap_ST_fsm_state4 = 32'd8;
-parameter    ap_ST_fsm_state5 = 32'd16;
-parameter    ap_ST_fsm_state6 = 32'd32;
-parameter    ap_ST_fsm_state7 = 32'd64;
-parameter    ap_ST_fsm_state8 = 32'd128;
-parameter    ap_ST_fsm_state9 = 32'd256;
-parameter    ap_ST_fsm_state10 = 32'd512;
-parameter    ap_ST_fsm_state11 = 32'd1024;
-parameter    ap_ST_fsm_state12 = 32'd2048;
-parameter    ap_ST_fsm_state13 = 32'd4096;
-parameter    ap_ST_fsm_state14 = 32'd8192;
-parameter    ap_ST_fsm_state15 = 32'd16384;
-parameter    ap_ST_fsm_state16 = 32'd32768;
-parameter    ap_ST_fsm_state17 = 32'd65536;
-parameter    ap_ST_fsm_state18 = 32'd131072;
-parameter    ap_ST_fsm_state19 = 32'd262144;
-parameter    ap_ST_fsm_state20 = 32'd524288;
-parameter    ap_ST_fsm_state21 = 32'd1048576;
-parameter    ap_ST_fsm_state22 = 32'd2097152;
-parameter    ap_ST_fsm_state23 = 32'd4194304;
-parameter    ap_ST_fsm_state24 = 32'd8388608;
-parameter    ap_ST_fsm_state25 = 32'd16777216;
-parameter    ap_ST_fsm_state26 = 32'd33554432;
-parameter    ap_ST_fsm_state27 = 32'd67108864;
-parameter    ap_ST_fsm_state28 = 32'd134217728;
-parameter    ap_ST_fsm_state29 = 32'd268435456;
-parameter    ap_ST_fsm_state30 = 32'd536870912;
-parameter    ap_ST_fsm_state31 = 32'd1073741824;
-parameter    ap_ST_fsm_state32 = 32'd2147483648;
+parameter    ap_ST_fsm_state1 = 33'd1;
+parameter    ap_ST_fsm_state2 = 33'd2;
+parameter    ap_ST_fsm_state3 = 33'd4;
+parameter    ap_ST_fsm_state4 = 33'd8;
+parameter    ap_ST_fsm_state5 = 33'd16;
+parameter    ap_ST_fsm_state6 = 33'd32;
+parameter    ap_ST_fsm_state7 = 33'd64;
+parameter    ap_ST_fsm_state8 = 33'd128;
+parameter    ap_ST_fsm_state9 = 33'd256;
+parameter    ap_ST_fsm_state10 = 33'd512;
+parameter    ap_ST_fsm_state11 = 33'd1024;
+parameter    ap_ST_fsm_state12 = 33'd2048;
+parameter    ap_ST_fsm_state13 = 33'd4096;
+parameter    ap_ST_fsm_state14 = 33'd8192;
+parameter    ap_ST_fsm_state15 = 33'd16384;
+parameter    ap_ST_fsm_state16 = 33'd32768;
+parameter    ap_ST_fsm_state17 = 33'd65536;
+parameter    ap_ST_fsm_state18 = 33'd131072;
+parameter    ap_ST_fsm_state19 = 33'd262144;
+parameter    ap_ST_fsm_state20 = 33'd524288;
+parameter    ap_ST_fsm_state21 = 33'd1048576;
+parameter    ap_ST_fsm_state22 = 33'd2097152;
+parameter    ap_ST_fsm_state23 = 33'd4194304;
+parameter    ap_ST_fsm_state24 = 33'd8388608;
+parameter    ap_ST_fsm_state25 = 33'd16777216;
+parameter    ap_ST_fsm_state26 = 33'd33554432;
+parameter    ap_ST_fsm_state27 = 33'd67108864;
+parameter    ap_ST_fsm_state28 = 33'd134217728;
+parameter    ap_ST_fsm_state29 = 33'd268435456;
+parameter    ap_ST_fsm_state30 = 33'd536870912;
+parameter    ap_ST_fsm_state31 = 33'd1073741824;
+parameter    ap_ST_fsm_state32 = 33'd2147483648;
+parameter    ap_ST_fsm_state33 = 33'd4294967296;
 
 input   ap_clk;
 input   ap_rst;
@@ -249,7 +250,7 @@ output   ap_done;
 output   ap_idle;
 output   ap_ready;
 input  [15:0] pixel_val;
-input  [15:0] threshold;
+input  [13:0] threshold;
 input  [9:0] cnn_pixel_counter_i;
 output  [9:0] cnn_pixel_counter_o;
 output   cnn_pixel_counter_o_ap_vld;
@@ -323,115 +324,115 @@ output  [12:0] cnn_v_mem_address1;
 output   cnn_v_mem_ce1;
 output   cnn_v_mem_we1;
 output  [15:0] cnn_v_mem_d1;
-output  [5:0] p_ZL12cnn_l2_v_mem_0_address0;
+output  [7:0] p_ZL12cnn_l2_v_mem_0_address0;
 output   p_ZL12cnn_l2_v_mem_0_ce0;
 input  [15:0] p_ZL12cnn_l2_v_mem_0_q0;
-output  [5:0] p_ZL12cnn_l2_v_mem_0_address1;
+output  [7:0] p_ZL12cnn_l2_v_mem_0_address1;
 output   p_ZL12cnn_l2_v_mem_0_ce1;
 output   p_ZL12cnn_l2_v_mem_0_we1;
 output  [15:0] p_ZL12cnn_l2_v_mem_0_d1;
-output  [5:0] p_ZL12cnn_l2_v_mem_1_address0;
+output  [7:0] p_ZL12cnn_l2_v_mem_1_address0;
 output   p_ZL12cnn_l2_v_mem_1_ce0;
 input  [15:0] p_ZL12cnn_l2_v_mem_1_q0;
-output  [5:0] p_ZL12cnn_l2_v_mem_1_address1;
+output  [7:0] p_ZL12cnn_l2_v_mem_1_address1;
 output   p_ZL12cnn_l2_v_mem_1_ce1;
 output   p_ZL12cnn_l2_v_mem_1_we1;
 output  [15:0] p_ZL12cnn_l2_v_mem_1_d1;
-output  [5:0] p_ZL12cnn_l2_v_mem_2_address0;
+output  [7:0] p_ZL12cnn_l2_v_mem_2_address0;
 output   p_ZL12cnn_l2_v_mem_2_ce0;
 input  [15:0] p_ZL12cnn_l2_v_mem_2_q0;
-output  [5:0] p_ZL12cnn_l2_v_mem_2_address1;
+output  [7:0] p_ZL12cnn_l2_v_mem_2_address1;
 output   p_ZL12cnn_l2_v_mem_2_ce1;
 output   p_ZL12cnn_l2_v_mem_2_we1;
 output  [15:0] p_ZL12cnn_l2_v_mem_2_d1;
-output  [5:0] p_ZL12cnn_l2_v_mem_3_address0;
+output  [7:0] p_ZL12cnn_l2_v_mem_3_address0;
 output   p_ZL12cnn_l2_v_mem_3_ce0;
 input  [15:0] p_ZL12cnn_l2_v_mem_3_q0;
-output  [5:0] p_ZL12cnn_l2_v_mem_3_address1;
+output  [7:0] p_ZL12cnn_l2_v_mem_3_address1;
 output   p_ZL12cnn_l2_v_mem_3_ce1;
 output   p_ZL12cnn_l2_v_mem_3_we1;
 output  [15:0] p_ZL12cnn_l2_v_mem_3_d1;
-output  [5:0] p_ZL12cnn_l2_v_mem_4_address0;
+output  [7:0] p_ZL12cnn_l2_v_mem_4_address0;
 output   p_ZL12cnn_l2_v_mem_4_ce0;
 input  [15:0] p_ZL12cnn_l2_v_mem_4_q0;
-output  [5:0] p_ZL12cnn_l2_v_mem_4_address1;
+output  [7:0] p_ZL12cnn_l2_v_mem_4_address1;
 output   p_ZL12cnn_l2_v_mem_4_ce1;
 output   p_ZL12cnn_l2_v_mem_4_we1;
 output  [15:0] p_ZL12cnn_l2_v_mem_4_d1;
-output  [5:0] p_ZL12cnn_l2_v_mem_5_address0;
+output  [7:0] p_ZL12cnn_l2_v_mem_5_address0;
 output   p_ZL12cnn_l2_v_mem_5_ce0;
 input  [15:0] p_ZL12cnn_l2_v_mem_5_q0;
-output  [5:0] p_ZL12cnn_l2_v_mem_5_address1;
+output  [7:0] p_ZL12cnn_l2_v_mem_5_address1;
 output   p_ZL12cnn_l2_v_mem_5_ce1;
 output   p_ZL12cnn_l2_v_mem_5_we1;
 output  [15:0] p_ZL12cnn_l2_v_mem_5_d1;
-output  [5:0] p_ZL12cnn_l2_v_mem_6_address0;
+output  [7:0] p_ZL12cnn_l2_v_mem_6_address0;
 output   p_ZL12cnn_l2_v_mem_6_ce0;
 input  [15:0] p_ZL12cnn_l2_v_mem_6_q0;
-output  [5:0] p_ZL12cnn_l2_v_mem_6_address1;
+output  [7:0] p_ZL12cnn_l2_v_mem_6_address1;
 output   p_ZL12cnn_l2_v_mem_6_ce1;
 output   p_ZL12cnn_l2_v_mem_6_we1;
 output  [15:0] p_ZL12cnn_l2_v_mem_6_d1;
-output  [5:0] p_ZL12cnn_l2_v_mem_7_address0;
+output  [7:0] p_ZL12cnn_l2_v_mem_7_address0;
 output   p_ZL12cnn_l2_v_mem_7_ce0;
 input  [15:0] p_ZL12cnn_l2_v_mem_7_q0;
-output  [5:0] p_ZL12cnn_l2_v_mem_7_address1;
+output  [7:0] p_ZL12cnn_l2_v_mem_7_address1;
 output   p_ZL12cnn_l2_v_mem_7_ce1;
 output   p_ZL12cnn_l2_v_mem_7_we1;
 output  [15:0] p_ZL12cnn_l2_v_mem_7_d1;
-output  [5:0] p_ZL12cnn_l2_v_mem_8_address0;
+output  [7:0] p_ZL12cnn_l2_v_mem_8_address0;
 output   p_ZL12cnn_l2_v_mem_8_ce0;
 input  [15:0] p_ZL12cnn_l2_v_mem_8_q0;
-output  [5:0] p_ZL12cnn_l2_v_mem_8_address1;
+output  [7:0] p_ZL12cnn_l2_v_mem_8_address1;
 output   p_ZL12cnn_l2_v_mem_8_ce1;
 output   p_ZL12cnn_l2_v_mem_8_we1;
 output  [15:0] p_ZL12cnn_l2_v_mem_8_d1;
-output  [5:0] p_ZL12cnn_l2_v_mem_9_address0;
+output  [7:0] p_ZL12cnn_l2_v_mem_9_address0;
 output   p_ZL12cnn_l2_v_mem_9_ce0;
 input  [15:0] p_ZL12cnn_l2_v_mem_9_q0;
-output  [5:0] p_ZL12cnn_l2_v_mem_9_address1;
+output  [7:0] p_ZL12cnn_l2_v_mem_9_address1;
 output   p_ZL12cnn_l2_v_mem_9_ce1;
 output   p_ZL12cnn_l2_v_mem_9_we1;
 output  [15:0] p_ZL12cnn_l2_v_mem_9_d1;
-output  [5:0] p_ZL12cnn_l2_v_mem_10_address0;
+output  [7:0] p_ZL12cnn_l2_v_mem_10_address0;
 output   p_ZL12cnn_l2_v_mem_10_ce0;
 input  [15:0] p_ZL12cnn_l2_v_mem_10_q0;
-output  [5:0] p_ZL12cnn_l2_v_mem_10_address1;
+output  [7:0] p_ZL12cnn_l2_v_mem_10_address1;
 output   p_ZL12cnn_l2_v_mem_10_ce1;
 output   p_ZL12cnn_l2_v_mem_10_we1;
 output  [15:0] p_ZL12cnn_l2_v_mem_10_d1;
-output  [5:0] p_ZL12cnn_l2_v_mem_11_address0;
+output  [7:0] p_ZL12cnn_l2_v_mem_11_address0;
 output   p_ZL12cnn_l2_v_mem_11_ce0;
 input  [15:0] p_ZL12cnn_l2_v_mem_11_q0;
-output  [5:0] p_ZL12cnn_l2_v_mem_11_address1;
+output  [7:0] p_ZL12cnn_l2_v_mem_11_address1;
 output   p_ZL12cnn_l2_v_mem_11_ce1;
 output   p_ZL12cnn_l2_v_mem_11_we1;
 output  [15:0] p_ZL12cnn_l2_v_mem_11_d1;
-output  [5:0] p_ZL12cnn_l2_v_mem_12_address0;
+output  [7:0] p_ZL12cnn_l2_v_mem_12_address0;
 output   p_ZL12cnn_l2_v_mem_12_ce0;
 input  [15:0] p_ZL12cnn_l2_v_mem_12_q0;
-output  [5:0] p_ZL12cnn_l2_v_mem_12_address1;
+output  [7:0] p_ZL12cnn_l2_v_mem_12_address1;
 output   p_ZL12cnn_l2_v_mem_12_ce1;
 output   p_ZL12cnn_l2_v_mem_12_we1;
 output  [15:0] p_ZL12cnn_l2_v_mem_12_d1;
-output  [5:0] p_ZL12cnn_l2_v_mem_13_address0;
+output  [7:0] p_ZL12cnn_l2_v_mem_13_address0;
 output   p_ZL12cnn_l2_v_mem_13_ce0;
 input  [15:0] p_ZL12cnn_l2_v_mem_13_q0;
-output  [5:0] p_ZL12cnn_l2_v_mem_13_address1;
+output  [7:0] p_ZL12cnn_l2_v_mem_13_address1;
 output   p_ZL12cnn_l2_v_mem_13_ce1;
 output   p_ZL12cnn_l2_v_mem_13_we1;
 output  [15:0] p_ZL12cnn_l2_v_mem_13_d1;
-output  [5:0] p_ZL12cnn_l2_v_mem_14_address0;
+output  [7:0] p_ZL12cnn_l2_v_mem_14_address0;
 output   p_ZL12cnn_l2_v_mem_14_ce0;
 input  [15:0] p_ZL12cnn_l2_v_mem_14_q0;
-output  [5:0] p_ZL12cnn_l2_v_mem_14_address1;
+output  [7:0] p_ZL12cnn_l2_v_mem_14_address1;
 output   p_ZL12cnn_l2_v_mem_14_ce1;
 output   p_ZL12cnn_l2_v_mem_14_we1;
 output  [15:0] p_ZL12cnn_l2_v_mem_14_d1;
-output  [5:0] p_ZL12cnn_l2_v_mem_15_address0;
+output  [7:0] p_ZL12cnn_l2_v_mem_15_address0;
 output   p_ZL12cnn_l2_v_mem_15_ce0;
 input  [15:0] p_ZL12cnn_l2_v_mem_15_q0;
-output  [5:0] p_ZL12cnn_l2_v_mem_15_address1;
+output  [7:0] p_ZL12cnn_l2_v_mem_15_address1;
 output   p_ZL12cnn_l2_v_mem_15_ce1;
 output   p_ZL12cnn_l2_v_mem_15_we1;
 output  [15:0] p_ZL12cnn_l2_v_mem_15_d1;
@@ -456,56 +457,149 @@ reg p_ZL9cnn_frame_1_2_ce0;
 reg p_ZL9cnn_frame_2_0_ce0;
 reg p_ZL9cnn_frame_2_1_ce0;
 reg p_ZL9cnn_frame_2_2_ce0;
+reg[7:0] p_ZL12cnn_l2_v_mem_0_address0;
+reg p_ZL12cnn_l2_v_mem_0_ce0;
+reg[7:0] p_ZL12cnn_l2_v_mem_0_address1;
+reg p_ZL12cnn_l2_v_mem_0_ce1;
+reg p_ZL12cnn_l2_v_mem_0_we1;
+reg[15:0] p_ZL12cnn_l2_v_mem_0_d1;
+reg[7:0] p_ZL12cnn_l2_v_mem_1_address0;
+reg p_ZL12cnn_l2_v_mem_1_ce0;
+reg[7:0] p_ZL12cnn_l2_v_mem_1_address1;
+reg p_ZL12cnn_l2_v_mem_1_ce1;
+reg p_ZL12cnn_l2_v_mem_1_we1;
+reg[15:0] p_ZL12cnn_l2_v_mem_1_d1;
+reg[7:0] p_ZL12cnn_l2_v_mem_2_address0;
+reg p_ZL12cnn_l2_v_mem_2_ce0;
+reg[7:0] p_ZL12cnn_l2_v_mem_2_address1;
+reg p_ZL12cnn_l2_v_mem_2_ce1;
+reg p_ZL12cnn_l2_v_mem_2_we1;
+reg[15:0] p_ZL12cnn_l2_v_mem_2_d1;
+reg[7:0] p_ZL12cnn_l2_v_mem_3_address0;
+reg p_ZL12cnn_l2_v_mem_3_ce0;
+reg[7:0] p_ZL12cnn_l2_v_mem_3_address1;
+reg p_ZL12cnn_l2_v_mem_3_ce1;
+reg p_ZL12cnn_l2_v_mem_3_we1;
+reg[15:0] p_ZL12cnn_l2_v_mem_3_d1;
+reg[7:0] p_ZL12cnn_l2_v_mem_4_address0;
+reg p_ZL12cnn_l2_v_mem_4_ce0;
+reg[7:0] p_ZL12cnn_l2_v_mem_4_address1;
+reg p_ZL12cnn_l2_v_mem_4_ce1;
+reg p_ZL12cnn_l2_v_mem_4_we1;
+reg[15:0] p_ZL12cnn_l2_v_mem_4_d1;
+reg[7:0] p_ZL12cnn_l2_v_mem_5_address0;
+reg p_ZL12cnn_l2_v_mem_5_ce0;
+reg[7:0] p_ZL12cnn_l2_v_mem_5_address1;
+reg p_ZL12cnn_l2_v_mem_5_ce1;
+reg p_ZL12cnn_l2_v_mem_5_we1;
+reg[15:0] p_ZL12cnn_l2_v_mem_5_d1;
+reg[7:0] p_ZL12cnn_l2_v_mem_6_address0;
+reg p_ZL12cnn_l2_v_mem_6_ce0;
+reg[7:0] p_ZL12cnn_l2_v_mem_6_address1;
+reg p_ZL12cnn_l2_v_mem_6_ce1;
+reg p_ZL12cnn_l2_v_mem_6_we1;
+reg[15:0] p_ZL12cnn_l2_v_mem_6_d1;
+reg[7:0] p_ZL12cnn_l2_v_mem_7_address0;
+reg p_ZL12cnn_l2_v_mem_7_ce0;
+reg[7:0] p_ZL12cnn_l2_v_mem_7_address1;
+reg p_ZL12cnn_l2_v_mem_7_ce1;
+reg p_ZL12cnn_l2_v_mem_7_we1;
+reg[15:0] p_ZL12cnn_l2_v_mem_7_d1;
+reg[7:0] p_ZL12cnn_l2_v_mem_8_address0;
+reg p_ZL12cnn_l2_v_mem_8_ce0;
+reg[7:0] p_ZL12cnn_l2_v_mem_8_address1;
+reg p_ZL12cnn_l2_v_mem_8_ce1;
+reg p_ZL12cnn_l2_v_mem_8_we1;
+reg[15:0] p_ZL12cnn_l2_v_mem_8_d1;
+reg[7:0] p_ZL12cnn_l2_v_mem_9_address0;
+reg p_ZL12cnn_l2_v_mem_9_ce0;
+reg[7:0] p_ZL12cnn_l2_v_mem_9_address1;
+reg p_ZL12cnn_l2_v_mem_9_ce1;
+reg p_ZL12cnn_l2_v_mem_9_we1;
+reg[15:0] p_ZL12cnn_l2_v_mem_9_d1;
+reg[7:0] p_ZL12cnn_l2_v_mem_10_address0;
+reg p_ZL12cnn_l2_v_mem_10_ce0;
+reg[7:0] p_ZL12cnn_l2_v_mem_10_address1;
+reg p_ZL12cnn_l2_v_mem_10_ce1;
+reg p_ZL12cnn_l2_v_mem_10_we1;
+reg[15:0] p_ZL12cnn_l2_v_mem_10_d1;
+reg[7:0] p_ZL12cnn_l2_v_mem_11_address0;
+reg p_ZL12cnn_l2_v_mem_11_ce0;
+reg[7:0] p_ZL12cnn_l2_v_mem_11_address1;
+reg p_ZL12cnn_l2_v_mem_11_ce1;
+reg p_ZL12cnn_l2_v_mem_11_we1;
+reg[15:0] p_ZL12cnn_l2_v_mem_11_d1;
+reg[7:0] p_ZL12cnn_l2_v_mem_12_address0;
+reg p_ZL12cnn_l2_v_mem_12_ce0;
+reg[7:0] p_ZL12cnn_l2_v_mem_12_address1;
+reg p_ZL12cnn_l2_v_mem_12_ce1;
+reg p_ZL12cnn_l2_v_mem_12_we1;
+reg[15:0] p_ZL12cnn_l2_v_mem_12_d1;
+reg[7:0] p_ZL12cnn_l2_v_mem_13_address0;
+reg p_ZL12cnn_l2_v_mem_13_ce0;
+reg[7:0] p_ZL12cnn_l2_v_mem_13_address1;
+reg p_ZL12cnn_l2_v_mem_13_ce1;
+reg p_ZL12cnn_l2_v_mem_13_we1;
+reg[15:0] p_ZL12cnn_l2_v_mem_13_d1;
+reg[7:0] p_ZL12cnn_l2_v_mem_14_address0;
+reg p_ZL12cnn_l2_v_mem_14_ce0;
+reg[7:0] p_ZL12cnn_l2_v_mem_14_address1;
+reg p_ZL12cnn_l2_v_mem_14_ce1;
+reg p_ZL12cnn_l2_v_mem_14_we1;
+reg[15:0] p_ZL12cnn_l2_v_mem_14_d1;
+reg[7:0] p_ZL12cnn_l2_v_mem_15_address0;
+reg p_ZL12cnn_l2_v_mem_15_ce0;
+reg[7:0] p_ZL12cnn_l2_v_mem_15_address1;
+reg p_ZL12cnn_l2_v_mem_15_ce1;
+reg p_ZL12cnn_l2_v_mem_15_we1;
+reg[15:0] p_ZL12cnn_l2_v_mem_15_d1;
 reg[0:0] cnn_spike_toggle_o;
 
-(* fsm_encoding = "none" *) reg   [31:0] ap_CS_fsm;
+(* fsm_encoding = "none" *) reg   [32:0] ap_CS_fsm;
 wire    ap_CS_fsm_state1;
 wire   [10:0] conv1_spike_buf_address0;
 wire   [10:0] conv1_spike_buf_q0;
 reg    conv1_spike_buf_ce1;
 reg    conv1_spike_buf_we1;
-reg   [5:0] trunc_ln_reg_938;
+reg   [5:0] trunc_ln_reg_945;
 wire    ap_CS_fsm_state12;
-reg   [3:0] tmp_reg_943;
-wire   [4:0] trunc_ln103_1_fu_595_p1;
+reg   [3:0] tmp_reg_950;
+wire   [4:0] trunc_ln103_1_fu_629_p1;
 wire    ap_CS_fsm_state14;
-reg   [3:0] tmp_86_reg_954;
-wire   [6:0] add_ln104_fu_652_p2;
-reg   [6:0] add_ln104_reg_959;
+reg   [3:0] tmp_87_reg_961;
+wire   [6:0] add_ln104_fu_686_p2;
+reg   [6:0] add_ln104_reg_966;
 wire    ap_CS_fsm_state15;
 wire    ap_CS_fsm_state22;
-wire   [9:0] trunc_ln107_fu_696_p1;
-wire   [11:0] add_ln144_fu_722_p2;
-reg   [11:0] add_ln144_reg_996;
+wire   [9:0] trunc_ln107_fu_730_p1;
+wire   [11:0] add_ln144_fu_756_p2;
+reg   [11:0] add_ln144_reg_1003;
 wire    ap_CS_fsm_state26;
-reg   [2:0] trunc_ln1_reg_1006;
+wire   [15:0] threshold_l2_fu_767_p3;
+reg   [15:0] threshold_l2_reg_1013;
+reg   [2:0] trunc_ln1_reg_1018;
 wire    ap_CS_fsm_state27;
-wire   [5:0] zext_ln148_fu_757_p1;
-reg   [5:0] zext_ln148_reg_1011;
-wire   [5:0] zext_ln149_fu_761_p1;
-reg   [5:0] zext_ln149_reg_1016;
-wire   [1:0] sub_ln161_fu_798_p2;
-reg   [1:0] sub_ln161_reg_1024;
+wire   [5:0] zext_ln151_fu_799_p1;
+reg   [5:0] zext_ln151_reg_1023;
+wire   [5:0] zext_ln151_1_fu_803_p1;
+reg   [5:0] zext_ln151_1_reg_1028;
+wire   [7:0] sub_ln158_2_fu_850_p2;
+reg   [7:0] sub_ln158_2_reg_1036;
 wire    ap_CS_fsm_state28;
-wire   [5:0] sub_ln162_fu_834_p2;
-reg   [5:0] sub_ln162_reg_1029;
-wire   [7:0] sub_ln169_fu_840_p2;
-reg   [7:0] sub_ln169_reg_1034;
-wire   [0:0] icmp_ln155_fu_846_p2;
-reg   [0:0] icmp_ln155_reg_1039;
-wire  signed [1:0] trunc_ln152_fu_862_p1;
-reg  signed [1:0] trunc_ln152_reg_1047;
+wire   [1:0] sub_ln158_fu_856_p2;
+reg   [1:0] sub_ln158_reg_1041;
+wire   [0:0] icmp_ln155_fu_862_p2;
+reg   [0:0] icmp_ln155_reg_1046;
+wire   [7:0] add_ln159_fu_891_p2;
+reg   [7:0] add_ln159_reg_1054;
 wire    ap_CS_fsm_state29;
-wire   [0:0] and_ln155_fu_881_p2;
-reg   [0:0] and_ln155_reg_1052;
-reg   [2:0] x2_reg_1056;
-wire   [2:0] add_ln151_fu_896_p2;
-wire   [1:0] sub_ln161_1_fu_902_p2;
-reg   [1:0] sub_ln161_1_reg_1067;
+wire   [0:0] and_ln155_fu_902_p2;
+reg   [0:0] and_ln155_reg_1059;
+wire   [2:0] add_ln151_fu_907_p2;
+wire   [1:0] sub_ln158_1_fu_917_p2;
+reg   [1:0] sub_ln158_1_reg_1068;
 wire    ap_CS_fsm_state30;
-wire   [5:0] add_ln162_fu_911_p2;
-reg   [5:0] add_ln162_reg_1072;
-wire   [2:0] add_ln152_fu_917_p2;
+wire   [2:0] add_ln152_fu_924_p2;
 wire    ap_CS_fsm_state31;
 wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_ap_start;
 wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_ap_done;
@@ -541,131 +635,233 @@ wire   [10:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTER
 wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_conv1_spike_buf_ce1;
 wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_conv1_spike_buf_we1;
 wire   [10:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_conv1_spike_buf_d1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_ap_start;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_ap_done;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_ap_idle;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_ap_ready;
-wire   [63:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_encoder_spikes_din;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_encoder_spikes_write;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_0_address0;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_0_ce0;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_0_address1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_0_ce1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_0_we1;
-wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_0_d1;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_1_address0;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_1_ce0;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_1_address1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_1_ce1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_1_we1;
-wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_1_d1;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_2_address0;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_2_ce0;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_2_address1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_2_ce1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_2_we1;
-wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_2_d1;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_3_address0;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_3_ce0;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_3_address1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_3_ce1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_3_we1;
-wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_3_d1;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_4_address0;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_4_ce0;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_4_address1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_4_ce1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_4_we1;
-wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_4_d1;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_5_address0;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_5_ce0;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_5_address1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_5_ce1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_5_we1;
-wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_5_d1;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_6_address0;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_6_ce0;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_6_address1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_6_ce1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_6_we1;
-wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_6_d1;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_7_address0;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_7_ce0;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_7_address1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_7_ce1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_7_we1;
-wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_7_d1;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_8_address0;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_8_ce0;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_8_address1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_8_ce1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_8_we1;
-wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_8_d1;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_9_address0;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_9_ce0;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_9_address1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_9_ce1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_9_we1;
-wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_9_d1;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_10_address0;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_10_ce0;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_10_address1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_10_ce1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_10_we1;
-wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_10_d1;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_11_address0;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_11_ce0;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_11_address1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_11_ce1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_11_we1;
-wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_11_d1;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_12_address0;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_12_ce0;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_12_address1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_12_ce1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_12_we1;
-wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_12_d1;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_13_address0;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_13_ce0;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_13_address1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_13_ce1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_13_we1;
-wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_13_d1;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_14_address0;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_14_ce0;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_14_address1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_14_ce1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_14_we1;
-wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_14_d1;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_15_address0;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_15_ce0;
-wire   [5:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_15_address1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_15_ce1;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_15_we1;
-wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_15_d1;
-wire   [0:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_cnn_spike_toggle_o;
-wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_cnn_spike_toggle_o_ap_vld;
-reg   [2:0] dy2_reg_407;
-wire   [0:0] icmp_ln152_fu_856_p2;
-reg   [2:0] dx2_reg_419;
-wire   [0:0] icmp_ln151_fu_765_p2;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_ap_start;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_ap_done;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_ap_idle;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_ap_ready;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_0_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_0_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_0_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_0_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_0_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_0_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_1_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_1_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_1_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_1_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_1_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_1_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_2_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_2_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_2_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_2_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_2_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_2_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_3_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_3_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_3_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_3_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_3_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_3_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_4_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_4_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_4_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_4_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_4_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_4_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_5_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_5_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_5_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_5_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_5_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_5_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_6_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_6_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_6_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_6_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_6_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_6_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_7_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_7_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_7_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_7_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_7_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_7_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_8_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_8_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_8_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_8_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_8_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_8_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_9_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_9_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_9_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_9_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_9_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_9_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_10_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_10_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_10_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_10_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_10_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_10_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_11_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_11_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_11_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_11_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_11_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_11_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_12_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_12_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_12_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_12_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_12_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_12_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_13_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_13_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_13_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_13_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_13_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_13_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_14_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_14_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_14_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_14_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_14_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_14_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_15_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_15_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_15_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_15_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_15_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_15_d1;
+wire   [0:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_cnn_spike_toggle_o;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_cnn_spike_toggle_o_ap_vld;
+wire   [63:0] grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_encoder_spikes_din;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_encoder_spikes_write;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_ap_start;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_ap_done;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_ap_idle;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_ap_ready;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_0_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_0_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_0_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_0_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_0_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_0_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_1_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_1_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_1_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_1_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_1_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_1_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_2_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_2_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_2_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_2_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_2_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_2_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_3_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_3_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_3_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_3_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_3_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_3_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_4_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_4_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_4_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_4_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_4_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_4_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_5_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_5_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_5_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_5_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_5_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_5_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_6_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_6_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_6_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_6_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_6_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_6_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_7_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_7_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_7_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_7_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_7_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_7_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_8_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_8_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_8_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_8_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_8_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_8_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_9_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_9_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_9_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_9_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_9_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_9_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_10_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_10_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_10_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_10_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_10_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_10_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_11_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_11_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_11_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_11_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_11_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_11_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_12_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_12_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_12_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_12_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_12_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_12_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_13_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_13_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_13_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_13_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_13_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_13_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_14_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_14_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_14_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_14_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_14_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_14_d1;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_15_address0;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_15_ce0;
+wire   [7:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_15_address1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_15_ce1;
+wire    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_15_we1;
+wire   [15:0] grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_15_d1;
+reg  signed [2:0] dy2_reg_407;
+wire   [0:0] icmp_ln152_fu_872_p2;
+reg  signed [2:0] dx2_reg_419;
+wire   [0:0] icmp_ln151_fu_807_p2;
 reg    ap_block_state31_on_subcall_done;
 reg   [9:0] cnn_pixel_counter_new_0_reg_431;
-wire   [0:0] icmp_ln107_fu_700_p2;
-wire   [0:0] icmp_ln144_fu_717_p2;
+wire   [0:0] icmp_ln107_fu_734_p2;
+wire    ap_CS_fsm_state32;
 reg    grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_ap_start_reg;
-reg   [31:0] ap_NS_fsm;
+reg   [32:0] ap_NS_fsm;
 wire    ap_NS_fsm_state23;
 wire    ap_CS_fsm_state24;
-reg    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_ap_start_reg;
+reg    grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_ap_start_reg;
+wire   [0:0] icmp_ln144_fu_751_p2;
 reg   [0:0] cnn_spike_toggle_o_reg;
-wire   [63:0] zext_ln104_1_fu_665_p1;
-wire   [63:0] zext_ln144_fu_728_p1;
-wire    ap_CS_fsm_state32;
+reg    grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_ap_start_reg;
+wire   [63:0] zext_ln104_1_fu_699_p1;
+wire   [63:0] zext_ln144_fu_762_p1;
+wire    ap_CS_fsm_state33;
 reg   [11:0] s_fu_216;
 reg    p_ZL9cnn_frame_1_1_we1_local;
-wire   [1:0] trunc_ln103_fu_661_p1;
-wire   [1:0] trunc_ln104_fu_677_p1;
+wire   [1:0] trunc_ln103_fu_695_p1;
+wire   [1:0] trunc_ln104_fu_711_p1;
 reg    p_ZL9cnn_frame_1_1_ce1_local;
 reg    p_ZL9cnn_frame_1_0_we1_local;
 reg    p_ZL9cnn_frame_1_0_ce1_local;
@@ -684,51 +880,50 @@ reg    p_ZL9cnn_frame_2_0_ce1_local;
 reg    p_ZL9cnn_frame_2_2_we1_local;
 reg    p_ZL9cnn_frame_2_2_ce1_local;
 reg    conv1_spike_buf_ce0_local;
-wire   [5:0] grp_fu_549_p1;
-wire   [9:0] mul_ln102_fu_558_p0;
-wire   [20:0] zext_ln102_1_fu_555_p1;
-wire   [11:0] mul_ln102_fu_558_p1;
-wire   [20:0] mul_ln102_fu_558_p2;
-wire   [9:0] mul_ln102_1_fu_574_p0;
-wire   [11:0] mul_ln102_1_fu_574_p1;
-wire   [20:0] mul_ln102_1_fu_574_p2;
-wire   [2:0] grp_fu_590_p1;
+wire   [5:0] grp_fu_583_p1;
+wire   [9:0] mul_ln102_fu_592_p0;
+wire   [20:0] zext_ln102_1_fu_589_p1;
+wire   [11:0] mul_ln102_fu_592_p1;
+wire   [20:0] mul_ln102_fu_592_p2;
+wire   [9:0] mul_ln102_1_fu_608_p0;
+wire   [11:0] mul_ln102_1_fu_608_p1;
+wire   [20:0] mul_ln102_1_fu_608_p2;
+wire   [2:0] grp_fu_624_p1;
 wire    ap_CS_fsm_state13;
-wire   [4:0] grp_fu_549_p2;
-wire   [4:0] mul_ln103_fu_603_p0;
-wire   [6:0] mul_ln103_fu_603_p1;
-wire   [10:0] mul_ln103_fu_603_p2;
-wire   [2:0] grp_fu_619_p1;
-wire   [4:0] tmp_85_fu_632_p3;
-wire   [6:0] tmp_84_fu_625_p3;
-wire   [6:0] zext_ln102_2_fu_639_p1;
-wire   [6:0] add_ln102_fu_643_p2;
-wire   [6:0] zext_ln104_fu_649_p1;
-wire   [1:0] grp_fu_590_p2;
-wire   [1:0] grp_fu_619_p2;
-wire   [10:0] zext_ln102_fu_658_p1;
-wire   [10:0] add_ln105_fu_690_p2;
-wire   [3:0] py_fu_747_p4;
-wire   [3:0] px_fu_733_p1;
-wire  signed [1:0] trunc_ln151_fu_771_p1;
-wire  signed [5:0] sext_ln156_fu_775_p1;
-wire   [5:0] add_ln156_fu_779_p2;
-wire  signed [4:0] trunc_ln156_1_fu_784_p4;
-wire   [2:0] tmp_87_fu_808_p4;
-wire   [5:0] p_shl_fu_826_p3;
-wire  signed [5:0] sext_ln162_fu_804_p1;
-wire   [7:0] tmp_88_fu_818_p3;
-wire  signed [7:0] sext_ln156_1_fu_794_p1;
-wire  signed [5:0] sext_ln155_fu_866_p1;
-wire   [5:0] add_ln155_fu_870_p2;
-wire   [0:0] icmp_ln155_1_fu_875_p2;
-wire   [5:0] zext_ln162_fu_908_p1;
-reg    grp_fu_549_ap_start;
-wire    grp_fu_549_ap_done;
-reg    grp_fu_590_ap_start;
-wire    grp_fu_590_ap_done;
-reg    grp_fu_619_ap_start;
-wire    grp_fu_619_ap_done;
+wire   [4:0] grp_fu_583_p2;
+wire   [4:0] mul_ln103_fu_637_p0;
+wire   [6:0] mul_ln103_fu_637_p1;
+wire   [10:0] mul_ln103_fu_637_p2;
+wire   [2:0] grp_fu_653_p1;
+wire   [4:0] tmp_86_fu_666_p3;
+wire   [6:0] tmp_85_fu_659_p3;
+wire   [6:0] zext_ln102_2_fu_673_p1;
+wire   [6:0] add_ln102_fu_677_p2;
+wire   [6:0] zext_ln104_fu_683_p1;
+wire   [1:0] grp_fu_624_p2;
+wire   [1:0] grp_fu_653_p2;
+wire   [10:0] zext_ln102_fu_692_p1;
+wire   [10:0] add_ln105_fu_724_p2;
+wire   [3:0] trunc_ln146_fu_775_p1;
+wire   [3:0] trunc_ln2_fu_789_p4;
+wire  signed [5:0] sext_ln151_fu_813_p1;
+wire   [5:0] add_ln153_fu_821_p2;
+wire   [3:0] trunc_ln159_fu_826_p1;
+wire   [6:0] tmp_88_fu_830_p3;
+wire   [7:0] tmp_89_fu_838_p3;
+wire   [7:0] zext_ln159_fu_846_p1;
+wire   [1:0] trunc_ln151_fu_817_p1;
+wire  signed [5:0] sext_ln152_fu_878_p1;
+wire  signed [5:0] add_ln154_fu_882_p2;
+wire  signed [7:0] sext_ln159_fu_887_p1;
+wire   [0:0] icmp_ln155_1_fu_896_p2;
+wire   [1:0] trunc_ln152_fu_913_p1;
+reg    grp_fu_583_ap_start;
+wire    grp_fu_583_ap_done;
+reg    grp_fu_624_ap_start;
+wire    grp_fu_624_ap_done;
+reg    grp_fu_653_ap_start;
+wire    grp_fu_653_ap_done;
 reg    ap_ST_fsm_state1_blk;
 wire    ap_ST_fsm_state2_blk;
 wire    ap_ST_fsm_state3_blk;
@@ -760,15 +955,17 @@ wire    ap_ST_fsm_state28_blk;
 wire    ap_ST_fsm_state29_blk;
 wire    ap_ST_fsm_state30_blk;
 reg    ap_ST_fsm_state31_blk;
-wire    ap_ST_fsm_state32_blk;
-wire   [10:0] mul_ln103_fu_603_p00;
+reg    ap_ST_fsm_state32_blk;
+wire    ap_ST_fsm_state33_blk;
+wire   [10:0] mul_ln103_fu_637_p00;
 wire    ap_ce_reg;
 
 // power-on initialization
 initial begin
-#0 ap_CS_fsm = 32'd1;
+#0 ap_CS_fsm = 33'd1;
 #0 grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_ap_start_reg = 1'b0;
-#0 grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_ap_start_reg = 1'b0;
+#0 grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_ap_start_reg = 1'b0;
+#0 grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_ap_start_reg = 1'b0;
 #0 s_fu_216 = 12'd0;
 end
 
@@ -837,138 +1034,257 @@ snn_top_hls_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS grp_
     .conv1_spike_buf_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_conv1_spike_buf_d1)
 );
 
-snn_top_hls_run_cnn3_streaming_pixel_Pipeline_CONV2_CO grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489(
+snn_top_hls_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489(
     .ap_clk(ap_clk),
     .ap_rst(ap_rst),
-    .ap_start(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_ap_start),
-    .ap_done(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_ap_done),
-    .ap_idle(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_ap_idle),
-    .ap_ready(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_ap_ready),
-    .encoder_spikes_din(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_encoder_spikes_din),
-    .encoder_spikes_full_n(encoder_spikes_full_n),
-    .encoder_spikes_write(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_encoder_spikes_write),
-    .threshold(threshold),
-    .add_ln162_1(add_ln162_reg_1072),
-    .trunc_ln17(trunc_ln1_reg_1006),
-    .zext_ln162_1(sub_ln161_reg_1024),
-    .zext_ln162_3(sub_ln161_1_reg_1067),
-    .mul_ln169(sub_ln169_reg_1034),
-    .zext_ln157(x2_reg_1056),
-    .p_ZL12cnn_l2_v_mem_0_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_0_address0),
-    .p_ZL12cnn_l2_v_mem_0_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_0_ce0),
+    .ap_start(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_ap_start),
+    .ap_done(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_ap_done),
+    .ap_idle(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_ap_idle),
+    .ap_ready(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_ap_ready),
+    .threshold_l2(threshold_l2_reg_1013),
+    .p_ZL12cnn_l2_v_mem_0_address0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_0_address0),
+    .p_ZL12cnn_l2_v_mem_0_ce0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_0_ce0),
     .p_ZL12cnn_l2_v_mem_0_q0(p_ZL12cnn_l2_v_mem_0_q0),
-    .p_ZL12cnn_l2_v_mem_0_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_0_address1),
-    .p_ZL12cnn_l2_v_mem_0_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_0_ce1),
-    .p_ZL12cnn_l2_v_mem_0_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_0_we1),
-    .p_ZL12cnn_l2_v_mem_0_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_0_d1),
-    .p_ZL12cnn_l2_v_mem_1_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_1_address0),
-    .p_ZL12cnn_l2_v_mem_1_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_1_ce0),
+    .p_ZL12cnn_l2_v_mem_0_address1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_0_address1),
+    .p_ZL12cnn_l2_v_mem_0_ce1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_0_ce1),
+    .p_ZL12cnn_l2_v_mem_0_we1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_0_we1),
+    .p_ZL12cnn_l2_v_mem_0_d1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_0_d1),
+    .p_ZL12cnn_l2_v_mem_1_address0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_1_address0),
+    .p_ZL12cnn_l2_v_mem_1_ce0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_1_ce0),
     .p_ZL12cnn_l2_v_mem_1_q0(p_ZL12cnn_l2_v_mem_1_q0),
-    .p_ZL12cnn_l2_v_mem_1_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_1_address1),
-    .p_ZL12cnn_l2_v_mem_1_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_1_ce1),
-    .p_ZL12cnn_l2_v_mem_1_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_1_we1),
-    .p_ZL12cnn_l2_v_mem_1_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_1_d1),
-    .p_ZL12cnn_l2_v_mem_2_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_2_address0),
-    .p_ZL12cnn_l2_v_mem_2_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_2_ce0),
+    .p_ZL12cnn_l2_v_mem_1_address1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_1_address1),
+    .p_ZL12cnn_l2_v_mem_1_ce1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_1_ce1),
+    .p_ZL12cnn_l2_v_mem_1_we1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_1_we1),
+    .p_ZL12cnn_l2_v_mem_1_d1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_1_d1),
+    .p_ZL12cnn_l2_v_mem_2_address0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_2_address0),
+    .p_ZL12cnn_l2_v_mem_2_ce0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_2_ce0),
     .p_ZL12cnn_l2_v_mem_2_q0(p_ZL12cnn_l2_v_mem_2_q0),
-    .p_ZL12cnn_l2_v_mem_2_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_2_address1),
-    .p_ZL12cnn_l2_v_mem_2_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_2_ce1),
-    .p_ZL12cnn_l2_v_mem_2_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_2_we1),
-    .p_ZL12cnn_l2_v_mem_2_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_2_d1),
-    .p_ZL12cnn_l2_v_mem_3_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_3_address0),
-    .p_ZL12cnn_l2_v_mem_3_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_3_ce0),
+    .p_ZL12cnn_l2_v_mem_2_address1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_2_address1),
+    .p_ZL12cnn_l2_v_mem_2_ce1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_2_ce1),
+    .p_ZL12cnn_l2_v_mem_2_we1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_2_we1),
+    .p_ZL12cnn_l2_v_mem_2_d1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_2_d1),
+    .p_ZL12cnn_l2_v_mem_3_address0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_3_address0),
+    .p_ZL12cnn_l2_v_mem_3_ce0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_3_ce0),
     .p_ZL12cnn_l2_v_mem_3_q0(p_ZL12cnn_l2_v_mem_3_q0),
-    .p_ZL12cnn_l2_v_mem_3_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_3_address1),
-    .p_ZL12cnn_l2_v_mem_3_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_3_ce1),
-    .p_ZL12cnn_l2_v_mem_3_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_3_we1),
-    .p_ZL12cnn_l2_v_mem_3_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_3_d1),
-    .p_ZL12cnn_l2_v_mem_4_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_4_address0),
-    .p_ZL12cnn_l2_v_mem_4_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_4_ce0),
+    .p_ZL12cnn_l2_v_mem_3_address1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_3_address1),
+    .p_ZL12cnn_l2_v_mem_3_ce1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_3_ce1),
+    .p_ZL12cnn_l2_v_mem_3_we1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_3_we1),
+    .p_ZL12cnn_l2_v_mem_3_d1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_3_d1),
+    .p_ZL12cnn_l2_v_mem_4_address0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_4_address0),
+    .p_ZL12cnn_l2_v_mem_4_ce0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_4_ce0),
     .p_ZL12cnn_l2_v_mem_4_q0(p_ZL12cnn_l2_v_mem_4_q0),
-    .p_ZL12cnn_l2_v_mem_4_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_4_address1),
-    .p_ZL12cnn_l2_v_mem_4_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_4_ce1),
-    .p_ZL12cnn_l2_v_mem_4_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_4_we1),
-    .p_ZL12cnn_l2_v_mem_4_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_4_d1),
-    .p_ZL12cnn_l2_v_mem_5_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_5_address0),
-    .p_ZL12cnn_l2_v_mem_5_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_5_ce0),
+    .p_ZL12cnn_l2_v_mem_4_address1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_4_address1),
+    .p_ZL12cnn_l2_v_mem_4_ce1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_4_ce1),
+    .p_ZL12cnn_l2_v_mem_4_we1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_4_we1),
+    .p_ZL12cnn_l2_v_mem_4_d1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_4_d1),
+    .p_ZL12cnn_l2_v_mem_5_address0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_5_address0),
+    .p_ZL12cnn_l2_v_mem_5_ce0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_5_ce0),
     .p_ZL12cnn_l2_v_mem_5_q0(p_ZL12cnn_l2_v_mem_5_q0),
-    .p_ZL12cnn_l2_v_mem_5_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_5_address1),
-    .p_ZL12cnn_l2_v_mem_5_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_5_ce1),
-    .p_ZL12cnn_l2_v_mem_5_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_5_we1),
-    .p_ZL12cnn_l2_v_mem_5_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_5_d1),
-    .p_ZL12cnn_l2_v_mem_6_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_6_address0),
-    .p_ZL12cnn_l2_v_mem_6_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_6_ce0),
+    .p_ZL12cnn_l2_v_mem_5_address1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_5_address1),
+    .p_ZL12cnn_l2_v_mem_5_ce1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_5_ce1),
+    .p_ZL12cnn_l2_v_mem_5_we1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_5_we1),
+    .p_ZL12cnn_l2_v_mem_5_d1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_5_d1),
+    .p_ZL12cnn_l2_v_mem_6_address0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_6_address0),
+    .p_ZL12cnn_l2_v_mem_6_ce0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_6_ce0),
     .p_ZL12cnn_l2_v_mem_6_q0(p_ZL12cnn_l2_v_mem_6_q0),
-    .p_ZL12cnn_l2_v_mem_6_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_6_address1),
-    .p_ZL12cnn_l2_v_mem_6_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_6_ce1),
-    .p_ZL12cnn_l2_v_mem_6_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_6_we1),
-    .p_ZL12cnn_l2_v_mem_6_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_6_d1),
-    .p_ZL12cnn_l2_v_mem_7_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_7_address0),
-    .p_ZL12cnn_l2_v_mem_7_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_7_ce0),
+    .p_ZL12cnn_l2_v_mem_6_address1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_6_address1),
+    .p_ZL12cnn_l2_v_mem_6_ce1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_6_ce1),
+    .p_ZL12cnn_l2_v_mem_6_we1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_6_we1),
+    .p_ZL12cnn_l2_v_mem_6_d1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_6_d1),
+    .p_ZL12cnn_l2_v_mem_7_address0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_7_address0),
+    .p_ZL12cnn_l2_v_mem_7_ce0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_7_ce0),
     .p_ZL12cnn_l2_v_mem_7_q0(p_ZL12cnn_l2_v_mem_7_q0),
-    .p_ZL12cnn_l2_v_mem_7_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_7_address1),
-    .p_ZL12cnn_l2_v_mem_7_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_7_ce1),
-    .p_ZL12cnn_l2_v_mem_7_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_7_we1),
-    .p_ZL12cnn_l2_v_mem_7_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_7_d1),
-    .p_ZL12cnn_l2_v_mem_8_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_8_address0),
-    .p_ZL12cnn_l2_v_mem_8_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_8_ce0),
+    .p_ZL12cnn_l2_v_mem_7_address1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_7_address1),
+    .p_ZL12cnn_l2_v_mem_7_ce1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_7_ce1),
+    .p_ZL12cnn_l2_v_mem_7_we1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_7_we1),
+    .p_ZL12cnn_l2_v_mem_7_d1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_7_d1),
+    .p_ZL12cnn_l2_v_mem_8_address0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_8_address0),
+    .p_ZL12cnn_l2_v_mem_8_ce0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_8_ce0),
     .p_ZL12cnn_l2_v_mem_8_q0(p_ZL12cnn_l2_v_mem_8_q0),
-    .p_ZL12cnn_l2_v_mem_8_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_8_address1),
-    .p_ZL12cnn_l2_v_mem_8_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_8_ce1),
-    .p_ZL12cnn_l2_v_mem_8_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_8_we1),
-    .p_ZL12cnn_l2_v_mem_8_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_8_d1),
-    .p_ZL12cnn_l2_v_mem_9_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_9_address0),
-    .p_ZL12cnn_l2_v_mem_9_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_9_ce0),
+    .p_ZL12cnn_l2_v_mem_8_address1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_8_address1),
+    .p_ZL12cnn_l2_v_mem_8_ce1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_8_ce1),
+    .p_ZL12cnn_l2_v_mem_8_we1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_8_we1),
+    .p_ZL12cnn_l2_v_mem_8_d1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_8_d1),
+    .p_ZL12cnn_l2_v_mem_9_address0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_9_address0),
+    .p_ZL12cnn_l2_v_mem_9_ce0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_9_ce0),
     .p_ZL12cnn_l2_v_mem_9_q0(p_ZL12cnn_l2_v_mem_9_q0),
-    .p_ZL12cnn_l2_v_mem_9_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_9_address1),
-    .p_ZL12cnn_l2_v_mem_9_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_9_ce1),
-    .p_ZL12cnn_l2_v_mem_9_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_9_we1),
-    .p_ZL12cnn_l2_v_mem_9_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_9_d1),
-    .p_ZL12cnn_l2_v_mem_10_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_10_address0),
-    .p_ZL12cnn_l2_v_mem_10_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_10_ce0),
+    .p_ZL12cnn_l2_v_mem_9_address1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_9_address1),
+    .p_ZL12cnn_l2_v_mem_9_ce1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_9_ce1),
+    .p_ZL12cnn_l2_v_mem_9_we1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_9_we1),
+    .p_ZL12cnn_l2_v_mem_9_d1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_9_d1),
+    .p_ZL12cnn_l2_v_mem_10_address0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_10_address0),
+    .p_ZL12cnn_l2_v_mem_10_ce0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_10_ce0),
     .p_ZL12cnn_l2_v_mem_10_q0(p_ZL12cnn_l2_v_mem_10_q0),
-    .p_ZL12cnn_l2_v_mem_10_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_10_address1),
-    .p_ZL12cnn_l2_v_mem_10_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_10_ce1),
-    .p_ZL12cnn_l2_v_mem_10_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_10_we1),
-    .p_ZL12cnn_l2_v_mem_10_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_10_d1),
-    .p_ZL12cnn_l2_v_mem_11_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_11_address0),
-    .p_ZL12cnn_l2_v_mem_11_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_11_ce0),
+    .p_ZL12cnn_l2_v_mem_10_address1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_10_address1),
+    .p_ZL12cnn_l2_v_mem_10_ce1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_10_ce1),
+    .p_ZL12cnn_l2_v_mem_10_we1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_10_we1),
+    .p_ZL12cnn_l2_v_mem_10_d1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_10_d1),
+    .p_ZL12cnn_l2_v_mem_11_address0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_11_address0),
+    .p_ZL12cnn_l2_v_mem_11_ce0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_11_ce0),
     .p_ZL12cnn_l2_v_mem_11_q0(p_ZL12cnn_l2_v_mem_11_q0),
-    .p_ZL12cnn_l2_v_mem_11_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_11_address1),
-    .p_ZL12cnn_l2_v_mem_11_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_11_ce1),
-    .p_ZL12cnn_l2_v_mem_11_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_11_we1),
-    .p_ZL12cnn_l2_v_mem_11_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_11_d1),
-    .p_ZL12cnn_l2_v_mem_12_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_12_address0),
-    .p_ZL12cnn_l2_v_mem_12_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_12_ce0),
+    .p_ZL12cnn_l2_v_mem_11_address1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_11_address1),
+    .p_ZL12cnn_l2_v_mem_11_ce1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_11_ce1),
+    .p_ZL12cnn_l2_v_mem_11_we1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_11_we1),
+    .p_ZL12cnn_l2_v_mem_11_d1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_11_d1),
+    .p_ZL12cnn_l2_v_mem_12_address0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_12_address0),
+    .p_ZL12cnn_l2_v_mem_12_ce0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_12_ce0),
     .p_ZL12cnn_l2_v_mem_12_q0(p_ZL12cnn_l2_v_mem_12_q0),
-    .p_ZL12cnn_l2_v_mem_12_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_12_address1),
-    .p_ZL12cnn_l2_v_mem_12_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_12_ce1),
-    .p_ZL12cnn_l2_v_mem_12_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_12_we1),
-    .p_ZL12cnn_l2_v_mem_12_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_12_d1),
-    .p_ZL12cnn_l2_v_mem_13_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_13_address0),
-    .p_ZL12cnn_l2_v_mem_13_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_13_ce0),
+    .p_ZL12cnn_l2_v_mem_12_address1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_12_address1),
+    .p_ZL12cnn_l2_v_mem_12_ce1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_12_ce1),
+    .p_ZL12cnn_l2_v_mem_12_we1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_12_we1),
+    .p_ZL12cnn_l2_v_mem_12_d1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_12_d1),
+    .p_ZL12cnn_l2_v_mem_13_address0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_13_address0),
+    .p_ZL12cnn_l2_v_mem_13_ce0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_13_ce0),
     .p_ZL12cnn_l2_v_mem_13_q0(p_ZL12cnn_l2_v_mem_13_q0),
-    .p_ZL12cnn_l2_v_mem_13_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_13_address1),
-    .p_ZL12cnn_l2_v_mem_13_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_13_ce1),
-    .p_ZL12cnn_l2_v_mem_13_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_13_we1),
-    .p_ZL12cnn_l2_v_mem_13_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_13_d1),
-    .p_ZL12cnn_l2_v_mem_14_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_14_address0),
-    .p_ZL12cnn_l2_v_mem_14_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_14_ce0),
+    .p_ZL12cnn_l2_v_mem_13_address1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_13_address1),
+    .p_ZL12cnn_l2_v_mem_13_ce1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_13_ce1),
+    .p_ZL12cnn_l2_v_mem_13_we1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_13_we1),
+    .p_ZL12cnn_l2_v_mem_13_d1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_13_d1),
+    .p_ZL12cnn_l2_v_mem_14_address0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_14_address0),
+    .p_ZL12cnn_l2_v_mem_14_ce0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_14_ce0),
     .p_ZL12cnn_l2_v_mem_14_q0(p_ZL12cnn_l2_v_mem_14_q0),
-    .p_ZL12cnn_l2_v_mem_14_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_14_address1),
-    .p_ZL12cnn_l2_v_mem_14_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_14_ce1),
-    .p_ZL12cnn_l2_v_mem_14_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_14_we1),
-    .p_ZL12cnn_l2_v_mem_14_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_14_d1),
-    .p_ZL12cnn_l2_v_mem_15_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_15_address0),
-    .p_ZL12cnn_l2_v_mem_15_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_15_ce0),
+    .p_ZL12cnn_l2_v_mem_14_address1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_14_address1),
+    .p_ZL12cnn_l2_v_mem_14_ce1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_14_ce1),
+    .p_ZL12cnn_l2_v_mem_14_we1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_14_we1),
+    .p_ZL12cnn_l2_v_mem_14_d1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_14_d1),
+    .p_ZL12cnn_l2_v_mem_15_address0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_15_address0),
+    .p_ZL12cnn_l2_v_mem_15_ce0(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_15_ce0),
     .p_ZL12cnn_l2_v_mem_15_q0(p_ZL12cnn_l2_v_mem_15_q0),
-    .p_ZL12cnn_l2_v_mem_15_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_15_address1),
-    .p_ZL12cnn_l2_v_mem_15_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_15_ce1),
-    .p_ZL12cnn_l2_v_mem_15_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_15_we1),
-    .p_ZL12cnn_l2_v_mem_15_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_15_d1),
+    .p_ZL12cnn_l2_v_mem_15_address1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_15_address1),
+    .p_ZL12cnn_l2_v_mem_15_ce1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_15_ce1),
+    .p_ZL12cnn_l2_v_mem_15_we1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_15_we1),
+    .p_ZL12cnn_l2_v_mem_15_d1(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_15_d1),
     .cnn_spike_toggle_i(cnn_spike_toggle_i),
-    .cnn_spike_toggle_o(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_cnn_spike_toggle_o),
-    .cnn_spike_toggle_o_ap_vld(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_cnn_spike_toggle_o_ap_vld)
+    .cnn_spike_toggle_o(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_cnn_spike_toggle_o),
+    .cnn_spike_toggle_o_ap_vld(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_cnn_spike_toggle_o_ap_vld),
+    .encoder_spikes_din(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_encoder_spikes_din),
+    .encoder_spikes_full_n(encoder_spikes_full_n),
+    .encoder_spikes_write(grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_encoder_spikes_write)
+);
+
+snn_top_hls_run_cnn3_streaming_pixel_Pipeline_CONV2_CO grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530(
+    .ap_clk(ap_clk),
+    .ap_rst(ap_rst),
+    .ap_start(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_ap_start),
+    .ap_done(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_ap_done),
+    .ap_idle(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_ap_idle),
+    .ap_ready(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_ap_ready),
+    .add_ln159_1(add_ln159_reg_1054),
+    .trunc_ln18(trunc_ln1_reg_1018),
+    .zext_ln155(sub_ln158_reg_1041),
+    .zext_ln159(sub_ln158_1_reg_1068),
+    .p_ZL12cnn_l2_v_mem_0_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_0_address0),
+    .p_ZL12cnn_l2_v_mem_0_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_0_ce0),
+    .p_ZL12cnn_l2_v_mem_0_q0(p_ZL12cnn_l2_v_mem_0_q0),
+    .p_ZL12cnn_l2_v_mem_0_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_0_address1),
+    .p_ZL12cnn_l2_v_mem_0_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_0_ce1),
+    .p_ZL12cnn_l2_v_mem_0_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_0_we1),
+    .p_ZL12cnn_l2_v_mem_0_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_0_d1),
+    .p_ZL12cnn_l2_v_mem_1_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_1_address0),
+    .p_ZL12cnn_l2_v_mem_1_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_1_ce0),
+    .p_ZL12cnn_l2_v_mem_1_q0(p_ZL12cnn_l2_v_mem_1_q0),
+    .p_ZL12cnn_l2_v_mem_1_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_1_address1),
+    .p_ZL12cnn_l2_v_mem_1_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_1_ce1),
+    .p_ZL12cnn_l2_v_mem_1_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_1_we1),
+    .p_ZL12cnn_l2_v_mem_1_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_1_d1),
+    .p_ZL12cnn_l2_v_mem_2_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_2_address0),
+    .p_ZL12cnn_l2_v_mem_2_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_2_ce0),
+    .p_ZL12cnn_l2_v_mem_2_q0(p_ZL12cnn_l2_v_mem_2_q0),
+    .p_ZL12cnn_l2_v_mem_2_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_2_address1),
+    .p_ZL12cnn_l2_v_mem_2_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_2_ce1),
+    .p_ZL12cnn_l2_v_mem_2_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_2_we1),
+    .p_ZL12cnn_l2_v_mem_2_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_2_d1),
+    .p_ZL12cnn_l2_v_mem_3_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_3_address0),
+    .p_ZL12cnn_l2_v_mem_3_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_3_ce0),
+    .p_ZL12cnn_l2_v_mem_3_q0(p_ZL12cnn_l2_v_mem_3_q0),
+    .p_ZL12cnn_l2_v_mem_3_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_3_address1),
+    .p_ZL12cnn_l2_v_mem_3_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_3_ce1),
+    .p_ZL12cnn_l2_v_mem_3_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_3_we1),
+    .p_ZL12cnn_l2_v_mem_3_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_3_d1),
+    .p_ZL12cnn_l2_v_mem_4_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_4_address0),
+    .p_ZL12cnn_l2_v_mem_4_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_4_ce0),
+    .p_ZL12cnn_l2_v_mem_4_q0(p_ZL12cnn_l2_v_mem_4_q0),
+    .p_ZL12cnn_l2_v_mem_4_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_4_address1),
+    .p_ZL12cnn_l2_v_mem_4_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_4_ce1),
+    .p_ZL12cnn_l2_v_mem_4_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_4_we1),
+    .p_ZL12cnn_l2_v_mem_4_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_4_d1),
+    .p_ZL12cnn_l2_v_mem_5_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_5_address0),
+    .p_ZL12cnn_l2_v_mem_5_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_5_ce0),
+    .p_ZL12cnn_l2_v_mem_5_q0(p_ZL12cnn_l2_v_mem_5_q0),
+    .p_ZL12cnn_l2_v_mem_5_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_5_address1),
+    .p_ZL12cnn_l2_v_mem_5_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_5_ce1),
+    .p_ZL12cnn_l2_v_mem_5_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_5_we1),
+    .p_ZL12cnn_l2_v_mem_5_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_5_d1),
+    .p_ZL12cnn_l2_v_mem_6_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_6_address0),
+    .p_ZL12cnn_l2_v_mem_6_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_6_ce0),
+    .p_ZL12cnn_l2_v_mem_6_q0(p_ZL12cnn_l2_v_mem_6_q0),
+    .p_ZL12cnn_l2_v_mem_6_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_6_address1),
+    .p_ZL12cnn_l2_v_mem_6_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_6_ce1),
+    .p_ZL12cnn_l2_v_mem_6_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_6_we1),
+    .p_ZL12cnn_l2_v_mem_6_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_6_d1),
+    .p_ZL12cnn_l2_v_mem_7_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_7_address0),
+    .p_ZL12cnn_l2_v_mem_7_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_7_ce0),
+    .p_ZL12cnn_l2_v_mem_7_q0(p_ZL12cnn_l2_v_mem_7_q0),
+    .p_ZL12cnn_l2_v_mem_7_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_7_address1),
+    .p_ZL12cnn_l2_v_mem_7_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_7_ce1),
+    .p_ZL12cnn_l2_v_mem_7_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_7_we1),
+    .p_ZL12cnn_l2_v_mem_7_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_7_d1),
+    .p_ZL12cnn_l2_v_mem_8_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_8_address0),
+    .p_ZL12cnn_l2_v_mem_8_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_8_ce0),
+    .p_ZL12cnn_l2_v_mem_8_q0(p_ZL12cnn_l2_v_mem_8_q0),
+    .p_ZL12cnn_l2_v_mem_8_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_8_address1),
+    .p_ZL12cnn_l2_v_mem_8_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_8_ce1),
+    .p_ZL12cnn_l2_v_mem_8_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_8_we1),
+    .p_ZL12cnn_l2_v_mem_8_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_8_d1),
+    .p_ZL12cnn_l2_v_mem_9_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_9_address0),
+    .p_ZL12cnn_l2_v_mem_9_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_9_ce0),
+    .p_ZL12cnn_l2_v_mem_9_q0(p_ZL12cnn_l2_v_mem_9_q0),
+    .p_ZL12cnn_l2_v_mem_9_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_9_address1),
+    .p_ZL12cnn_l2_v_mem_9_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_9_ce1),
+    .p_ZL12cnn_l2_v_mem_9_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_9_we1),
+    .p_ZL12cnn_l2_v_mem_9_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_9_d1),
+    .p_ZL12cnn_l2_v_mem_10_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_10_address0),
+    .p_ZL12cnn_l2_v_mem_10_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_10_ce0),
+    .p_ZL12cnn_l2_v_mem_10_q0(p_ZL12cnn_l2_v_mem_10_q0),
+    .p_ZL12cnn_l2_v_mem_10_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_10_address1),
+    .p_ZL12cnn_l2_v_mem_10_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_10_ce1),
+    .p_ZL12cnn_l2_v_mem_10_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_10_we1),
+    .p_ZL12cnn_l2_v_mem_10_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_10_d1),
+    .p_ZL12cnn_l2_v_mem_11_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_11_address0),
+    .p_ZL12cnn_l2_v_mem_11_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_11_ce0),
+    .p_ZL12cnn_l2_v_mem_11_q0(p_ZL12cnn_l2_v_mem_11_q0),
+    .p_ZL12cnn_l2_v_mem_11_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_11_address1),
+    .p_ZL12cnn_l2_v_mem_11_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_11_ce1),
+    .p_ZL12cnn_l2_v_mem_11_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_11_we1),
+    .p_ZL12cnn_l2_v_mem_11_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_11_d1),
+    .p_ZL12cnn_l2_v_mem_12_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_12_address0),
+    .p_ZL12cnn_l2_v_mem_12_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_12_ce0),
+    .p_ZL12cnn_l2_v_mem_12_q0(p_ZL12cnn_l2_v_mem_12_q0),
+    .p_ZL12cnn_l2_v_mem_12_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_12_address1),
+    .p_ZL12cnn_l2_v_mem_12_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_12_ce1),
+    .p_ZL12cnn_l2_v_mem_12_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_12_we1),
+    .p_ZL12cnn_l2_v_mem_12_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_12_d1),
+    .p_ZL12cnn_l2_v_mem_13_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_13_address0),
+    .p_ZL12cnn_l2_v_mem_13_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_13_ce0),
+    .p_ZL12cnn_l2_v_mem_13_q0(p_ZL12cnn_l2_v_mem_13_q0),
+    .p_ZL12cnn_l2_v_mem_13_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_13_address1),
+    .p_ZL12cnn_l2_v_mem_13_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_13_ce1),
+    .p_ZL12cnn_l2_v_mem_13_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_13_we1),
+    .p_ZL12cnn_l2_v_mem_13_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_13_d1),
+    .p_ZL12cnn_l2_v_mem_14_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_14_address0),
+    .p_ZL12cnn_l2_v_mem_14_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_14_ce0),
+    .p_ZL12cnn_l2_v_mem_14_q0(p_ZL12cnn_l2_v_mem_14_q0),
+    .p_ZL12cnn_l2_v_mem_14_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_14_address1),
+    .p_ZL12cnn_l2_v_mem_14_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_14_ce1),
+    .p_ZL12cnn_l2_v_mem_14_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_14_we1),
+    .p_ZL12cnn_l2_v_mem_14_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_14_d1),
+    .p_ZL12cnn_l2_v_mem_15_address0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_15_address0),
+    .p_ZL12cnn_l2_v_mem_15_ce0(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_15_ce0),
+    .p_ZL12cnn_l2_v_mem_15_q0(p_ZL12cnn_l2_v_mem_15_q0),
+    .p_ZL12cnn_l2_v_mem_15_address1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_15_address1),
+    .p_ZL12cnn_l2_v_mem_15_ce1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_15_ce1),
+    .p_ZL12cnn_l2_v_mem_15_we1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_15_we1),
+    .p_ZL12cnn_l2_v_mem_15_d1(grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_15_d1)
 );
 
 snn_top_hls_urem_10ns_6ns_5_14_seq_1 #(
@@ -977,15 +1293,15 @@ snn_top_hls_urem_10ns_6ns_5_14_seq_1 #(
     .din0_WIDTH( 10 ),
     .din1_WIDTH( 6 ),
     .dout_WIDTH( 5 ))
-urem_10ns_6ns_5_14_seq_1_U182(
+urem_10ns_6ns_5_14_seq_1_U197(
     .clk(ap_clk),
     .reset(ap_rst),
-    .start(grp_fu_549_ap_start),
-    .done(grp_fu_549_ap_done),
+    .start(grp_fu_583_ap_start),
+    .done(grp_fu_583_ap_done),
     .din0(cnn_pixel_counter_i),
-    .din1(grp_fu_549_p1),
+    .din1(grp_fu_583_p1),
     .ce(1'b1),
-    .dout(grp_fu_549_p2)
+    .dout(grp_fu_583_p2)
 );
 
 snn_top_hls_mul_10ns_12ns_21_1_1 #(
@@ -994,10 +1310,10 @@ snn_top_hls_mul_10ns_12ns_21_1_1 #(
     .din0_WIDTH( 10 ),
     .din1_WIDTH( 12 ),
     .dout_WIDTH( 21 ))
-mul_10ns_12ns_21_1_1_U183(
-    .din0(mul_ln102_fu_558_p0),
-    .din1(mul_ln102_fu_558_p1),
-    .dout(mul_ln102_fu_558_p2)
+mul_10ns_12ns_21_1_1_U198(
+    .din0(mul_ln102_fu_592_p0),
+    .din1(mul_ln102_fu_592_p1),
+    .dout(mul_ln102_fu_592_p2)
 );
 
 snn_top_hls_mul_10ns_12ns_21_1_1 #(
@@ -1006,10 +1322,10 @@ snn_top_hls_mul_10ns_12ns_21_1_1 #(
     .din0_WIDTH( 10 ),
     .din1_WIDTH( 12 ),
     .dout_WIDTH( 21 ))
-mul_10ns_12ns_21_1_1_U184(
-    .din0(mul_ln102_1_fu_574_p0),
-    .din1(mul_ln102_1_fu_574_p1),
-    .dout(mul_ln102_1_fu_574_p2)
+mul_10ns_12ns_21_1_1_U199(
+    .din0(mul_ln102_1_fu_608_p0),
+    .din1(mul_ln102_1_fu_608_p1),
+    .dout(mul_ln102_1_fu_608_p2)
 );
 
 snn_top_hls_urem_6ns_3ns_2_10_seq_1 #(
@@ -1018,15 +1334,15 @@ snn_top_hls_urem_6ns_3ns_2_10_seq_1 #(
     .din0_WIDTH( 6 ),
     .din1_WIDTH( 3 ),
     .dout_WIDTH( 2 ))
-urem_6ns_3ns_2_10_seq_1_U185(
+urem_6ns_3ns_2_10_seq_1_U200(
     .clk(ap_clk),
     .reset(ap_rst),
-    .start(grp_fu_590_ap_start),
-    .done(grp_fu_590_ap_done),
-    .din0(trunc_ln_reg_938),
-    .din1(grp_fu_590_p1),
+    .start(grp_fu_624_ap_start),
+    .done(grp_fu_624_ap_done),
+    .din0(trunc_ln_reg_945),
+    .din1(grp_fu_624_p1),
     .ce(1'b1),
-    .dout(grp_fu_590_p2)
+    .dout(grp_fu_624_p2)
 );
 
 snn_top_hls_mul_5ns_7ns_11_1_1 #(
@@ -1035,10 +1351,10 @@ snn_top_hls_mul_5ns_7ns_11_1_1 #(
     .din0_WIDTH( 5 ),
     .din1_WIDTH( 7 ),
     .dout_WIDTH( 11 ))
-mul_5ns_7ns_11_1_1_U186(
-    .din0(mul_ln103_fu_603_p0),
-    .din1(mul_ln103_fu_603_p1),
-    .dout(mul_ln103_fu_603_p2)
+mul_5ns_7ns_11_1_1_U201(
+    .din0(mul_ln103_fu_637_p0),
+    .din1(mul_ln103_fu_637_p1),
+    .dout(mul_ln103_fu_637_p2)
 );
 
 snn_top_hls_urem_5ns_3ns_2_9_seq_1 #(
@@ -1047,15 +1363,15 @@ snn_top_hls_urem_5ns_3ns_2_9_seq_1 #(
     .din0_WIDTH( 5 ),
     .din1_WIDTH( 3 ),
     .dout_WIDTH( 2 ))
-urem_5ns_3ns_2_9_seq_1_U187(
+urem_5ns_3ns_2_9_seq_1_U202(
     .clk(ap_clk),
     .reset(ap_rst),
-    .start(grp_fu_619_ap_start),
-    .done(grp_fu_619_ap_done),
-    .din0(trunc_ln103_1_fu_595_p1),
-    .din1(grp_fu_619_p1),
+    .start(grp_fu_653_ap_start),
+    .done(grp_fu_653_ap_done),
+    .din0(trunc_ln103_1_fu_629_p1),
+    .din1(grp_fu_653_p1),
     .ce(1'b1),
-    .dout(grp_fu_619_p2)
+    .dout(grp_fu_653_p2)
 );
 
 always @ (posedge ap_clk) begin
@@ -1080,108 +1396,118 @@ end
 
 always @ (posedge ap_clk) begin
     if (ap_rst == 1'b1) begin
-        grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_ap_start_reg <= 1'b0;
+        grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_ap_start_reg <= 1'b0;
     end else begin
-        if ((1'b1 == ap_CS_fsm_state30)) begin
-            grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_ap_start_reg <= 1'b1;
-        end else if ((grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_ap_ready == 1'b1)) begin
-            grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_ap_start_reg <= 1'b0;
+        if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state30))) begin
+            grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_ap_start_reg <= 1'b1;
+        end else if ((grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_ap_ready == 1'b1)) begin
+            grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_ap_start_reg <= 1'b0;
         end
     end
 end
 
 always @ (posedge ap_clk) begin
-    if (((icmp_ln144_fu_717_p2 == 1'd1) & (1'b1 == ap_CS_fsm_state26))) begin
+    if (ap_rst == 1'b1) begin
+        grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_ap_start_reg <= 1'b0;
+    end else begin
+        if (((icmp_ln144_fu_751_p2 == 1'd1) & (1'b1 == ap_CS_fsm_state26))) begin
+            grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_ap_start_reg <= 1'b1;
+        end else if ((grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_ap_ready == 1'b1)) begin
+            grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_ap_start_reg <= 1'b0;
+        end
+    end
+end
+
+always @ (posedge ap_clk) begin
+    if (((grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_ap_done == 1'b1) & (1'b1 == ap_CS_fsm_state32))) begin
         cnn_pixel_counter_new_0_reg_431 <= 10'd0;
-    end else if (((icmp_ln107_fu_700_p2 == 1'd0) & (1'b1 == ap_CS_fsm_state22))) begin
-        cnn_pixel_counter_new_0_reg_431 <= trunc_ln107_fu_696_p1;
+    end else if (((icmp_ln107_fu_734_p2 == 1'd0) & (1'b1 == ap_CS_fsm_state22))) begin
+        cnn_pixel_counter_new_0_reg_431 <= trunc_ln107_fu_730_p1;
     end
 end
 
 always @ (posedge ap_clk) begin
     if (((1'b0 == ap_block_state31_on_subcall_done) & (1'b1 == ap_CS_fsm_state31))) begin
-        dx2_reg_419 <= add_ln152_fu_917_p2;
-    end else if (((icmp_ln151_fu_765_p2 == 1'd0) & (1'b1 == ap_CS_fsm_state28))) begin
+        dx2_reg_419 <= add_ln152_fu_924_p2;
+    end else if (((icmp_ln151_fu_807_p2 == 1'd0) & (1'b1 == ap_CS_fsm_state28))) begin
         dx2_reg_419 <= 3'd7;
     end
 end
 
 always @ (posedge ap_clk) begin
-    if (((icmp_ln152_fu_856_p2 == 1'd1) & (1'b1 == ap_CS_fsm_state29))) begin
-        dy2_reg_407 <= add_ln151_fu_896_p2;
+    if (((icmp_ln152_fu_872_p2 == 1'd1) & (1'b1 == ap_CS_fsm_state29))) begin
+        dy2_reg_407 <= add_ln151_fu_907_p2;
     end else if ((1'b1 == ap_CS_fsm_state27)) begin
         dy2_reg_407 <= 3'd7;
     end
 end
 
 always @ (posedge ap_clk) begin
-    if (((icmp_ln107_fu_700_p2 == 1'd1) & (1'b1 == ap_CS_fsm_state22))) begin
+    if (((icmp_ln107_fu_734_p2 == 1'd1) & (1'b1 == ap_CS_fsm_state22))) begin
         s_fu_216 <= 12'd0;
-    end else if (((icmp_ln151_fu_765_p2 == 1'd1) & (1'b1 == ap_CS_fsm_state28))) begin
-        s_fu_216 <= add_ln144_reg_996;
+    end else if (((icmp_ln151_fu_807_p2 == 1'd1) & (1'b1 == ap_CS_fsm_state28))) begin
+        s_fu_216 <= add_ln144_reg_1003;
     end
 end
 
 always @ (posedge ap_clk) begin
     if ((1'b1 == ap_CS_fsm_state15)) begin
-        add_ln104_reg_959 <= add_ln104_fu_652_p2;
+        add_ln104_reg_966 <= add_ln104_fu_686_p2;
     end
 end
 
 always @ (posedge ap_clk) begin
     if ((1'b1 == ap_CS_fsm_state26)) begin
-        add_ln144_reg_996 <= add_ln144_fu_722_p2;
-    end
-end
-
-always @ (posedge ap_clk) begin
-    if ((1'b1 == ap_CS_fsm_state30)) begin
-        add_ln162_reg_1072 <= add_ln162_fu_911_p2;
-        sub_ln161_1_reg_1067 <= sub_ln161_1_fu_902_p2;
+        add_ln144_reg_1003 <= add_ln144_fu_756_p2;
+        threshold_l2_reg_1013[15 : 2] <= threshold_l2_fu_767_p3[15 : 2];
     end
 end
 
 always @ (posedge ap_clk) begin
     if ((1'b1 == ap_CS_fsm_state29)) begin
-        and_ln155_reg_1052 <= and_ln155_fu_881_p2;
-        trunc_ln152_reg_1047 <= trunc_ln152_fu_862_p1;
-        x2_reg_1056 <= {{add_ln155_fu_870_p2[3:1]}};
+        add_ln159_reg_1054 <= add_ln159_fu_891_p2;
+        and_ln155_reg_1059 <= and_ln155_fu_902_p2;
     end
 end
 
 always @ (posedge ap_clk) begin
-    if (((1'd1 == and_ln155_reg_1052) & (grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_cnn_spike_toggle_o_ap_vld == 1'b1) & (1'b1 == ap_CS_fsm_state31))) begin
-        cnn_spike_toggle_o_reg <= grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_cnn_spike_toggle_o;
+    if (((grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_cnn_spike_toggle_o_ap_vld == 1'b1) & (1'b1 == ap_CS_fsm_state32))) begin
+        cnn_spike_toggle_o_reg <= grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_cnn_spike_toggle_o;
     end
 end
 
 always @ (posedge ap_clk) begin
     if ((1'b1 == ap_CS_fsm_state28)) begin
-        icmp_ln155_reg_1039 <= icmp_ln155_fu_846_p2;
-        sub_ln161_reg_1024 <= sub_ln161_fu_798_p2;
-        sub_ln162_reg_1029 <= sub_ln162_fu_834_p2;
-        sub_ln169_reg_1034 <= sub_ln169_fu_840_p2;
+        icmp_ln155_reg_1046 <= icmp_ln155_fu_862_p2;
+        sub_ln158_2_reg_1036[7 : 1] <= sub_ln158_2_fu_850_p2[7 : 1];
+        sub_ln158_reg_1041 <= sub_ln158_fu_856_p2;
+    end
+end
+
+always @ (posedge ap_clk) begin
+    if ((1'b1 == ap_CS_fsm_state30)) begin
+        sub_ln158_1_reg_1068 <= sub_ln158_1_fu_917_p2;
     end
 end
 
 always @ (posedge ap_clk) begin
     if ((1'b1 == ap_CS_fsm_state14)) begin
-        tmp_86_reg_954 <= {{mul_ln103_fu_603_p2[10:7]}};
+        tmp_87_reg_961 <= {{mul_ln103_fu_637_p2[10:7]}};
     end
 end
 
 always @ (posedge ap_clk) begin
     if ((1'b1 == ap_CS_fsm_state12)) begin
-        tmp_reg_943 <= {{mul_ln102_1_fu_574_p2[20:17]}};
-        trunc_ln_reg_938 <= {{mul_ln102_fu_558_p2[20:15]}};
+        tmp_reg_950 <= {{mul_ln102_1_fu_608_p2[20:17]}};
+        trunc_ln_reg_945 <= {{mul_ln102_fu_592_p2[20:15]}};
     end
 end
 
 always @ (posedge ap_clk) begin
     if ((1'b1 == ap_CS_fsm_state27)) begin
-        trunc_ln1_reg_1006 <= {{conv1_spike_buf_q0[10:8]}};
-        zext_ln148_reg_1011[3 : 0] <= zext_ln148_fu_757_p1[3 : 0];
-        zext_ln149_reg_1016[3 : 0] <= zext_ln149_fu_761_p1[3 : 0];
+        trunc_ln1_reg_1018 <= {{conv1_spike_buf_q0[10:8]}};
+        zext_ln151_1_reg_1028[3 : 0] <= zext_ln151_1_fu_803_p1[3 : 0];
+        zext_ln151_reg_1023[3 : 0] <= zext_ln151_fu_799_p1[3 : 0];
     end
 end
 
@@ -1251,7 +1577,15 @@ always @ (*) begin
     end
 end
 
-assign ap_ST_fsm_state32_blk = 1'b0;
+always @ (*) begin
+    if ((grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_ap_done == 1'b0)) begin
+        ap_ST_fsm_state32_blk = 1'b1;
+    end else begin
+        ap_ST_fsm_state32_blk = 1'b0;
+    end
+end
+
+assign ap_ST_fsm_state33_blk = 1'b0;
 
 assign ap_ST_fsm_state3_blk = 1'b0;
 
@@ -1268,7 +1602,7 @@ assign ap_ST_fsm_state8_blk = 1'b0;
 assign ap_ST_fsm_state9_blk = 1'b0;
 
 always @ (*) begin
-    if (((1'b1 == ap_CS_fsm_state32) | ((ap_start == 1'b0) & (1'b1 == ap_CS_fsm_state1)))) begin
+    if (((1'b1 == ap_CS_fsm_state33) | ((ap_start == 1'b0) & (1'b1 == ap_CS_fsm_state1)))) begin
         ap_done = 1'b1;
     end else begin
         ap_done = 1'b0;
@@ -1284,7 +1618,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if ((1'b1 == ap_CS_fsm_state32)) begin
+    if ((1'b1 == ap_CS_fsm_state33)) begin
         ap_ready = 1'b1;
     end else begin
         ap_ready = 1'b0;
@@ -1292,7 +1626,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if ((1'b1 == ap_CS_fsm_state32)) begin
+    if ((1'b1 == ap_CS_fsm_state33)) begin
         cnn_pixel_counter_o = cnn_pixel_counter_new_0_reg_431;
     end else begin
         cnn_pixel_counter_o = cnn_pixel_counter_i;
@@ -1300,7 +1634,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if ((1'b1 == ap_CS_fsm_state32)) begin
+    if ((1'b1 == ap_CS_fsm_state33)) begin
         cnn_pixel_counter_o_ap_vld = 1'b1;
     end else begin
         cnn_pixel_counter_o_ap_vld = 1'b0;
@@ -1308,8 +1642,8 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((1'd1 == and_ln155_reg_1052) & (grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_cnn_spike_toggle_o_ap_vld == 1'b1) & (1'b1 == ap_CS_fsm_state31))) begin
-        cnn_spike_toggle_o = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_cnn_spike_toggle_o;
+    if (((grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_cnn_spike_toggle_o_ap_vld == 1'b1) & (1'b1 == ap_CS_fsm_state32))) begin
+        cnn_spike_toggle_o = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_cnn_spike_toggle_o;
     end else begin
         cnn_spike_toggle_o = cnn_spike_toggle_o_reg;
     end
@@ -1341,25 +1675,985 @@ end
 
 always @ (*) begin
     if (((ap_start == 1'b1) & (1'b1 == ap_CS_fsm_state1))) begin
-        grp_fu_549_ap_start = 1'b1;
+        grp_fu_583_ap_start = 1'b1;
     end else begin
-        grp_fu_549_ap_start = 1'b0;
+        grp_fu_583_ap_start = 1'b0;
     end
 end
 
 always @ (*) begin
     if ((1'b1 == ap_CS_fsm_state13)) begin
-        grp_fu_590_ap_start = 1'b1;
+        grp_fu_624_ap_start = 1'b1;
     end else begin
-        grp_fu_590_ap_start = 1'b0;
+        grp_fu_624_ap_start = 1'b0;
     end
 end
 
 always @ (*) begin
     if ((1'b1 == ap_CS_fsm_state14)) begin
-        grp_fu_619_ap_start = 1'b1;
+        grp_fu_653_ap_start = 1'b1;
     end else begin
-        grp_fu_619_ap_start = 1'b0;
+        grp_fu_653_ap_start = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_0_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_0_address0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_0_address0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_0_address0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_0_address0 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_0_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_0_address1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_0_address1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_0_address1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_0_address1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_0_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_0_ce0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_0_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_0_ce0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_0_ce0 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_0_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_0_ce1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_0_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_0_ce1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_0_ce1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_0_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_0_d1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_0_d1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_0_d1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_0_d1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_0_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_0_we1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_0_we1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_0_we1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_0_we1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_10_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_10_address0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_10_address0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_10_address0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_10_address0 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_10_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_10_address1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_10_address1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_10_address1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_10_address1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_10_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_10_ce0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_10_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_10_ce0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_10_ce0 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_10_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_10_ce1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_10_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_10_ce1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_10_ce1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_10_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_10_d1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_10_d1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_10_d1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_10_d1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_10_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_10_we1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_10_we1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_10_we1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_10_we1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_11_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_11_address0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_11_address0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_11_address0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_11_address0 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_11_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_11_address1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_11_address1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_11_address1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_11_address1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_11_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_11_ce0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_11_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_11_ce0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_11_ce0 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_11_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_11_ce1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_11_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_11_ce1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_11_ce1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_11_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_11_d1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_11_d1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_11_d1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_11_d1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_11_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_11_we1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_11_we1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_11_we1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_11_we1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_12_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_12_address0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_12_address0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_12_address0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_12_address0 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_12_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_12_address1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_12_address1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_12_address1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_12_address1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_12_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_12_ce0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_12_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_12_ce0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_12_ce0 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_12_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_12_ce1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_12_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_12_ce1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_12_ce1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_12_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_12_d1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_12_d1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_12_d1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_12_d1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_12_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_12_we1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_12_we1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_12_we1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_12_we1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_13_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_13_address0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_13_address0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_13_address0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_13_address0 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_13_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_13_address1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_13_address1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_13_address1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_13_address1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_13_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_13_ce0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_13_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_13_ce0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_13_ce0 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_13_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_13_ce1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_13_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_13_ce1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_13_ce1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_13_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_13_d1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_13_d1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_13_d1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_13_d1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_13_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_13_we1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_13_we1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_13_we1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_13_we1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_14_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_14_address0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_14_address0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_14_address0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_14_address0 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_14_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_14_address1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_14_address1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_14_address1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_14_address1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_14_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_14_ce0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_14_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_14_ce0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_14_ce0 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_14_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_14_ce1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_14_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_14_ce1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_14_ce1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_14_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_14_d1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_14_d1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_14_d1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_14_d1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_14_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_14_we1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_14_we1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_14_we1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_14_we1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_15_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_15_address0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_15_address0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_15_address0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_15_address0 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_15_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_15_address1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_15_address1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_15_address1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_15_address1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_15_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_15_ce0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_15_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_15_ce0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_15_ce0 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_15_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_15_ce1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_15_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_15_ce1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_15_ce1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_15_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_15_d1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_15_d1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_15_d1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_15_d1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_15_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_15_we1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_15_we1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_15_we1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_15_we1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_1_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_1_address0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_1_address0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_1_address0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_1_address0 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_1_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_1_address1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_1_address1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_1_address1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_1_address1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_1_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_1_ce0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_1_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_1_ce0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_1_ce0 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_1_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_1_ce1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_1_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_1_ce1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_1_ce1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_1_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_1_d1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_1_d1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_1_d1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_1_d1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_1_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_1_we1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_1_we1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_1_we1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_1_we1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_2_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_2_address0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_2_address0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_2_address0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_2_address0 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_2_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_2_address1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_2_address1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_2_address1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_2_address1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_2_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_2_ce0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_2_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_2_ce0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_2_ce0 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_2_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_2_ce1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_2_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_2_ce1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_2_ce1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_2_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_2_d1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_2_d1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_2_d1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_2_d1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_2_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_2_we1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_2_we1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_2_we1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_2_we1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_3_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_3_address0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_3_address0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_3_address0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_3_address0 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_3_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_3_address1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_3_address1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_3_address1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_3_address1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_3_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_3_ce0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_3_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_3_ce0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_3_ce0 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_3_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_3_ce1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_3_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_3_ce1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_3_ce1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_3_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_3_d1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_3_d1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_3_d1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_3_d1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_3_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_3_we1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_3_we1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_3_we1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_3_we1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_4_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_4_address0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_4_address0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_4_address0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_4_address0 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_4_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_4_address1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_4_address1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_4_address1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_4_address1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_4_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_4_ce0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_4_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_4_ce0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_4_ce0 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_4_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_4_ce1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_4_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_4_ce1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_4_ce1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_4_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_4_d1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_4_d1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_4_d1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_4_d1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_4_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_4_we1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_4_we1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_4_we1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_4_we1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_5_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_5_address0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_5_address0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_5_address0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_5_address0 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_5_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_5_address1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_5_address1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_5_address1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_5_address1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_5_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_5_ce0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_5_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_5_ce0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_5_ce0 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_5_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_5_ce1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_5_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_5_ce1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_5_ce1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_5_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_5_d1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_5_d1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_5_d1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_5_d1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_5_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_5_we1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_5_we1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_5_we1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_5_we1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_6_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_6_address0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_6_address0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_6_address0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_6_address0 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_6_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_6_address1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_6_address1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_6_address1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_6_address1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_6_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_6_ce0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_6_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_6_ce0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_6_ce0 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_6_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_6_ce1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_6_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_6_ce1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_6_ce1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_6_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_6_d1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_6_d1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_6_d1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_6_d1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_6_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_6_we1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_6_we1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_6_we1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_6_we1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_7_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_7_address0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_7_address0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_7_address0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_7_address0 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_7_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_7_address1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_7_address1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_7_address1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_7_address1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_7_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_7_ce0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_7_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_7_ce0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_7_ce0 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_7_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_7_ce1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_7_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_7_ce1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_7_ce1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_7_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_7_d1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_7_d1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_7_d1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_7_d1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_7_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_7_we1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_7_we1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_7_we1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_7_we1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_8_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_8_address0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_8_address0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_8_address0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_8_address0 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_8_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_8_address1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_8_address1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_8_address1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_8_address1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_8_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_8_ce0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_8_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_8_ce0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_8_ce0 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_8_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_8_ce1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_8_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_8_ce1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_8_ce1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_8_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_8_d1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_8_d1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_8_d1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_8_d1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_8_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_8_we1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_8_we1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_8_we1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_8_we1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_9_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_9_address0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_9_address0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_9_address0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_9_address0 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_9_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_9_address1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_9_address1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_9_address1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_9_address1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_9_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_9_ce0;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_9_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_9_ce0;
+    end else begin
+        p_ZL12cnn_l2_v_mem_9_ce0 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_9_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_9_ce1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_9_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_9_ce1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_9_ce1 = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_9_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_9_d1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_9_d1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_9_d1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_9_d1 = 'bx;
+    end
+end
+
+always @ (*) begin
+    if (((1'd1 == and_ln155_reg_1059) & (1'b1 == ap_CS_fsm_state31))) begin
+        p_ZL12cnn_l2_v_mem_9_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_p_ZL12cnn_l2_v_mem_9_we1;
+    end else if ((1'b1 == ap_CS_fsm_state32)) begin
+        p_ZL12cnn_l2_v_mem_9_we1 = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_p_ZL12cnn_l2_v_mem_9_we1;
+    end else begin
+        p_ZL12cnn_l2_v_mem_9_we1 = 1'b0;
     end
 end
 
@@ -1380,7 +2674,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((trunc_ln104_fu_677_p1 == 2'd0) & (trunc_ln103_fu_661_p1 == 2'd0) & (1'b1 == ap_CS_fsm_state22))) begin
+    if (((trunc_ln104_fu_711_p1 == 2'd0) & (trunc_ln103_fu_695_p1 == 2'd0) & (1'b1 == ap_CS_fsm_state22))) begin
         p_ZL9cnn_frame_0_0_we1_local = 1'b1;
     end else begin
         p_ZL9cnn_frame_0_0_we1_local = 1'b0;
@@ -1404,7 +2698,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((trunc_ln104_fu_677_p1 == 2'd1) & (trunc_ln103_fu_661_p1 == 2'd0) & (1'b1 == ap_CS_fsm_state22))) begin
+    if (((trunc_ln104_fu_711_p1 == 2'd1) & (trunc_ln103_fu_695_p1 == 2'd0) & (1'b1 == ap_CS_fsm_state22))) begin
         p_ZL9cnn_frame_0_1_we1_local = 1'b1;
     end else begin
         p_ZL9cnn_frame_0_1_we1_local = 1'b0;
@@ -1428,7 +2722,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if ((~(trunc_ln104_fu_677_p1 == 2'd0) & ~(trunc_ln104_fu_677_p1 == 2'd1) & (trunc_ln103_fu_661_p1 == 2'd0) & (1'b1 == ap_CS_fsm_state22))) begin
+    if ((~(trunc_ln104_fu_711_p1 == 2'd0) & ~(trunc_ln104_fu_711_p1 == 2'd1) & (trunc_ln103_fu_695_p1 == 2'd0) & (1'b1 == ap_CS_fsm_state22))) begin
         p_ZL9cnn_frame_0_2_we1_local = 1'b1;
     end else begin
         p_ZL9cnn_frame_0_2_we1_local = 1'b0;
@@ -1452,7 +2746,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((trunc_ln104_fu_677_p1 == 2'd0) & (trunc_ln103_fu_661_p1 == 2'd1) & (1'b1 == ap_CS_fsm_state22))) begin
+    if (((trunc_ln104_fu_711_p1 == 2'd0) & (trunc_ln103_fu_695_p1 == 2'd1) & (1'b1 == ap_CS_fsm_state22))) begin
         p_ZL9cnn_frame_1_0_we1_local = 1'b1;
     end else begin
         p_ZL9cnn_frame_1_0_we1_local = 1'b0;
@@ -1476,7 +2770,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((trunc_ln104_fu_677_p1 == 2'd1) & (trunc_ln103_fu_661_p1 == 2'd1) & (1'b1 == ap_CS_fsm_state22))) begin
+    if (((trunc_ln104_fu_711_p1 == 2'd1) & (trunc_ln103_fu_695_p1 == 2'd1) & (1'b1 == ap_CS_fsm_state22))) begin
         p_ZL9cnn_frame_1_1_we1_local = 1'b1;
     end else begin
         p_ZL9cnn_frame_1_1_we1_local = 1'b0;
@@ -1500,7 +2794,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if ((~(trunc_ln104_fu_677_p1 == 2'd0) & ~(trunc_ln104_fu_677_p1 == 2'd1) & (trunc_ln103_fu_661_p1 == 2'd1) & (1'b1 == ap_CS_fsm_state22))) begin
+    if ((~(trunc_ln104_fu_711_p1 == 2'd0) & ~(trunc_ln104_fu_711_p1 == 2'd1) & (trunc_ln103_fu_695_p1 == 2'd1) & (1'b1 == ap_CS_fsm_state22))) begin
         p_ZL9cnn_frame_1_2_we1_local = 1'b1;
     end else begin
         p_ZL9cnn_frame_1_2_we1_local = 1'b0;
@@ -1524,7 +2818,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if ((~(trunc_ln103_fu_661_p1 == 2'd0) & ~(trunc_ln103_fu_661_p1 == 2'd1) & (trunc_ln104_fu_677_p1 == 2'd0) & (1'b1 == ap_CS_fsm_state22))) begin
+    if ((~(trunc_ln103_fu_695_p1 == 2'd1) & ~(trunc_ln103_fu_695_p1 == 2'd0) & (trunc_ln104_fu_711_p1 == 2'd0) & (1'b1 == ap_CS_fsm_state22))) begin
         p_ZL9cnn_frame_2_0_we1_local = 1'b1;
     end else begin
         p_ZL9cnn_frame_2_0_we1_local = 1'b0;
@@ -1548,7 +2842,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if ((~(trunc_ln103_fu_661_p1 == 2'd0) & ~(trunc_ln103_fu_661_p1 == 2'd1) & (trunc_ln104_fu_677_p1 == 2'd1) & (1'b1 == ap_CS_fsm_state22))) begin
+    if ((~(trunc_ln103_fu_695_p1 == 2'd1) & ~(trunc_ln103_fu_695_p1 == 2'd0) & (trunc_ln104_fu_711_p1 == 2'd1) & (1'b1 == ap_CS_fsm_state22))) begin
         p_ZL9cnn_frame_2_1_we1_local = 1'b1;
     end else begin
         p_ZL9cnn_frame_2_1_we1_local = 1'b0;
@@ -1572,7 +2866,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if ((~(trunc_ln103_fu_661_p1 == 2'd0) & ~(trunc_ln104_fu_677_p1 == 2'd0) & ~(trunc_ln104_fu_677_p1 == 2'd1) & ~(trunc_ln103_fu_661_p1 == 2'd1) & (1'b1 == ap_CS_fsm_state22))) begin
+    if ((~(trunc_ln104_fu_711_p1 == 2'd0) & ~(trunc_ln104_fu_711_p1 == 2'd1) & ~(trunc_ln103_fu_695_p1 == 2'd1) & ~(trunc_ln103_fu_695_p1 == 2'd0) & (1'b1 == ap_CS_fsm_state22))) begin
         p_ZL9cnn_frame_2_2_we1_local = 1'b1;
     end else begin
         p_ZL9cnn_frame_2_2_we1_local = 1'b0;
@@ -1649,8 +2943,8 @@ always @ (*) begin
             ap_NS_fsm = ap_ST_fsm_state22;
         end
         ap_ST_fsm_state22 : begin
-            if (((icmp_ln107_fu_700_p2 == 1'd0) & (1'b1 == ap_CS_fsm_state22))) begin
-                ap_NS_fsm = ap_ST_fsm_state32;
+            if (((icmp_ln107_fu_734_p2 == 1'd0) & (1'b1 == ap_CS_fsm_state22))) begin
+                ap_NS_fsm = ap_ST_fsm_state33;
             end else begin
                 ap_NS_fsm = ap_ST_fsm_state23;
             end
@@ -1669,7 +2963,7 @@ always @ (*) begin
             ap_NS_fsm = ap_ST_fsm_state26;
         end
         ap_ST_fsm_state26 : begin
-            if (((icmp_ln144_fu_717_p2 == 1'd1) & (1'b1 == ap_CS_fsm_state26))) begin
+            if (((icmp_ln144_fu_751_p2 == 1'd1) & (1'b1 == ap_CS_fsm_state26))) begin
                 ap_NS_fsm = ap_ST_fsm_state32;
             end else begin
                 ap_NS_fsm = ap_ST_fsm_state27;
@@ -1679,17 +2973,15 @@ always @ (*) begin
             ap_NS_fsm = ap_ST_fsm_state28;
         end
         ap_ST_fsm_state28 : begin
-            if (((icmp_ln151_fu_765_p2 == 1'd1) & (1'b1 == ap_CS_fsm_state28))) begin
+            if (((icmp_ln151_fu_807_p2 == 1'd1) & (1'b1 == ap_CS_fsm_state28))) begin
                 ap_NS_fsm = ap_ST_fsm_state26;
             end else begin
                 ap_NS_fsm = ap_ST_fsm_state29;
             end
         end
         ap_ST_fsm_state29 : begin
-            if (((icmp_ln152_fu_856_p2 == 1'd1) & (1'b1 == ap_CS_fsm_state29))) begin
+            if (((icmp_ln152_fu_872_p2 == 1'd1) & (1'b1 == ap_CS_fsm_state29))) begin
                 ap_NS_fsm = ap_ST_fsm_state28;
-            end else if (((1'd0 == and_ln155_fu_881_p2) & (icmp_ln152_fu_856_p2 == 1'd0) & (1'b1 == ap_CS_fsm_state29))) begin
-                ap_NS_fsm = ap_ST_fsm_state31;
             end else begin
                 ap_NS_fsm = ap_ST_fsm_state30;
             end
@@ -1705,6 +2997,13 @@ always @ (*) begin
             end
         end
         ap_ST_fsm_state32 : begin
+            if (((grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_ap_done == 1'b1) & (1'b1 == ap_CS_fsm_state32))) begin
+                ap_NS_fsm = ap_ST_fsm_state33;
+            end else begin
+                ap_NS_fsm = ap_ST_fsm_state32;
+            end
+        end
+        ap_ST_fsm_state33 : begin
             ap_NS_fsm = ap_ST_fsm_state1;
         end
         default : begin
@@ -1713,25 +3012,25 @@ always @ (*) begin
     endcase
 end
 
-assign add_ln102_fu_643_p2 = (tmp_84_fu_625_p3 + zext_ln102_2_fu_639_p1);
+assign add_ln102_fu_677_p2 = (tmp_85_fu_659_p3 + zext_ln102_2_fu_673_p1);
 
-assign add_ln104_fu_652_p2 = (add_ln102_fu_643_p2 + zext_ln104_fu_649_p1);
+assign add_ln104_fu_686_p2 = (add_ln102_fu_677_p2 + zext_ln104_fu_683_p1);
 
-assign add_ln105_fu_690_p2 = (zext_ln102_fu_658_p1 + 11'd1);
+assign add_ln105_fu_724_p2 = (zext_ln102_fu_692_p1 + 11'd1);
 
-assign add_ln144_fu_722_p2 = (s_fu_216 + 12'd1);
+assign add_ln144_fu_756_p2 = (s_fu_216 + 12'd1);
 
-assign add_ln151_fu_896_p2 = (dy2_reg_407 + 3'd1);
+assign add_ln151_fu_907_p2 = ($signed(dy2_reg_407) + $signed(3'd1));
 
-assign add_ln152_fu_917_p2 = (dx2_reg_419 + 3'd1);
+assign add_ln152_fu_924_p2 = ($signed(dx2_reg_419) + $signed(3'd1));
 
-assign add_ln155_fu_870_p2 = ($signed(sext_ln155_fu_866_p1) + $signed(zext_ln149_reg_1016));
+assign add_ln153_fu_821_p2 = ($signed(sext_ln151_fu_813_p1) + $signed(zext_ln151_1_reg_1028));
 
-assign add_ln156_fu_779_p2 = ($signed(sext_ln156_fu_775_p1) + $signed(zext_ln148_reg_1011));
+assign add_ln154_fu_882_p2 = ($signed(sext_ln152_fu_878_p1) + $signed(zext_ln151_reg_1023));
 
-assign add_ln162_fu_911_p2 = (sub_ln162_reg_1029 + zext_ln162_fu_908_p1);
+assign add_ln159_fu_891_p2 = ($signed(sub_ln158_2_reg_1036) + $signed(sext_ln159_fu_887_p1));
 
-assign and_ln155_fu_881_p2 = (icmp_ln155_reg_1039 & icmp_ln155_1_fu_875_p2);
+assign and_ln155_fu_902_p2 = (icmp_ln155_reg_1046 & icmp_ln155_1_fu_896_p2);
 
 assign ap_CS_fsm_state1 = ap_CS_fsm[32'd0];
 
@@ -1761,13 +3060,15 @@ assign ap_CS_fsm_state31 = ap_CS_fsm[32'd30];
 
 assign ap_CS_fsm_state32 = ap_CS_fsm[32'd31];
 
+assign ap_CS_fsm_state33 = ap_CS_fsm[32'd32];
+
 assign ap_NS_fsm_state23 = ap_NS_fsm[32'd22];
 
 always @ (*) begin
-    ap_block_state31_on_subcall_done = ((1'd1 == and_ln155_reg_1052) & (grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_ap_done == 1'b0));
+    ap_block_state31_on_subcall_done = ((1'd1 == and_ln155_reg_1059) & (grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_ap_done == 1'b0));
 end
 
-assign cnn_spike_toggle_o_ap_vld = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_cnn_spike_toggle_o_ap_vld;
+assign cnn_spike_toggle_o_ap_vld = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_cnn_spike_toggle_o_ap_vld;
 
 assign cnn_v_mem_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_cnn_v_mem_address0;
 
@@ -1781,243 +3082,53 @@ assign cnn_v_mem_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV
 
 assign cnn_v_mem_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_cnn_v_mem_we1;
 
-assign conv1_spike_buf_address0 = zext_ln144_fu_728_p1;
+assign conv1_spike_buf_address0 = zext_ln144_fu_762_p1;
 
-assign encoder_spikes_din = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_encoder_spikes_din;
+assign encoder_spikes_din = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_encoder_spikes_din;
 
-assign encoder_spikes_write = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_encoder_spikes_write;
+assign encoder_spikes_write = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_encoder_spikes_write;
 
-assign grp_fu_549_p1 = 10'd28;
+assign grp_fu_583_p1 = 10'd28;
 
-assign grp_fu_590_p1 = 6'd3;
+assign grp_fu_624_p1 = 6'd3;
 
-assign grp_fu_619_p1 = 5'd3;
+assign grp_fu_653_p1 = 5'd3;
 
 assign grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_ap_start = grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_ap_start_reg;
 
-assign grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_ap_start = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_ap_start_reg;
+assign grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_ap_start = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_ap_start_reg;
 
-assign icmp_ln107_fu_700_p2 = ((add_ln105_fu_690_p2 > 11'd783) ? 1'b1 : 1'b0);
+assign grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_ap_start = grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_ap_start_reg;
 
-assign icmp_ln144_fu_717_p2 = ((s_fu_216 == grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_conv1_spike_count_1_out) ? 1'b1 : 1'b0);
+assign icmp_ln107_fu_734_p2 = ((add_ln105_fu_724_p2 > 11'd783) ? 1'b1 : 1'b0);
 
-assign icmp_ln151_fu_765_p2 = ((dy2_reg_407 == 3'd2) ? 1'b1 : 1'b0);
+assign icmp_ln144_fu_751_p2 = ((s_fu_216 == grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_conv1_spike_count_1_out) ? 1'b1 : 1'b0);
 
-assign icmp_ln152_fu_856_p2 = ((dx2_reg_419 == 3'd2) ? 1'b1 : 1'b0);
+assign icmp_ln151_fu_807_p2 = ((dy2_reg_407 == 3'd2) ? 1'b1 : 1'b0);
 
-assign icmp_ln155_1_fu_875_p2 = ((add_ln155_fu_870_p2 < 6'd14) ? 1'b1 : 1'b0);
+assign icmp_ln152_fu_872_p2 = ((dx2_reg_419 == 3'd2) ? 1'b1 : 1'b0);
 
-assign icmp_ln155_fu_846_p2 = ((add_ln156_fu_779_p2 < 6'd14) ? 1'b1 : 1'b0);
+assign icmp_ln155_1_fu_896_p2 = ((add_ln154_fu_882_p2 < 6'd14) ? 1'b1 : 1'b0);
 
-assign mul_ln102_1_fu_574_p0 = zext_ln102_1_fu_555_p1;
+assign icmp_ln155_fu_862_p2 = ((add_ln153_fu_821_p2 < 6'd14) ? 1'b1 : 1'b0);
 
-assign mul_ln102_1_fu_574_p1 = 21'd1561;
+assign mul_ln102_1_fu_608_p0 = zext_ln102_1_fu_589_p1;
 
-assign mul_ln102_fu_558_p0 = zext_ln102_1_fu_555_p1;
+assign mul_ln102_1_fu_608_p1 = 21'd1561;
 
-assign mul_ln102_fu_558_p1 = 21'd1171;
+assign mul_ln102_fu_592_p0 = zext_ln102_1_fu_589_p1;
 
-assign mul_ln103_fu_603_p0 = mul_ln103_fu_603_p00;
+assign mul_ln102_fu_592_p1 = 21'd1171;
 
-assign mul_ln103_fu_603_p00 = trunc_ln103_1_fu_595_p1;
+assign mul_ln103_fu_637_p0 = mul_ln103_fu_637_p00;
 
-assign mul_ln103_fu_603_p1 = 11'd43;
+assign mul_ln103_fu_637_p00 = trunc_ln103_1_fu_629_p1;
 
-assign p_ZL12cnn_l2_v_mem_0_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_0_address0;
-
-assign p_ZL12cnn_l2_v_mem_0_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_0_address1;
-
-assign p_ZL12cnn_l2_v_mem_0_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_0_ce0;
-
-assign p_ZL12cnn_l2_v_mem_0_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_0_ce1;
-
-assign p_ZL12cnn_l2_v_mem_0_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_0_d1;
-
-assign p_ZL12cnn_l2_v_mem_0_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_0_we1;
-
-assign p_ZL12cnn_l2_v_mem_10_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_10_address0;
-
-assign p_ZL12cnn_l2_v_mem_10_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_10_address1;
-
-assign p_ZL12cnn_l2_v_mem_10_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_10_ce0;
-
-assign p_ZL12cnn_l2_v_mem_10_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_10_ce1;
-
-assign p_ZL12cnn_l2_v_mem_10_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_10_d1;
-
-assign p_ZL12cnn_l2_v_mem_10_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_10_we1;
-
-assign p_ZL12cnn_l2_v_mem_11_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_11_address0;
-
-assign p_ZL12cnn_l2_v_mem_11_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_11_address1;
-
-assign p_ZL12cnn_l2_v_mem_11_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_11_ce0;
-
-assign p_ZL12cnn_l2_v_mem_11_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_11_ce1;
-
-assign p_ZL12cnn_l2_v_mem_11_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_11_d1;
-
-assign p_ZL12cnn_l2_v_mem_11_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_11_we1;
-
-assign p_ZL12cnn_l2_v_mem_12_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_12_address0;
-
-assign p_ZL12cnn_l2_v_mem_12_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_12_address1;
-
-assign p_ZL12cnn_l2_v_mem_12_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_12_ce0;
-
-assign p_ZL12cnn_l2_v_mem_12_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_12_ce1;
-
-assign p_ZL12cnn_l2_v_mem_12_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_12_d1;
-
-assign p_ZL12cnn_l2_v_mem_12_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_12_we1;
-
-assign p_ZL12cnn_l2_v_mem_13_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_13_address0;
-
-assign p_ZL12cnn_l2_v_mem_13_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_13_address1;
-
-assign p_ZL12cnn_l2_v_mem_13_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_13_ce0;
-
-assign p_ZL12cnn_l2_v_mem_13_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_13_ce1;
-
-assign p_ZL12cnn_l2_v_mem_13_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_13_d1;
-
-assign p_ZL12cnn_l2_v_mem_13_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_13_we1;
-
-assign p_ZL12cnn_l2_v_mem_14_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_14_address0;
-
-assign p_ZL12cnn_l2_v_mem_14_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_14_address1;
-
-assign p_ZL12cnn_l2_v_mem_14_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_14_ce0;
-
-assign p_ZL12cnn_l2_v_mem_14_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_14_ce1;
-
-assign p_ZL12cnn_l2_v_mem_14_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_14_d1;
-
-assign p_ZL12cnn_l2_v_mem_14_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_14_we1;
-
-assign p_ZL12cnn_l2_v_mem_15_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_15_address0;
-
-assign p_ZL12cnn_l2_v_mem_15_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_15_address1;
-
-assign p_ZL12cnn_l2_v_mem_15_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_15_ce0;
-
-assign p_ZL12cnn_l2_v_mem_15_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_15_ce1;
-
-assign p_ZL12cnn_l2_v_mem_15_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_15_d1;
-
-assign p_ZL12cnn_l2_v_mem_15_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_15_we1;
-
-assign p_ZL12cnn_l2_v_mem_1_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_1_address0;
-
-assign p_ZL12cnn_l2_v_mem_1_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_1_address1;
-
-assign p_ZL12cnn_l2_v_mem_1_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_1_ce0;
-
-assign p_ZL12cnn_l2_v_mem_1_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_1_ce1;
-
-assign p_ZL12cnn_l2_v_mem_1_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_1_d1;
-
-assign p_ZL12cnn_l2_v_mem_1_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_1_we1;
-
-assign p_ZL12cnn_l2_v_mem_2_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_2_address0;
-
-assign p_ZL12cnn_l2_v_mem_2_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_2_address1;
-
-assign p_ZL12cnn_l2_v_mem_2_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_2_ce0;
-
-assign p_ZL12cnn_l2_v_mem_2_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_2_ce1;
-
-assign p_ZL12cnn_l2_v_mem_2_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_2_d1;
-
-assign p_ZL12cnn_l2_v_mem_2_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_2_we1;
-
-assign p_ZL12cnn_l2_v_mem_3_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_3_address0;
-
-assign p_ZL12cnn_l2_v_mem_3_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_3_address1;
-
-assign p_ZL12cnn_l2_v_mem_3_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_3_ce0;
-
-assign p_ZL12cnn_l2_v_mem_3_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_3_ce1;
-
-assign p_ZL12cnn_l2_v_mem_3_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_3_d1;
-
-assign p_ZL12cnn_l2_v_mem_3_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_3_we1;
-
-assign p_ZL12cnn_l2_v_mem_4_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_4_address0;
-
-assign p_ZL12cnn_l2_v_mem_4_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_4_address1;
-
-assign p_ZL12cnn_l2_v_mem_4_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_4_ce0;
-
-assign p_ZL12cnn_l2_v_mem_4_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_4_ce1;
-
-assign p_ZL12cnn_l2_v_mem_4_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_4_d1;
-
-assign p_ZL12cnn_l2_v_mem_4_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_4_we1;
-
-assign p_ZL12cnn_l2_v_mem_5_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_5_address0;
-
-assign p_ZL12cnn_l2_v_mem_5_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_5_address1;
-
-assign p_ZL12cnn_l2_v_mem_5_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_5_ce0;
-
-assign p_ZL12cnn_l2_v_mem_5_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_5_ce1;
-
-assign p_ZL12cnn_l2_v_mem_5_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_5_d1;
-
-assign p_ZL12cnn_l2_v_mem_5_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_5_we1;
-
-assign p_ZL12cnn_l2_v_mem_6_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_6_address0;
-
-assign p_ZL12cnn_l2_v_mem_6_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_6_address1;
-
-assign p_ZL12cnn_l2_v_mem_6_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_6_ce0;
-
-assign p_ZL12cnn_l2_v_mem_6_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_6_ce1;
-
-assign p_ZL12cnn_l2_v_mem_6_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_6_d1;
-
-assign p_ZL12cnn_l2_v_mem_6_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_6_we1;
-
-assign p_ZL12cnn_l2_v_mem_7_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_7_address0;
-
-assign p_ZL12cnn_l2_v_mem_7_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_7_address1;
-
-assign p_ZL12cnn_l2_v_mem_7_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_7_ce0;
-
-assign p_ZL12cnn_l2_v_mem_7_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_7_ce1;
-
-assign p_ZL12cnn_l2_v_mem_7_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_7_d1;
-
-assign p_ZL12cnn_l2_v_mem_7_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_7_we1;
-
-assign p_ZL12cnn_l2_v_mem_8_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_8_address0;
-
-assign p_ZL12cnn_l2_v_mem_8_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_8_address1;
-
-assign p_ZL12cnn_l2_v_mem_8_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_8_ce0;
-
-assign p_ZL12cnn_l2_v_mem_8_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_8_ce1;
-
-assign p_ZL12cnn_l2_v_mem_8_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_8_d1;
-
-assign p_ZL12cnn_l2_v_mem_8_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_8_we1;
-
-assign p_ZL12cnn_l2_v_mem_9_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_9_address0;
-
-assign p_ZL12cnn_l2_v_mem_9_address1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_9_address1;
-
-assign p_ZL12cnn_l2_v_mem_9_ce0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_9_ce0;
-
-assign p_ZL12cnn_l2_v_mem_9_ce1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_9_ce1;
-
-assign p_ZL12cnn_l2_v_mem_9_d1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_9_d1;
-
-assign p_ZL12cnn_l2_v_mem_9_we1 = grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_489_p_ZL12cnn_l2_v_mem_9_we1;
+assign mul_ln103_fu_637_p1 = 11'd43;
 
 assign p_ZL9cnn_frame_0_0_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_p_ZL9cnn_frame_0_0_address0;
 
-assign p_ZL9cnn_frame_0_0_address1 = zext_ln104_1_fu_665_p1;
+assign p_ZL9cnn_frame_0_0_address1 = zext_ln104_1_fu_699_p1;
 
 assign p_ZL9cnn_frame_0_0_ce1 = p_ZL9cnn_frame_0_0_ce1_local;
 
@@ -2027,7 +3138,7 @@ assign p_ZL9cnn_frame_0_0_we1 = p_ZL9cnn_frame_0_0_we1_local;
 
 assign p_ZL9cnn_frame_0_1_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_p_ZL9cnn_frame_0_1_address0;
 
-assign p_ZL9cnn_frame_0_1_address1 = zext_ln104_1_fu_665_p1;
+assign p_ZL9cnn_frame_0_1_address1 = zext_ln104_1_fu_699_p1;
 
 assign p_ZL9cnn_frame_0_1_ce1 = p_ZL9cnn_frame_0_1_ce1_local;
 
@@ -2037,7 +3148,7 @@ assign p_ZL9cnn_frame_0_1_we1 = p_ZL9cnn_frame_0_1_we1_local;
 
 assign p_ZL9cnn_frame_0_2_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_p_ZL9cnn_frame_0_2_address0;
 
-assign p_ZL9cnn_frame_0_2_address1 = zext_ln104_1_fu_665_p1;
+assign p_ZL9cnn_frame_0_2_address1 = zext_ln104_1_fu_699_p1;
 
 assign p_ZL9cnn_frame_0_2_ce1 = p_ZL9cnn_frame_0_2_ce1_local;
 
@@ -2047,7 +3158,7 @@ assign p_ZL9cnn_frame_0_2_we1 = p_ZL9cnn_frame_0_2_we1_local;
 
 assign p_ZL9cnn_frame_1_0_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_p_ZL9cnn_frame_1_0_address0;
 
-assign p_ZL9cnn_frame_1_0_address1 = zext_ln104_1_fu_665_p1;
+assign p_ZL9cnn_frame_1_0_address1 = zext_ln104_1_fu_699_p1;
 
 assign p_ZL9cnn_frame_1_0_ce1 = p_ZL9cnn_frame_1_0_ce1_local;
 
@@ -2057,7 +3168,7 @@ assign p_ZL9cnn_frame_1_0_we1 = p_ZL9cnn_frame_1_0_we1_local;
 
 assign p_ZL9cnn_frame_1_1_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_p_ZL9cnn_frame_1_1_address0;
 
-assign p_ZL9cnn_frame_1_1_address1 = zext_ln104_1_fu_665_p1;
+assign p_ZL9cnn_frame_1_1_address1 = zext_ln104_1_fu_699_p1;
 
 assign p_ZL9cnn_frame_1_1_ce1 = p_ZL9cnn_frame_1_1_ce1_local;
 
@@ -2067,7 +3178,7 @@ assign p_ZL9cnn_frame_1_1_we1 = p_ZL9cnn_frame_1_1_we1_local;
 
 assign p_ZL9cnn_frame_1_2_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_p_ZL9cnn_frame_1_2_address0;
 
-assign p_ZL9cnn_frame_1_2_address1 = zext_ln104_1_fu_665_p1;
+assign p_ZL9cnn_frame_1_2_address1 = zext_ln104_1_fu_699_p1;
 
 assign p_ZL9cnn_frame_1_2_ce1 = p_ZL9cnn_frame_1_2_ce1_local;
 
@@ -2077,7 +3188,7 @@ assign p_ZL9cnn_frame_1_2_we1 = p_ZL9cnn_frame_1_2_we1_local;
 
 assign p_ZL9cnn_frame_2_0_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_p_ZL9cnn_frame_2_0_address0;
 
-assign p_ZL9cnn_frame_2_0_address1 = zext_ln104_1_fu_665_p1;
+assign p_ZL9cnn_frame_2_0_address1 = zext_ln104_1_fu_699_p1;
 
 assign p_ZL9cnn_frame_2_0_ce1 = p_ZL9cnn_frame_2_0_ce1_local;
 
@@ -2087,7 +3198,7 @@ assign p_ZL9cnn_frame_2_0_we1 = p_ZL9cnn_frame_2_0_we1_local;
 
 assign p_ZL9cnn_frame_2_1_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_p_ZL9cnn_frame_2_1_address0;
 
-assign p_ZL9cnn_frame_2_1_address1 = zext_ln104_1_fu_665_p1;
+assign p_ZL9cnn_frame_2_1_address1 = zext_ln104_1_fu_699_p1;
 
 assign p_ZL9cnn_frame_2_1_ce1 = p_ZL9cnn_frame_2_1_ce1_local;
 
@@ -2097,7 +3208,7 @@ assign p_ZL9cnn_frame_2_1_we1 = p_ZL9cnn_frame_2_1_we1_local;
 
 assign p_ZL9cnn_frame_2_2_address0 = grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_p_ZL9cnn_frame_2_2_address0;
 
-assign p_ZL9cnn_frame_2_2_address1 = zext_ln104_1_fu_665_p1;
+assign p_ZL9cnn_frame_2_2_address1 = zext_ln104_1_fu_699_p1;
 
 assign p_ZL9cnn_frame_2_2_ce1 = p_ZL9cnn_frame_2_2_ce1_local;
 
@@ -2105,71 +3216,69 @@ assign p_ZL9cnn_frame_2_2_d1 = pixel_val;
 
 assign p_ZL9cnn_frame_2_2_we1 = p_ZL9cnn_frame_2_2_we1_local;
 
-assign p_shl_fu_826_p3 = {{tmp_87_fu_808_p4}, {3'd0}};
+assign sext_ln151_fu_813_p1 = dy2_reg_407;
 
-assign px_fu_733_p1 = conv1_spike_buf_q0[3:0];
+assign sext_ln152_fu_878_p1 = dx2_reg_419;
 
-assign py_fu_747_p4 = {{conv1_spike_buf_q0[7:4]}};
+assign sext_ln159_fu_887_p1 = add_ln154_fu_882_p2;
 
-assign sext_ln155_fu_866_p1 = trunc_ln152_fu_862_p1;
+assign sub_ln158_1_fu_917_p2 = (2'd1 - trunc_ln152_fu_913_p1);
 
-assign sext_ln156_1_fu_794_p1 = trunc_ln156_1_fu_784_p4;
+assign sub_ln158_2_fu_850_p2 = (tmp_89_fu_838_p3 - zext_ln159_fu_846_p1);
 
-assign sext_ln156_fu_775_p1 = trunc_ln151_fu_771_p1;
+assign sub_ln158_fu_856_p2 = (2'd1 - trunc_ln151_fu_817_p1);
 
-assign sext_ln162_fu_804_p1 = trunc_ln156_1_fu_784_p4;
+assign threshold_l2_fu_767_p3 = {{threshold}, {2'd0}};
 
-assign sub_ln161_1_fu_902_p2 = ($signed(2'd1) - $signed(trunc_ln152_reg_1047));
+assign tmp_85_fu_659_p3 = {{tmp_reg_950}, {3'd0}};
 
-assign sub_ln161_fu_798_p2 = ($signed(2'd1) - $signed(trunc_ln151_fu_771_p1));
+assign tmp_86_fu_666_p3 = {{tmp_reg_950}, {1'd0}};
 
-assign sub_ln162_fu_834_p2 = ($signed(p_shl_fu_826_p3) - $signed(sext_ln162_fu_804_p1));
+assign tmp_88_fu_830_p3 = {{add_ln153_fu_821_p2}, {1'd0}};
 
-assign sub_ln169_fu_840_p2 = ($signed(tmp_88_fu_818_p3) - $signed(sext_ln156_1_fu_794_p1));
+assign tmp_89_fu_838_p3 = {{trunc_ln159_fu_826_p1}, {4'd0}};
 
-assign tmp_84_fu_625_p3 = {{tmp_reg_943}, {3'd0}};
+assign trunc_ln103_1_fu_629_p1 = grp_fu_583_p2[4:0];
 
-assign tmp_85_fu_632_p3 = {{tmp_reg_943}, {1'd0}};
+assign trunc_ln103_fu_695_p1 = grp_fu_624_p2[1:0];
 
-assign tmp_87_fu_808_p4 = {{add_ln156_fu_779_p2[3:1]}};
+assign trunc_ln104_fu_711_p1 = grp_fu_653_p2[1:0];
 
-assign tmp_88_fu_818_p3 = {{trunc_ln156_1_fu_784_p4}, {3'd0}};
+assign trunc_ln107_fu_730_p1 = add_ln105_fu_724_p2[9:0];
 
-assign trunc_ln103_1_fu_595_p1 = grp_fu_549_p2[4:0];
+assign trunc_ln146_fu_775_p1 = conv1_spike_buf_q0[3:0];
 
-assign trunc_ln103_fu_661_p1 = grp_fu_590_p2[1:0];
+assign trunc_ln151_fu_817_p1 = dy2_reg_407[1:0];
 
-assign trunc_ln104_fu_677_p1 = grp_fu_619_p2[1:0];
+assign trunc_ln152_fu_913_p1 = dx2_reg_419[1:0];
 
-assign trunc_ln107_fu_696_p1 = add_ln105_fu_690_p2[9:0];
+assign trunc_ln159_fu_826_p1 = add_ln153_fu_821_p2[3:0];
 
-assign trunc_ln151_fu_771_p1 = dy2_reg_407[1:0];
+assign trunc_ln2_fu_789_p4 = {{conv1_spike_buf_q0[7:4]}};
 
-assign trunc_ln152_fu_862_p1 = dx2_reg_419[1:0];
+assign zext_ln102_1_fu_589_p1 = cnn_pixel_counter_i;
 
-assign trunc_ln156_1_fu_784_p4 = {{add_ln156_fu_779_p2[5:1]}};
+assign zext_ln102_2_fu_673_p1 = tmp_86_fu_666_p3;
 
-assign zext_ln102_1_fu_555_p1 = cnn_pixel_counter_i;
+assign zext_ln102_fu_692_p1 = cnn_pixel_counter_i;
 
-assign zext_ln102_2_fu_639_p1 = tmp_85_fu_632_p3;
+assign zext_ln104_1_fu_699_p1 = add_ln104_reg_966;
 
-assign zext_ln102_fu_658_p1 = cnn_pixel_counter_i;
+assign zext_ln104_fu_683_p1 = tmp_87_reg_961;
 
-assign zext_ln104_1_fu_665_p1 = add_ln104_reg_959;
+assign zext_ln144_fu_762_p1 = s_fu_216;
 
-assign zext_ln104_fu_649_p1 = tmp_86_reg_954;
+assign zext_ln151_1_fu_803_p1 = trunc_ln2_fu_789_p4;
 
-assign zext_ln144_fu_728_p1 = s_fu_216;
+assign zext_ln151_fu_799_p1 = trunc_ln146_fu_775_p1;
 
-assign zext_ln148_fu_757_p1 = py_fu_747_p4;
-
-assign zext_ln149_fu_761_p1 = px_fu_733_p1;
-
-assign zext_ln162_fu_908_p1 = x2_reg_1056;
+assign zext_ln159_fu_846_p1 = tmp_88_fu_830_p3;
 
 always @ (posedge ap_clk) begin
-    zext_ln148_reg_1011[5:4] <= 2'b00;
-    zext_ln149_reg_1016[5:4] <= 2'b00;
+    threshold_l2_reg_1013[1:0] <= 2'b00;
+    zext_ln151_reg_1023[5:4] <= 2'b00;
+    zext_ln151_1_reg_1028[5:4] <= 2'b00;
+    sub_ln158_2_reg_1036[0] <= 1'b0;
 end
 
 endmodule //snn_top_hls_run_cnn3_streaming_pixel

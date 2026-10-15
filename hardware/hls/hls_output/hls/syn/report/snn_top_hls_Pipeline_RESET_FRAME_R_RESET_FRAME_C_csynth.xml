@@ -49,13 +49,13 @@
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:73~src/snn_top_hls.cpp:948</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:73~src/snn_top_hls.cpp:960</SourceLocation>
 <SummaryOfLoopViolations>
 <RESET_FRAME_R_RESET_FRAME_C>
 <Name>RESET_FRAME_R_RESET_FRAME_C</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:72~src/snn_top_hls.cpp:948</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:72~src/snn_top_hls.cpp:960</SourceLocation>
 </RESET_FRAME_R_RESET_FRAME_C>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>
