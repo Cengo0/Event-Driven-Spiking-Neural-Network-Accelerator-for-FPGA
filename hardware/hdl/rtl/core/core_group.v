@@ -178,12 +178,17 @@ module core_group #(
             for (j = 0; j < SF_DEPTH; j = j + 1)
                 spike_flag_mem[j] <= 8'd0;
         end else begin
-            if (sf_set_pending)
+            if (sf_set_pending && sf_clear_pending && (sf_set_addr == sf_clear_addr)) begin
                 spike_flag_mem[sf_set_addr] <=
-                    spike_flag_mem[sf_set_addr] | (8'd1 << sf_set_bit);
-            if (sf_clear_pending)
-                spike_flag_mem[sf_clear_addr] <=
-                    spike_flag_mem[sf_clear_addr] & sf_clear_mask;
+                    (spike_flag_mem[sf_set_addr] & sf_clear_mask) | (8'd1 << sf_set_bit);
+            end else begin
+                if (sf_set_pending)
+                    spike_flag_mem[sf_set_addr] <=
+                        spike_flag_mem[sf_set_addr] | (8'd1 << sf_set_bit);
+                if (sf_clear_pending)
+                    spike_flag_mem[sf_clear_addr] <=
+                        spike_flag_mem[sf_clear_addr] & sf_clear_mask;
+            end
         end
     end
 

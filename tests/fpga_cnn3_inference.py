@@ -400,15 +400,11 @@ def main():
             lat_ms = (t1 - t0) * 1000.0
             latencies_ms.append(lat_ms)
 
-            # Read hardware diagnostic counters for this image (delta from free-running registers)
+            # Read hardware diagnostic counters for this image (snn_reset zeros RTL counters before each image)
             curr_r_spks = int(mmio.read(CFG_ROUTER_SPKS))
             curr_n_spks = int(mmio.read(CFG_NEURON_SPKS))
-            delta_r_spks = curr_r_spks - last_r_spks
-            delta_n_spks = curr_n_spks - last_n_spks
-            last_r_spks = curr_r_spks
-            last_n_spks = curr_n_spks
-            accum_router_spk += delta_r_spks
-            accum_neuron_spk += delta_n_spks
+            accum_router_spk += curr_r_spks
+            accum_neuron_spk += curr_n_spks
 
             total_spikes += int(np.sum(class_spk))
             pred = int(np.argmax(class_spk))
@@ -420,8 +416,8 @@ def main():
                 "true_label":      lbl,
                 "predicted_label": pred,
                 "spikes":          class_spk.tolist(),
-                "router_spikes":   delta_r_spks,
-                "neuron_spikes":   delta_n_spks,
+                "router_spikes":   curr_r_spks,
+                "neuron_spikes":   curr_n_spks,
                 "latency_ms":      round(lat_ms, 2)
             })
 

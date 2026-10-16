@@ -164,18 +164,21 @@ static void run_cnn3_streaming_pixel(
         }
 
         // Phase 3: Layer 2 LIF sweep (th*4) and 2x2 sum-pooling into Layer 3 (16x7x7)
+        // Sweep sub-pixel position s=0..3 as the outer loop so consecutive spikes
+        // for the same (dst_grp, local_nid) are separated by a full 784-position sweep,
+        // preventing collisions in core_group.v's 1-bit spike_flag_mem bitmap.
         ap_int<16> threshold_l2 = (ap_int<16>)(threshold << 2);
 
-        L2_SWEEP_CO: for (int co = 0; co < CNN_CONV2_CHANNELS; co++) {
-            int dst_grp = co >> 2;   // 4 groups of 4 channels: co / 4
-            int local_ch = co & 3;   // co % 4
-            L2_SWEEP_Y2: for (int y2 = 0; y2 < CNN_POOL2_HEIGHT; y2++) {
-                L2_SWEEP_X2: for (int x2 = 0; x2 < CNN_POOL2_WIDTH; x2++) {
-                    int local_nid = local_ch * CNN_POOL2_SIZE + y2 * CNN_POOL2_WIDTH + x2;
-                    ap_uint<11> global_nid = ((ap_uint<3>)dst_grp << 8) | (ap_uint<8>)local_nid;
-
-                    L2_SUB_POS: for (int s = 0; s < 4; s++) {
+        L2_SUB_POS: for (int s = 0; s < 4; s++) {
+            L2_SWEEP_CO: for (int co = 0; co < CNN_CONV2_CHANNELS; co++) {
+                ap_uint<11> dst_grp = (ap_uint<11>)(co >> 2);   // 4 groups of 4 channels: co / 4
+                int local_ch = co & 3;                          // co % 4
+                L2_SWEEP_Y2: for (int y2 = 0; y2 < CNN_POOL2_HEIGHT; y2++) {
+                    L2_SWEEP_X2: for (int x2 = 0; x2 < CNN_POOL2_WIDTH; x2++) {
                         #pragma HLS PIPELINE II=1
+                        ap_uint<11> local_nid = (ap_uint<11>)(local_ch * CNN_POOL2_SIZE + y2 * CNN_POOL2_WIDTH + x2);
+                        ap_uint<11> global_nid = (dst_grp << 8) | local_nid;
+
                         int oy = (y2 << 1) + (s >> 1);
                         int ox = (x2 << 1) + (s & 1);
 

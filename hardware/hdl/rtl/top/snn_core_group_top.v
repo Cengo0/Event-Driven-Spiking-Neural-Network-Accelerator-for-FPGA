@@ -497,12 +497,12 @@ module snn_core_group_top #(
             hls_spike_valid_d <= 1'b0;
             hls_spike_nid_d   <= {HLS_NEURON_ID_WIDTH{1'b0}};
             hls_spike_wt_d    <= {HLS_WEIGHT_WIDTH{1'b0}};
-        end else begin
-            hls_spike_valid_d <= hls_spike_out_valid;
-            if (hls_spike_out_valid) begin
-                hls_spike_nid_d <= hls_spike_out_neuron_id;
-                hls_spike_wt_d  <= hls_spike_out_weight;
-            end
+        end else if (!hls_spike_out_valid) begin
+            hls_spike_valid_d <= 1'b0;
+        end else if (!router_busy && !learn_weight_valid_br) begin
+            hls_spike_valid_d <= 1'b1;
+            hls_spike_nid_d   <= hls_spike_out_neuron_id;
+            hls_spike_wt_d    <= hls_spike_out_weight;
         end
     end
 
