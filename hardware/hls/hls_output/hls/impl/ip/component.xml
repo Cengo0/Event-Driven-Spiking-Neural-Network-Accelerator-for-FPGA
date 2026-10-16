@@ -2003,7 +2003,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>c40d58e9</spirit:value>
+            <spirit:value>a37900ec</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2022,7 +2022,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>3474ae03</spirit:value>
+            <spirit:value>c9b72d67</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2041,7 +2041,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>72240c4e</spirit:value>
+            <spirit:value>62fd06e9</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2060,7 +2060,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>ea3da28c</spirit:value>
+            <spirit:value>f3953b01</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -3694,7 +3694,7 @@
         <spirit:fileType>verilogSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/verilog/snn_top_hls_mac_muladd_6ns_2ns_6ns_8_4_1.v</spirit:name>
+        <spirit:name>hdl/verilog/snn_top_hls_mac_muladd_6ns_2ns_3ns_8_4_1.v</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
@@ -3914,7 +3914,7 @@
         <spirit:fileType>verilogSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/verilog/snn_top_hls_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS.v</spirit:name>
+        <spirit:name>hdl/verilog/snn_top_hls_run_cnn3_streaming_pixel_Pipeline_L2_SUB_POS_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2.v</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
@@ -4134,7 +4134,7 @@
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/verilog/snn_top_hls_mac_muladd_6ns_2ns_6ns_8_4_1.v</spirit:name>
+        <spirit:name>hdl/verilog/snn_top_hls_mac_muladd_6ns_2ns_3ns_8_4_1.v</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
@@ -4392,7 +4392,7 @@
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/verilog/snn_top_hls_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS.v</spirit:name>
+        <spirit:name>hdl/verilog/snn_top_hls_run_cnn3_streaming_pixel_Pipeline_L2_SUB_POS_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2.v</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
@@ -4620,7 +4620,7 @@
         <spirit:fileType>vhdlSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/vhdl/snn_top_hls_mac_muladd_6ns_2ns_6ns_8_4_1.vhd</spirit:name>
+        <spirit:name>hdl/vhdl/snn_top_hls_mac_muladd_6ns_2ns_3ns_8_4_1.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
@@ -4772,7 +4772,7 @@
         <spirit:fileType>vhdlSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/vhdl/snn_top_hls_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS.vhd</spirit:name>
+        <spirit:name>hdl/vhdl/snn_top_hls_run_cnn3_streaming_pixel_Pipeline_L2_SUB_POS_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
@@ -4890,7 +4890,7 @@
       <spirit:file>
         <spirit:name>hdl/vhdl/snn_top_hls.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_c2f889e2</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_0c1087e0</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -4975,7 +4975,7 @@
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/vhdl/snn_top_hls_mac_muladd_6ns_2ns_6ns_8_4_1.vhd</spirit:name>
+        <spirit:name>hdl/vhdl/snn_top_hls_mac_muladd_6ns_2ns_3ns_8_4_1.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
@@ -5165,7 +5165,7 @@
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/vhdl/snn_top_hls_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS.vhd</spirit:name>
+        <spirit:name>hdl/vhdl/snn_top_hls_run_cnn3_streaming_pixel_Pipeline_L2_SUB_POS_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
@@ -5437,8 +5437,8 @@
       </xilinx:taxonomies>
       <xilinx:displayName>Snn_top_hls</xilinx:displayName>
       <xilinx:definitionSource>HLS</xilinx:definitionSource>
-      <xilinx:coreRevision>2114830391</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2026-10-15T14:11:40Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>2114831590</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2026-10-16T10:10:15Z</xilinx:coreCreationDateTime>
       <xilinx:sdxKernelAttributes>
         <xilinx:sdx_kernel>true</xilinx:sdx_kernel>
         <xilinx:sdx_kernel_type>hls</xilinx:sdx_kernel_type>
@@ -5448,7 +5448,7 @@
       <xilinx:xilinxVersion>2025.2</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="804234dc"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="f17df90b"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="a51fb7d3"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="0a4cb081"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="739d4b71"/>
       <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="4395c73a"/>
       <xilinx:checksum xilinx:scope="parameters" xilinx:value="050161e0"/>

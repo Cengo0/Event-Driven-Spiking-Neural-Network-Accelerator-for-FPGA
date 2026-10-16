@@ -373,7 +373,7 @@ reg    p_ZL12cnn_l2_v_mem_14_ce1_local;
 reg    p_ZL12cnn_l2_v_mem_15_ce0_local;
 reg    p_ZL12cnn_l2_v_mem_15_we1_local;
 reg    p_ZL12cnn_l2_v_mem_15_ce1_local;
-wire   [6:0] tmp_9_fu_477_p3;
+wire   [6:0] tmp_10_fu_477_p3;
 wire   [8:0] p_shl2_fu_489_p4;
 wire   [8:0] zext_ln158_fu_485_p1;
 wire   [8:0] sub_ln158_fu_499_p2;
@@ -1308,7 +1308,7 @@ assign sub_ln158_1_fu_560_p2 = (p_shl_fu_553_p3 - zext_ln158_1_fu_550_p1);
 
 assign sub_ln158_fu_499_p2 = (p_shl2_fu_489_p4 - zext_ln158_fu_485_p1);
 
-assign tmp_9_fu_477_p3 = {{trunc_ln156_fu_473_p1}, {trunc_ln18}};
+assign tmp_10_fu_477_p3 = {{trunc_ln156_fu_473_p1}, {trunc_ln18}};
 
 assign tmp_s_fu_580_p33 = 'bx;
 
@@ -1320,7 +1320,7 @@ assign zext_ln158_1_fu_550_p1 = add_ln158_reg_698;
 
 assign zext_ln158_2_fu_571_p1 = add_ln158_1_fu_566_p2;
 
-assign zext_ln158_fu_485_p1 = tmp_9_fu_477_p3;
+assign zext_ln158_fu_485_p1 = tmp_10_fu_477_p3;
 
 assign zext_ln159_cast_fu_445_p1 = zext_ln159;
 

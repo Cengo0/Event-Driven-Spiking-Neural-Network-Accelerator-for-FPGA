@@ -49,14 +49,14 @@
 <SummaryOfViolations>
 <IssueType>Timing Violation</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:501</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:504</SourceLocation>
 <SummaryOfLoopViolations>
 <LTP_LOOP>
 <Name>LTP_LOOP</Name>
 <IssueType>II Violation</IssueType>
 <ViolationType>Memory Dependency</ViolationType>
 <IterationDistance>1</IterationDistance>
-<SourceLocation>src/snn_top_hls.cpp:501</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:504</SourceLocation>
 </LTP_LOOP>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>
@@ -169,8 +169,8 @@
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
-<name>zext_ln501</name>
-<Object>zext_ln501</Object>
+<name>zext_ln504</name>
+<Object>zext_ln504</Object>
 <Type>scalar</Type>
 <Scope></Scope>
 <IOProtocol>ap_none</IOProtocol>
@@ -191,8 +191,8 @@
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
-<name>sext_ln530</name>
-<Object>sext_ln530</Object>
+<name>sext_ln533</name>
+<Object>sext_ln533</Object>
 <Type>scalar</Type>
 <Scope></Scope>
 <IOProtocol>ap_none</IOProtocol>
@@ -202,8 +202,8 @@
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
-<name>sext_ln318</name>
-<Object>sext_ln318</Object>
+<name>sext_ln321</name>
+<Object>sext_ln321</Object>
 <Type>scalar</Type>
 <Scope></Scope>
 <IOProtocol>ap_none</IOProtocol>
@@ -224,8 +224,8 @@
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
-<name>icmp_ln318</name>
-<Object>icmp_ln318</Object>
+<name>icmp_ln321</name>
+<Object>icmp_ln321</Object>
 <Type>scalar</Type>
 <Scope></Scope>
 <IOProtocol>ap_none</IOProtocol>

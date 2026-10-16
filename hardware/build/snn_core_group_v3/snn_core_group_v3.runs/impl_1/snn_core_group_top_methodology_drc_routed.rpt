@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
-| Date         : Thu Oct 15 16:24:50 2026
+| Date         : Fri Oct 16 12:26:12 2026
 | Host         : Mariana running 64-bit Ubuntu 22.04.5 LTS
 | Command      : report_methodology -file snn_core_group_top_methodology_drc_routed.rpt -pb snn_core_group_top_methodology_drc_routed.pb -rpx snn_core_group_top_methodology_drc_routed.rpx
 | Design       : snn_core_group_top
@@ -23,12 +23,12 @@ Table of Contents
           Floorplan: design_1
       Design limits: <entire design considered>
              Max checks: <unlimited>
-             Checks found: 11
+             Checks found: 47
 +-----------+----------+--------------------------------------------+--------+
 | Rule      | Severity | Description                                | Checks |
 +-----------+----------+--------------------------------------------+--------+
 | LUTAR-1   | Warning  | LUT drives async reset alert               | 6      |
-| SYNTH-6   | Warning  | Timing of a RAM block might be sub-optimal | 4      |
+| SYNTH-6   | Warning  | Timing of a RAM block might be sub-optimal | 40     |
 | TIMING-18 | Warning  | Missing input or output delay              | 1      |
 +-----------+----------+--------------------------------------------+--------+
 
@@ -161,17 +161,197 @@ Related violations: <none>
 
 SYNTH-6#2 Warning
 Timing of a RAM block might be sub-optimal  
-The timing for the instance gen_core_groups[1].u_core_group/neuron_state_mem_reg, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+The timing for the instance gen_core_groups[0].u_core_group/weight_mem_reg_1_0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
 Related violations: <none>
 
 SYNTH-6#3 Warning
 Timing of a RAM block might be sub-optimal  
-The timing for the instance gen_core_groups[2].u_core_group/neuron_state_mem_reg, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+The timing for the instance gen_core_groups[0].u_core_group/weight_mem_reg_1_1, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
 Related violations: <none>
 
 SYNTH-6#4 Warning
 Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[0].u_core_group/weight_mem_reg_1_2, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#5 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[0].u_core_group/weight_mem_reg_1_3, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#6 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[0].u_core_group/weight_mem_reg_1_4, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#7 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[0].u_core_group/weight_mem_reg_1_5, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#8 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[0].u_core_group/weight_mem_reg_1_6, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#9 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[0].u_core_group/weight_mem_reg_1_7, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#10 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[0].u_core_group/weight_mem_reg_1_8, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#11 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[1].u_core_group/neuron_state_mem_reg, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#12 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[1].u_core_group/weight_mem_reg_1_0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#13 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[1].u_core_group/weight_mem_reg_1_1, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#14 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[1].u_core_group/weight_mem_reg_1_2, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#15 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[1].u_core_group/weight_mem_reg_1_3, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#16 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[1].u_core_group/weight_mem_reg_1_4, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#17 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[1].u_core_group/weight_mem_reg_1_5, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#18 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[1].u_core_group/weight_mem_reg_1_6, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#19 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[1].u_core_group/weight_mem_reg_1_7, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#20 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[1].u_core_group/weight_mem_reg_1_8, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#21 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[2].u_core_group/neuron_state_mem_reg, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#22 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[2].u_core_group/weight_mem_reg_1_0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#23 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[2].u_core_group/weight_mem_reg_1_1, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#24 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[2].u_core_group/weight_mem_reg_1_2, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#25 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[2].u_core_group/weight_mem_reg_1_3, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#26 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[2].u_core_group/weight_mem_reg_1_4, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#27 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[2].u_core_group/weight_mem_reg_1_5, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#28 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[2].u_core_group/weight_mem_reg_1_6, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#29 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[2].u_core_group/weight_mem_reg_1_7, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#30 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[2].u_core_group/weight_mem_reg_1_8, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#31 Warning
+Timing of a RAM block might be sub-optimal  
 The timing for the instance gen_core_groups[3].u_core_group/neuron_state_mem_reg, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#32 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[3].u_core_group/weight_mem_reg_1_0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#33 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[3].u_core_group/weight_mem_reg_1_1, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#34 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[3].u_core_group/weight_mem_reg_1_2, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#35 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[3].u_core_group/weight_mem_reg_1_3, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#36 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[3].u_core_group/weight_mem_reg_1_4, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#37 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[3].u_core_group/weight_mem_reg_1_5, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#38 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[3].u_core_group/weight_mem_reg_1_6, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#39 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[3].u_core_group/weight_mem_reg_1_7, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#40 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_core_groups[3].u_core_group/weight_mem_reg_1_8, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
 Related violations: <none>
 
 TIMING-18#1 Warning

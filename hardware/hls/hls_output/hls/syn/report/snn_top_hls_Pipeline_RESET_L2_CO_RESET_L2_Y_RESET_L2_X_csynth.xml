@@ -49,13 +49,13 @@
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:88~src/snn_top_hls.cpp:960</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:88~src/snn_top_hls.cpp:963</SourceLocation>
 <SummaryOfLoopViolations>
 <RESET_L2_CO_RESET_L2_Y_RESET_L2_X>
 <Name>RESET_L2_CO_RESET_L2_Y_RESET_L2_X</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:87~src/snn_top_hls.cpp:960</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:87~src/snn_top_hls.cpp:963</SourceLocation>
 </RESET_L2_CO_RESET_L2_Y_RESET_L2_X>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>

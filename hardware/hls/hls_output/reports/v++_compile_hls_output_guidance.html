@@ -3407,7 +3407,7 @@ window.onload = function () { addSorting(); }
 <center><h1>Design Guidance Report</h1></center><center><table class="header" border="0">
 <tr><td><b>Copyright</b></td><td>Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.</td></tr>
 <tr><td><b>Tool Version</b></td><td>xcd v.2025.2 (lin64) Build 0 </td></tr>
-<tr><td><b>Date</b></td><td>Thu Oct 15 16:11:40 2026</td></tr>
+<tr><td><b>Date</b></td><td>Fri Oct 16 12:10:16 2026</td></tr>
 <tr><td><b>Host</b></td><td>Mariana running 64-bit Ubuntu 22.04.5 LTS</td></tr>
 <tr><td><b>Command</b></td><td>/home/chipwisperer/AMD/2025.2/Vitis/bin/unwrapped/lnx64.o/v++  -c --mode hls --part xc7z020clg400-1 --work_dir ./hls_output --hls.clock 10ns --hls.syn.top snn_top_hls --hls.syn.file src/snn_top_hls.cpp --hls.flow_target vivado </td></tr>
 </table></center><br>
@@ -3434,272 +3434,7 @@ window.onload = function () { addSorting(); }
 <th align="left" width="380">Resolution</th>
 </tr>
 <tr>
-<td align="left">11</td>
-<td align="left">Throughput</td>
-<td align="left">ADVISORY</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Throughput Related</td>
-<td align="left">Accelerator.snn_top_hls.Throughput</td>
-<td align="left">%s</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">5</td>
-<td align="left">Kernel</td>
-<td align="left">WARNING</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Kernel Related</td>
-<td align="left">Accelerator.snn_top_hls.Kernel</td>
-<td align="left">Cannot meet target clock period from 'icmp' operation 1 bit ('icmp_ln80', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=960">snn_top_hls.cpp</a>) to 'store' operation ('x_write_ln80', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=960">snn_top_hls.cpp</a>) of variable 'add_ln80', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=960">snn_top_hls.cpp</a> 5 bit on local variable 'x', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=960">snn_top_hls.cpp</a> (combination delay: 7.341 ns) to honor II or Latency constraint in region 'RESET_V_K_RESET_V_Y_RESET_V_X'.
-</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">31</td>
-<td align="left">Kernel</td>
-<td align="left">WARNING</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Kernel Related</td>
-<td align="left">Accelerator.snn_top_hls.Kernel</td>
-<td align="left">%s</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">12</td>
-<td align="left">Throughput</td>
-<td align="left">ADVISORY</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Throughput Related</td>
-<td align="left">Accelerator.snn_top_hls.Throughput</td>
-<td align="left">%s</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">6</td>
-<td align="left">Throughput</td>
-<td align="left">ADVISORY</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Throughput Related</td>
-<td align="left">Accelerator.snn_top_hls.Throughput</td>
-<td align="left">%s</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">16</td>
-<td align="left">Throughput</td>
-<td align="left">ADVISORY</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Throughput Related</td>
-<td align="left">Accelerator.snn_top_hls.Throughput</td>
-<td align="left">%s</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">13</td>
-<td align="left">Throughput</td>
-<td align="left">ADVISORY</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Throughput Related</td>
-<td align="left">Accelerator.snn_top_hls.Throughput</td>
-<td align="left">%s</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">7</td>
-<td align="left">Kernel</td>
-<td align="left">WARNING</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Kernel Related</td>
-<td align="left">Accelerator.snn_top_hls.Kernel</td>
-<td align="left">%s</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">17</td>
-<td align="left">Throughput</td>
-<td align="left">ADVISORY</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Throughput Related</td>
-<td align="left">Accelerator.snn_top_hls.Throughput</td>
-<td align="left">%s</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">32</td>
-<td align="left">Kernel</td>
-<td align="left">WARNING</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Kernel Related</td>
-<td align="left">Accelerator.snn_top_hls.Kernel</td>
-<td align="left">%s</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">14</td>
-<td align="left">Throughput</td>
-<td align="left">ADVISORY</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Throughput Related</td>
-<td align="left">Accelerator.snn_top_hls.Throughput</td>
-<td align="left">%s</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">24</td>
-<td align="left">Throughput</td>
-<td align="left">ADVISORY</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Throughput Related</td>
-<td align="left">Accelerator.snn_top_hls.Throughput</td>
-<td align="left">%s</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">18</td>
-<td align="left">Kernel</td>
-<td align="left">WARNING</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Kernel Related</td>
-<td align="left">Accelerator.snn_top_hls.Kernel</td>
-<td align="left">Cannot meet target clock period from 'load' operation 16 bit ('p_ZL12cnn_l2_v_mem_3_load', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=182">snn_top_hls.cpp</a>) on array 'p_ZL12cnn_l2_v_mem_3' to 'store' operation ('p_ZL12cnn_l2_v_mem_2_addr_write_ln183', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=183">snn_top_hls.cpp</a>) of variable 'sub_ln183', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=183">snn_top_hls.cpp</a> 16 bit on array 'p_ZL12cnn_l2_v_mem_2' (combination delay: 8.785 ns) to honor II or Latency constraint in region 'L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS'.
-</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">33</td>
-<td align="left">Kernel</td>
-<td align="left">ADVISORY</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Kernel Related</td>
-<td align="left">Accelerator.snn_top_hls.Kernel</td>
-<td align="left">%s</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">15</td>
-<td align="left">Throughput</td>
-<td align="left">ADVISORY</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Throughput Related</td>
-<td align="left">Accelerator.snn_top_hls.Throughput</td>
-<td align="left">%s</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">25</td>
-<td align="left">Kernel</td>
-<td align="left">WARNING</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Kernel Related</td>
-<td align="left">Accelerator.snn_top_hls.Kernel</td>
-<td align="left">%s</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">19</td>
-<td align="left">Throughput</td>
-<td align="left">ADVISORY</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Throughput Related</td>
-<td align="left">Accelerator.snn_top_hls.Throughput</td>
-<td align="left">%s</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">34</td>
-<td align="left">Kernel</td>
-<td align="left">ADVISORY</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Kernel Related</td>
-<td align="left">Accelerator.snn_top_hls.Kernel</td>
-<td align="left">%s</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">26</td>
-<td align="left">Kernel</td>
-<td align="left">WARNING</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Kernel Related</td>
-<td align="left">Accelerator.snn_top_hls.Kernel</td>
-<td align="left">The critical path in module 'process_post_spike_aer_Pipeline_LTP_LOOP' consists of the following:
-	'mul' operation 28 bit ('mul_ln530', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=530">snn_top_hls.cpp</a>) [80]  (1.471 ns)
-	'add' operation 16 bit ('w', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=535">snn_top_hls.cpp</a>) [84]  (2.077 ns)
-	'icmp' operation 1 bit ('icmp_ln281', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=281">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=535">snn_top_hls.cpp</a>) [87]  (2.077 ns)
-	'or' operation 1 bit ('or_ln280', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=280">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=535">snn_top_hls.cpp</a>) [90]  (0.000 ns)
-	'select' operation 4 bit ('updated', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=280">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=535">snn_top_hls.cpp</a>) [91]  (1.024 ns)
-	'store' operation ('weight_memory_addr_write_ln536', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=536">snn_top_hls.cpp</a>) of variable 'updated', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=280">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=535">snn_top_hls.cpp</a> 4 bit on array 'weight_memory' [92]  (1.682 ns)
-
-</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">20</td>
-<td align="left">Kernel</td>
-<td align="left">WARNING</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Kernel Related</td>
-<td align="left">Accelerator.snn_top_hls.Kernel</td>
-<td align="left">%s</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">1</td>
-<td align="left">Throughput</td>
-<td align="left">ADVISORY</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Throughput Related</td>
-<td align="left">Accelerator.snn_top_hls.Throughput</td>
-<td align="left">%s</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">27</td>
-<td align="left">Throughput</td>
-<td align="left">ADVISORY</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Throughput Related</td>
-<td align="left">Accelerator.snn_top_hls.Throughput</td>
-<td align="left">%s</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">21</td>
-<td align="left">Kernel</td>
-<td align="left">WARNING</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Kernel Related</td>
-<td align="left">Accelerator.snn_top_hls.Kernel</td>
-<td align="left">The critical path in module 'run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS' consists of the following:
-	'load' operation 16 bit ('p_ZL12cnn_l2_v_mem_0_load', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=182">snn_top_hls.cpp</a>) on array 'p_ZL12cnn_l2_v_mem_0' [127]  (2.322 ns)
-	'sparsemux' operation 16 bit ('tmp_s', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=182">snn_top_hls.cpp</a>) [143]  (2.064 ns)
-	'icmp' operation 1 bit ('icmp_ln182', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=182">snn_top_hls.cpp</a>) [144]  (2.077 ns)
-	'store' operation ('p_ZL12cnn_l2_v_mem_9_addr_write_ln183', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=183">snn_top_hls.cpp</a>) of variable 'sub_ln183', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=183">snn_top_hls.cpp</a> 16 bit on array 'p_ZL12cnn_l2_v_mem_9' [165]  (2.322 ns)
-
-</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">8</td>
-<td align="left">Kernel</td>
-<td align="left">WARNING</td>
-<td align="left"><undefined></td>
-<td align="left">HLS Kernel Related</td>
-<td align="left">Accelerator.snn_top_hls.Kernel</td>
-<td align="left">The critical path in module 'snn_top_hls_Pipeline_RESET_V_K_RESET_V_Y_RESET_V_X' consists of the following:
-	'load' operation 5 bit ('x_load', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=960">snn_top_hls.cpp</a>) on local variable 'x', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=960">snn_top_hls.cpp</a> [20]  (0.000 ns)
-	'icmp' operation 1 bit ('icmp_ln80', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=960">snn_top_hls.cpp</a>) [30]  (1.780 ns)
-	'and' operation 1 bit ('and_ln78', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=78">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=960">snn_top_hls.cpp</a>) [31]  (0.978 ns)
-	'or' operation 1 bit ('empty', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=78">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=960">snn_top_hls.cpp</a>) [34]  (0.000 ns)
-	'select' operation 5 bit ('x_mid2', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=78">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=960">snn_top_hls.cpp</a>) [35]  (1.215 ns)
-	'add' operation 5 bit ('add_ln80', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=960">snn_top_hls.cpp</a>) [54]  (1.780 ns)
-	'store' operation ('x_write_ln80', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=960">snn_top_hls.cpp</a>) of variable 'add_ln80', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=960">snn_top_hls.cpp</a> 5 bit on local variable 'x', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=960">snn_top_hls.cpp</a> [61]  (1.588 ns)
-
-</td>
-<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
-</tr>
-<tr>
-<td align="left">2</td>
+<td align="left">22</td>
 <td align="left">Throughput</td>
 <td align="left">ADVISORY</td>
 <td align="left"><undefined></td>
@@ -3719,7 +3454,7 @@ window.onload = function () { addSorting(); }
 <td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
 </tr>
 <tr>
-<td align="left">22</td>
+<td align="left">1</td>
 <td align="left">Throughput</td>
 <td align="left">ADVISORY</td>
 <td align="left"><undefined></td>
@@ -3729,7 +3464,263 @@ window.onload = function () { addSorting(); }
 <td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
 </tr>
 <tr>
-<td align="left">9</td>
+<td align="left">15</td>
+<td align="left">Throughput</td>
+<td align="left">ADVISORY</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Throughput Related</td>
+<td align="left">Accelerator.snn_top_hls.Throughput</td>
+<td align="left">%s</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">21</td>
+<td align="left">Kernel</td>
+<td align="left">WARNING</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Kernel Related</td>
+<td align="left">Accelerator.snn_top_hls.Kernel</td>
+<td align="left">The critical path in module 'run_cnn3_streaming_pixel_Pipeline_L2_SUB_POS_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2' consists of the following:
+	'load' operation 16 bit ('p_ZL12cnn_l2_v_mem_0_load', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=185">snn_top_hls.cpp</a>) on array 'p_ZL12cnn_l2_v_mem_0' [129]  (2.322 ns)
+	'sparsemux' operation 16 bit ('tmp_s', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=185">snn_top_hls.cpp</a>) [145]  (2.064 ns)
+	'icmp' operation 1 bit ('icmp_ln185', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=185">snn_top_hls.cpp</a>) [146]  (2.077 ns)
+	'store' operation ('p_ZL12cnn_l2_v_mem_14_addr_write_ln186', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=186">snn_top_hls.cpp</a>) of variable 'sub_ln186', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=186">snn_top_hls.cpp</a> 16 bit on array 'p_ZL12cnn_l2_v_mem_14' [152]  (2.322 ns)
+
+</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">14</td>
+<td align="left">Throughput</td>
+<td align="left">ADVISORY</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Throughput Related</td>
+<td align="left">Accelerator.snn_top_hls.Throughput</td>
+<td align="left">%s</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">20</td>
+<td align="left">Kernel</td>
+<td align="left">WARNING</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Kernel Related</td>
+<td align="left">Accelerator.snn_top_hls.Kernel</td>
+<td align="left">%s</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">34</td>
+<td align="left">Kernel</td>
+<td align="left">ADVISORY</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Kernel Related</td>
+<td align="left">Accelerator.snn_top_hls.Kernel</td>
+<td align="left">%s</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">7</td>
+<td align="left">Kernel</td>
+<td align="left">WARNING</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Kernel Related</td>
+<td align="left">Accelerator.snn_top_hls.Kernel</td>
+<td align="left">%s</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">13</td>
+<td align="left">Throughput</td>
+<td align="left">ADVISORY</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Throughput Related</td>
+<td align="left">Accelerator.snn_top_hls.Throughput</td>
+<td align="left">%s</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">27</td>
+<td align="left">Throughput</td>
+<td align="left">ADVISORY</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Throughput Related</td>
+<td align="left">Accelerator.snn_top_hls.Throughput</td>
+<td align="left">%s</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">33</td>
+<td align="left">Kernel</td>
+<td align="left">ADVISORY</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Kernel Related</td>
+<td align="left">Accelerator.snn_top_hls.Kernel</td>
+<td align="left">%s</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">6</td>
+<td align="left">Throughput</td>
+<td align="left">ADVISORY</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Throughput Related</td>
+<td align="left">Accelerator.snn_top_hls.Throughput</td>
+<td align="left">%s</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">12</td>
+<td align="left">Throughput</td>
+<td align="left">ADVISORY</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Throughput Related</td>
+<td align="left">Accelerator.snn_top_hls.Throughput</td>
+<td align="left">%s</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">26</td>
+<td align="left">Kernel</td>
+<td align="left">WARNING</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Kernel Related</td>
+<td align="left">Accelerator.snn_top_hls.Kernel</td>
+<td align="left">The critical path in module 'process_post_spike_aer_Pipeline_LTP_LOOP' consists of the following:
+	'mul' operation 28 bit ('mul_ln533', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=533">snn_top_hls.cpp</a>) [80]  (1.471 ns)
+	'add' operation 16 bit ('w', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=538">snn_top_hls.cpp</a>) [84]  (2.077 ns)
+	'icmp' operation 1 bit ('icmp_ln284', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=284">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=538">snn_top_hls.cpp</a>) [87]  (2.077 ns)
+	'or' operation 1 bit ('or_ln283', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=283">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=538">snn_top_hls.cpp</a>) [90]  (0.000 ns)
+	'select' operation 4 bit ('updated', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=283">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=538">snn_top_hls.cpp</a>) [91]  (1.024 ns)
+	'store' operation ('weight_memory_addr_write_ln539', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=539">snn_top_hls.cpp</a>) of variable 'updated', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=283">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=538">snn_top_hls.cpp</a> 4 bit on array 'weight_memory' [92]  (1.682 ns)
+
+</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">32</td>
+<td align="left">Kernel</td>
+<td align="left">WARNING</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Kernel Related</td>
+<td align="left">Accelerator.snn_top_hls.Kernel</td>
+<td align="left">%s</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">5</td>
+<td align="left">Kernel</td>
+<td align="left">WARNING</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Kernel Related</td>
+<td align="left">Accelerator.snn_top_hls.Kernel</td>
+<td align="left">Cannot meet target clock period from 'icmp' operation 1 bit ('icmp_ln80', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=963">snn_top_hls.cpp</a>) to 'store' operation ('x_write_ln80', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=963">snn_top_hls.cpp</a>) of variable 'add_ln80', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=963">snn_top_hls.cpp</a> 5 bit on local variable 'x', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=963">snn_top_hls.cpp</a> (combination delay: 7.341 ns) to honor II or Latency constraint in region 'RESET_V_K_RESET_V_Y_RESET_V_X'.
+</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">19</td>
+<td align="left">Throughput</td>
+<td align="left">ADVISORY</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Throughput Related</td>
+<td align="left">Accelerator.snn_top_hls.Throughput</td>
+<td align="left">%s</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">25</td>
+<td align="left">Kernel</td>
+<td align="left">WARNING</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Kernel Related</td>
+<td align="left">Accelerator.snn_top_hls.Kernel</td>
+<td align="left">%s</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="left">Throughput</td>
+<td align="left">ADVISORY</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Throughput Related</td>
+<td align="left">Accelerator.snn_top_hls.Throughput</td>
+<td align="left">%s</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">18</td>
+<td align="left">Kernel</td>
+<td align="left">WARNING</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Kernel Related</td>
+<td align="left">Accelerator.snn_top_hls.Kernel</td>
+<td align="left">Cannot meet target clock period from 'load' operation 16 bit ('p_ZL12cnn_l2_v_mem_7_load', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=185">snn_top_hls.cpp</a>) on array 'p_ZL12cnn_l2_v_mem_7' to 'store' operation ('p_ZL12cnn_l2_v_mem_10_addr_write_ln186', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=186">snn_top_hls.cpp</a>) of variable 'sub_ln186', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=186">snn_top_hls.cpp</a> 16 bit on array 'p_ZL12cnn_l2_v_mem_10' (combination delay: 8.785 ns) to honor II or Latency constraint in region 'L2_SUB_POS_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2'.
+</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">24</td>
+<td align="left">Throughput</td>
+<td align="left">ADVISORY</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Throughput Related</td>
+<td align="left">Accelerator.snn_top_hls.Throughput</td>
+<td align="left">%s</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">11</td>
+<td align="left">Throughput</td>
+<td align="left">ADVISORY</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Throughput Related</td>
+<td align="left">Accelerator.snn_top_hls.Throughput</td>
+<td align="left">%s</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">17</td>
+<td align="left">Throughput</td>
+<td align="left">ADVISORY</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Throughput Related</td>
+<td align="left">Accelerator.snn_top_hls.Throughput</td>
+<td align="left">%s</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">31</td>
+<td align="left">Kernel</td>
+<td align="left">WARNING</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Kernel Related</td>
+<td align="left">Accelerator.snn_top_hls.Kernel</td>
+<td align="left">%s</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">10</td>
+<td align="left">Throughput</td>
+<td align="left">ADVISORY</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Throughput Related</td>
+<td align="left">Accelerator.snn_top_hls.Throughput</td>
+<td align="left">%s</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">16</td>
+<td align="left">Throughput</td>
+<td align="left">ADVISORY</td>
+<td align="left"><undefined></td>
+<td align="left">HLS Throughput Related</td>
+<td align="left">Accelerator.snn_top_hls.Throughput</td>
+<td align="left">%s</td>
+<td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
+</tr>
+<tr>
+<td align="left">30</td>
 <td align="left">Throughput</td>
 <td align="left">ADVISORY</td>
 <td align="left"><undefined></td>
@@ -3749,7 +3740,7 @@ window.onload = function () { addSorting(); }
 <td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
 </tr>
 <tr>
-<td align="left">29</td>
+<td align="left">9</td>
 <td align="left">Throughput</td>
 <td align="left">ADVISORY</td>
 <td align="left"><undefined></td>
@@ -3765,12 +3756,12 @@ window.onload = function () { addSorting(); }
 <td align="left"><undefined></td>
 <td align="left">HLS Kernel Related</td>
 <td align="left">Accelerator.snn_top_hls.Kernel</td>
-<td align="left">Cannot meet target clock period from 'mul' operation 28 bit ('mul_ln530', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=530">snn_top_hls.cpp</a>) to 'store' operation ('weight_memory_addr_write_ln536', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=536">snn_top_hls.cpp</a>) of variable 'updated', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=280">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=535">snn_top_hls.cpp</a> 4 bit on array 'weight_memory' (combination delay: 8.331 ns) to honor II or Latency constraint in region 'LTP_LOOP'.
+<td align="left">Cannot meet target clock period from 'mul' operation 28 bit ('mul_ln533', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=533">snn_top_hls.cpp</a>) to 'store' operation ('weight_memory_addr_write_ln539', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=539">snn_top_hls.cpp</a>) of variable 'updated', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=283">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=538">snn_top_hls.cpp</a> 4 bit on array 'weight_memory' (combination delay: 8.331 ns) to honor II or Latency constraint in region 'LTP_LOOP'.
 </td>
 <td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
 </tr>
 <tr>
-<td align="left">10</td>
+<td align="left">29</td>
 <td align="left">Throughput</td>
 <td align="left">ADVISORY</td>
 <td align="left"><undefined></td>
@@ -3780,7 +3771,7 @@ window.onload = function () { addSorting(); }
 <td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
 </tr>
 <tr>
-<td align="left">4</td>
+<td align="left">2</td>
 <td align="left">Throughput</td>
 <td align="left">ADVISORY</td>
 <td align="left"><undefined></td>
@@ -3790,13 +3781,22 @@ window.onload = function () { addSorting(); }
 <td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
 </tr>
 <tr>
-<td align="left">30</td>
-<td align="left">Throughput</td>
-<td align="left">ADVISORY</td>
+<td align="left">8</td>
+<td align="left">Kernel</td>
+<td align="left">WARNING</td>
 <td align="left"><undefined></td>
-<td align="left">HLS Throughput Related</td>
-<td align="left">Accelerator.snn_top_hls.Throughput</td>
-<td align="left">%s</td>
+<td align="left">HLS Kernel Related</td>
+<td align="left">Accelerator.snn_top_hls.Kernel</td>
+<td align="left">The critical path in module 'snn_top_hls_Pipeline_RESET_V_K_RESET_V_Y_RESET_V_X' consists of the following:
+	'load' operation 5 bit ('x_load', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=963">snn_top_hls.cpp</a>) on local variable 'x', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=963">snn_top_hls.cpp</a> [20]  (0.000 ns)
+	'icmp' operation 1 bit ('icmp_ln80', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=963">snn_top_hls.cpp</a>) [30]  (1.780 ns)
+	'and' operation 1 bit ('and_ln78', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=78">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=963">snn_top_hls.cpp</a>) [31]  (0.978 ns)
+	'or' operation 1 bit ('empty', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=78">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=963">snn_top_hls.cpp</a>) [34]  (0.000 ns)
+	'select' operation 5 bit ('x_mid2', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=78">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=963">snn_top_hls.cpp</a>) [35]  (1.215 ns)
+	'add' operation 5 bit ('add_ln80', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=963">snn_top_hls.cpp</a>) [54]  (1.780 ns)
+	'store' operation ('x_write_ln80', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=963">snn_top_hls.cpp</a>) of variable 'add_ln80', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=963">snn_top_hls.cpp</a> 5 bit on local variable 'x', <a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=80">snn_top_hls.cpp</a>-><a href="file:///home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/src/snn_top_hls.cpp#line=963">snn_top_hls.cpp</a> [61]  (1.588 ns)
+
+</td>
 <td align="left"><a href="http:///docs.amd.com/access/sources/dita/map?Doc_Version=2025.2%20English&url=ug1399-vitis-hls">Vitis HLS User Guide (UG1399)</a></td>
 </tr>
 </table>

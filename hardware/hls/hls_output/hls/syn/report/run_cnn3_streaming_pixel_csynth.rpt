@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'run_cnn3_streaming_pixel'
 ================================================================
-* Date:           Thu Oct 15 16:11:19 2026
+* Date:           Fri Oct 16 12:09:54 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -39,7 +39,7 @@
         |                                           Instance                                          |                                      Module                                      |   min   |   max   |    min    |    max    | min | max |        Type       |
         +---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+---------+---------+-----------+-----------+-----+-----+-------------------+
         |grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442                   |run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS                   |    12570|    12570|   0.126 ms|   0.126 ms|    0|    0|  loop pipeline stp|
-        |grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489  |run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS  |     6275|     6275|  62.750 us|  62.750 us|    0|    0|  loop pipeline stp|
+        |grp_run_cnn3_streaming_pixel_Pipeline_L2_SUB_POS_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_fu_489  |run_cnn3_streaming_pixel_Pipeline_L2_SUB_POS_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2  |     6275|     6275|  62.750 us|  62.750 us|    0|    0|  loop pipeline stp|
         |grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530                                        |run_cnn3_streaming_pixel_Pipeline_CONV2_CO                                        |       20|       20|   0.200 us|   0.200 us|    0|    0|  loop pipeline stp|
         +---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+---------+---------+-----------+-----------+-----+-----+-------------------+
 
@@ -65,12 +65,12 @@
 |DSP              |        -|    -|       -|      -|    -|
 |Expression       |        -|    -|       0|    216|    -|
 |FIFO             |        -|    -|       -|      -|    -|
-|Instance         |        1|   28|    7018|   9398|    -|
+|Instance         |        1|   28|    7027|   9395|    -|
 |Memory           |        2|    -|       0|      0|    -|
 |Multiplexer      |        -|    -|       0|   1648|    -|
 |Register         |        -|    -|     144|      -|    -|
 +-----------------+---------+-----+--------+-------+-----+
-|Total            |        3|   28|    7162|  11262|    0|
+|Total            |        3|   28|    7171|  11259|    0|
 +-----------------+---------+-----+--------+-------+-----+
 |Available        |      280|  220|  106400|  53200|    0|
 +-----------------+---------+-----+--------+-------+-----+
@@ -87,12 +87,12 @@
     |mul_5ns_7ns_11_1_1_U201                                                                      |mul_5ns_7ns_11_1_1                                                                |        0|   0|     0|    33|    0|
     |grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442                   |run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS                   |        0|  25|  6160|  8496|    0|
     |grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530                                        |run_cnn3_streaming_pixel_Pipeline_CONV2_CO                                        |        1|   0|   371|   225|    0|
-    |grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489  |run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS  |        0|   1|   205|   508|    0|
+    |grp_run_cnn3_streaming_pixel_Pipeline_L2_SUB_POS_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_fu_489  |run_cnn3_streaming_pixel_Pipeline_L2_SUB_POS_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2  |        0|   1|   214|   505|    0|
     |urem_10ns_6ns_5_14_seq_1_U197                                                                |urem_10ns_6ns_5_14_seq_1                                                          |        0|   0|   130|    63|    0|
     |urem_5ns_3ns_2_9_seq_1_U202                                                                  |urem_5ns_3ns_2_9_seq_1                                                            |        0|   0|    70|    28|    0|
     |urem_6ns_3ns_2_10_seq_1_U200                                                                 |urem_6ns_3ns_2_10_seq_1                                                           |        0|   0|    82|    33|    0|
     +---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+---------+----+------+------+-----+
-    |Total                                                                                        |                                                                                  |        1|  28|  7018|  9398|    0|
+    |Total                                                                                        |                                                                                  |        1|  28|  7027|  9395|    0|
     +---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+---------+----+------+------+-----+
 
     * DSP: 
@@ -275,7 +275,7 @@
     |dy2_reg_407                                                                                               |   3|   0|    3|          0|
     |grp_run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS_fu_442_ap_start_reg                   |   1|   0|    1|          0|
     |grp_run_cnn3_streaming_pixel_Pipeline_CONV2_CO_fu_530_ap_start_reg                                        |   1|   0|    1|          0|
-    |grp_run_cnn3_streaming_pixel_Pipeline_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_L2_SUB_POS_fu_489_ap_start_reg  |   1|   0|    1|          0|
+    |grp_run_cnn3_streaming_pixel_Pipeline_L2_SUB_POS_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2_fu_489_ap_start_reg  |   1|   0|    1|          0|
     |icmp_ln155_reg_1046                                                                                       |   1|   0|    1|          0|
     |s_fu_216                                                                                                  |  12|   0|   12|          0|
     |sub_ln158_1_reg_1068                                                                                      |   2|   0|    2|          0|
