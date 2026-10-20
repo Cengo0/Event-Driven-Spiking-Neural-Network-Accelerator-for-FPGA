@@ -141,6 +141,39 @@ def upload_network_weights(mmio, q_w2_aug: np.ndarray, q_w3_aug: np.ndarray):
     print(f"  Layer 3: Wrote {w3_entries} active synaptic connections.")
 
 
+def reset_hardware_state(hls_ctrl, mmio):
+    """
+    Fast Zero-State Hardware Reset between images (~0.3 ms):
+      1. Pulses HLS reset (ctrl_reg=0x03) to assert hls_snn_reset into RTL,
+         clearing Core Group input FIFOs, spike_flag_mem, and diagnostic counters.
+      2. Sets 100% leak rate (0x0009 -> shift1=1, shift2=1) in CFG_NEURON_PARAMS.
+      3. Runs HLS with snn_enable=1, reset=0 for 1600 cycles (>2 full 768-cycle sweeps
+         across 256 neurons) so all BRAM membrane potentials in Group 1 and Group 2 decay to 0.
+      4. Restores zero leak rate (0x0000) for inference.
+    """
+    hls_ctrl.write(0x10, 0x03)          # ctrl_reg: enable=1, reset=1
+    hls_ctrl.write(0x28, 1)             # 1 step
+    hls_ctrl.write(0x00, 0x01)          # ap_start
+    t0 = time.time() + 0.010
+    while time.time() < t0:
+        if hls_ctrl.read(0x00) & 0x02:  # wait ap_done
+            break
+
+    mmio.write(CFG_NEURON_PARAMS, 0x0009) # shift1=1, shift2=1 -> 100% leak per sweep
+
+    hls_ctrl.write(0x10, 0x01)          # ctrl_reg: enable=1, reset=0
+    hls_ctrl.write(0x28, 1600)          # >2 full 768-cycle sweeps of 256-neuron BRAM
+    hls_ctrl.write(0x00, 0x01)          # ap_start -> Core Groups zero BRAM!
+    t0 = time.time() + 0.015
+    while time.time() < t0:
+        if hls_ctrl.read(0x00) & 0x02:  # wait ap_done
+            break
+
+    mmio.write(CFG_NEURON_PARAMS, 0x0000) # restore zero leak
+    hls_ctrl.write(0x28, 1)
+    hls_ctrl.write(0x00, 0x00)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Multi-Layer SNN Hardware Inference with SCA Trigger")
     parser.add_argument('--bitstream',     default='snn_core_group_v2.bit',
@@ -157,21 +190,23 @@ def main():
                         help='Skip PL programming')
     parser.add_argument('--rate-coding',   action='store_true',
                         help='Use stochastic Poisson rate encoding at Layer 1 (matching rate_spikes training)')
+    parser.add_argument('--reset-mode',    choices=['fast', 'none'], default='fast',
+                        help='Hardware state reset between images: fast (100%% leak sweep, default) or none')
     args = parser.parse_args()
 
     # ── Load payload ──────────────────────────────────────────────────────────
     print(f"Loading deployment payload: {args.data}")
     payload      = np.load(args.data)
-    w1_f         = payload['w1_f']          # (256, 784) float32
+    w1_f         = payload['w1_f']          # (256, 784) or (256, 3072) float32
     b1_f         = payload['b1_f']          # (256,)     float32
     q_w2_aug     = payload['q_w2_aug']      # (256, 257) int8
     q_w3_aug     = payload['q_w3_aug']      # (10, 257)  int8
-    test_imgs    = payload['test_imgs']     # (10000, 28, 28) pre-normalized
+    test_imgs    = payload['test_imgs']     # (10000, ...) pre-normalized
     test_lbls    = payload['test_lbls']     # (10000,)
     hw_threshold = int(payload['hw_threshold'])
 
     print(f"  Dataset: {len(test_imgs)} test images loaded.")
-    print(f"  Hardware threshold (Layer 2): {hw_threshold}")
+    print(f"  Hardware threshold (Reg 0x10): {hw_threshold}")
 
     # ── Load Overlay ──────────────────────────────────────────────────────────
     print("Initialising PYNQ Overlay...")
@@ -194,7 +229,7 @@ def main():
     upload_network_weights(mmio, q_w2_aug, q_w3_aug)
 
     # ── Configure Neurons ─────────────────────────────────────────────────────
-    # Layer 2 threshold (Group 1) = hw_threshold (e.g. 291)
+    # Layer 2 (Group 1) & Layer 3 (Group 2) threshold = hw_threshold
     # Group 0 is hardwired to threshold=1 (instant relay)
     mmio.write(CFG_THRESHOLD, hw_threshold & 0xFFFF)
     mmio.write(CFG_NEURON_PARAMS, 0x0000)  # leak=0, refrac=0
@@ -215,12 +250,15 @@ def main():
     correct  = 0
     log      = []
 
-    print(f"\nStarting inference on {n_test} images (SCA trigger enabled on Pin Y18)...")
+    print(f"\nStarting inference on {n_test} images (SCA trigger enabled on Pin Y18, reset_mode={args.reset_mode})...")
     t_start = time.time()
 
     for img_idx in range(n_test):
         img_flat = test_imgs[img_idx].flatten().astype(np.float32)
         lbl      = int(test_lbls[img_idx])
+
+        if args.reset_mode == 'fast':
+            reset_hardware_state(hls_ctrl, mmio)
 
         mem1 = np.zeros(256, dtype=np.float32)
         class_spikes = np.zeros(10, dtype=np.int32)
@@ -315,10 +353,16 @@ def main():
         if prediction == lbl:
             correct += 1
 
+        curr_r_spks = int(mmio.read(CFG_ROUTER_SPKS))
+        curr_n_spks = int(mmio.read(CFG_NEURON_SPKS))
+
         log.append({
             "image_index":     img_idx,
             "true_label":      lbl,
-            "predicted_label": prediction
+            "predicted_label": prediction,
+            "spikes":          class_spikes.tolist(),
+            "router_spikes":   curr_r_spks,
+            "neuron_spikes":   curr_n_spks
         })
 
         if (img_idx + 1) % 100 == 0:
@@ -332,8 +376,12 @@ def main():
     acc     = correct / n_test * 100
     avg_lat = (t_end - t_start) / n_test * 1000
 
-    final_router_spks = mmio.read(CFG_ROUTER_SPKS)
-    final_neuron_spks = mmio.read(CFG_NEURON_SPKS)
+    if args.reset_mode == 'fast':
+        final_router_spks = sum(entry["router_spikes"] for entry in log)
+        final_neuron_spks = sum(entry["neuron_spikes"] for entry in log)
+    else:
+        final_router_spks = int(mmio.read(CFG_ROUTER_SPKS))
+        final_neuron_spks = int(mmio.read(CFG_NEURON_SPKS))
 
     print(f"\n{'='*50}")
     print(f"  Multi-Layer Inference Complete")
@@ -351,6 +399,7 @@ def main():
             "samples":      n_test,
             "timesteps":    args.timesteps,
             "hw_threshold": hw_threshold,
+            "reset_mode":   args.reset_mode,
             "trigger_pin":  "Y18",
         },
         "metrics": {
