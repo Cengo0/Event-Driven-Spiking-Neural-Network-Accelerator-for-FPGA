@@ -80,10 +80,11 @@ def ct_write(mmio, addr: int, data: int):
 
 def prepare_ct_table(q_fc_w: np.ndarray) -> list:
     n_classes, n_l2 = q_fc_w.shape
+    group_size_l2 = n_l2 // 4  # 196 for MNIST (784), 256 for CIFAR-10 (1024)
     entries = []
     for global_src in range(n_l2):
-        src_grp = global_src // GROUP_SIZE_L2
-        src_nid = global_src % GROUP_SIZE_L2
+        src_grp = global_src // group_size_l2
+        src_nid = global_src % group_size_l2
         fanout = 0
         for dst in range(n_classes):
             w = int(q_fc_w[dst, global_src])
@@ -123,7 +124,7 @@ def fast_upload_layer3_weights(mmio, entries: list):
 def upload_layer3_weights(mmio, q_fc_w: np.ndarray):
     """
     Upload Layer 2 -> Layer 3 dense weights to hardware connectivity table.
-      - Source neurons: 784 Layer 2 neurons mapped across Groups 0..3 (196 each)
+      - Source neurons: 784 (MNIST, 4x196) or 1024 (CIFAR-10, 4x256) Layer 2 neurons across Groups 0..3
       - Destination neurons: 10 Class neurons in Group 4
     """
     entries = prepare_ct_table(q_fc_w)
@@ -137,8 +138,8 @@ def reset_hardware_state(hls_ctrl, mmio):
       1. HLS Reset: clears Conv1/Conv2 buffers, cnn_v_mem, cnn_l2_v_mem, resets cnn_pixel_counter=0,
          and asserts physical snn_reset wire into RTL.
       2. Configure 100% leak (0x0009) on RTL Core Groups.
-      3. Run HLS for 1500 cycles with reset=0 (snn_reset drops, snn_enable=1):
-         the RTL Core Groups run their leak FSM (>2 full 588-cycle sweeps across 196 neurons)
+      3. Run HLS for 2000 cycles with reset=0 (snn_reset drops, snn_enable=1):
+         the RTL Core Groups run their leak FSM (>2 full 768-cycle sweeps across up to 256 neurons)
          so even odd membrane potentials ((mem >> 1) + (mem >> 1)) decay completely to 0.
       4. Restore leak_rate=0 for inference.
       5. Configure HLS ready for inference (enable=1, reset=0, time_steps=1).
@@ -155,10 +156,10 @@ def reset_hardware_state(hls_ctrl, mmio):
     # 2. Configure 100% leak rate on RTL Core Groups
     mmio.write(CFG_NEURON_PARAMS, 0x0009) # shift1=1, shift2=1 -> 100% leak per sweep
 
-    # 3. Run HLS with snn_enable=1 for 1500 cycles (>2 full 588-cycle BRAM sweeps)
+    # 3. Run HLS with snn_enable=1 for 2000 cycles (>2 full 768-cycle BRAM sweeps for up to 256 neurons)
     hls_ctrl.write(0x10, 0x01)          # ctrl_reg: enable=1, reset=0 (snn_reset drops!)
     hls_ctrl.write(0x20, MODE_CNN_STREAM)
-    hls_ctrl.write(0x28, 1500)          # 1500 cycles (>1176 cycles required for 2 full sweeps)
+    hls_ctrl.write(0x28, 2000)          # 2000 cycles (>1536 cycles required for 2 full 256-neuron sweeps)
     hls_ctrl.write(0x00, 0x01)          # ap_start -> snn_enable=1, Core Groups zero BRAM!
     t0 = time.time() + 0.015
     while time.time() < t0:
@@ -252,7 +253,8 @@ def main():
         print(f"  HLS Layer 2 threshold configured          : {hw_threshold_l2}")
 
         # ── Allocate DMA Buffers ──────────────────────────────────────────────
-        in_buffer  = allocate(shape=(784,), dtype=np.uint32)
+        n_pixels   = int(test_imgs[0].size)     # 784 for MNIST (28x28), 3072 for CIFAR-10 (3x32x32)
+        in_buffer  = allocate(shape=(n_pixels,), dtype=np.uint32)
         out_buffer = allocate(shape=(512,), dtype=np.uint32)
 
         # Pre-compute connectivity table entries
@@ -275,7 +277,7 @@ def main():
         t_start_all = time.time()
 
         for i in range(n_test):
-            img = test_imgs[i] # 28x28 float32
+            img = test_imgs[i] # 28x28 or 3x32x32 float32
             lbl = int(test_lbls[i])
 
             # Zero hardware state & membrane potentials between images
@@ -297,8 +299,7 @@ def main():
 
             # Quantize pixel values to Q8.8 fixed-point (pixel * 256)
             px_quant = np.clip(np.round(img.flatten() * 256.0), -32768, 32767).astype(np.int16)
-            for k in range(784):
-                in_buffer[k] = int(px_quant[k]) & 0xFFFF
+            in_buffer[:] = (px_quant.astype(np.int32) & 0xFFFF).astype(np.uint32)
             in_buffer.flush()
 
             class_spk = np.zeros(10, dtype=np.int32)
@@ -326,12 +327,12 @@ def main():
                 dma_mmio.write(0x48, dest_ptr)
                 dma_mmio.write(0x58, 4)        # arm for 1st spike (4 bytes)
 
-                # 3. Start MM2S DMA (ARM -> FPGA): send 784 pixels
+                # 3. Start MM2S DMA (ARM -> FPGA): send n_pixels (784 or 3072) pixels
                 src_ptr = in_buffer.device_address
                 dma_mmio.write(0x04, 0x1000)   # clear MM2S IOC flag
                 dma_mmio.write(0x00, 0x01)     # run MM2S channel
                 dma_mmio.write(0x18, src_ptr)
-                dma_mmio.write(0x28, 784 * 4)  # trigger transfer (3136 bytes)
+                dma_mmio.write(0x28, n_pixels * 4)  # trigger transfer (4 bytes per pixel)
 
                 # 4. Start HLS Kernel with Auto-Restart (Pin Y18 SCA Trigger goes HIGH!)
                 hls_ctrl.write(0x00, 0x81)

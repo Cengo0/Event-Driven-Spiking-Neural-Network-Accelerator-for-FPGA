@@ -10,6 +10,7 @@ stream from snn_top_hls.cpp and mandatory event-driven bias folding.
 
 import os
 import sys
+import json
 import argparse
 import numpy as np
 import torch
@@ -29,10 +30,10 @@ def fuse_batchnorm_conv(w, b, bn_gamma, bn_beta, bn_mean, bn_var, eps=1e-5):
     return w_fused.numpy(), b_fused.numpy()
 
 
-def export_hls_weights_header(w1_f, b1_f, q_conv2_int, header_path):
+def export_hls_weights_header(w1_f, b1_f, q_conv2_int, q_conv2_bias_int16, header_path):
     """
     Auto-generate C++ header containing Conv1 float weights/biases and
-    Conv2 int8 weights for HLS Streaming 2D Convolution Engine.
+    Conv2 int8 weights + int16 biases for HLS Streaming 2D Convolution Engine.
     """
     os.makedirs(os.path.dirname(os.path.abspath(header_path)), exist_ok=True)
     with open(header_path, 'w') as f:
@@ -69,6 +70,11 @@ def export_hls_weights_header(w1_f, b1_f, q_conv2_int, header_path):
             f.write("    },\n")
         f.write("};\n\n")
 
+        # CONV2_BIAS [16] - Scaled integer biases (4 * SCALE2 * b2_f)
+        f.write(f"static const short CONV2_BIAS[{len(q_conv2_bias_int16)}] = {{\n    ")
+        f.write(", ".join([f"{int(b)}" for b in q_conv2_bias_int16]))
+        f.write("\n};\n\n")
+
         f.write("#endif // CNN3_WEIGHTS_H\n")
     print(f"Auto-generated HLS C++ weights header: {header_path}")
 
@@ -79,6 +85,9 @@ def parse_args():
                         help='Path to PyTorch .pth model checkpoint')
     parser.add_argument('--output', default='data/cache/mnist_cnn3_deployment.npz',
                         help='Output deployment payload path')
+    parser.add_argument('--bias-report', '--bias-json', dest='bias_report',
+                        default='data/cache/mnist_cnn3_bias_report.json',
+                        help='Output path for the detailed JSON bias diagnostic report')
     parser.add_argument('--hls-header', default='hardware/hls/include/cnn3_weights.h',
                         help='Path to output auto-generated HLS weights C++ header')
     parser.add_argument('--timesteps', type=int, default=4,
@@ -94,6 +103,7 @@ def main():
     args = parse_args()
     MODEL_PATH = args.model
     OUTPUT_PATH = args.output
+    BIAS_REPORT_PATH = args.bias_report
     TIMESTEPS = args.timesteps
 
     # ─────────────────────────────────────────────────────────────────
@@ -107,7 +117,9 @@ def main():
     state_dict = torch.load(MODEL_PATH, map_location='cpu')
 
     # Layer 1 (Conv1): features.0
-    if 'features.1.running_var' in state_dict and 'features.1.weight' in state_dict:
+    l1_has_raw_bias = 'features.0.bias' in state_dict
+    l1_has_bn = ('features.1.running_var' in state_dict and 'features.1.weight' in state_dict)
+    if l1_has_bn:
         print("  Layer 1: Fusing BatchNorm into Conv1...")
         w1_f, b1_f = fuse_batchnorm_conv(
             state_dict['features.0.weight'],
@@ -117,25 +129,35 @@ def main():
             state_dict['features.1.running_mean'],
             state_dict['features.1.running_var']
         )
+        l1_bias_nature = 'fused_batchnorm_and_conv2d_bias' if l1_has_raw_bias else 'fused_batchnorm'
+        l1_source_keys = [k for k in ['features.0.weight', 'features.0.bias', 'features.1.weight', 'features.1.bias', 'features.1.running_mean', 'features.1.running_var'] if k in state_dict]
     else:
         w1_f = state_dict['features.0.weight'].numpy()
-        b1_f = state_dict['features.0.bias'].numpy() if 'features.0.bias' in state_dict else np.zeros(w1_f.shape[0], dtype=np.float32)
+        b1_f = state_dict['features.0.bias'].numpy() if l1_has_raw_bias else np.zeros(w1_f.shape[0], dtype=np.float32)
+        l1_bias_nature = 'explicit_conv2d_bias' if (l1_has_raw_bias and not np.all(b1_f == 0)) else 'none_zero'
+        l1_source_keys = [k for k in ['features.0.weight', 'features.0.bias'] if k in state_dict]
 
     # Layer 2 (Conv2): features.3 (or features.2 if no pool)
     conv2_w_key = 'features.3.weight' if 'features.3.weight' in state_dict else 'features.2.weight'
     conv2_b_key = 'features.3.bias' if 'features.3.bias' in state_dict else 'features.2.bias'
+    l2_has_raw_bias = conv2_b_key in state_dict
     w2_f = state_dict[conv2_w_key].numpy()
-    b2_f = state_dict[conv2_b_key].numpy() if conv2_b_key in state_dict else np.zeros(w2_f.shape[0], dtype=np.float32)
+    b2_f = state_dict[conv2_b_key].numpy() if l2_has_raw_bias else np.zeros(w2_f.shape[0], dtype=np.float32)
+    l2_bias_nature = 'explicit_conv2d_bias' if (l2_has_raw_bias and not np.all(b2_f == 0)) else 'none_zero'
+    l2_source_keys = [k for k in [conv2_w_key, conv2_b_key] if k in state_dict]
 
     # Layer 3 (Classifier): classifier
+    l3_has_raw_bias = 'classifier.bias' in state_dict
     w3_f = state_dict['classifier.weight'].numpy()
-    b3_f = state_dict['classifier.bias'].numpy() if 'classifier.bias' in state_dict else np.zeros(w3_f.shape[0], dtype=np.float32)
+    b3_f = state_dict['classifier.bias'].numpy() if l3_has_raw_bias else np.zeros(w3_f.shape[0], dtype=np.float32)
+    l3_bias_nature = 'explicit_linear_bias' if (l3_has_raw_bias and not np.all(b3_f == 0)) else 'none_zero'
+    l3_source_keys = [k for k in ['classifier.weight', 'classifier.bias'] if k in state_dict]
 
     has_biases = not (np.all(b1_f == 0) and np.all(b2_f == 0) and np.all(b3_f == 0))
     print(f"Model Biases Detected: {'Yes (fused/explicit)' if has_biases else 'No (bias=False / zero bias)'}")
-    print(f"  Layer 1 (Conv1) shape: {w1_f.shape} (Input 1 -> {w1_f.shape[0]} Output Channels, 3x3)")
-    print(f"  Layer 2 (Conv2) shape: {w2_f.shape} (Channels {w2_f.shape[1]} -> {w2_f.shape[0]}, 3x3)")
-    print(f"  Layer 3 (Linear) shape: {w3_f.shape} (Flattened {w3_f.shape[1]} -> {w3_f.shape[0]} Classes)")
+    print(f"  Layer 1 (Conv1) shape: {w1_f.shape} (Input 1 -> {w1_f.shape[0]} Output Channels, 3x3) | Bias: {l1_bias_nature}")
+    print(f"  Layer 2 (Conv2) shape: {w2_f.shape} (Channels {w2_f.shape[1]} -> {w2_f.shape[0]}, 3x3) | Bias: {l2_bias_nature}")
+    print(f"  Layer 3 (Linear) shape: {w3_f.shape} (Flattened {w3_f.shape[1]} -> {w3_f.shape[0]} Classes) | Bias: {l3_bias_nature}")
     print(f"  Layer 3 Biases (b3_f): {[round(float(x), 4) for x in b3_f]}")
 
     # ─────────────────────────────────────────────────────────────────
@@ -262,22 +284,56 @@ def main():
     avg_l2_events = max(1.0, float(np.mean(np.sum(p2_calib, axis=(1, 2)))))
     print(f"  Empirical Layer 2 Routed Events / Image : {avg_l2_events:.1f} (matches ~2330 on FPGA)")
 
-    # Pre-build ordered spike event lists per (sample, timestep)
-    event_streams = []
-    for i in range(n_calib):
-        sample_ts = []
-        for t in range(TIMESTEPS):
+    # Pre-build padded 2D event index arrays per timestep: shape (n_calib, max_events_t)
+    N_L2 = w3_f.shape[1]
+    padded_events_calib = []
+    for t in range(TIMESTEPS):
+        ts_lists = []
+        max_len = 0
+        for i in range(n_calib):
             active_srcs = np.nonzero(p2_calib[i, t] > 0)[0]
             expanded = np.repeat(active_srcs, p2_calib[i, t, active_srcs])
-            sample_ts.append(expanded)
-        event_streams.append(sample_ts)
+            ts_lists.append(expanded)
+            if len(expanded) > max_len:
+                max_len = len(expanded)
+        arr_t = np.full((n_calib, max_len), N_L2, dtype=np.int32)
+        for i, seq in enumerate(ts_lists):
+            if len(seq) > 0:
+                arr_t[i, :len(seq)] = seq
+        padded_events_calib.append(arr_t)
+
+    def simulate_sequential_batch(q_fc_mat, padded_events_list, th_l3_val, batch_size):
+        """Exact cycle-accurate sequential LIF simulation vectorized across batch_size images."""
+        q_fc_pad = np.zeros((N_L2 + 1, 10), dtype=np.int32)
+        q_fc_pad[:N_L2, :] = q_fc_mat.T
+        v4 = np.zeros((batch_size, 10), dtype=np.int32)
+        spk_out = np.zeros((batch_size, 10), dtype=np.int32)
+        max_ts_spk = 0
+        for t in range(TIMESTEPS):
+            ev_t = padded_events_list[t]
+            ts_spk = np.zeros(batch_size, dtype=np.int32)
+            for e_idx in range(ev_t.shape[1]):
+                v4 += q_fc_pad[ev_t[:, e_idx]]
+                np.maximum(v4, 0, out=v4)
+                fired = (v4 >= th_l3_val)
+                if np.any(fired):
+                    spk_out += fired
+                    ts_spk += np.sum(fired, axis=1)
+                    v4[fired] = 0
+            if batch_size > 0:
+                m_ts = int(np.max(ts_spk))
+                if m_ts > max_ts_spk:
+                    max_ts_spk = m_ts
+        return spk_out, max_ts_spk
 
     # Mandatory non-zero event-driven bias folding (alpha > 0) to preserve negative Class 8 bias (-0.2507)
-    alphas = [0.004, 0.006, 0.008, 0.010, 0.012, 0.015, 0.018, 0.022]
+    # Include 0.0 solely to measure best_unfolded_acc for the bias diagnostic report
+    alphas = [0.0, 0.004, 0.006, 0.008, 0.010, 0.012, 0.015, 0.018, 0.022]
     s_ratios = [1.0]  # Full 8-bit [-127, +127] dynamic range for Layer 3
     candidate_l3_ths = [1400, 1600, 1800, 2000, 2200, 2400, 2600, 2800, 3000, 3200, 3500]
 
     best_calib_acc = -1.0
+    best_unfolded_acc = -1.0
     best_params = (0.010, 1.0, 2400)
 
     for alpha in alphas:
@@ -291,41 +347,24 @@ def main():
             q_fc = np.clip(np.round(w3_folded * scale3), -127, 127).astype(np.int32)
 
             for th_l3 in candidate_l3_ths:
-                correct = 0
-                total_spk = 0
-                max_ts_spk = 0
-                pred_hist = np.zeros(10, dtype=np.int32)
-
-                for i in range(n_calib):
-                    v4 = np.zeros(10, dtype=np.int32)
-                    spk_out = np.zeros(10, dtype=np.int32)
-
-                    for t in range(TIMESTEPS):
-                        ts_spk = 0
-                        for src in event_streams[i][t]:
-                            v4 += q_fc[:, src]
-                            v4 = np.maximum(v4, 0)     # Clamped at 0 on inhibition (core_group.v)
-                            fired = (v4 >= th_l3)
-                            if np.any(fired):
-                                spk_out[fired] += 1
-                                ts_spk += int(np.sum(fired))
-                                v4[fired] = 0          # Hard reset to 0 on firing (core_group.v)
-                        if ts_spk > max_ts_spk:
-                            max_ts_spk = ts_spk
-
-                    total_spk += int(np.sum(spk_out))
-                    pred = int(np.argmax(spk_out))
-                    pred_hist[pred] += 1
-                    if np.sum(spk_out) > 0 and pred == calib_lbls[i]:
-                        correct += 1
+                spk_out_b, max_ts_spk = simulate_sequential_batch(q_fc, padded_events_calib, th_l3, n_calib)
+                tot_per_img = np.sum(spk_out_b, axis=1)
+                preds = np.argmax(spk_out_b, axis=1)
+                correct = int(np.sum((tot_per_img > 0) & (preds == calib_lbls)))
+                total_spk = int(np.sum(tot_per_img))
+                pred_hist = np.bincount(preds, minlength=10)
 
                 acc = correct / n_calib * 100.0
                 avg_spk = total_spk / n_calib
                 max_class_share = np.max(pred_hist) / n_calib
-                # Require < 28 spikes/timestep (fits 32-entry FIFO) and no single class > 16% of predictions
-                if max_ts_spk < 28 and 3.0 <= avg_spk <= 25.0 and max_class_share < 0.16 and acc > best_calib_acc:
-                    best_calib_acc = acc
-                    best_params = (alpha, s_ratio, th_l3)
+                if alpha == 0.0:
+                    if 3.0 <= avg_spk <= 25.0 and acc > best_unfolded_acc:
+                        best_unfolded_acc = acc
+                else:
+                    # Require < 28 spikes/timestep (fits 32-entry FIFO) and no single class > 16% of predictions
+                    if max_ts_spk < 28 and 3.0 <= avg_spk <= 25.0 and max_class_share < 0.16 and acc > best_calib_acc:
+                        best_calib_acc = acc
+                        best_params = (alpha, s_ratio, th_l3)
 
     BIAS_FOLD_COEFF, best_scale3_ratio, best_th_l3 = best_params
     w3_folded = w3_f.copy()
@@ -333,8 +372,11 @@ def main():
         w3_folded[c, :] += (b3_f[c] * BIAS_FOLD_COEFF)
     final_scale3 = best_scale3_ratio * (127.0 / np.max(np.abs(w3_folded)))
     q_fc_int = np.clip(np.round(w3_folded * final_scale3), -127, 127).astype(np.int8)
+    q_fc_unfolded = np.clip(np.round(w3_f * final_scale3), -127, 127).astype(np.int8)
+    q_b2 = np.clip(np.round(b2_f * SCALE2), -127, 127).astype(np.int8)
+    q_b3 = np.clip(np.round(b3_f * final_scale3), -127, 127).astype(np.int8)
 
-    print(f"  Optimized Calibration Accuracy   : {best_calib_acc:.2f}% (on {n_calib} validation samples)")
+    print(f"  Optimized Calibration Accuracy   : {best_calib_acc:.2f}% (Without Bias Folding: {best_unfolded_acc:.2f}%)")
     print(f"  Optimized Bias Fold Coeff        : {BIAS_FOLD_COEFF:.4f}")
     print(f"  Optimized Layer 3 Scale Ratio    : {best_scale3_ratio:.2f} (scale3 = {final_scale3:.2f})")
     print(f"  Layer 2 Threshold (HLS 0x18)     : {base_th}")
@@ -372,7 +414,8 @@ def main():
             for t in range(TIMESTEPS):
                 v1 += cur1_b
                 s1 = (v1 >= 1.0).float()
-                v1 -= s1 * 1.0
+                s1_sub = s1 * 1.0
+                v1 -= s1_sub
 
                 p1 = pool1(s1)
                 cur2 = nn.functional.conv2d(p1, q_conv2_t, padding=1)
@@ -383,26 +426,29 @@ def main():
                 p2 = (pool2(s2) * 4.0).view(B, 784).numpy()
                 p2_batch[:, t, :] = np.round(p2).astype(np.int32)
 
-            for bi in range(B):
-                v4 = np.zeros(10, dtype=np.int32)
-                spk_out = np.zeros(10, dtype=np.int32)
-                for t in range(TIMESTEPS):
+            padded_ev_b = []
+            for t in range(TIMESTEPS):
+                ts_lists = []
+                max_len = 0
+                for bi in range(B):
                     active_srcs = np.nonzero(p2_batch[bi, t] > 0)[0]
-                    for src in active_srcs:
-                        for _ in range(int(p2_batch[bi, t, src])):
-                            v4 += q_fc_i32[:, src]
-                            v4 = np.maximum(v4, 0)
-                            fired = (v4 >= best_th_l3)
-                            if np.any(fired):
-                                spk_out[fired] += 1
-                                v4[fired] = 0
+                    expanded = np.repeat(active_srcs, p2_batch[bi, t, active_srcs])
+                    ts_lists.append(expanded)
+                    if len(expanded) > max_len:
+                        max_len = len(expanded)
+                arr_t = np.full((B, max_len), N_L2, dtype=np.int32)
+                for bi, seq in enumerate(ts_lists):
+                    if len(seq) > 0:
+                        arr_t[bi, :len(seq)] = seq
+                padded_ev_b.append(arr_t)
 
-                pred = int(np.argmax(spk_out))
-                class_pred_hist[pred] += 1
-                if np.sum(spk_out) > 0 and pred == int(b_lbls_np[bi]):
-                    correct_full += 1
-                total_spikes_full += int(np.sum(spk_out))
-                total_samples += 1
+            spk_out_b, _ = simulate_sequential_batch(q_fc_i32, padded_ev_b, best_th_l3, B)
+            tot_b = np.sum(spk_out_b, axis=1)
+            preds_b = np.argmax(spk_out_b, axis=1)
+            class_pred_hist += np.bincount(preds_b, minlength=10)
+            correct_full += int(np.sum((tot_b > 0) & (preds_b == b_lbls_np)))
+            total_spikes_full += int(np.sum(tot_b))
+            total_samples += B
 
     full_acc = correct_full / total_samples * 100.0
     avg_spikes = total_spikes_full / total_samples
@@ -410,7 +456,7 @@ def main():
     print(f"Prediction Distribution across Classes 0..9: {class_pred_hist.tolist()}")
 
     # ─────────────────────────────────────────────────────────────────
-    # 6. Save Deployment Payload
+    # 6. Save Deployment Payload & Detailed Bias Report JSON
     # ─────────────────────────────────────────────────────────────────
     os.makedirs(os.path.dirname(os.path.abspath(OUTPUT_PATH)), exist_ok=True)
     np.savez_compressed(
@@ -418,9 +464,9 @@ def main():
         w1_f=w1_f,
         b1_f=b1_f,
         q_conv2_w=q_conv2_int,
-        q_conv2_b=np.clip(np.round(b2_f * SCALE2), -127, 127).astype(np.int8),
+        q_conv2_b=q_b2,
         q_fc_w=q_fc_int,
-        q_fc_b=np.clip(np.round(b3_f * final_scale3), -127, 127).astype(np.int8),
+        q_fc_b=q_b3,
         test_imgs=test_imgs,
         test_lbls=test_lbls,
         hw_threshold=np.array(base_th, dtype=np.int32),
@@ -433,10 +479,167 @@ def main():
     )
     print(f"\nSaved CNN3 Deployment Payload: {OUTPUT_PATH}")
 
+    def summarize_float_bias(b_arr):
+        b = np.asarray(b_arr, dtype=np.float64)
+        return {
+            "dtype_source_pytorch": "torch.float32 (IEEE-754 32-bit floating point)",
+            "num_channels_or_neurons": int(b.size),
+            "non_zero_count": int(np.count_nonzero(b)),
+            "zero_count": int(b.size - np.count_nonzero(b)),
+            "positive_excitatory_count": int(np.sum(b > 0)),
+            "negative_inhibitory_count": int(np.sum(b < 0)),
+            "min_float32": float(np.min(b)),
+            "max_float32": float(np.max(b)),
+            "range_span_float32": float(np.max(b) - np.min(b)),
+            "mean_float32": float(np.mean(b)),
+            "std_float32": float(np.std(b)),
+            "median_float32": float(np.median(b)),
+            "mean_abs_l1_float32": float(np.mean(np.abs(b))),
+            "l2_norm_float32": float(np.linalg.norm(b))
+        }
+
+    avg_l2_events_per_ts = avg_l2_events / float(TIMESTEPS)
+    w3_diff = q_fc_int.astype(np.int32) - q_fc_unfolded.astype(np.int32)
+
+    per_digit_l3_report = []
+    for digit in range(len(b3_f)):
+        b_val = float(b3_f[digit])
+        qb_val = int(q_b3[digit])
+        float_shift_per_spk = float(b_val * BIAS_FOLD_COEFF)
+        hw_shift_per_spk = float(b_val * BIAS_FOLD_COEFF * final_scale3)
+        exp_hw_per_ts = float(hw_shift_per_spk * avg_l2_events_per_ts)
+        row_diff = q_fc_int[digit].astype(np.int32) - q_fc_unfolded[digit].astype(np.int32)
+        role = "excitatory (promotes firing)" if b_val > 0 else ("inhibitory (suppresses firing)" if b_val < 0 else "neutral (zero bias)")
+        per_digit_l3_report.append({
+            "class_index": int(digit),
+            "label": f"Digit {digit}",
+            "bias_nature": l3_bias_nature,
+            "bias_float32": b_val,
+            "direct_quantized_bias_int8": qb_val,
+            "functional_effect": role,
+            "folded_float_shift_per_l2_spike": float_shift_per_spk,
+            "folded_hw_units_per_l2_spike": hw_shift_per_spk,
+            "expected_hw_units_per_timestep": exp_hw_per_ts,
+            "expected_pct_of_hw_threshold_l3_per_timestep": float(exp_hw_per_ts / max(1, best_th_l3) * 100.0),
+            "incoming_synapses_shifted_count": int(np.count_nonzero(row_diff)),
+            "incoming_synapses_total": int(q_fc_int.shape[1]),
+            "mean_synaptic_int8_delta": float(np.mean(row_diff))
+        })
+
+    bias_report = {
+        "dataset": "MNIST",
+        "architecture": "CNN3 (100% On-FPGA Hybrid HLS Conv1/Conv2 + RTL Core Groups Layer 3)",
+        "model_path": MODEL_PATH,
+        "deployment_payload_path": OUTPUT_PATH,
+        "hls_weights_header_path": args.hls_header,
+        "timesteps": int(TIMESTEPS),
+        "input_normalization": "zscore (mean=0.1307, std=0.3081)" if selected_norm == 'zscore' else "raw [0, 1]",
+        "overall_bias_summary": {
+            "has_biases": bool(has_biases),
+            "bias_detected_status": "Yes (fused/explicit)" if has_biases else "No (bias=False / zero bias)",
+            "layer_1_bias_nature": l1_bias_nature,
+            "layer_2_bias_nature": l2_bias_nature,
+            "layer_3_bias_nature": l3_bias_nature,
+            "hardware_bias_mechanism_explanation": (
+                "Layer 1 (Conv1) executes inside the HLS Streaming 2D Convolution Engine using ap_fixed<16,8> "
+                "(Q8.8 signed fixed-point), where CONV1_BIAS[k] is added directly to each filter's 3x3 accumulator "
+                "at every pixel and timestep before the V_th=1.0 LIF check. Layer 2 (Conv2) executes in HLS Phase 2/3 "
+                "using 8-bit signed integer weights (CONV2_WEIGHTS) and 16-bit signed membrane potentials (cnn_l2_v_mem). "
+                "Layer 3 (Classifier) executes on RTL Core Group 4, which receives ~2,330 Layer 2 spike events per image "
+                "from Relay Core Groups 0..3 and has no dedicated bias adder register. Event-Driven Synaptic Bias Folding "
+                "embeds b3_f[c] into the 784 incoming synaptic weights per class: W3_folded[c, j] = W3_f[c, j] + alpha * b3_f[c]."
+            ),
+            "calibration_accuracy_comparison": {
+                "calibration_subset_size": int(n_calib),
+                "validation_accuracy_without_bias_folding_percent": float(best_unfolded_acc),
+                "validation_accuracy_with_bias_folding_percent": float(best_calib_acc),
+                "validation_accuracy_gain_percent": float(best_calib_acc - best_unfolded_acc) if best_unfolded_acc >= 0 else 0.0,
+                "full_test_set_10000_accuracy_percent": float(full_acc),
+                "calibrated_l2_threshold_hls_reg_0x18": int(base_th),
+                "calibrated_l3_threshold_rtl_reg_0x10": int(best_th_l3)
+            }
+        },
+        "layers": {
+            "layer_1_conv1": {
+                "topology": f"Conv2d ({w1_f.shape[1]} -> {w1_f.shape[0]}, kernel={w1_f.shape[2]}x{w1_f.shape[3]}, padding=1) + LIF(1.0) + AvgPool2d(2x2)",
+                "execution_target": "FPGA HLS Engine Phase 1 (cnn_v_mem[8][28][28], ap_fixed<16,8> Q8.8 fixed-point)",
+                "bias_nature": l1_bias_nature,
+                "state_dict_keys_used": l1_source_keys,
+                "has_explicit_conv2d_bias_in_checkpoint": bool(l1_has_raw_bias),
+                "has_batchnorm_in_checkpoint": bool(l1_has_bn),
+                "bias_handling_in_hardware": "Exported to CONV1_BIAS[8] in cnn3_weights.h and cast to ap_fixed<16,8> (Q8.8, step=1/256=0.00390625) in snn_top_hls.cpp Phase 1",
+                "float32_statistics": summarize_float_bias(b1_f),
+                "hardware_q8_8_fixed_point_representation": {
+                    "dtype": "ap_fixed<16,8> (signed 16-bit fixed-point: 8 integer bits, 8 fractional bits)",
+                    "range": [-128.0, 127.99609375],
+                    "resolution_step": 0.00390625,
+                    "q8_8_raw_int16_values": [int(round(float(x) * 256.0)) for x in b1_f],
+                    "q8_8_quantized_float_values": [round(int(round(float(x) * 256.0)) / 256.0, 6) for x in b1_f]
+                },
+                "bias_values_float32": [round(float(x), 6) for x in b1_f]
+            },
+            "layer_2_conv2": {
+                "topology": f"Conv2d ({w2_f.shape[1]} -> {w2_f.shape[0]}, kernel={w2_f.shape[2]}x{w2_f.shape[3]}, padding=1) + LIF({base_th}) + SumPool2d(2x2)",
+                "execution_target": "FPGA HLS Engine Phase 2 & 3 (cnn_l2_v_mem[16][14][14], int16 membrane potential, int8 weights)",
+                "bias_nature": l2_bias_nature,
+                "state_dict_keys_used": l2_source_keys,
+                "has_explicit_conv2d_bias_in_checkpoint": bool(l2_has_raw_bias),
+                "has_batchnorm_in_checkpoint": False,
+                "float32_statistics": summarize_float_bias(b2_f),
+                "hardware_quantization": {
+                    "weight_dtype": "int8 (signed char CONV2_WEIGHTS[16][8][3][3] in cnn3_weights.h)",
+                    "accumulator_dtype": "ap_int<16> (signed 16-bit integer cnn_l2_v_mem)",
+                    "quantization_scale2": float(SCALE2),
+                    "hls_layer2_base_threshold_reg_0x18": int(base_th),
+                    "hls_phase3_effective_threshold_l2": int(base_th * 4),
+                    "direct_quantized_bias_int8_range": [int(np.min(q_b2)), int(np.max(q_b2))],
+                    "direct_quantized_bias_values_int8": [int(x) for x in q_b2]
+                },
+                "bias_values_float32": [round(float(x), 6) for x in b2_f]
+            },
+            "layer_3_classifier": {
+                "topology": f"Linear ({w3_f.shape[1]} -> {w3_f.shape[0]})",
+                "execution_target": "FPGA RTL Core Group 4 (10 Output Class LIF Neurons 0..9, int8 BRAM synapses, int16 membrane potential)",
+                "bias_nature": l3_bias_nature,
+                "state_dict_keys_used": l3_source_keys,
+                "has_explicit_linear_bias_in_checkpoint": bool(l3_has_raw_bias),
+                "has_batchnorm_in_checkpoint": False,
+                "bias_handling_in_hardware": (
+                    "Folded into Layer 3 incoming synaptic weights: W3_folded[c, src] = W3_f[c, src] + alpha * b3_f[c], "
+                    "then quantized to int8 [-127, 127] and uploaded into the 16,384-entry BRAM Connectivity Table."
+                ),
+                "float32_statistics": summarize_float_bias(b3_f),
+                "hardware_quantization_and_folding": {
+                    "hardware_weight_dtype": "int8 (8-bit magnitude + 1-bit exc_inh flag in BRAM connectivity table)",
+                    "hardware_accumulator_dtype": "uint16/int16 (16-bit membrane potential in core_group.v)",
+                    "hardware_threshold_dtype": "uint16 (16-bit global threshold CFG_THRESHOLD at AXI 0x10)",
+                    "int8_valid_range": [-127, 127],
+                    "quantization_scale3": float(final_scale3),
+                    "float_step_per_int8_lsb": float(1.0 / final_scale3) if final_scale3 > 0 else 0.0,
+                    "bias_folding_coefficient_alpha": float(BIAS_FOLD_COEFF),
+                    "avg_incoming_l2_events_per_image": float(avg_l2_events),
+                    "avg_incoming_l2_events_per_timestep": float(avg_l2_events_per_ts),
+                    "total_synapses_in_layer": int(q_fc_int.size),
+                    "synapses_shifted_by_bias_folding_count": int(np.count_nonzero(w3_diff)),
+                    "synapses_shifted_by_bias_folding_percent": float(np.count_nonzero(w3_diff) / max(1, q_fc_int.size) * 100.0),
+                    "synaptic_int8_shift_min": int(np.min(w3_diff)),
+                    "synaptic_int8_shift_max": int(np.max(w3_diff))
+                },
+                "per_digit_bias_breakdown": per_digit_l3_report
+            }
+        }
+    }
+
+    os.makedirs(os.path.dirname(os.path.abspath(BIAS_REPORT_PATH)), exist_ok=True)
+    with open(BIAS_REPORT_PATH, 'w') as f:
+        json.dump(bias_report, f, indent=2)
+    print(f"Saved Detailed Bias Diagnostic Report: {BIAS_REPORT_PATH}")
+
     # ─────────────────────────────────────────────────────────────────
     # 7. Export HLS C++ Weights Header
     # ─────────────────────────────────────────────────────────────────
-    export_hls_weights_header(w1_f, b1_f, q_conv2_int, args.hls_header)
+    q_b2_hls = np.round(4.0 * SCALE2 * b2_f).astype(np.int16)
+    export_hls_weights_header(w1_f, b1_f, q_conv2_int, q_b2_hls, args.hls_header)
 
 
 if __name__ == '__main__':

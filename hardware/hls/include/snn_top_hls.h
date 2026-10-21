@@ -21,25 +21,27 @@
 #include "cnn3_weights.h"
 
 //=============================================================================
-// CNN3 Streaming 2D Convolution Engine Definitions
+// CNN3 Streaming 2D Convolution Engine Definitions (CIFAR-10: 3x32x32)
 //=============================================================================
 #define MODE_CNN_STREAM 3      // Mode 3: 2D streaming conv engine active
 
-const int CNN_IMG_WIDTH        = 28;
-const int CNN_IMG_HEIGHT       = 28;
-const int CNN_IMG_PIXELS       = 784;
+const int CNN_IMG_CHANNELS     = 3;
+const int CNN_IMG_WIDTH        = 32;
+const int CNN_IMG_HEIGHT       = 32;
+const int CNN_IMG_CHAN_PIXELS  = 1024; // 32 x 32 per channel
+const int CNN_IMG_PIXELS       = 3072; // 3 x 32 x 32 total input elements
 
 const int CNN_CONV1_CHANNELS   = 8;
 const int CNN_CONV1_K          = 3;
-const int CNN_POOL1_WIDTH      = 14;
-const int CNN_POOL1_HEIGHT     = 14;
-const int CNN_POOL1_SIZE       = 196; // 14 x 14 = 196 per channel
+const int CNN_POOL1_WIDTH      = 16;
+const int CNN_POOL1_HEIGHT     = 16;
+const int CNN_POOL1_SIZE       = 256; // 16 x 16 = 256 per channel
 
 const int CNN_CONV2_CHANNELS   = 16;
-const int CNN_POOL2_WIDTH      = 7;
-const int CNN_POOL2_HEIGHT     = 7;
-const int CNN_POOL2_SIZE       = 49;  // 7 x 7 = 49 per channel
-const int CNN_L2_TOTAL         = 784; // 16 x 49 = 784 neurons
+const int CNN_POOL2_WIDTH      = 8;
+const int CNN_POOL2_HEIGHT     = 8;
+const int CNN_POOL2_SIZE       = 64;  // 8 x 8 = 64 per channel
+const int CNN_L2_TOTAL         = 1024;// 16 x 64 = 1024 neurons
 
 //=============================================================================
 // Configuration (derived from snn_params.h)

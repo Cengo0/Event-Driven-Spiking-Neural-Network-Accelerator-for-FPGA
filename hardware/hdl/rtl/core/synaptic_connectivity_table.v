@@ -73,8 +73,8 @@ module synaptic_connectivity_table #(
 
     //=========================================================================
     // Connection Table - Dual-Port BRAM
-    // Compact Layered Allocation for Core Groups v3:
-    //   Groups 0..3 (Layer 2): 4 groups x 196 neurons x 16 fanout = 12,544 entries
+    // Compact Layered Allocation for Core Groups v3 (CNN3 CIFAR-10 / MNIST):
+    //   Groups 0..3 (Layer 2): 4 groups x 256 neurons x 16 fanout = 16,384 entries
     //   Total capacity = 16,384 entries (fits in 9 RAMB36 / 18 RAMB18 tiles)
     //   Address mapping: {src_group[1:0], src_neuron[7:0], fanout_idx[3:0]}
     //=========================================================================

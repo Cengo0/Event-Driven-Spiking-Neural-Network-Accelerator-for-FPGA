@@ -1,0 +1,483 @@
+#!/usr/bin/env python3
+"""
+fpga_cnn3_cifar10_inference.py
+==============================
+Multi-Layer CIFAR-10 Convolutional SNN (CNN3) 100% On-FPGA Inference with Pin Y18 SCA Trigger.
+Architecture: snn_core_group_top.v (conv_cifar10) + HLS Streaming 2D Convolution Engine
+
+Pipeline on Hardware:
+  - Layer 1 & 2 (HLS Engine)     : Conv1(3->8) -> LIF(1.0) -> Pool1 -> Conv2(8->16) -> LIF(hw_threshold_l2) -> Pool2
+  - Layer 2 Relay (RTL Grps 0..3): 1,024 Instant-Relay Neurons across 4 Core Groups (4 x 256, Vth = 1)
+  - Layer 3 (RTL Core Group 4)   : 10 Class LIF Neurons in Group 4 (Vth = hw_threshold_l3, Full Int8)
+  - Inter-Group Routing Table    : Hardware BRAM (16,384 rows mapping Groups 0..3 -> Group 4)
+  - Dedicated Hardware Trigger   : Pin Y18 (snn_busy) pulses HIGH during full on-chip inference
+
+Usage:
+  python3 tests/fpga_cnn3_cifar10_inference.py --bitstream outputs_conv_cifar10/snn_core_group_conv_cifar10.bit \
+                                               --data data/cache/cifar10_cnn3_deployment.npz
+"""
+
+import argparse
+import time
+import json
+import os
+import numpy as np
+from datetime import datetime
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Hardware Parameters (matching snn_params.vh generated from snn_params.yaml)
+# ─────────────────────────────────────────────────────────────────────────────
+NUM_GROUPS         = 5
+GROUP_SIZE_L2      = 256  # Groups 0..3: Layer 2 relay neurons (4 x 256 = 1024)
+GROUP_SIZE_L3      = 16   # Group 4: Layer 3 output class neurons (10 classes: 0..9)
+OUTPUT_GROUP       = 4    # Output classification layer
+
+LOCAL_ID_WIDTH     = 8    # 256 neurons -> 8 bits
+GROUP_ID_WIDTH     = 3    # 5 groups -> 3 bits
+
+# Register offsets (snn_config_regs.v)
+CFG_CTRL           = 0x00
+CFG_ADDR           = 0x04
+CFG_WDATA          = 0x08
+CFG_THRESHOLD      = 0x10
+CFG_NEURON_PARAMS  = 0x14
+CFG_ROUTER_SPKS    = 0x18
+CFG_NEURON_SPKS    = 0x1C
+
+# HLS Modes
+MODE_INFERENCE     = 0x01
+MODE_CNN_STREAM    = 0x03
+
+
+def encode_ct_write(src_group: int, src_neuron: int, fanout_idx: int,
+                    dst_group: int, dst_neuron: int, weight: int,
+                    exc: bool) -> tuple:
+    """
+    Build (addr, data) for connectivity table write (14-bit compact addressing).
+    ADDR:  [31:28]=0x0, [27:20]=fanout_idx(8b), [19:12]=src_neuron(8b), [3:0]=src_group(4b)
+    WDATA: [31]=valid, [30:27]=dst_group(4b), [23:16]=dst_neuron(8b), [15:8]=weight(8b), [0]=exc
+    """
+    addr  = (0x0 << 28)
+    addr |= ((fanout_idx & 0xFF) << 20)
+    addr |= ((src_neuron & 0xFF) << 12)
+    addr |= (src_group  & 0xF)
+
+    data  = (1 << 31)                      # valid bit
+    data |= ((dst_group  & 0xF)  << 27)    # dst_group
+    data |= ((dst_neuron & 0xFF) << 16)    # dst_neuron (8-bit)
+    data |= ((weight     & 0xFF) << 8)     # weight (8-bit)
+    data |= (1 if exc else 0)              # exc_inh (bit 0)
+
+    return addr, data
+
+
+def ct_write(mmio, addr: int, data: int):
+    """Write one row of the connectivity table via AXI-Lite."""
+    mmio.write(CFG_CTRL,  0)      # target = router
+    mmio.write(CFG_ADDR,  addr)
+    mmio.write(CFG_WDATA, data)   # triggers config_we pulse
+
+
+def prepare_ct_table(q_fc_w: np.ndarray) -> list:
+    n_classes, n_l2 = q_fc_w.shape
+    group_size_l2 = n_l2 // 4
+    entries = []
+    for global_src in range(n_l2):
+        src_grp = global_src // group_size_l2
+        src_nid = global_src % group_size_l2
+        fanout = 0
+        for dst in range(n_classes):
+            w = int(q_fc_w[dst, global_src])
+            if w != 0:
+                addr, data = encode_ct_write(
+                    src_group=src_grp,
+                    src_neuron=src_nid,
+                    fanout_idx=fanout,
+                    dst_group=OUTPUT_GROUP,
+                    dst_neuron=dst,
+                    weight=abs(w),
+                    exc=(w > 0)
+                )
+                entries.append((addr, data))
+                fanout += 1
+        if fanout < 16:
+            addr, _ = encode_ct_write(
+                src_group=src_grp,
+                src_neuron=src_nid,
+                fanout_idx=fanout,
+                dst_group=0,
+                dst_neuron=0,
+                weight=0,
+                exc=False
+            )
+            entries.append((addr, 0))
+    return entries
+
+
+def fast_upload_layer3_weights(mmio, entries: list):
+    mmio.write(CFG_CTRL, 0)
+    for addr, data in entries:
+        mmio.write(CFG_ADDR, addr)
+        mmio.write(CFG_WDATA, data)
+
+
+def upload_layer3_weights(mmio, q_fc_w: np.ndarray):
+    """
+    Upload Layer 2 -> Layer 3 dense weights to hardware connectivity table.
+      - Source neurons: 1,024 Layer 2 neurons mapped across Groups 0..3 (256 each)
+      - Destination neurons: 10 Class neurons in Group 4
+    """
+    entries = prepare_ct_table(q_fc_w)
+    fast_upload_layer3_weights(mmio, entries)
+    print(f"  Layer 3: Successfully wrote {len(entries)} active synaptic connections into BRAM table.")
+
+
+def reset_hardware_state(hls_ctrl, mmio):
+    """
+    Complete Zero-State Hardware Reset:
+      1. HLS Reset: clears Conv1/Conv2 buffers, cnn_v_mem, cnn_l2_v_mem, resets cnn_pixel_counter=0,
+         and asserts physical snn_reset wire into RTL.
+      2. Configure 100% leak (0x0009) on RTL Core Groups.
+      3. Run HLS for 2000 cycles with reset=0 (snn_reset drops, snn_enable=1):
+         the RTL Core Groups run their leak FSM (>2 full 768-cycle sweeps across 256 neurons)
+         so even odd membrane potentials ((mem >> 1) + (mem >> 1)) decay completely to 0.
+      4. Restore leak_rate=0 for inference.
+      5. Configure HLS ready for inference (enable=1, reset=0, time_steps=1).
+    """
+    # 1. HLS Engine Reset (clears cnn_frame, cnn_v_mem, cnn_l2_v_mem, asserts snn_reset into RTL)
+    hls_ctrl.write(0x10, 0x03)          # ctrl_reg: enable=1, reset=1
+    hls_ctrl.write(0x28, 1)             # 1 step
+    hls_ctrl.write(0x00, 0x01)          # ap_start
+    t0 = time.time() + 0.010
+    while time.time() < t0:
+        if hls_ctrl.read(0x00) & 0x02:  # wait ap_done
+            break
+
+    # 2. Configure 100% leak rate on RTL Core Groups
+    mmio.write(CFG_NEURON_PARAMS, 0x0009) # shift1=1, shift2=1 -> 100% leak per sweep
+
+    # 3. Run HLS with snn_enable=1 for 2000 cycles (>2 full 768-cycle BRAM sweeps)
+    hls_ctrl.write(0x10, 0x01)          # ctrl_reg: enable=1, reset=0 (snn_reset drops!)
+    hls_ctrl.write(0x20, MODE_CNN_STREAM)
+    hls_ctrl.write(0x28, 2000)          # 2000 cycles (>1536 cycles required for 2 full sweeps)
+    hls_ctrl.write(0x00, 0x01)          # ap_start -> snn_enable=1, Core Groups zero BRAM!
+    t0 = time.time() + 0.015
+    while time.time() < t0:
+        if hls_ctrl.read(0x00) & 0x02:  # wait ap_done
+            break
+
+    # 4. Restore zero leak rate for inference
+    mmio.write(CFG_NEURON_PARAMS, 0x0000) # restore zero leak
+    hls_ctrl.write(0x28, 1)
+    hls_ctrl.write(0x00, 0x00)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="All-on-FPGA CIFAR-10 CNN3 SNN Hardware Inference with SCA Trigger")
+    parser.add_argument('--bitstream',     default='snn_core_group_conv_cifar10.bit',
+                        help='Path to snn_core_group_conv_cifar10 bitstream')
+    parser.add_argument('--data',          default='cifar10_cnn3_deployment.npz',
+                        help='Deployment payload (.npz)')
+    parser.add_argument('--samples',  type=int, default=10000,
+                        help='Number of test images to evaluate (default: 10000)')
+    parser.add_argument('--timesteps', type=int, default=4,
+                        help='Number of SNN timesteps (default: 4)')
+    parser.add_argument('--threshold-l2', type=int, default=None,
+                        help='Optional override for HLS Layer 2 threshold (default: payload hw_threshold)')
+    parser.add_argument('--threshold', type=int, default=None,
+                        help='Optional override for RTL Layer 3 classifier threshold (default: payload hw_threshold_l3)')
+    parser.add_argument('--output-json',   default='cifar10_cnn3_inference_results.json',
+                        help='Results output JSON path')
+    parser.add_argument('--skip-bitstream', action='store_true',
+                        help='Skip PL programming if overlay is already active')
+    parser.add_argument('--reset-mode', choices=['flash', 'fast'], default='flash',
+                        help='Hardware state reset mode: flash (bitstream reload) or fast (leak sweep)')
+    args = parser.parse_args()
+
+    # ── Load Deployment Payload ───────────────────────────────────────────────
+    print(f"Loading CIFAR-10 CNN3 deployment payload: {args.data}")
+    payload      = np.load(args.data)
+    q_fc_w       = payload['q_fc_w']        # (10, 1024) int8
+    test_imgs    = payload['test_imgs']     # (10000, 3, 32, 32) pre-normalized float32
+    test_lbls    = payload['test_lbls']     # (10000,)
+
+    hw_threshold_l2 = args.threshold_l2 if args.threshold_l2 is not None else int(
+        payload['hw_threshold_l2'] if 'hw_threshold_l2' in payload else payload['hw_threshold']
+    )
+    hw_threshold_l3 = args.threshold if args.threshold is not None else int(
+        payload['hw_threshold_l3'] if 'hw_threshold_l3' in payload else payload['hw_threshold']
+    )
+
+    print(f"  Dataset: {len(test_imgs)} test images loaded, shape: {test_imgs.shape}")
+    print(f"  Layer 2 Threshold (HLS 0x18)        : {hw_threshold_l2}")
+    print(f"  Layer 3 Threshold (RTL Group 4 0x10): {hw_threshold_l3}")
+    print(f"  Layer 3 Weight Range (q_fc_w)       : [{q_fc_w.min()}, {q_fc_w.max()}] "
+          f"(Non-zero: {int(np.count_nonzero(q_fc_w))}/{q_fc_w.size})")
+
+    # ── Initialise PYNQ Overlay ───────────────────────────────────────────────
+    try:
+        from pynq import Overlay, allocate
+        print("Initialising PYNQ Overlay...")
+        if not args.skip_bitstream and os.path.exists(args.bitstream):
+            overlay = Overlay(args.bitstream)
+            print(f"  Programmed PL with: {args.bitstream}")
+        else:
+            overlay = Overlay(args.bitstream, download=False)
+            print("  Using existing PL configuration.")
+
+        mmio     = overlay.snn_config_regs_0.mmio
+        hls_ctrl = overlay.snn_top_hls_0.mmio
+        dma_mmio = overlay.axi_dma_0.mmio
+
+        # Reset HLS core
+        print("Resetting HLS core and hardware state...")
+        hls_ctrl.write(0x00, 0x02) # assert reset
+        time.sleep(0.01)
+        hls_ctrl.write(0x00, 0x00) # deassert reset
+        time.sleep(0.01)
+
+        # ── Upload Weights to Connectivity Table ──────────────────────────────
+        upload_layer3_weights(mmio, q_fc_w)
+
+        # ── Configure Hardware Neurons & Registers (RTL Group 4 Classifier) ───
+        mmio.write(CFG_THRESHOLD, hw_threshold_l3 & 0xFFFF)
+        mmio.write(CFG_NEURON_PARAMS, 0x0000)  # leak=0, refrac=0
+        print(f"  RTL Group 4 (Layer 3) threshold configured: {hw_threshold_l3}")
+
+        # ── Configure HLS for CNN Streaming Mode (HLS Layer 2 Engine) ─────────
+        hls_ctrl.write(0x10, 0x01)              # 0x10: ctrl_reg: enable=1, reset=0
+        hls_ctrl.write(0x18, hw_threshold_l2)   # 0x18: config_reg: Layer 2 threshold
+        hls_ctrl.write(0x20, MODE_CNN_STREAM)   # 0x20: mode_reg: Mode 3 (Streaming 2D Conv)
+        hls_ctrl.write(0x28, 1)                 # 0x28: time_steps_reg: 1 (auto-restart)
+        hls_ctrl.write(0x00, 0x00)              # 0x00: ap_ctrl: idle
+        print(f"  HLS Layer 2 threshold configured          : {hw_threshold_l2}")
+
+        # ── Allocate DMA Buffers ──────────────────────────────────────────────
+        n_pixels   = int(test_imgs[0].size)     # 3072 for CIFAR-10 (3x32x32)
+        in_buffer  = allocate(shape=(n_pixels,), dtype=np.uint32)
+        out_buffer = allocate(shape=(512,), dtype=np.uint32)
+
+        # Pre-compute connectivity table entries
+        ct_entries = prepare_ct_table(q_fc_w)
+
+        # ── Run Hardware Inference Loop ───────────────────────────────────────
+        n_test  = min(args.samples, len(test_imgs))
+        correct = 0
+        total_spikes = 0
+        accum_router_spk = 0
+        accum_neuron_spk = 0
+        latencies_ms = []
+        log = []
+
+        print(f"\nStarting 100% on-FPGA CIFAR-10 inference on {n_test} images (Pin Y18 SCA Trigger active)...")
+        t_start_all = time.time()
+
+        for i in range(n_test):
+            img = test_imgs[i] # 3x32x32 float32
+            lbl = int(test_lbls[i])
+
+            # Zero hardware state & membrane potentials between images
+            if args.reset_mode == 'flash':
+                overlay.download()
+                mmio     = overlay.snn_config_regs_0.mmio
+                hls_ctrl = overlay.snn_top_hls_0.mmio
+                dma_mmio = overlay.axi_dma_0.mmio
+                fast_upload_layer3_weights(mmio, ct_entries)
+                mmio.write(CFG_THRESHOLD, hw_threshold_l3 & 0xFFFF)
+                mmio.write(CFG_NEURON_PARAMS, 0x0000)
+                hls_ctrl.write(0x10, 0x01)
+                hls_ctrl.write(0x18, hw_threshold_l2)
+                hls_ctrl.write(0x20, MODE_CNN_STREAM)
+                hls_ctrl.write(0x28, 1)
+                hls_ctrl.write(0x00, 0x00)
+            else:
+                reset_hardware_state(hls_ctrl, mmio)
+
+            # Quantize pixel values to Q8.8 fixed-point (pixel * 256)
+            px_quant = np.clip(np.round(img.flatten() * 256.0), -32768, 32767).astype(np.int16)
+            in_buffer[:] = (px_quant.astype(np.int32) & 0xFFFF).astype(np.uint32)
+            in_buffer.flush()
+
+            class_spk = np.zeros(10, dtype=np.int32)
+            t0 = time.time()
+
+            # Clean initial DMA channel reset before first timestep of this image
+            dma_mmio.write(0x00, 0x04) # MM2S reset
+            dma_mmio.write(0x30, 0x04) # S2MM reset
+            t_rst_wait = time.time() + 0.005
+            while (dma_mmio.read(0x00) & 0x04 or dma_mmio.read(0x30) & 0x04) and time.time() < t_rst_wait:
+                pass
+
+            # Stream across SNN timesteps (T=4)
+            for t in range(args.timesteps):
+                # 1. Reset S2MM channel for this timestep to clear any stale pending re-arm
+                dma_mmio.write(0x30, 0x04)
+                t_rst_wait = time.time() + 0.005
+                while (dma_mmio.read(0x30) & 0x04) and time.time() < t_rst_wait:
+                    pass
+
+                # 2. Arm S2MM DMA (FPGA -> ARM) to capture output class spikes
+                dest_ptr = out_buffer.device_address
+                dma_mmio.write(0x34, 0x1000)   # clear S2MM IOC flag
+                dma_mmio.write(0x30, 0x01)     # run S2MM channel
+                dma_mmio.write(0x48, dest_ptr)
+                dma_mmio.write(0x58, 4)        # arm for 1st spike (4 bytes)
+
+                # 3. Start MM2S DMA (ARM -> FPGA): send 3072 pixels (12,288 bytes)
+                src_ptr = in_buffer.device_address
+                dma_mmio.write(0x04, 0x1000)   # clear MM2S IOC flag
+                dma_mmio.write(0x00, 0x01)     # run MM2S channel
+                dma_mmio.write(0x18, src_ptr)
+                dma_mmio.write(0x28, n_pixels * 4)
+
+                # 4. Start HLS Kernel with Auto-Restart (Pin Y18 SCA Trigger goes HIGH!)
+                hls_ctrl.write(0x00, 0x81)
+
+                # 5. Concurrent Drain Loop: Drain S2MM spikes while MM2S transfers & tail settles
+                spikes_received = 0
+                mm2s_done = False
+                quiet_deadline = None
+                t_abort = time.time() + 1.0    # 1.0s hard safety timeout
+                dma_arr = getattr(dma_mmio, 'array', None)
+
+                while time.time() < t_abort:
+                    # A. Service S2MM spike if arrived (prevents backpressure on router/HLS)
+                    if dma_arr is not None:
+                        if dma_arr[13] & 0x1000: # 0x34 S2MM_DMASR
+                            if spikes_received < 512:
+                                spikes_received += 1
+                                dma_arr[13] = 0x1000   # clear IOC flag
+                                if spikes_received < 512:
+                                    dma_arr[18] = dest_ptr + (spikes_received * 4) # 0x48 S2MM_DA
+                                    dma_arr[22] = 4    # 0x58 S2MM_LENGTH
+                            if mm2s_done:
+                                quiet_deadline = time.time() + 0.010
+                    else:
+                        if dma_mmio.read(0x34) & 0x1000:
+                            if spikes_received < 512:
+                                spikes_received += 1
+                                dma_mmio.write(0x34, 0x1000)   # clear IOC flag
+                                dma_mmio.write(0x30, 0x01)     # keep S2MM running
+                                if spikes_received < 512:
+                                    dma_mmio.write(0x48, dest_ptr + (spikes_received * 4))
+                                    dma_mmio.write(0x58, 4)    # re-arm for next spike
+                            if mm2s_done:
+                                quiet_deadline = time.time() + 0.010
+
+                    # B. Check if MM2S has finished sending all 3072 pixels
+                    if not mm2s_done:
+                        mm2s_sr = dma_arr[1] if dma_arr is not None else dma_mmio.read(0x04)
+                        if (mm2s_sr & 0x1000) or (mm2s_sr & 0x0002):
+                            mm2s_done = True
+                            quiet_deadline = time.time() + 0.010  # start 10ms quiet drain countdown
+                    else:
+                        # C. MM2S is done and quiet drain window elapsed
+                        if quiet_deadline is not None and time.time() >= quiet_deadline:
+                            break
+
+                # 6. Stop HLS & S2MM channel for this timestep cleanly (Pin Y18 SCA Trigger drops LOW!)
+                hls_ctrl.write(0x00, 0x00)     # deassert auto-restart
+                dma_mmio.write(0x30, 0x00)     # stop S2MM
+                out_buffer.invalidate()
+
+                # 7. Decode received output class spikes from Group 4
+                for s in range(spikes_received):
+                    pkt = int(out_buffer[s])
+                    if pkt != 0:
+                        gid = pkt & 0x7FF
+                        grp = (gid >> LOCAL_ID_WIDTH) & 0x7
+                        nid = gid & 0xFF
+                        if grp == OUTPUT_GROUP and nid < 10:
+                            class_spk[nid] += 1
+
+                out_buffer[:] = 0
+                out_buffer.flush()
+
+            t1 = time.time()
+            lat_ms = (t1 - t0) * 1000.0
+            latencies_ms.append(lat_ms)
+
+            # Read hardware diagnostic counters for this image (snn_reset zeros RTL counters before each image)
+            curr_r_spks = int(mmio.read(CFG_ROUTER_SPKS))
+            curr_n_spks = int(mmio.read(CFG_NEURON_SPKS))
+            accum_router_spk += curr_r_spks
+            accum_neuron_spk += curr_n_spks
+
+            total_spikes += int(np.sum(class_spk))
+            pred = int(np.argmax(class_spk))
+            if pred == lbl:
+                correct += 1
+
+            log.append({
+                "image_index":     i,
+                "true_label":      lbl,
+                "predicted_label": pred,
+                "spikes":          class_spk.tolist(),
+                "router_spikes":   curr_r_spks,
+                "neuron_spikes":   curr_n_spks,
+                "latency_ms":      round(lat_ms, 2)
+            })
+
+            # Print initial images and periodic progress
+            if (i + 1) <= 10 or (i + 1) % 100 == 0 or (i + 1) == n_test:
+                acc_so_far = correct / (i + 1) * 100
+                avg_spk_so_far = total_spikes / (i + 1)
+                print(f"  Processed [{i+1:5d}/{n_test:5d}] | Pred: {pred} (True: {lbl}) | "
+                      f"Spk: {class_spk.tolist()} | Acc: {acc_so_far:.2f}% | Avg Spk/Img: {avg_spk_so_far:.1f}")
+
+        total_time = time.time() - t_start_all
+        accuracy = correct / n_test * 100
+        avg_lat = np.mean(latencies_ms)
+        fps = n_test / total_time
+
+        print(f"\n========================================================")
+        print(f"  CIFAR-10 CNN3 Hardware Inference Results (All-on-FPGA)")
+        print(f"========================================================")
+        print(f"  Total Images   : {n_test}")
+        print(f"  Accuracy       : {accuracy:.2f}% ({correct}/{n_test})")
+        print(f"  Avg Latency    : {avg_lat:.2f} ms/image")
+        print(f"  Throughput     : {fps:.1f} FPS")
+        print(f"  Avg Spk/Img    : {total_spikes / n_test:.1f}")
+        print(f"\n  Hardware Diagnostics:")
+        print(f"    Router Spikes: {accum_router_spk}")
+        print(f"    Neuron Spikes: {accum_neuron_spk}")
+        print(f"========================================================")
+
+        out_dir = os.path.dirname(args.output_json)
+        if out_dir:
+            os.makedirs(out_dir, exist_ok=True)
+        results = {
+            "metadata": {
+                "timestamp":       datetime.now().isoformat(),
+                "model":           "cifar_cnn3_T_4_clean_l2",
+                "samples":         n_test,
+                "timesteps":       args.timesteps,
+                "hw_threshold_l2": hw_threshold_l2,
+                "hw_threshold_l3": hw_threshold_l3,
+                "trigger_pin":     "Y18"
+            },
+            "metrics": {
+                "accuracy_percent":   round(accuracy, 2),
+                "correct":            correct,
+                "total":              n_test,
+                "average_latency_ms": round(avg_lat, 2),
+                "fps":                round(fps, 1),
+                "avg_spikes_per_image": round(total_spikes / n_test, 2),
+                "diagnostics": {
+                    "router_spikes": accum_router_spk,
+                    "neuron_spikes": accum_neuron_spk
+                }
+            },
+            "predictions": log
+        }
+        with open(args.output_json, 'w') as f:
+            json.dump(results, f, indent=4)
+        print(f"Saved detailed results to: {args.output_json}")
+
+    except ImportError:
+        print("Note: pynq library not found on this host. Run this script directly on the PYNQ-Z2 board.")
+
+
+if __name__ == '__main__':
+    main()
+

@@ -32,12 +32,12 @@
 #
 #   Fallback: if group_sizes is absent, all groups get `neurons_per_group`.
 architecture:
-  neurons_per_group: 196    # Default / fallback per-group size
+  neurons_per_group: 256    # Default / fallback per-group size
   group_sizes:              # Per-group neuron counts (len = num_groups)
-    - 196                   # Group 0: Layer 2 Conv2 neurons partition 0 (0..195)
-    - 196                   # Group 1: Layer 2 Conv2 neurons partition 1 (196..391)
-    - 196                   # Group 2: Layer 2 Conv2 neurons partition 2 (392..587)
-    - 196                   # Group 3: Layer 2 Conv2 neurons partition 3 (588..783) -> Total L2 = 784
+    - 256                   # Group 0: Layer 2 Conv2 neurons partition 0 (0..255)
+    - 256                   # Group 1: Layer 2 Conv2 neurons partition 1 (256..511)
+    - 256                   # Group 2: Layer 2 Conv2 neurons partition 2 (512..767)
+    - 256                   # Group 3: Layer 2 Conv2 neurons partition 3 (768..1023) -> Total L2 = 1024
     - 16                    # Group 4: Layer 3 output class neurons (10 classes: 0..9)
   max_fanout_inter: 16      # Max inter-group fanout entries per neuron (Layer 2 -> Layer 3 is 10)
   spike_buffer_depth: 64    # Input FIFO depth per core group (entries)
@@ -47,13 +47,13 @@ architecture:
 # ─────────────────────────────────────────────────────────────────────────────
 neuron_groups:
   - name: "layer2_g0"
-    size: 196
+    size: 256
   - name: "layer2_g1"
-    size: 196
+    size: 256
   - name: "layer2_g2"
-    size: 196
+    size: 256
   - name: "layer2_g3"
-    size: 196
+    size: 256
   - name: "layer3_output"
     size: 16
 

@@ -56,12 +56,12 @@ static void encoder_write_axis_spike(
 }
 
 //=============================================================================
-// CNN3 Streaming 2D Line-Buffer Convolution & LIF Engine
+// CNN3 Streaming 2D Line-Buffer Convolution & LIF Engine (CIFAR-10: 3x32x32)
 //=============================================================================
-static ap_fixed<16,8> cnn_frame[CNN_IMG_HEIGHT][CNN_IMG_WIDTH];
+static ap_fixed<16,8> cnn_frame[CNN_IMG_CHANNELS][CNN_IMG_HEIGHT][CNN_IMG_WIDTH];
 static ap_fixed<16,8> cnn_v_mem[CNN_CONV1_CHANNELS][CNN_IMG_HEIGHT][CNN_IMG_WIDTH];
 static ap_int<16>     cnn_l2_v_mem[CNN_CONV2_CHANNELS][CNN_POOL1_HEIGHT][CNN_POOL1_WIDTH];
-static ap_uint<12>    conv1_spike_buf[2048];
+static ap_uint<12>    conv1_spike_buf[4096];
 static ap_uint<16>    cnn_pixel_counter = 0;
 static ap_uint<1>     cnn_spike_toggle = 0;
 
@@ -69,10 +69,12 @@ static void reset_cnn3_engine() {
     #pragma HLS INLINE
     cnn_pixel_counter = 0;
     cnn_spike_toggle = 0;
-    RESET_FRAME_R: for (int r = 0; r < CNN_IMG_HEIGHT; r++) {
-        RESET_FRAME_C: for (int c = 0; c < CNN_IMG_WIDTH; c++) {
-            #pragma HLS PIPELINE II=1
-            cnn_frame[r][c] = 0;
+    RESET_FRAME_CH: for (int ch = 0; ch < CNN_IMG_CHANNELS; ch++) {
+        RESET_FRAME_R: for (int r = 0; r < CNN_IMG_HEIGHT; r++) {
+            RESET_FRAME_C: for (int c = 0; c < CNN_IMG_WIDTH; c++) {
+                #pragma HLS PIPELINE II=1
+                cnn_frame[ch][r][c] = 0;
+            }
         }
     }
     RESET_V_K: for (int k = 0; k < CNN_CONV1_CHANNELS; k++) {
@@ -99,39 +101,43 @@ static void run_cnn3_streaming_pixel(
     hls::stream<encoder_axis_word_t> &spike_fifo
 ) {
     #pragma HLS INLINE off
-    int r = cnn_pixel_counter / CNN_IMG_WIDTH;
-    int c = cnn_pixel_counter % CNN_IMG_WIDTH;
-    cnn_frame[r][c] = pixel_val;
+    int ch  = cnn_pixel_counter / CNN_IMG_CHAN_PIXELS;
+    int rem = cnn_pixel_counter % CNN_IMG_CHAN_PIXELS;
+    int r   = rem / CNN_IMG_WIDTH;
+    int c   = rem % CNN_IMG_WIDTH;
+    cnn_frame[ch][r][c] = pixel_val;
     cnn_pixel_counter++;
 
     if (cnn_pixel_counter >= CNN_IMG_PIXELS) {
         cnn_pixel_counter = 0;
 
-        // Phase 1: Execute full Conv1 + LIF on buffered frame with exact zero-padding
-        ap_uint<12> conv1_spike_count = 0;
+        // Phase 1: Execute full Conv1 (3->8, 3x3) + LIF on buffered frame with exact zero-padding
+        ap_uint<13> conv1_spike_count = 0;
 
         CONV1_Y: for (int y = 0; y < CNN_IMG_HEIGHT; y++) {
             CONV1_X: for (int x = 0; x < CNN_IMG_WIDTH; x++) {
                 CONV1_FILTERS: for (int k = 0; k < CNN_CONV1_CHANNELS; k++) {
                     ap_fixed<16,8> acc = (ap_fixed<16,8>)CONV1_BIAS[k];
-                    CONV1_DY: for (int dy = -1; dy <= 1; dy++) {
-                        CONV1_DX: for (int dx = -1; dx <= 1; dx++) {
-                            int iy = y + dy;
-                            int ix = x + dx;
-                            ap_fixed<16,8> px = (iy >= 0 && iy < CNN_IMG_HEIGHT && ix >= 0 && ix < CNN_IMG_WIDTH) 
-                                               ? cnn_frame[iy][ix] : (ap_fixed<16,8>)0;
-                            acc += (ap_fixed<16,8>)CONV1_WEIGHTS[k][dy+1][dx+1] * px;
+                    CONV1_IC: for (int ic = 0; ic < CNN_IMG_CHANNELS; ic++) {
+                        CONV1_DY: for (int dy = -1; dy <= 1; dy++) {
+                            CONV1_DX: for (int dx = -1; dx <= 1; dx++) {
+                                int iy = y + dy;
+                                int ix = x + dx;
+                                ap_fixed<16,8> px = (iy >= 0 && iy < CNN_IMG_HEIGHT && ix >= 0 && ix < CNN_IMG_WIDTH)
+                                                   ? cnn_frame[ic][iy][ix] : (ap_fixed<16,8>)0;
+                                acc += (ap_fixed<16,8>)CONV1_WEIGHTS[k][ic][dy+1][dx+1] * px;
+                            }
                         }
                     }
 
-                    // LIF Membrane Potential Update with Hard Reset
+                    // LIF Membrane Potential Update with Soft Reset
                     cnn_v_mem[k][y][x] += acc;
                     if (cnn_v_mem[k][y][x] >= (ap_fixed<16,8>)1.0) {
                         cnn_v_mem[k][y][x] -= (ap_fixed<16,8>)1.0;
-                        ap_uint<4> py = y >> 1; // 2x2 average pool bin: 0..13
+                        ap_uint<4> py = y >> 1; // 2x2 average pool bin: 0..15
                         ap_uint<4> px = x >> 1;
 
-                        if (conv1_spike_count < 2048) {
+                        if (conv1_spike_count < 4096) {
                             conv1_spike_buf[conv1_spike_count] = ((ap_uint<12>)k << 8) | ((ap_uint<12>)py << 4) | (ap_uint<12>)px;
                             conv1_spike_count++;
                         }
@@ -140,9 +146,20 @@ static void run_cnn3_streaming_pixel(
             }
         }
 
-        // Phase 2: Conv2 event-driven scatter into 16x14x14 Layer 2 neurons
+        // Phase 2a: Add per-channel Layer 2 bias (scaled by 4 * SCALE2) once per timestep
+        L2_BIAS_Y: for (int oy = 0; oy < CNN_POOL1_HEIGHT; oy++) {
+            L2_BIAS_X: for (int ox = 0; ox < CNN_POOL1_WIDTH; ox++) {
+                #pragma HLS PIPELINE II=1
+                L2_BIAS_CO: for (int co = 0; co < CNN_CONV2_CHANNELS; co++) {
+                    #pragma HLS UNROLL
+                    cnn_l2_v_mem[co][oy][ox] += (ap_int<16>)CONV2_BIAS[co];
+                }
+            }
+        }
+
+        // Phase 2b: Conv2 event-driven scatter into 16x16x16 Layer 2 neurons
         CONV2_SPIKE_LOOP: for (int s = 0; s < conv1_spike_count; s++) {
-            #pragma HLS LOOP_TRIPCOUNT min=200 max=1650 avg=850
+            #pragma HLS LOOP_TRIPCOUNT min=200 max=3200 avg=1400
             ap_uint<12> spk = conv1_spike_buf[s];
             int k = (spk >> 8) & 7;
             int py = (spk >> 4) & 15;
@@ -163,9 +180,9 @@ static void run_cnn3_streaming_pixel(
             }
         }
 
-        // Phase 3: Layer 2 LIF sweep (th*4) and 2x2 sum-pooling into Layer 3 (16x7x7)
+        // Phase 3: Layer 2 LIF sweep (th*4) and 2x2 sum-pooling into Layer 3 (16x8x8 = 1024)
         // Sweep sub-pixel position s=0..3 as the outer loop so consecutive spikes
-        // for the same (dst_grp, local_nid) are separated by a full 784-position sweep,
+        // for the same (dst_grp, local_nid) are separated by a full 1024-position sweep,
         // preventing collisions in core_group.v's 1-bit spike_flag_mem bitmap.
         ap_int<16> threshold_l2 = (ap_int<16>)(threshold << 2);
 
@@ -848,7 +865,7 @@ void snn_top_hls(
     #pragma HLS ARRAY_PARTITION variable=encoder_phase_acc cyclic factor=2
 
     // CNN3 streaming engine arrays
-    #pragma HLS BIND_STORAGE variable=cnn_frame type=RAM_2P impl=LUTRAM
+    #pragma HLS BIND_STORAGE variable=cnn_frame type=RAM_2P impl=BRAM
     #pragma HLS BIND_STORAGE variable=cnn_v_mem type=RAM_2P impl=BRAM
     #pragma HLS BIND_STORAGE variable=cnn_l2_v_mem type=RAM_2P impl=LUTRAM
     #pragma HLS ARRAY_PARTITION variable=cnn_l2_v_mem complete dim=1
@@ -875,7 +892,7 @@ void snn_top_hls(
     // avoids "stuck-high" ready that can break one-spike-per-ack semantics.
     static ap_uint<1> spike_out_ack_toggle = 0;
     static hls::stream<encoder_axis_word_t> encoder_spikes("encoder_spikes");
-    #pragma HLS STREAM variable=encoder_spikes depth=2048
+    #pragma HLS STREAM variable=encoder_spikes depth=4096
     
     //=========================================================================
     // Control Signal Extraction

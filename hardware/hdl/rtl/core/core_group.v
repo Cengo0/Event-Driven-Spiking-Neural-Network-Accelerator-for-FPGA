@@ -349,13 +349,13 @@ module core_group #(
                         else
                             ns_din <= {STATE_WIDTH{1'b0}};
 
-                        leak_idx <= leak_addr_hold + 1;
-                        if (leak_addr_hold + 1 >= NEURONS_PER_GROUP) begin
+                        leak_idx <= leak_addr_hold + 1'b1;
+                        if ({1'b0, leak_addr_hold} + 9'd1 >= NEURONS_PER_GROUP) begin
                             leak_idx        <= 0;
                             leak_cycle_done <= 1;
                             state           <= ST_IDLE;
                         end else begin
-                            ns_rd_addr <= leak_addr_hold + 1;
+                            ns_rd_addr <= leak_addr_hold + 1'b1;
                             state      <= ST_LEAK_RD;
                         end
                     end
@@ -503,10 +503,10 @@ module core_group #(
 
                     if (scan_bit_pos == 3'd7) begin
                         scan_active <= 0;
-                        if (scan_idx + 8 >= NEURONS_PER_GROUP)
+                        if ({1'b0, scan_idx} + 9'd8 >= NEURONS_PER_GROUP)
                             scan_idx <= 0;
                         else
-                            scan_idx <= scan_idx + 8;
+                            scan_idx <= scan_idx + 8'd8;
                     end else begin
                         scan_bit_pos <= scan_bit_pos + 1;
                     end
