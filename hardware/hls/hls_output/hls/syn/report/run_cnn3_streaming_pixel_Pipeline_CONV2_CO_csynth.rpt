@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'run_cnn3_streaming_pixel_Pipeline_CONV2_CO'
 ================================================================
-* Date:           Fri Oct 16 12:09:53 2026
+* Date:           Wed Oct 21 17:48:07 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -73,7 +73,7 @@
     +----------------------------+-----------------------+---------+----+---+----+-----+
     |          Instance          |         Module        | BRAM_18K| DSP| FF| LUT| URAM|
     +----------------------------+-----------------------+---------+----+---+----+-----+
-    |sparsemux_33_4_16_1_1_U152  |sparsemux_33_4_16_1_1  |        0|   0|  0|  65|    0|
+    |sparsemux_33_4_16_1_1_U305  |sparsemux_33_4_16_1_1  |        0|   0|  0|  65|    0|
     +----------------------------+-----------------------+---------+----+---+----+-----+
     |Total                       |                       |        0|   0|  0|  65|    0|
     +----------------------------+-----------------------+---------+----+---+----+-----+
@@ -97,13 +97,13 @@
     +-----------------------+----------+----+---+----+------------+------------+
     |     Variable Name     | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
     +-----------------------+----------+----+---+----+------------+------------+
-    |add_ln156_fu_467_p2    |         +|   0|  0|  13|           5|           1|
-    |add_ln158_1_fu_566_p2  |         +|   0|  0|  11|          11|          11|
-    |add_ln158_fu_505_p2    |         +|   0|  0|   9|           9|           9|
-    |add_ln159_fu_651_p2    |         +|   0|  0|  23|          16|          16|
-    |sub_ln158_1_fu_560_p2  |         -|   0|  0|  11|          11|          11|
-    |sub_ln158_fu_499_p2    |         -|   0|  0|   9|           9|           9|
-    |icmp_ln156_fu_461_p2   |      icmp|   0|  0|  14|           5|           6|
+    |add_ln173_fu_467_p2    |         +|   0|  0|  13|           5|           1|
+    |add_ln175_1_fu_566_p2  |         +|   0|  0|  11|          11|          11|
+    |add_ln175_fu_505_p2    |         +|   0|  0|   9|           9|           9|
+    |add_ln176_fu_651_p2    |         +|   0|  0|  23|          16|          16|
+    |sub_ln175_1_fu_560_p2  |         -|   0|  0|  11|          11|          11|
+    |sub_ln175_fu_499_p2    |         -|   0|  0|   9|           9|           9|
+    |icmp_ln173_fu_461_p2   |      icmp|   0|  0|  14|           5|           6|
     |ap_enable_pp0          |       xor|   0|  0|   2|           1|           2|
     +-----------------------+----------+----+---+----+------------+------------+
     |Total                  |          |   0|  0|  92|          67|          65|
@@ -125,9 +125,9 @@
     +--------------------------------------------------+----+----+-----+-----------+
     |                       Name                       | FF | LUT| Bits| Const Bits|
     +--------------------------------------------------+----+----+-----+-----------+
-    |add_ln158_reg_698                                 |   9|   0|    9|          0|
-    |add_ln159_1_cast_reg_664                          |   8|   0|   64|         56|
-    |add_ln159_reg_805                                 |  16|   0|   16|          0|
+    |add_ln175_reg_698                                 |   9|   0|    9|          0|
+    |add_ln176_1_cast_reg_664                          |   8|   0|   64|         56|
+    |add_ln176_reg_805                                 |  16|   0|   16|          0|
     |ap_CS_fsm                                         |   1|   0|    1|          0|
     |ap_done_reg                                       |   1|   0|    1|          0|
     |ap_enable_reg_pp0_iter1                           |   1|   0|    1|          0|
@@ -168,9 +168,9 @@
     |p_ZL12cnn_l2_v_mem_8_addr_reg_752_pp0_iter2_reg   |   8|   0|    8|          0|
     |p_ZL12cnn_l2_v_mem_9_addr_reg_758                 |   8|   0|    8|          0|
     |p_ZL12cnn_l2_v_mem_9_addr_reg_758_pp0_iter2_reg   |   8|   0|    8|          0|
-    |trunc_ln156_reg_693                               |   4|   0|    4|          0|
-    |zext_ln159_cast_reg_684                           |   2|   0|   11|          9|
-    |trunc_ln156_reg_693                               |  64|  32|    4|          0|
+    |trunc_ln173_reg_693                               |   4|   0|    4|          0|
+    |zext_ln176_cast_reg_684                           |   2|   0|   11|          9|
+    |trunc_ln173_reg_693                               |  64|  32|    4|          0|
     +--------------------------------------------------+----+----+-----+-----------+
     |Total                                             | 371|  32|  376|         65|
     +--------------------------------------------------+----+----+-----+-----------+
@@ -190,10 +190,10 @@
 |ap_done                         |  out|    1|  ap_ctrl_hs|  run_cnn3_streaming_pixel_Pipeline_CONV2_CO|  return value|
 |ap_idle                         |  out|    1|  ap_ctrl_hs|  run_cnn3_streaming_pixel_Pipeline_CONV2_CO|  return value|
 |ap_ready                        |  out|    1|  ap_ctrl_hs|  run_cnn3_streaming_pixel_Pipeline_CONV2_CO|  return value|
-|add_ln159_1                     |   in|    8|     ap_none|                                 add_ln159_1|        scalar|
-|trunc_ln18                      |   in|    3|     ap_none|                                  trunc_ln18|        scalar|
-|zext_ln155                      |   in|    2|     ap_none|                                  zext_ln155|        scalar|
-|zext_ln159                      |   in|    2|     ap_none|                                  zext_ln159|        scalar|
+|add_ln176_1                     |   in|    8|     ap_none|                                 add_ln176_1|        scalar|
+|trunc_ln19                      |   in|    3|     ap_none|                                  trunc_ln19|        scalar|
+|zext_ln172                      |   in|    2|     ap_none|                                  zext_ln172|        scalar|
+|zext_ln176                      |   in|    2|     ap_none|                                  zext_ln176|        scalar|
 |p_ZL12cnn_l2_v_mem_0_address0   |  out|    8|   ap_memory|                        p_ZL12cnn_l2_v_mem_0|         array|
 |p_ZL12cnn_l2_v_mem_0_ce0        |  out|    1|   ap_memory|                        p_ZL12cnn_l2_v_mem_0|         array|
 |p_ZL12cnn_l2_v_mem_0_q0         |   in|   16|   ap_memory|                        p_ZL12cnn_l2_v_mem_0|         array|

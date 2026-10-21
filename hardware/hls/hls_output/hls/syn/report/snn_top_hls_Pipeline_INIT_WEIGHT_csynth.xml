@@ -18,27 +18,27 @@
 <PipelineType>loop pipeline stp</PipelineType>
 <SummaryOfTimingAnalysis>
 <unit>ns</unit>
-<EstimatedClockPeriod>5.082</EstimatedClockPeriod>
+<EstimatedClockPeriod>5.214</EstimatedClockPeriod>
 </SummaryOfTimingAnalysis>
 <SummaryOfOverallLatency>
 <unit>clock cycles</unit>
-<Best-caseLatency>12546</Best-caseLatency>
-<Average-caseLatency>12546</Average-caseLatency>
-<Worst-caseLatency>12546</Worst-caseLatency>
-<Best-caseRealTimeLatency>0.125 ms</Best-caseRealTimeLatency>
-<Average-caseRealTimeLatency>0.125 ms</Average-caseRealTimeLatency>
-<Worst-caseRealTimeLatency>0.125 ms</Worst-caseRealTimeLatency>
-<Interval-min>12545</Interval-min>
-<Interval-max>12545</Interval-max>
+<Best-caseLatency>16386</Best-caseLatency>
+<Average-caseLatency>16386</Average-caseLatency>
+<Worst-caseLatency>16386</Worst-caseLatency>
+<Best-caseRealTimeLatency>0.164 ms</Best-caseRealTimeLatency>
+<Average-caseRealTimeLatency>0.164 ms</Average-caseRealTimeLatency>
+<Worst-caseRealTimeLatency>0.164 ms</Worst-caseRealTimeLatency>
+<Interval-min>16385</Interval-min>
+<Interval-max>16385</Interval-max>
 <PerformancePragma>-</PerformancePragma>
 </SummaryOfOverallLatency>
 <SummaryOfLoopLatency>
 <INIT_WEIGHT>
 <Slack>7.30</Slack>
-<TripCount>12544</TripCount>
+<TripCount>16384</TripCount>
 <isPerfectNested>0</isPerfectNested>
-<Latency>12544</Latency>
-<AbsoluteTimeLatency>125440</AbsoluteTimeLatency>
+<Latency>16384</Latency>
+<AbsoluteTimeLatency>163840</AbsoluteTimeLatency>
 <PipelineII>1</PipelineII>
 <PipelineDepth>2</PipelineDepth>
 <PerformancePragma>-</PerformancePragma>
@@ -49,13 +49,13 @@
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:971</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:988</SourceLocation>
 <SummaryOfLoopViolations>
 <INIT_WEIGHT>
 <Name>INIT_WEIGHT</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:971</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:988</SourceLocation>
 </INIT_WEIGHT>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>
@@ -63,8 +63,8 @@
 
 <AreaEstimates>
 <Resources>
-<FF>17</FF>
-<LUT>72</LUT>
+<FF>18</FF>
+<LUT>81</LUT>
 <BRAM_18K>0</BRAM_18K>
 <DSP>0</DSP>
 <URAM>0</URAM>

@@ -22,28 +22,28 @@
 </SummaryOfTimingAnalysis>
 <SummaryOfOverallLatency>
 <unit>clock cycles</unit>
-<Best-caseLatency>805</Best-caseLatency>
-<Average-caseLatency>805</Average-caseLatency>
-<Worst-caseLatency>805</Worst-caseLatency>
-<Best-caseRealTimeLatency>8.050 us</Best-caseRealTimeLatency>
-<Average-caseRealTimeLatency>8.050 us</Average-caseRealTimeLatency>
-<Worst-caseRealTimeLatency>8.050 us</Worst-caseRealTimeLatency>
-<Interval-min>805</Interval-min>
-<Interval-max>805</Interval-max>
+<Best-caseLatency>1045</Best-caseLatency>
+<Average-caseLatency>1045</Average-caseLatency>
+<Worst-caseLatency>1045</Worst-caseLatency>
+<Best-caseRealTimeLatency>10.450 us</Best-caseRealTimeLatency>
+<Average-caseRealTimeLatency>10.450 us</Average-caseRealTimeLatency>
+<Worst-caseRealTimeLatency>10.450 us</Worst-caseRealTimeLatency>
+<Interval-min>1045</Interval-min>
+<Interval-max>1045</Interval-max>
 <PerformancePragma>-</PerformancePragma>
 </SummaryOfOverallLatency>
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:359</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:376</SourceLocation>
 </SummaryOfViolations>
 </PerformanceEstimates>
 
 <AreaEstimates>
 <Resources>
 <DSP>2</DSP>
-<FF>234</FF>
-<LUT>238</LUT>
+<FF>238</FF>
+<LUT>234</LUT>
 <BRAM_18K>0</BRAM_18K>
 <URAM>0</URAM>
 </Resources>
@@ -142,7 +142,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>10</Bits>
+<Bits>11</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -175,7 +175,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>10</Bits>
+<Bits>11</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -219,7 +219,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>10</Bits>
+<Bits>11</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -252,7 +252,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>10</Bits>
+<Bits>11</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>

@@ -18,18 +18,18 @@
 <PipelineType>no</PipelineType>
 <SummaryOfTimingAnalysis>
 <unit>ns</unit>
-<EstimatedClockPeriod>6.860</EstimatedClockPeriod>
+<EstimatedClockPeriod>6.947</EstimatedClockPeriod>
 </SummaryOfTimingAnalysis>
 <SummaryOfOverallLatency>
 <unit>clock cycles</unit>
 <Best-caseLatency>1</Best-caseLatency>
-<Average-caseLatency>7061</Average-caseLatency>
-<Worst-caseLatency>25097</Worst-caseLatency>
+<Average-caseLatency>9221</Average-caseLatency>
+<Worst-caseLatency>32777</Worst-caseLatency>
 <Best-caseRealTimeLatency>10.000 ns</Best-caseRealTimeLatency>
-<Average-caseRealTimeLatency>70.610 us</Average-caseRealTimeLatency>
-<Worst-caseRealTimeLatency>0.251 ms</Worst-caseRealTimeLatency>
+<Average-caseRealTimeLatency>92.210 us</Average-caseRealTimeLatency>
+<Worst-caseRealTimeLatency>0.328 ms</Worst-caseRealTimeLatency>
 <Interval-min>1</Interval-min>
-<Interval-max>25097</Interval-max>
+<Interval-max>32777</Interval-max>
 <PerformancePragma>-</PerformancePragma>
 </SummaryOfOverallLatency>
 <SummaryOfLoopLatency>
@@ -39,20 +39,20 @@
 <isPerfectNested>0</isPerfectNested>
 <Latency>
 <range>
-<min>2360</min>
-<max>25096</max>
+<min>3080</min>
+<max>32776</max>
 </range>
 </Latency>
 <AbsoluteTimeLatency>
 <range>
-<min>23600</min>
-<max>250960</max>
+<min>30800</min>
+<max>327760</max>
 </range>
 </AbsoluteTimeLatency>
 <IterationLatency>
 <range>
-<min>590</min>
-<max>6274</max>
+<min>770</min>
+<max>8194</max>
 </range>
 </IterationLatency>
 <PerformancePragma>-</PerformancePragma>
@@ -60,18 +60,18 @@
 </InstanceList>
 <RSTDP_OUTER>
 <Slack>7.30</Slack>
-<TripCount>196</TripCount>
+<TripCount>256</TripCount>
 <isPerfectNested>0</isPerfectNested>
 <Latency>
 <range>
-<min>588</min>
-<max>6272</max>
+<min>768</min>
+<max>8192</max>
 </range>
 </Latency>
 <AbsoluteTimeLatency>
 <range>
-<min>5880</min>
-<max>62720</max>
+<min>7680</min>
+<max>81920</max>
 </range>
 </AbsoluteTimeLatency>
 <IterationLatency>
@@ -89,18 +89,18 @@
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:567</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:584</SourceLocation>
 <SummaryOfLoopViolations>
 <RSTDP_CONN_LOOP>
 <Name>RSTDP_CONN_LOOP</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:588</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:605</SourceLocation>
 <RSTDP_OUTER>
 <Name>RSTDP_OUTER</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:592</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:609</SourceLocation>
 </RSTDP_OUTER>
 </RSTDP_CONN_LOOP>
 </SummaryOfLoopViolations>
@@ -110,8 +110,8 @@
 <AreaEstimates>
 <Resources>
 <DSP>3</DSP>
-<FF>505</FF>
-<LUT>861</LUT>
+<FF>531</FF>
+<LUT>922</LUT>
 <BRAM_18K>0</BRAM_18K>
 <URAM>0</URAM>
 </Resources>
@@ -243,7 +243,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>10</Bits>
+<Bits>11</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -276,7 +276,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>10</Bits>
+<Bits>11</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -419,7 +419,7 @@
 <IOProtocol>ap_vld</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>2</Bits>
+<Bits>3</Bits>
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -463,7 +463,7 @@
 <IOProtocol>ap_vld</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>6</Bits>
+<Bits>5</Bits>
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -551,7 +551,7 @@
 <IOProtocol>ap_vld</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>2</Bits>
+<Bits>3</Bits>
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>

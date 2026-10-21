@@ -17,17 +17,17 @@ port (
     ap_idle : OUT STD_LOGIC;
     ap_ready : OUT STD_LOGIC;
     params_trace_decay_val : IN STD_LOGIC_VECTOR (7 downto 0);
-    pre_traces_address0 : OUT STD_LOGIC_VECTOR (9 downto 0);
+    pre_traces_address0 : OUT STD_LOGIC_VECTOR (10 downto 0);
     pre_traces_ce0 : OUT STD_LOGIC;
     pre_traces_q0 : IN STD_LOGIC_VECTOR (7 downto 0);
-    pre_traces_address1 : OUT STD_LOGIC_VECTOR (9 downto 0);
+    pre_traces_address1 : OUT STD_LOGIC_VECTOR (10 downto 0);
     pre_traces_ce1 : OUT STD_LOGIC;
     pre_traces_we1 : OUT STD_LOGIC;
     pre_traces_d1 : OUT STD_LOGIC_VECTOR (7 downto 0);
-    post_traces_address0 : OUT STD_LOGIC_VECTOR (9 downto 0);
+    post_traces_address0 : OUT STD_LOGIC_VECTOR (10 downto 0);
     post_traces_ce0 : OUT STD_LOGIC;
     post_traces_q0 : IN STD_LOGIC_VECTOR (7 downto 0);
-    post_traces_address1 : OUT STD_LOGIC_VECTOR (9 downto 0);
+    post_traces_address1 : OUT STD_LOGIC_VECTOR (10 downto 0);
     post_traces_ce1 : OUT STD_LOGIC;
     post_traces_we1 : OUT STD_LOGIC;
     post_traces_d1 : OUT STD_LOGIC_VECTOR (7 downto 0) );
@@ -56,9 +56,9 @@ attribute shreg_extract : string;
     signal grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28_ap_done : STD_LOGIC;
     signal grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28_ap_idle : STD_LOGIC;
     signal grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28_ap_ready : STD_LOGIC;
-    signal grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28_pre_traces_address0 : STD_LOGIC_VECTOR (9 downto 0);
+    signal grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28_pre_traces_address0 : STD_LOGIC_VECTOR (10 downto 0);
     signal grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28_pre_traces_ce0 : STD_LOGIC;
-    signal grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28_pre_traces_address1 : STD_LOGIC_VECTOR (9 downto 0);
+    signal grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28_pre_traces_address1 : STD_LOGIC_VECTOR (10 downto 0);
     signal grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28_pre_traces_ce1 : STD_LOGIC;
     signal grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28_pre_traces_we1 : STD_LOGIC;
     signal grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28_pre_traces_d1 : STD_LOGIC_VECTOR (7 downto 0);
@@ -66,9 +66,9 @@ attribute shreg_extract : string;
     signal grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36_ap_done : STD_LOGIC;
     signal grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36_ap_idle : STD_LOGIC;
     signal grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36_ap_ready : STD_LOGIC;
-    signal grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36_post_traces_address0 : STD_LOGIC_VECTOR (9 downto 0);
+    signal grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36_post_traces_address0 : STD_LOGIC_VECTOR (10 downto 0);
     signal grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36_post_traces_ce0 : STD_LOGIC;
-    signal grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36_post_traces_address1 : STD_LOGIC_VECTOR (9 downto 0);
+    signal grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36_post_traces_address1 : STD_LOGIC_VECTOR (10 downto 0);
     signal grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36_post_traces_ce1 : STD_LOGIC;
     signal grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36_post_traces_we1 : STD_LOGIC;
     signal grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36_post_traces_d1 : STD_LOGIC_VECTOR (7 downto 0);
@@ -90,11 +90,11 @@ attribute shreg_extract : string;
         ap_done : OUT STD_LOGIC;
         ap_idle : OUT STD_LOGIC;
         ap_ready : OUT STD_LOGIC;
-        zext_ln361 : IN STD_LOGIC_VECTOR (7 downto 0);
-        pre_traces_address0 : OUT STD_LOGIC_VECTOR (9 downto 0);
+        zext_ln378 : IN STD_LOGIC_VECTOR (7 downto 0);
+        pre_traces_address0 : OUT STD_LOGIC_VECTOR (10 downto 0);
         pre_traces_ce0 : OUT STD_LOGIC;
         pre_traces_q0 : IN STD_LOGIC_VECTOR (7 downto 0);
-        pre_traces_address1 : OUT STD_LOGIC_VECTOR (9 downto 0);
+        pre_traces_address1 : OUT STD_LOGIC_VECTOR (10 downto 0);
         pre_traces_ce1 : OUT STD_LOGIC;
         pre_traces_we1 : OUT STD_LOGIC;
         pre_traces_d1 : OUT STD_LOGIC_VECTOR (7 downto 0) );
@@ -109,11 +109,11 @@ attribute shreg_extract : string;
         ap_done : OUT STD_LOGIC;
         ap_idle : OUT STD_LOGIC;
         ap_ready : OUT STD_LOGIC;
-        zext_ln361 : IN STD_LOGIC_VECTOR (7 downto 0);
-        post_traces_address0 : OUT STD_LOGIC_VECTOR (9 downto 0);
+        zext_ln378 : IN STD_LOGIC_VECTOR (7 downto 0);
+        post_traces_address0 : OUT STD_LOGIC_VECTOR (10 downto 0);
         post_traces_ce0 : OUT STD_LOGIC;
         post_traces_q0 : IN STD_LOGIC_VECTOR (7 downto 0);
-        post_traces_address1 : OUT STD_LOGIC_VECTOR (9 downto 0);
+        post_traces_address1 : OUT STD_LOGIC_VECTOR (10 downto 0);
         post_traces_ce1 : OUT STD_LOGIC;
         post_traces_we1 : OUT STD_LOGIC;
         post_traces_d1 : OUT STD_LOGIC_VECTOR (7 downto 0) );
@@ -130,7 +130,7 @@ begin
         ap_done => grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28_ap_done,
         ap_idle => grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28_ap_idle,
         ap_ready => grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28_ap_ready,
-        zext_ln361 => params_trace_decay_val,
+        zext_ln378 => params_trace_decay_val,
         pre_traces_address0 => grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28_pre_traces_address0,
         pre_traces_ce0 => grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28_pre_traces_ce0,
         pre_traces_q0 => pre_traces_q0,
@@ -147,7 +147,7 @@ begin
         ap_done => grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36_ap_done,
         ap_idle => grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36_ap_idle,
         ap_ready => grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36_ap_ready,
-        zext_ln361 => params_trace_decay_val,
+        zext_ln378 => params_trace_decay_val,
         post_traces_address0 => grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36_post_traces_address0,
         post_traces_ce0 => grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36_post_traces_ce0,
         post_traces_q0 => post_traces_q0,

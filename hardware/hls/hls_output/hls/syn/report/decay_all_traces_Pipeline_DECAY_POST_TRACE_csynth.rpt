@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'decay_all_traces_Pipeline_DECAY_POST_TRACE'
 ================================================================
-* Date:           Fri Oct 16 12:09:52 2026
+* Date:           Wed Oct 21 17:48:03 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -25,12 +25,12 @@
 
 + Latency: 
     * Summary: 
-    +---------+---------+----------+----------+-----+-----+-------------------+
-    |  Latency (cycles) |  Latency (absolute) |  Interval |      Pipeline     |
-    |   min   |   max   |    min   |    max   | min | max |        Type       |
-    +---------+---------+----------+----------+-----+-----+-------------------+
-    |      804|      804|  8.040 us|  8.040 us|    0|    0|  loop pipeline stp|
-    +---------+---------+----------+----------+-----+-----+-------------------+
+    +---------+---------+-----------+-----------+-----+-----+-------------------+
+    |  Latency (cycles) |   Latency (absolute)  |  Interval |      Pipeline     |
+    |   min   |   max   |    min    |    max    | min | max |        Type       |
+    +---------+---------+-----------+-----------+-----+-----+-------------------+
+    |     1044|     1044|  10.440 us|  10.440 us|    0|    0|  loop pipeline stp|
+    +---------+---------+-----------+-----------+-----+-----+-------------------+
 
     + Detail: 
         * Instance: 
@@ -41,7 +41,7 @@
         |                    |  Latency (cycles) | Iteration|  Initiation Interval  | Trip |          |
         |      Loop Name     |   min   |   max   |  Latency |  achieved |   target  | Count| Pipelined|
         +--------------------+---------+---------+----------+-----------+-----------+------+----------+
-        |- DECAY_POST_TRACE  |      802|      802|         4|          1|          1|   800|       yes|
+        |- DECAY_POST_TRACE  |     1042|     1042|         4|          1|          1|  1040|       yes|
         +--------------------+---------+---------+----------+-----------+-----------+------+----------+
 
 
@@ -54,14 +54,14 @@
 |       Name      | BRAM_18K| DSP |   FF   |  LUT  | URAM|
 +-----------------+---------+-----+--------+-------+-----+
 |DSP              |        -|    -|       -|      -|    -|
-|Expression       |        -|    -|       0|     43|    -|
+|Expression       |        -|    -|       0|     41|    -|
 |FIFO             |        -|    -|       -|      -|    -|
 |Instance         |        -|    1|       0|      0|    -|
 |Memory           |        -|    -|       -|      -|    -|
 |Multiplexer      |        -|    -|       0|     36|    -|
-|Register         |        -|    -|     115|     32|    -|
+|Register         |        -|    -|     117|     32|    -|
 +-----------------+---------+-----+--------+-------+-----+
-|Total            |        0|    1|     115|    111|    0|
+|Total            |        0|    1|     117|    109|    0|
 +-----------------+---------+-----+--------+-------+-----+
 |Available        |      280|  220|  106400|  53200|    0|
 +-----------------+---------+-----+--------+-------+-----+
@@ -73,7 +73,7 @@
     +------------------------+--------------------+---------+----+---+----+-----+
     |        Instance        |       Module       | BRAM_18K| DSP| FF| LUT| URAM|
     +------------------------+--------------------+---------+----+---+----+-----+
-    |mul_8ns_8ns_16_3_1_U54  |mul_8ns_8ns_16_3_1  |        0|   1|  0|   0|    0|
+    |mul_8ns_8ns_16_3_1_U74  |mul_8ns_8ns_16_3_1  |        0|   1|  0|   0|    0|
     +------------------------+--------------------+---------+----+---+----+-----+
     |Total                   |                    |        0|   1|  0|   0|    0|
     +------------------------+--------------------+---------+----+---+----+-----+
@@ -91,12 +91,12 @@
     +----------------------+----------+----+---+----+------------+------------+
     |     Variable Name    | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
     +----------------------+----------+----+---+----+------------+------------+
-    |add_ln369_fu_107_p2   |         +|   0|  0|  13|          10|           1|
-    |sub_ln375_fu_142_p2   |         -|   0|  0|  15|           8|           8|
-    |icmp_ln369_fu_101_p2  |      icmp|   0|  0|  13|          10|           9|
+    |add_ln386_fu_107_p2   |         +|   0|  0|  12|          11|           1|
+    |sub_ln392_fu_142_p2   |         -|   0|  0|  15|           8|           8|
+    |icmp_ln386_fu_101_p2  |      icmp|   0|  0|  12|          11|          11|
     |ap_enable_pp0         |       xor|   0|  0|   2|           1|           2|
     +----------------------+----------+----+---+----+------------+------------+
-    |Total                 |          |   0|  0|  43|          29|          20|
+    |Total                 |          |   0|  0|  41|          31|          22|
     +----------------------+----------+----+---+----+------------+------------+
 
     * Multiplexer: 
@@ -105,10 +105,10 @@
     +-------------------------+----+-----------+-----+-----------+
     |ap_done_int              |   9|          2|    1|          2|
     |ap_enable_reg_pp0_iter1  |   9|          2|    1|          2|
-    |ap_sig_allocacmp_i       |   9|          2|   10|         20|
-    |i_5_fu_62                |   9|          2|   10|         20|
+    |ap_sig_allocacmp_i       |   9|          2|   11|         22|
+    |i_5_fu_62                |   9|          2|   11|         22|
     +-------------------------+----+-----------+-----+-----------+
-    |Total                    |  36|          8|   22|         44|
+    |Total                    |  36|          8|   24|         48|
     +-------------------------+----+-----------+-----+-----------+
 
     * Register: 
@@ -122,14 +122,14 @@
     |ap_enable_reg_pp0_iter3           |   1|   0|    1|          0|
     |ap_loop_exit_ready_pp0_iter1_reg  |   1|   0|    1|          0|
     |ap_loop_exit_ready_pp0_iter2_reg  |   1|   0|    1|          0|
-    |i_5_fu_62                         |  10|   0|   10|          0|
-    |post_traces_addr_reg_164          |  10|   0|   10|          0|
+    |i_5_fu_62                         |  11|   0|   11|          0|
+    |post_traces_addr_reg_164          |  11|   0|   11|          0|
     |t_reg_170                         |   8|   0|    8|          0|
     |t_reg_170_pp0_iter2_reg           |   8|   0|    8|          0|
-    |zext_ln361_cast_reg_155           |   8|   0|   16|          8|
-    |post_traces_addr_reg_164          |  64|  32|   10|          0|
+    |zext_ln378_cast_reg_155           |   8|   0|   16|          8|
+    |post_traces_addr_reg_164          |  64|  32|   11|          0|
     +----------------------------------+----+----+-----+-----------+
-    |Total                             | 115|  32|   69|          8|
+    |Total                             | 117|  32|   72|          8|
     +----------------------------------+----+----+-----+-----------+
 
 
@@ -147,11 +147,11 @@
 |ap_done               |  out|    1|  ap_ctrl_hs|  decay_all_traces_Pipeline_DECAY_POST_TRACE|  return value|
 |ap_idle               |  out|    1|  ap_ctrl_hs|  decay_all_traces_Pipeline_DECAY_POST_TRACE|  return value|
 |ap_ready              |  out|    1|  ap_ctrl_hs|  decay_all_traces_Pipeline_DECAY_POST_TRACE|  return value|
-|zext_ln361            |   in|    8|     ap_none|                                  zext_ln361|        scalar|
-|post_traces_address0  |  out|   10|   ap_memory|                                 post_traces|         array|
+|zext_ln378            |   in|    8|     ap_none|                                  zext_ln378|        scalar|
+|post_traces_address0  |  out|   11|   ap_memory|                                 post_traces|         array|
 |post_traces_ce0       |  out|    1|   ap_memory|                                 post_traces|         array|
 |post_traces_q0        |   in|    8|   ap_memory|                                 post_traces|         array|
-|post_traces_address1  |  out|   10|   ap_memory|                                 post_traces|         array|
+|post_traces_address1  |  out|   11|   ap_memory|                                 post_traces|         array|
 |post_traces_ce1       |  out|    1|   ap_memory|                                 post_traces|         array|
 |post_traces_we1       |  out|    1|   ap_memory|                                 post_traces|         array|
 |post_traces_d1        |  out|    8|   ap_memory|                                 post_traces|         array|

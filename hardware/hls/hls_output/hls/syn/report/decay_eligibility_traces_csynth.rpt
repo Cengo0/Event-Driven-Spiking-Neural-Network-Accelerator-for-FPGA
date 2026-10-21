@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'decay_eligibility_traces'
 ================================================================
-* Date:           Fri Oct 16 12:09:55 2026
+* Date:           Wed Oct 21 17:48:09 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -25,22 +25,22 @@
 
 + Latency: 
     * Summary: 
-    +---------+---------+----------+----------+-----+-----+---------+
-    |  Latency (cycles) |  Latency (absolute) |  Interval | Pipeline|
-    |   min   |   max   |    min   |    max   | min | max |   Type  |
-    +---------+---------+----------+----------+-----+-----+---------+
-    |      803|      803|  8.030 us|  8.030 us|  803|  803|       no|
-    +---------+---------+----------+----------+-----+-----+---------+
+    +---------+---------+-----------+-----------+------+------+---------+
+    |  Latency (cycles) |   Latency (absolute)  |   Interval  | Pipeline|
+    |   min   |   max   |    min    |    max    |  min |  max |   Type  |
+    +---------+---------+-----------+-----------+------+------+---------+
+    |     1043|     1043|  10.430 us|  10.430 us|  1043|  1043|       no|
+    +---------+---------+-----------+-----------+------+------+---------+
 
     + Detail: 
         * Instance: 
-        +--------------------------------------------------------+----------------------------------------------+---------+---------+----------+----------+-----+-----+-------------------+
-        |                                                        |                                              |  Latency (cycles) |  Latency (absolute) |  Interval |      Pipeline     |
-        |                        Instance                        |                    Module                    |   min   |   max   |    min   |    max   | min | max |        Type       |
-        +--------------------------------------------------------+----------------------------------------------+---------+---------+----------+----------+-----+-----+-------------------+
-        |grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_18   |decay_eligibility_traces_Pipeline_DECAY_PRE   |      802|      802|  8.020 us|  8.020 us|    0|    0|  loop pipeline stp|
-        |grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_24  |decay_eligibility_traces_Pipeline_DECAY_POST  |      802|      802|  8.020 us|  8.020 us|    0|    0|  loop pipeline stp|
-        +--------------------------------------------------------+----------------------------------------------+---------+---------+----------+----------+-----+-----+-------------------+
+        +--------------------------------------------------------+----------------------------------------------+---------+---------+-----------+-----------+-----+-----+-------------------+
+        |                                                        |                                              |  Latency (cycles) |   Latency (absolute)  |  Interval |      Pipeline     |
+        |                        Instance                        |                    Module                    |   min   |   max   |    min    |    max    | min | max |        Type       |
+        +--------------------------------------------------------+----------------------------------------------+---------+---------+-----------+-----------+-----+-----+-------------------+
+        |grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_18   |decay_eligibility_traces_Pipeline_DECAY_PRE   |     1042|     1042|  10.420 us|  10.420 us|    0|    0|  loop pipeline stp|
+        |grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_24  |decay_eligibility_traces_Pipeline_DECAY_POST  |     1042|     1042|  10.420 us|  10.420 us|    0|    0|  loop pipeline stp|
+        +--------------------------------------------------------+----------------------------------------------+---------+---------+-----------+-----------+-----+-----+-------------------+
 
         * Loop: 
         N/A
@@ -57,12 +57,12 @@
 |DSP              |        -|    -|       -|      -|    -|
 |Expression       |        -|    -|       0|      2|    -|
 |FIFO             |        -|    -|       -|      -|    -|
-|Instance         |        -|    -|      46|    158|    -|
+|Instance         |        -|    -|      50|    154|    -|
 |Memory           |        -|    -|       -|      -|    -|
 |Multiplexer      |        -|    -|       0|     14|    -|
 |Register         |        -|    -|       4|      -|    -|
 +-----------------+---------+-----+--------+-------+-----+
-|Total            |        0|    0|      50|    174|    0|
+|Total            |        0|    0|      54|    170|    0|
 +-----------------+---------+-----+--------+-------+-----+
 |Available        |      280|  220|  106400|  53200|    0|
 +-----------------+---------+-----+--------+-------+-----+
@@ -74,10 +74,10 @@
     +--------------------------------------------------------+----------------------------------------------+---------+----+----+----+-----+
     |                        Instance                        |                    Module                    | BRAM_18K| DSP| FF | LUT| URAM|
     +--------------------------------------------------------+----------------------------------------------+---------+----+----+----+-----+
-    |grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_24  |decay_eligibility_traces_Pipeline_DECAY_POST  |        0|   0|  23|  79|    0|
-    |grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_18   |decay_eligibility_traces_Pipeline_DECAY_PRE   |        0|   0|  23|  79|    0|
+    |grp_decay_eligibility_traces_Pipeline_DECAY_POST_fu_24  |decay_eligibility_traces_Pipeline_DECAY_POST  |        0|   0|  25|  77|    0|
+    |grp_decay_eligibility_traces_Pipeline_DECAY_PRE_fu_18   |decay_eligibility_traces_Pipeline_DECAY_PRE   |        0|   0|  25|  77|    0|
     +--------------------------------------------------------+----------------------------------------------+---------+----+----+----+-----+
-    |Total                                                   |                                              |        0|   0|  46| 158|    0|
+    |Total                                                   |                                              |        0|   0|  50| 154|    0|
     +--------------------------------------------------------+----------------------------------------------+---------+----+----+----+-----+
 
     * DSP: 
@@ -133,17 +133,17 @@
 |ap_done                    |  out|    1|  ap_ctrl_hs|  decay_eligibility_traces|  return value|
 |ap_idle                    |  out|    1|  ap_ctrl_hs|  decay_eligibility_traces|  return value|
 |ap_ready                   |  out|    1|  ap_ctrl_hs|  decay_eligibility_traces|  return value|
-|pre_eligibility_address0   |  out|   10|   ap_memory|           pre_eligibility|         array|
+|pre_eligibility_address0   |  out|   11|   ap_memory|           pre_eligibility|         array|
 |pre_eligibility_ce0        |  out|    1|   ap_memory|           pre_eligibility|         array|
 |pre_eligibility_q0         |   in|    8|   ap_memory|           pre_eligibility|         array|
-|pre_eligibility_address1   |  out|   10|   ap_memory|           pre_eligibility|         array|
+|pre_eligibility_address1   |  out|   11|   ap_memory|           pre_eligibility|         array|
 |pre_eligibility_ce1        |  out|    1|   ap_memory|           pre_eligibility|         array|
 |pre_eligibility_we1        |  out|    1|   ap_memory|           pre_eligibility|         array|
 |pre_eligibility_d1         |  out|    8|   ap_memory|           pre_eligibility|         array|
-|post_eligibility_address0  |  out|   10|   ap_memory|          post_eligibility|         array|
+|post_eligibility_address0  |  out|   11|   ap_memory|          post_eligibility|         array|
 |post_eligibility_ce0       |  out|    1|   ap_memory|          post_eligibility|         array|
 |post_eligibility_q0        |   in|    8|   ap_memory|          post_eligibility|         array|
-|post_eligibility_address1  |  out|   10|   ap_memory|          post_eligibility|         array|
+|post_eligibility_address1  |  out|   11|   ap_memory|          post_eligibility|         array|
 |post_eligibility_ce1       |  out|    1|   ap_memory|          post_eligibility|         array|
 |post_eligibility_we1       |  out|    1|   ap_memory|          post_eligibility|         array|
 |post_eligibility_d1        |  out|    8|   ap_memory|          post_eligibility|         array|

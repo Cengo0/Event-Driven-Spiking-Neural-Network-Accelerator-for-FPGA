@@ -13,7 +13,7 @@ entity snn_top_hls_p_ZL12cnn_l2_v_mem_0_RAM_2P_LUTRAM_1R1W is
         MEM_TYPE        : string    := "distributed";
         DataWidth       : integer   := 16;
         AddressWidth    : integer   := 8;
-        AddressRange    : integer   := 196
+        AddressRange    : integer   := 256
     );
     port (
         address0    : in std_logic_vector(AddressWidth-1 downto 0);

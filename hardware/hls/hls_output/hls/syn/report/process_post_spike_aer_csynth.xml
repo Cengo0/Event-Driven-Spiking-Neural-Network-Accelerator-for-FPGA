@@ -23,13 +23,13 @@
 <SummaryOfOverallLatency>
 <unit>clock cycles</unit>
 <Best-caseLatency>11</Best-caseLatency>
-<Average-caseLatency>4723</Average-caseLatency>
-<Worst-caseLatency>9435</Worst-caseLatency>
+<Average-caseLatency>6163</Average-caseLatency>
+<Worst-caseLatency>12315</Worst-caseLatency>
 <Best-caseRealTimeLatency>0.110 us</Best-caseRealTimeLatency>
-<Average-caseRealTimeLatency>47.230 us</Average-caseRealTimeLatency>
-<Worst-caseRealTimeLatency>94.350 us</Worst-caseRealTimeLatency>
+<Average-caseRealTimeLatency>61.630 us</Average-caseRealTimeLatency>
+<Worst-caseRealTimeLatency>0.123 ms</Worst-caseRealTimeLatency>
 <Interval-min>11</Interval-min>
-<Interval-max>9435</Interval-max>
+<Interval-max>12315</Interval-max>
 <PerformancePragma>-</PerformancePragma>
 </SummaryOfOverallLatency>
 <SummaryOfLoopLatency>
@@ -40,19 +40,19 @@
 <Latency>
 <range>
 <min>8</min>
-<max>9432</max>
+<max>12312</max>
 </range>
 </Latency>
 <AbsoluteTimeLatency>
 <range>
 <min>80</min>
-<max>94320</max>
+<max>123120</max>
 </range>
 </AbsoluteTimeLatency>
 <IterationLatency>
 <range>
 <min>2</min>
-<max>2358</max>
+<max>3078</max>
 </range>
 </IterationLatency>
 <PerformancePragma>-</PerformancePragma>
@@ -63,13 +63,13 @@
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:493</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:510</SourceLocation>
 <SummaryOfLoopViolations>
 <LTP_CONN_LOOP>
 <Name>LTP_CONN_LOOP</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:493</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:510</SourceLocation>
 </LTP_CONN_LOOP>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>
@@ -78,8 +78,8 @@
 <AreaEstimates>
 <Resources>
 <DSP>3</DSP>
-<FF>257</FF>
-<LUT>697</LUT>
+<FF>254</FF>
+<LUT>686</LUT>
 <BRAM_18K>0</BRAM_18K>
 <URAM>0</URAM>
 </Resources>
@@ -211,7 +211,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>10</Bits>
+<Bits>11</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -244,7 +244,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>10</Bits>
+<Bits>11</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -288,7 +288,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>10</Bits>
+<Bits>11</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -409,7 +409,7 @@
 <IOProtocol>ap_vld</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>2</Bits>
+<Bits>3</Bits>
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -453,7 +453,7 @@
 <IOProtocol>ap_vld</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>6</Bits>
+<Bits>5</Bits>
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -541,7 +541,7 @@
 <IOProtocol>ap_vld</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>2</Bits>
+<Bits>3</Bits>
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>

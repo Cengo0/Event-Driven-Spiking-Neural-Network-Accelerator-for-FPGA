@@ -13,7 +13,7 @@ entity snn_top_hls_cnn_v_mem_RAM_2P_BRAM_1R1W is
         MEM_TYPE        : string    := "block";
         DataWidth       : integer   := 16;
         AddressWidth    : integer   := 13;
-        AddressRange    : integer   := 6272
+        AddressRange    : integer   := 8192
     );
     port (
         address0    : in std_logic_vector(AddressWidth-1 downto 0);

@@ -4,10 +4,12 @@ set_directive_array_partition snn_top_hls/CONNECTION_TABLE (.src_size) -dim=1 -t
 set_directive_pipeline run_cnn3_streaming_pixel/CONV1_FILTERS
 # Inferred from performance & pipeline pragmas/directives
 set_directive_loop_flatten snn_top_hls/RESET_FRAME_R
+set_directive_loop_flatten snn_top_hls/RESET_FRAME_CH
 set_directive_loop_flatten snn_top_hls/RESET_V_Y
 set_directive_loop_flatten snn_top_hls/RESET_V_K
 set_directive_loop_flatten snn_top_hls/RESET_L2_Y
 set_directive_loop_flatten snn_top_hls/RESET_L2_CO
+set_directive_loop_flatten run_cnn3_streaming_pixel/L2_BIAS_Y
 set_directive_loop_flatten run_cnn3_streaming_pixel/CONV2_SPIKE_LOOP -off
 set_directive_loop_flatten run_cnn3_streaming_pixel/L2_SWEEP_Y2
 set_directive_loop_flatten run_cnn3_streaming_pixel/L2_SWEEP_CO

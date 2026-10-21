@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'snn_top_hls_Pipeline_RESET_ELIG'
 ================================================================
-* Date:           Fri Oct 16 12:09:51 2026
+* Date:           Wed Oct 21 17:48:02 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -20,17 +20,17 @@
     +--------+----------+----------+------------+
     |  Clock |  Target  | Estimated| Uncertainty|
     +--------+----------+----------+------------+
-    |ap_clk  |  10.00 ns|  5.641 ns|     2.70 ns|
+    |ap_clk  |  10.00 ns|  5.549 ns|     2.70 ns|
     +--------+----------+----------+------------+
 
 + Latency: 
     * Summary: 
-    +---------+---------+----------+----------+-----+-----+-------------------+
-    |  Latency (cycles) |  Latency (absolute) |  Interval |      Pipeline     |
-    |   min   |   max   |    min   |    max   | min | max |        Type       |
-    +---------+---------+----------+----------+-----+-----+-------------------+
-    |      802|      802|  8.020 us|  8.020 us|    0|    0|  loop pipeline stp|
-    +---------+---------+----------+----------+-----+-----+-------------------+
+    +---------+---------+-----------+-----------+-----+-----+-------------------+
+    |  Latency (cycles) |   Latency (absolute)  |  Interval |      Pipeline     |
+    |   min   |   max   |    min    |    max    | min | max |        Type       |
+    +---------+---------+-----------+-----------+-----+-----+-------------------+
+    |     1042|     1042|  10.420 us|  10.420 us|    0|    0|  loop pipeline stp|
+    +---------+---------+-----------+-----------+-----+-----+-------------------+
 
     + Detail: 
         * Instance: 
@@ -41,7 +41,7 @@
         |              |  Latency (cycles) | Iteration|  Initiation Interval  | Trip |          |
         |   Loop Name  |   min   |   max   |  Latency |  achieved |   target  | Count| Pipelined|
         +--------------+---------+---------+----------+-----------+-----------+------+----------+
-        |- RESET_ELIG  |      800|      800|         1|          1|          1|   800|       yes|
+        |- RESET_ELIG  |     1040|     1040|         1|          1|          1|  1040|       yes|
         +--------------+---------+---------+----------+-----------+-----------+------+----------+
 
 
@@ -54,14 +54,14 @@
 |       Name      | BRAM_18K| DSP |   FF   |  LUT  | URAM|
 +-----------------+---------+-----+--------+-------+-----+
 |DSP              |        -|    -|       -|      -|    -|
-|Expression       |        -|    -|       0|     26|    -|
+|Expression       |        -|    -|       0|     24|    -|
 |FIFO             |        -|    -|       -|      -|    -|
 |Instance         |        -|    -|       -|      -|    -|
 |Memory           |        -|    -|       -|      -|    -|
 |Multiplexer      |        -|    -|       0|     27|    -|
-|Register         |        -|    -|      12|      -|    -|
+|Register         |        -|    -|      13|      -|    -|
 +-----------------+---------+-----+--------+-------+-----+
-|Total            |        0|    0|      12|     53|    0|
+|Total            |        0|    0|      13|     51|    0|
 +-----------------+---------+-----+--------+-------+-----+
 |Available        |      280|  220|  106400|  53200|    0|
 +-----------------+---------+-----+--------+-------+-----+
@@ -85,10 +85,10 @@
     +---------------------+----------+----+---+----+------------+------------+
     |    Variable Name    | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
     +---------------------+----------+----+---+----+------------+------------+
-    |add_ln943_fu_96_p2   |         +|   0|  0|  13|          10|           1|
-    |icmp_ln943_fu_90_p2  |      icmp|   0|  0|  13|          10|           9|
+    |add_ln960_fu_96_p2   |         +|   0|  0|  12|          11|           1|
+    |icmp_ln960_fu_90_p2  |      icmp|   0|  0|  12|          11|          11|
     +---------------------+----------+----+---+----+------------+------------+
-    |Total                |          |   0|  0|  26|          20|          10|
+    |Total                |          |   0|  0|  24|          22|          12|
     +---------------------+----------+----+---+----+------------+------------+
 
     * Multiplexer: 
@@ -96,10 +96,10 @@
     |         Name         | LUT| Input Size| Bits| Total Bits|
     +----------------------+----+-----------+-----+-----------+
     |ap_done_int           |   9|          2|    1|          2|
-    |ap_sig_allocacmp_i_3  |   9|          2|   10|         20|
-    |i_fu_42               |   9|          2|   10|         20|
+    |ap_sig_allocacmp_i_3  |   9|          2|   11|         22|
+    |i_fu_42               |   9|          2|   11|         22|
     +----------------------+----+-----------+-----+-----------+
-    |Total                 |  27|          6|   21|         42|
+    |Total                 |  27|          6|   23|         46|
     +----------------------+----+-----------+-----+-----------+
 
     * Register: 
@@ -108,9 +108,9 @@
     +-------------+----+----+-----+-----------+
     |ap_CS_fsm    |   1|   0|    1|          0|
     |ap_done_reg  |   1|   0|    1|          0|
-    |i_fu_42      |  10|   0|   10|          0|
+    |i_fu_42      |  11|   0|   11|          0|
     +-------------+----+----+-----+-----------+
-    |Total        |  12|   0|   12|          0|
+    |Total        |  13|   0|   13|          0|
     +-------------+----+----+-----+-----------+
 
 
@@ -128,11 +128,11 @@
 |ap_done                    |  out|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_RESET_ELIG|  return value|
 |ap_idle                    |  out|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_RESET_ELIG|  return value|
 |ap_ready                   |  out|    1|  ap_ctrl_hs|  snn_top_hls_Pipeline_RESET_ELIG|  return value|
-|pre_eligibility_address1   |  out|   10|   ap_memory|                  pre_eligibility|         array|
+|pre_eligibility_address1   |  out|   11|   ap_memory|                  pre_eligibility|         array|
 |pre_eligibility_ce1        |  out|    1|   ap_memory|                  pre_eligibility|         array|
 |pre_eligibility_we1        |  out|    1|   ap_memory|                  pre_eligibility|         array|
 |pre_eligibility_d1         |  out|    8|   ap_memory|                  pre_eligibility|         array|
-|post_eligibility_address1  |  out|   10|   ap_memory|                 post_eligibility|         array|
+|post_eligibility_address1  |  out|   11|   ap_memory|                 post_eligibility|         array|
 |post_eligibility_ce1       |  out|    1|   ap_memory|                 post_eligibility|         array|
 |post_eligibility_we1       |  out|    1|   ap_memory|                 post_eligibility|         array|
 |post_eligibility_d1        |  out|    8|   ap_memory|                 post_eligibility|         array|

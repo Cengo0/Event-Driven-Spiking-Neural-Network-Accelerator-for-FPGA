@@ -22,23 +22,23 @@
 </SummaryOfTimingAnalysis>
 <SummaryOfOverallLatency>
 <unit>clock cycles</unit>
-<Best-caseLatency>2355</Best-caseLatency>
-<Average-caseLatency>2355</Average-caseLatency>
-<Worst-caseLatency>2355</Worst-caseLatency>
-<Best-caseRealTimeLatency>23.550 us</Best-caseRealTimeLatency>
-<Average-caseRealTimeLatency>23.550 us</Average-caseRealTimeLatency>
-<Worst-caseRealTimeLatency>23.550 us</Worst-caseRealTimeLatency>
-<Interval-min>2354</Interval-min>
-<Interval-max>2354</Interval-max>
+<Best-caseLatency>3075</Best-caseLatency>
+<Average-caseLatency>3075</Average-caseLatency>
+<Worst-caseLatency>3075</Worst-caseLatency>
+<Best-caseRealTimeLatency>30.750 us</Best-caseRealTimeLatency>
+<Average-caseRealTimeLatency>30.750 us</Average-caseRealTimeLatency>
+<Worst-caseRealTimeLatency>30.750 us</Worst-caseRealTimeLatency>
+<Interval-min>3074</Interval-min>
+<Interval-max>3074</Interval-max>
 <PerformancePragma>-</PerformancePragma>
 </SummaryOfOverallLatency>
 <SummaryOfLoopLatency>
 <LTP_LOOP>
 <Slack>7.30</Slack>
-<TripCount>196</TripCount>
+<TripCount>256</TripCount>
 <isPerfectNested>0</isPerfectNested>
-<Latency>2353</Latency>
-<AbsoluteTimeLatency>23530</AbsoluteTimeLatency>
+<Latency>3073</Latency>
+<AbsoluteTimeLatency>30730</AbsoluteTimeLatency>
 <PipelineII>12</PipelineII>
 <PipelineDepth>14</PipelineDepth>
 <PerformancePragma>-</PerformancePragma>
@@ -49,14 +49,14 @@
 <SummaryOfViolations>
 <IssueType>Timing Violation</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:504</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:521</SourceLocation>
 <SummaryOfLoopViolations>
 <LTP_LOOP>
 <Name>LTP_LOOP</Name>
 <IssueType>II Violation</IssueType>
 <ViolationType>Memory Dependency</ViolationType>
 <IterationDistance>1</IterationDistance>
-<SourceLocation>src/snn_top_hls.cpp:504</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:521</SourceLocation>
 </LTP_LOOP>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>
@@ -65,8 +65,8 @@
 <AreaEstimates>
 <Resources>
 <DSP>3</DSP>
-<FF>146</FF>
-<LUT>347</LUT>
+<FF>143</FF>
+<LUT>338</LUT>
 <BRAM_18K>0</BRAM_18K>
 <URAM>0</URAM>
 </Resources>
@@ -147,8 +147,8 @@
 <Attribute>control</Attribute>
 </RtlPorts>
 <RtlPorts>
-<name>widx</name>
-<Object>widx</Object>
+<name>zext_ln521</name>
+<Object>zext_ln521</Object>
 <Type>scalar</Type>
 <Scope></Scope>
 <IOProtocol>ap_none</IOProtocol>
@@ -165,12 +165,12 @@
 <IOProtocol>ap_none</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>in</Dir>
-<Bits>7</Bits>
+<Bits>9</Bits>
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
-<name>zext_ln504</name>
-<Object>zext_ln504</Object>
+<name>zext_ln521_1</name>
+<Object>zext_ln521_1</Object>
 <Type>scalar</Type>
 <Scope></Scope>
 <IOProtocol>ap_none</IOProtocol>
@@ -180,8 +180,8 @@
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
-<name>tmp_81</name>
-<Object>tmp_81</Object>
+<name>tmp_191</name>
+<Object>tmp_191</Object>
 <Type>scalar</Type>
 <Scope></Scope>
 <IOProtocol>ap_none</IOProtocol>
@@ -191,8 +191,8 @@
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
-<name>sext_ln533</name>
-<Object>sext_ln533</Object>
+<name>sext_ln550</name>
+<Object>sext_ln550</Object>
 <Type>scalar</Type>
 <Scope></Scope>
 <IOProtocol>ap_none</IOProtocol>
@@ -202,8 +202,8 @@
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
-<name>sext_ln321</name>
-<Object>sext_ln321</Object>
+<name>sext_ln338</name>
+<Object>sext_ln338</Object>
 <Type>scalar</Type>
 <Scope></Scope>
 <IOProtocol>ap_none</IOProtocol>
@@ -224,8 +224,8 @@
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
-<name>icmp_ln321</name>
-<Object>icmp_ln321</Object>
+<name>icmp_ln338</name>
+<Object>icmp_ln338</Object>
 <Type>scalar</Type>
 <Scope></Scope>
 <IOProtocol>ap_none</IOProtocol>
@@ -242,7 +242,7 @@
 <IOProtocol>ap_none</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>in</Dir>
-<Bits>5</Bits>
+<Bits>4</Bits>
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -253,7 +253,7 @@
 <IOProtocol>ap_none</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>in</Dir>
-<Bits>2</Bits>
+<Bits>3</Bits>
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -264,7 +264,7 @@
 <IOProtocol>ap_memory</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>10</Bits>
+<Bits>11</Bits>
 <Attribute>address</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -385,7 +385,7 @@
 <IOProtocol>ap_vld</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>2</Bits>
+<Bits>3</Bits>
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -429,7 +429,7 @@
 <IOProtocol>ap_vld</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>6</Bits>
+<Bits>5</Bits>
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
@@ -517,7 +517,7 @@
 <IOProtocol>ap_vld</IOProtocol>
 <IOConfig></IOConfig>
 <Dir>out</Dir>
-<Bits>2</Bits>
+<Bits>3</Bits>
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>

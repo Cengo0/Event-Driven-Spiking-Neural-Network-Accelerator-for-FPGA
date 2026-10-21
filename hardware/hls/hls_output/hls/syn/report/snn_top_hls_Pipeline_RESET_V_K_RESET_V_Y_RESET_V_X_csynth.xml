@@ -18,29 +18,29 @@
 <PipelineType>loop pipeline stp</PipelineType>
 <SummaryOfTimingAnalysis>
 <unit>ns</unit>
-<EstimatedClockPeriod>7.341</EstimatedClockPeriod>
+<EstimatedClockPeriod>7.404</EstimatedClockPeriod>
 </SummaryOfTimingAnalysis>
 <SummaryOfOverallLatency>
 <unit>clock cycles</unit>
-<Best-caseLatency>6276</Best-caseLatency>
-<Average-caseLatency>6276</Average-caseLatency>
-<Worst-caseLatency>6276</Worst-caseLatency>
-<Best-caseRealTimeLatency>62.760 us</Best-caseRealTimeLatency>
-<Average-caseRealTimeLatency>62.760 us</Average-caseRealTimeLatency>
-<Worst-caseRealTimeLatency>62.760 us</Worst-caseRealTimeLatency>
-<Interval-min>6273</Interval-min>
-<Interval-max>6273</Interval-max>
+<Best-caseLatency>8195</Best-caseLatency>
+<Average-caseLatency>8195</Average-caseLatency>
+<Worst-caseLatency>8195</Worst-caseLatency>
+<Best-caseRealTimeLatency>81.950 us</Best-caseRealTimeLatency>
+<Average-caseRealTimeLatency>81.950 us</Average-caseRealTimeLatency>
+<Worst-caseRealTimeLatency>81.950 us</Worst-caseRealTimeLatency>
+<Interval-min>8193</Interval-min>
+<Interval-max>8193</Interval-max>
 <PerformancePragma>-</PerformancePragma>
 </SummaryOfOverallLatency>
 <SummaryOfLoopLatency>
 <RESET_V_K_RESET_V_Y_RESET_V_X>
 <Slack>7.30</Slack>
-<TripCount>6272</TripCount>
+<TripCount>8192</TripCount>
 <isPerfectNested>0</isPerfectNested>
-<Latency>6274</Latency>
-<AbsoluteTimeLatency>62740</AbsoluteTimeLatency>
+<Latency>8193</Latency>
+<AbsoluteTimeLatency>81930</AbsoluteTimeLatency>
 <PipelineII>1</PipelineII>
-<PipelineDepth>4</PipelineDepth>
+<PipelineDepth>3</PipelineDepth>
 <PerformancePragma>-</PerformancePragma>
 <InstanceList>
 </InstanceList>
@@ -49,13 +49,13 @@
 <SummaryOfViolations>
 <IssueType>Timing Violation</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:80~src/snn_top_hls.cpp:963</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:82~src/snn_top_hls.cpp:980</SourceLocation>
 <SummaryOfLoopViolations>
 <RESET_V_K_RESET_V_Y_RESET_V_X>
 <Name>RESET_V_K_RESET_V_Y_RESET_V_X</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:78~src/snn_top_hls.cpp:963</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:80~src/snn_top_hls.cpp:980</SourceLocation>
 </RESET_V_K_RESET_V_Y_RESET_V_X>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>
@@ -63,7 +63,7 @@
 
 <AreaEstimates>
 <Resources>
-<FF>78</FF>
+<FF>62</FF>
 <LUT>268</LUT>
 <BRAM_18K>0</BRAM_18K>
 <DSP>0</DSP>
