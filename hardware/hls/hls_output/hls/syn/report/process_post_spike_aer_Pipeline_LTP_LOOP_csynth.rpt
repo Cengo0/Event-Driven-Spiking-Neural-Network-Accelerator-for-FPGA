@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'process_post_spike_aer_Pipeline_LTP_LOOP'
 ================================================================
-* Date:           Mon Nov  9 08:18:33 2026
+* Date:           Mon Nov  9 10:30:03 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -179,7 +179,7 @@
 |widx                           |   in|   14|     ap_none|                                      widx|        scalar|
 |tmp_s                          |   in|    7|     ap_none|                                     tmp_s|        scalar|
 |zext_ln515                     |   in|    5|     ap_none|                                zext_ln515|        scalar|
-|tmp_81                         |   in|   10|     ap_none|                                    tmp_81|        scalar|
+|tmp_82                         |   in|   10|     ap_none|                                    tmp_82|        scalar|
 |sext_ln544                     |   in|   16|     ap_none|                                sext_ln544|        scalar|
 |sext_ln332                     |   in|   16|     ap_none|                                sext_ln332|        scalar|
 |learn_weight_ready             |   in|    1|     ap_none|                        learn_weight_ready|        scalar|

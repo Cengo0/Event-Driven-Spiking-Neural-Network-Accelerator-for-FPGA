@@ -191,7 +191,7 @@ attribute shreg_extract : string;
     signal pre_traces_ce1_local : STD_LOGIC;
     signal zext_ln408_1_fu_238_p1 : STD_LOGIC_VECTOR (8 downto 0);
     signal new_trace_fu_241_p2 : STD_LOGIC_VECTOR (8 downto 0);
-    signal tmp_92_fu_247_p3 : STD_LOGIC_VECTOR (0 downto 0);
+    signal tmp_93_fu_247_p3 : STD_LOGIC_VECTOR (0 downto 0);
     signal trunc_ln409_fu_255_p1 : STD_LOGIC_VECTOR (7 downto 0);
     signal src_start_fu_292_p9 : STD_LOGIC_VECTOR (9 downto 0);
     signal src_start_fu_292_p11 : STD_LOGIC_VECTOR (9 downto 0);
@@ -1044,13 +1044,13 @@ begin
     end process;
 
     select_ln409_fu_259_p3 <= 
-        ap_const_lv8_FF when (tmp_92_fu_247_p3(0) = '1') else 
+        ap_const_lv8_FF when (tmp_93_fu_247_p3(0) = '1') else 
         trunc_ln409_fu_255_p1;
         sext_ln421_fu_344_p1 <= std_logic_vector(IEEE.numeric_std.resize(signed(tmp_fu_320_p11),8));
 
     src_end_fu_352_p2 <= std_logic_vector(unsigned(zext_ln421_fu_348_p1) + unsigned(src_start_fu_292_p11));
     src_start_fu_292_p9 <= "XXXXXXXXXX";
-    tmp_92_fu_247_p3 <= new_trace_fu_241_p2(8 downto 8);
+    tmp_93_fu_247_p3 <= new_trace_fu_241_p2(8 downto 8);
     tmp_fu_320_p9 <= "XXXXXXX";
     tmp_s_fu_452_p9 <= "XXXXXXXXX";
     trunc_ln409_fu_255_p1 <= new_trace_fu_241_p2(8 - 1 downto 0);

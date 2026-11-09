@@ -17,7 +17,7 @@ module snn_top_hls_process_post_spike_aer_Pipeline_LTP_LOOP (
         widx,
         tmp_s,
         zext_ln515,
-        tmp_81,
+        tmp_82,
         sext_ln544,
         sext_ln332,
         learn_weight_ready,
@@ -73,7 +73,7 @@ output   ap_ready;
 input  [13:0] widx;
 input  [6:0] tmp_s;
 input  [4:0] zext_ln515;
-input  [9:0] tmp_81;
+input  [9:0] tmp_82;
 input  [15:0] sext_ln544;
 input  [15:0] sext_ln332;
 input  [0:0] learn_weight_ready;
@@ -199,13 +199,13 @@ wire   [27:0] grp_fu_443_p2;
 wire   [15:0] delta_fu_451_p4;
 wire  signed [15:0] sext_ln532_fu_448_p1;
 wire   [15:0] w_fu_461_p2;
-wire   [12:0] tmp_93_fu_467_p4;
+wire   [12:0] tmp_94_fu_467_p4;
 wire   [0:0] icmp_ln294_fu_477_p2;
 wire   [0:0] icmp_ln295_fu_483_p2;
 wire   [0:0] or_ln294_fu_501_p2;
 wire   [3:0] select_ln294_fu_493_p3;
 wire   [3:0] trunc_ln296_fu_489_p1;
-wire   [0:0] tmp_94_fu_516_p3;
+wire   [0:0] tmp_95_fu_516_p3;
 wire   [3:0] mag_3_fu_529_p2;
 reg    ap_done_reg;
 wire    ap_continue_int;
@@ -745,7 +745,7 @@ assign grp_fu_424_p1 = sext_ln544_cast_reg_589;
 
 assign grp_fu_443_p1 = sext_ln332_cast_reg_599;
 
-assign icmp_ln294_fu_477_p2 = (($signed(tmp_93_fu_467_p4) > $signed(13'd0)) ? 1'b1 : 1'b0);
+assign icmp_ln294_fu_477_p2 = (($signed(tmp_94_fu_467_p4) > $signed(13'd0)) ? 1'b1 : 1'b0);
 
 assign icmp_ln295_fu_483_p2 = (($signed(w_fu_461_p2) < $signed(16'd65528)) ? 1'b1 : 1'b0);
 
@@ -753,13 +753,13 @@ assign icmp_ln515_fu_271_p2 = ((ap_sig_allocacmp_ii_1 == sext_ln512_fu_254_p1) ?
 
 assign icmp_ln526_fu_311_p2 = ((pre_traces_q0 == 8'd0) ? 1'b1 : 1'b0);
 
-assign learn_bridge_data = ((tmp_94_fu_516_p3[0:0] == 1'b1) ? mag_3_fu_529_p2 : updated_reg_662);
+assign learn_bridge_data = ((tmp_95_fu_516_p3[0:0] == 1'b1) ? mag_3_fu_529_p2 : updated_reg_662);
 
 assign learn_bridge_dst = post_id_cast_reg_584;
 
 assign learn_bridge_dst_group = dst_group;
 
-assign learn_bridge_exc = (tmp_94_fu_516_p3 ^ 1'd1);
+assign learn_bridge_exc = (tmp_95_fu_516_p3 ^ 1'd1);
 
 assign learn_bridge_group = {{pre_id_reg_608[9:8]}};
 
@@ -775,7 +775,7 @@ assign or_ln326_fu_332_p2 = (icmp_ln332 | and_ln326_fu_326_p2);
 
 assign post_id_cast_fu_238_p1 = post_id;
 
-assign pre_id_fu_287_p2 = (zext_ln515_2_fu_283_p1 + tmp_81);
+assign pre_id_fu_287_p2 = (zext_ln515_2_fu_283_p1 + tmp_82);
 
 assign pre_traces_address0 = zext_ln522_fu_293_p1;
 
@@ -791,9 +791,9 @@ assign sext_ln532_fu_448_p1 = current_w_reg_637;
 
 assign sext_ln544_cast_fu_242_p1 = $signed(sext_ln544);
 
-assign tmp_93_fu_467_p4 = {{w_fu_461_p2[15:3]}};
+assign tmp_94_fu_467_p4 = {{w_fu_461_p2[15:3]}};
 
-assign tmp_94_fu_516_p3 = updated_reg_662[32'd3];
+assign tmp_95_fu_516_p3 = updated_reg_662[32'd3];
 
 assign tmp_fu_337_p4 = {{pre_id_reg_608[9:8]}};
 

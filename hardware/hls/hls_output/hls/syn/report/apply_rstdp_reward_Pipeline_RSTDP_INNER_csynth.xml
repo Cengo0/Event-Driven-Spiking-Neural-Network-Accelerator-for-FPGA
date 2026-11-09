@@ -168,8 +168,8 @@
 <Attribute>data</Attribute>
 </RtlPorts>
 <RtlPorts>
-<name>tmp_83</name>
-<Object>tmp_83</Object>
+<name>tmp_84</name>
+<Object>tmp_84</Object>
 <Type>scalar</Type>
 <Scope></Scope>
 <IOProtocol>ap_none</IOProtocol>

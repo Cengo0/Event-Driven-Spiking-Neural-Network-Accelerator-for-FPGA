@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'apply_rstdp_reward_Pipeline_RSTDP_INNER'
 ================================================================
-* Date:           Mon Nov  9 08:18:33 2026
+* Date:           Mon Nov  9 10:30:03 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -195,7 +195,7 @@
 |ap_ready                       |  out|    1|  ap_ctrl_hs|  apply_rstdp_reward_Pipeline_RSTDP_INNER|  return value|
 |add_ln614                      |   in|   14|     ap_none|                                add_ln614|        scalar|
 |add_ln614_2                    |   in|   14|     ap_none|                              add_ln614_2|        scalar|
-|tmp_83                         |   in|    9|     ap_none|                                   tmp_83|        scalar|
+|tmp_84                         |   in|    9|     ap_none|                                   tmp_84|        scalar|
 |sext_ln648                     |   in|    8|     ap_none|                               sext_ln648|        scalar|
 |shift_sel                      |   in|    2|     ap_none|                                shift_sel|        scalar|
 |sext_ln599                     |   in|   16|     ap_none|                               sext_ln599|        scalar|

@@ -209,7 +209,7 @@ wire   [8:0] zext_ln428_1_fu_278_p1;
 wire  signed [9:0] sext_ln435_fu_288_p1;
 wire   [0:0] xor_ln326_fu_327_p2;
 wire   [0:0] and_ln326_fu_332_p2;
-wire   [0:0] tmp_90_fu_343_p3;
+wire   [0:0] tmp_91_fu_343_p3;
 wire  signed [3:0] bit_sel_fu_400_p1;
 wire   [0:0] bit_sel_fu_400_p3;
 wire  signed [3:0] trunc_ln445_fu_414_p0;
@@ -234,7 +234,7 @@ wire   [0:0] icmp_ln295_fu_502_p2;
 wire   [0:0] or_ln294_fu_520_p2;
 wire   [3:0] select_ln294_fu_512_p3;
 wire   [3:0] trunc_ln296_fu_508_p1;
-wire   [0:0] tmp_91_fu_534_p3;
+wire   [0:0] tmp_92_fu_534_p3;
 wire   [3:0] mag_1_fu_547_p2;
 reg    ap_done_reg;
 wire    ap_continue_int;
@@ -831,13 +831,13 @@ assign icmp_ln428_fu_266_p2 = ((ap_sig_allocacmp_widx_1 == add_ln428_1) ? 1'b1 :
 
 assign icmp_ln439_fu_317_p2 = ((post_traces_q0 == 8'd0) ? 1'b1 : 1'b0);
 
-assign learn_bridge_data = ((tmp_91_fu_534_p3[0:0] == 1'b1) ? mag_1_fu_547_p2 : updated_reg_680);
+assign learn_bridge_data = ((tmp_92_fu_534_p3[0:0] == 1'b1) ? mag_1_fu_547_p2 : updated_reg_680);
 
 assign learn_bridge_dst = post_id_reg_625[5:0];
 
 assign learn_bridge_dst_group = select_ln341_fu_350_p3;
 
-assign learn_bridge_exc = (tmp_91_fu_534_p3 ^ 1'd1);
+assign learn_bridge_exc = (tmp_92_fu_534_p3 ^ 1'd1);
 
 assign learn_bridge_group = src_group;
 
@@ -859,7 +859,7 @@ assign post_traces_ce0 = post_traces_ce0_local;
 
 assign select_ln294_fu_512_p3 = ((icmp_ln294_fu_496_p2[0:0] == 1'b1) ? 4'd7 : 4'd8);
 
-assign select_ln341_fu_350_p3 = ((tmp_90_fu_343_p3[0:0] == 1'b1) ? 2'd3 : 2'd0);
+assign select_ln341_fu_350_p3 = ((tmp_91_fu_343_p3[0:0] == 1'b1) ? 2'd3 : 2'd0);
 
 assign sext_ln331_cast_fu_246_p1 = $signed(sext_ln331);
 
@@ -869,9 +869,9 @@ assign sext_ln445_fu_467_p1 = current_w_reg_655_pp0_iter11_reg;
 
 assign sext_ln457_cast_fu_242_p1 = $signed(sext_ln457);
 
-assign tmp_90_fu_343_p3 = post_id_reg_625[32'd8];
+assign tmp_91_fu_343_p3 = post_id_reg_625[32'd8];
 
-assign tmp_91_fu_534_p3 = updated_reg_680[32'd3];
+assign tmp_92_fu_534_p3 = updated_reg_680[32'd3];
 
 assign tmp_fu_486_p4 = {{w_fu_480_p2[15:3]}};
 

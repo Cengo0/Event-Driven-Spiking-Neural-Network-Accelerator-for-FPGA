@@ -197,7 +197,7 @@ wire   [7:0] select_ln409_fu_259_p3;
 reg    pre_traces_ce1_local;
 wire   [8:0] zext_ln408_1_fu_238_p1;
 wire   [8:0] new_trace_fu_241_p2;
-wire   [0:0] tmp_92_fu_247_p3;
+wire   [0:0] tmp_93_fu_247_p3;
 wire   [7:0] trunc_ln409_fu_255_p1;
 wire   [9:0] src_start_fu_292_p9;
 wire   [9:0] src_start_fu_292_p11;
@@ -837,7 +837,7 @@ assign pre_traces_d1 = select_ln409_fu_259_p3;
 
 assign pre_traces_we1 = pre_traces_we1_local;
 
-assign select_ln409_fu_259_p3 = ((tmp_92_fu_247_p3[0:0] == 1'b1) ? 8'd255 : trunc_ln409_fu_255_p1);
+assign select_ln409_fu_259_p3 = ((tmp_93_fu_247_p3[0:0] == 1'b1) ? 8'd255 : trunc_ln409_fu_255_p1);
 
 assign sext_ln421_fu_344_p1 = $signed(tmp_fu_320_p11);
 
@@ -845,7 +845,7 @@ assign src_end_fu_352_p2 = (zext_ln421_fu_348_p1 + src_start_fu_292_p11);
 
 assign src_start_fu_292_p9 = 'bx;
 
-assign tmp_92_fu_247_p3 = new_trace_fu_241_p2[32'd8];
+assign tmp_93_fu_247_p3 = new_trace_fu_241_p2[32'd8];
 
 assign tmp_fu_320_p9 = 'bx;
 

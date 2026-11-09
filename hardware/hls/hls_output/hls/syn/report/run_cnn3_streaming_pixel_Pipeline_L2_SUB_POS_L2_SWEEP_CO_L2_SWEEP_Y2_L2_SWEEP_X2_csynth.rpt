@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'run_cnn3_streaming_pixel_Pipeline_L2_SUB_POS_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2'
 ================================================================
-* Date:           Mon Nov  9 08:18:32 2026
+* Date:           Mon Nov  9 10:30:02 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -121,8 +121,8 @@
     |icmp_ln187_fu_601_p2                     |      icmp|   0|  0|  14|           6|           5|
     |icmp_ln188_fu_589_p2                     |      icmp|   0|  0|  11|           3|           2|
     |icmp_ln196_fu_935_p2                     |      icmp|   0|  0|  23|          16|          16|
-    |empty_101_fu_667_p2                      |        or|   0|  0|   2|           1|           1|
-    |empty_102_fu_673_p2                      |        or|   0|  0|   2|           1|           1|
+    |empty_100_fu_667_p2                      |        or|   0|  0|   2|           1|           1|
+    |empty_101_fu_673_p2                      |        or|   0|  0|   2|           1|           1|
     |empty_fu_627_p2                          |        or|   0|  0|   2|           1|           1|
     |not_exitcond_flatten32_mid265_fu_647_p2  |        or|   0|  0|   2|           1|           1|
     |emit_wt_fu_1034_p3                       |    select|   0|  0|   3|           1|           2|
@@ -204,7 +204,7 @@
     |s_fu_194                                   |   3|   0|    3|          0|
     |select_ln184_reg_1172                      |   5|   0|    5|          0|
     |select_ln187_reg_1211                      |   3|   0|    3|          0|
-    |tmp_15_reg_1322                            |   1|   0|    1|          0|
+    |tmp_16_reg_1322                            |   1|   0|    1|          0|
     |tmp_9_reg_1206                             |   2|   0|    2|          0|
     |tmp_9_reg_1206_pp0_iter1_reg               |   2|   0|    2|          0|
     |tmp_reg_1189                               |   1|   0|    1|          0|

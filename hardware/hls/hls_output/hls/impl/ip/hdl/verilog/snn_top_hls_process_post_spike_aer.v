@@ -118,8 +118,8 @@ reg[1:0] learn_bridge_dst_group;
 wire    ap_CS_fsm_state1;
 wire   [3:0] empty_fu_215_p1;
 reg   [3:0] empty_reg_501;
-wire   [4:0] empty_103_fu_219_p1;
-reg   [4:0] empty_103_reg_506;
+wire   [4:0] empty_102_fu_219_p1;
+reg   [4:0] empty_102_reg_506;
 reg   [9:0] post_traces_addr_reg_511;
 reg   [1:0] dst_group_cast_reg_517;
 reg   [7:0] post_traces_load_reg_522;
@@ -143,8 +143,8 @@ reg   [6:0] tmp_s_reg_576;
 wire    ap_CS_fsm_state5;
 wire   [13:0] widx_fu_452_p2;
 reg   [13:0] widx_reg_581;
-wire   [9:0] tmp_79_fu_459_p11;
-reg   [9:0] tmp_79_reg_586;
+wire   [9:0] tmp_80_fu_459_p11;
+reg   [9:0] tmp_80_reg_586;
 wire    grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_ap_start;
 wire    grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_ap_done;
 wire    grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_ap_idle;
@@ -206,10 +206,10 @@ wire   [0:0] icmp_ln509_fu_375_p2;
 wire   [0:0] xor_ln509_fu_385_p2;
 wire   [3:0] trunc_ln507_fu_321_p1;
 wire   [6:0] tmp_s_fu_402_p9;
-wire   [13:0] tmp_78_fu_429_p9;
+wire   [13:0] tmp_79_fu_429_p9;
 wire   [13:0] zext_ln512_fu_426_p1;
-wire   [13:0] tmp_78_fu_429_p11;
-wire   [9:0] tmp_79_fu_459_p9;
+wire   [13:0] tmp_79_fu_429_p11;
+wire   [9:0] tmp_80_fu_459_p9;
 wire   [0:0] icmp_ln504_fu_281_p2;
 reg   [5:0] ap_NS_fsm;
 reg    ap_ST_fsm_state1_blk;
@@ -230,14 +230,14 @@ wire   [1:0] tmp_s_fu_402_p1;
 wire   [1:0] tmp_s_fu_402_p3;
 wire  signed [1:0] tmp_s_fu_402_p5;
 wire  signed [1:0] tmp_s_fu_402_p7;
-wire   [1:0] tmp_78_fu_429_p1;
-wire   [1:0] tmp_78_fu_429_p3;
-wire  signed [1:0] tmp_78_fu_429_p5;
-wire  signed [1:0] tmp_78_fu_429_p7;
-wire   [1:0] tmp_79_fu_459_p1;
-wire   [1:0] tmp_79_fu_459_p3;
-wire  signed [1:0] tmp_79_fu_459_p5;
-wire  signed [1:0] tmp_79_fu_459_p7;
+wire   [1:0] tmp_79_fu_429_p1;
+wire   [1:0] tmp_79_fu_429_p3;
+wire  signed [1:0] tmp_79_fu_429_p5;
+wire  signed [1:0] tmp_79_fu_429_p7;
+wire   [1:0] tmp_80_fu_459_p1;
+wire   [1:0] tmp_80_fu_459_p3;
+wire  signed [1:0] tmp_80_fu_459_p5;
+wire  signed [1:0] tmp_80_fu_459_p7;
 wire    ap_ce_reg;
 
 // power-on initialization
@@ -257,12 +257,12 @@ snn_top_hls_process_post_spike_aer_Pipeline_LTP_LOOP grp_process_post_spike_aer_
     .widx(widx_reg_581),
     .tmp_s(tmp_s_reg_576),
     .zext_ln515(zext_ln515_cast_reg_562),
-    .tmp_81(tmp_79_reg_586),
+    .tmp_82(tmp_80_reg_586),
     .sext_ln544(params_a_plus_val),
     .sext_ln332(params_learning_rate_val),
     .learn_weight_ready(learn_weight_ready),
     .icmp_ln332(icmp_ln332_reg_542),
-    .post_id(empty_103_reg_506),
+    .post_id(empty_102_reg_506),
     .dst_group(dst_group_cast_reg_517),
     .pre_traces_address0(grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_pre_traces_address0),
     .pre_traces_ce0(grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_pre_traces_ce0),
@@ -382,9 +382,9 @@ sparsemux_9_2_14_1_1_U333(
     .din1(14'd3136),
     .din2(14'd6272),
     .din3(14'd9408),
-    .def(tmp_78_fu_429_p9),
+    .def(tmp_79_fu_429_p9),
     .sel(trunc_ln504_reg_555),
-    .dout(tmp_78_fu_429_p11)
+    .dout(tmp_79_fu_429_p11)
 );
 
 (* dissolve_hierarchy = "yes" *) snn_top_hls_sparsemux_9_2_10_1_1 #(
@@ -406,9 +406,9 @@ sparsemux_9_2_10_1_1_U334(
     .din1(10'd196),
     .din2(10'd392),
     .din3(10'd588),
-    .def(tmp_79_fu_459_p9),
+    .def(tmp_80_fu_459_p9),
     .sel(trunc_ln504_reg_555),
-    .dout(tmp_79_fu_459_p11)
+    .dout(tmp_80_fu_459_p11)
 );
 
 always @ (posedge ap_clk) begin
@@ -452,7 +452,7 @@ end
 always @ (posedge ap_clk) begin
     if ((1'b1 == ap_CS_fsm_state1)) begin
         dst_group_cast_reg_517 <= {{post_id[9:8]}};
-        empty_103_reg_506 <= empty_103_fu_219_p1;
+        empty_102_reg_506 <= empty_102_fu_219_p1;
         empty_reg_501 <= empty_fu_215_p1;
         post_traces_addr_reg_511 <= zext_ln495_fu_223_p1;
     end
@@ -520,7 +520,7 @@ end
 
 always @ (posedge ap_clk) begin
     if ((1'b1 == ap_CS_fsm_state5)) begin
-        tmp_79_reg_586 <= tmp_79_fu_459_p11;
+        tmp_80_reg_586 <= tmp_80_fu_459_p11;
         tmp_s_reg_576 <= tmp_s_fu_402_p11;
         widx_reg_581 <= widx_fu_452_p2;
     end
@@ -724,7 +724,7 @@ assign dst_end_fu_361_p2 = ($signed(zext_ln508_fu_357_p1) + $signed(dst_start_fu
 
 assign dst_start_fu_297_p9 = 'bx;
 
-assign empty_103_fu_219_p1 = post_id[4:0];
+assign empty_102_fu_219_p1 = post_id[4:0];
 
 assign empty_fu_215_p1 = post_id[3:0];
 
@@ -782,9 +782,9 @@ assign sext_ln507_fu_325_p1 = dst_start_fu_297_p11;
 
 assign sext_ln508_fu_367_p1 = $signed(dst_end_fu_361_p2);
 
-assign tmp_78_fu_429_p9 = 'bx;
+assign tmp_79_fu_429_p9 = 'bx;
 
-assign tmp_79_fu_459_p9 = 'bx;
+assign tmp_80_fu_459_p9 = 'bx;
 
 assign tmp_fu_252_p3 = new_trace_fu_246_p2[32'd8];
 
@@ -804,7 +804,7 @@ assign weight_memory_d0 = grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_we
 
 assign weight_memory_we0 = grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_weight_memory_we0;
 
-assign widx_fu_452_p2 = (zext_ln512_fu_426_p1 + tmp_78_fu_429_p11);
+assign widx_fu_452_p2 = (zext_ln512_fu_426_p1 + tmp_79_fu_429_p11);
 
 assign xor_ln509_fu_385_p2 = (icmp_ln509_1_fu_380_p2 ^ 1'd1);
 

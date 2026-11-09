@@ -285,7 +285,7 @@ reg    ap_ready_int;
 reg    encoder_spikes_blk_n;
 wire    ap_block_pp0_stage0_grp1;
 reg   [0:0] icmp_ln196_reg_1318;
-reg   [0:0] tmp_15_reg_1322;
+reg   [0:0] tmp_16_reg_1322;
 wire    ap_block_pp0_stage0_11001_grp0;
 reg    ap_block_pp0_stage0_subdone_grp0_done_reg;
 wire    ap_block_pp0_stage0_subdone_grp0;
@@ -409,12 +409,12 @@ wire   [0:0] exitcond_flatten32_not_fu_641_p2;
 wire   [0:0] and_ln183_fu_595_p2;
 wire   [0:0] not_exitcond_flatten32_mid265_fu_647_p2;
 wire   [4:0] add_ln184_fu_621_p2;
-wire   [0:0] empty_101_fu_667_p2;
-wire   [0:0] empty_102_fu_673_p2;
+wire   [0:0] empty_100_fu_667_p2;
+wire   [0:0] empty_101_fu_673_p2;
 wire   [1:0] trunc_ln190_fu_703_p1;
 wire   [10:0] add_ln184_1_fu_721_p2;
 wire   [2:0] add_ln187_fu_750_p2;
-wire   [4:0] tmp_14_fu_770_p4;
+wire   [4:0] tmp_15_fu_770_p4;
 wire   [7:0] p_shl_fu_761_p4;
 wire   [7:0] zext_ln196_fu_779_p1;
 wire   [3:0] or_ln_fu_789_p3;
@@ -434,7 +434,7 @@ wire   [7:0] zext_ln193_fu_1010_p1;
 wire   [9:0] global_nid_fu_1019_p3;
 wire   [1:0] emit_wt_fu_1034_p3;
 wire   [10:0] zext_ln191_1_fu_1026_p1;
-wire   [12:0] tmp_16_fu_1054_p3;
+wire   [12:0] tmp_17_fu_1054_p3;
 wire  signed [17:0] sext_ln211_fu_1062_p1;
 wire   [31:0] zext_ln211_fu_1066_p1;
 wire   [48:0] zext_ln211_1_cast_fu_1070_p3;
@@ -733,7 +733,7 @@ always @ (posedge ap_clk) begin
         icmp_ln196_reg_1318 <= icmp_ln196_fu_935_p2;
         indvar_flatten30_load_reg_1147 <= indvar_flatten30_fu_182;
         select_ln184_reg_1172 <= select_ln184_fu_659_p3;
-        tmp_15_reg_1322 <= encoder_spikes_full_n;
+        tmp_16_reg_1322 <= encoder_spikes_full_n;
         tmp_9_reg_1206 <= {{select_ln184_fu_659_p3[3:2]}};
         tmp_9_reg_1206_pp0_iter1_reg <= tmp_9_reg_1206;
         tmp_reg_1189 <= select_ln183_1_fu_613_p3[32'd1];
@@ -847,7 +847,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((1'b0 == ap_block_pp0_stage0_grp1) & (ap_enable_reg_pp0_iter2 == 1'b1) & (tmp_15_reg_1322 == 1'd1) & (icmp_ln196_reg_1318 == 1'd0) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
+    if (((1'b0 == ap_block_pp0_stage0_grp1) & (ap_enable_reg_pp0_iter2 == 1'b1) & (tmp_16_reg_1322 == 1'd1) & (icmp_ln196_reg_1318 == 1'd0) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
         encoder_spikes_blk_n = encoder_spikes_full_n;
     end else begin
         encoder_spikes_blk_n = 1'b1;
@@ -1351,16 +1351,16 @@ assign ap_enable_pp0 = (ap_idle_pp0 ^ 1'b1);
 assign ap_loop_exit_ready = ap_condition_exit_pp0_iter0_stage1;
 
 always @ (*) begin
-    ap_predicate_op211_write_state5 = ((tmp_15_reg_1322 == 1'd1) & (icmp_ln196_reg_1318 == 1'd0));
+    ap_predicate_op211_write_state5 = ((tmp_16_reg_1322 == 1'd1) & (icmp_ln196_reg_1318 == 1'd0));
 end
 
 assign ap_ready = ap_ready_sig;
 
 assign emit_wt_fu_1034_p3 = ((cnn_spike_toggle_i[0:0] == 1'b1) ? 2'd3 : 2'd2);
 
-assign empty_101_fu_667_p2 = (icmp_ln188_mid242_fu_653_p2 | and_ln183_1_fu_607_p2);
+assign empty_100_fu_667_p2 = (icmp_ln188_mid242_fu_653_p2 | and_ln183_1_fu_607_p2);
 
-assign empty_102_fu_673_p2 = (icmp_ln184_fu_569_p2 | empty_101_fu_667_p2);
+assign empty_101_fu_673_p2 = (icmp_ln184_fu_569_p2 | empty_100_fu_667_p2);
 
 assign empty_fu_627_p2 = (icmp_ln184_fu_569_p2 | and_ln183_1_fu_607_p2);
 
@@ -1606,7 +1606,7 @@ assign select_ln187_1_fu_835_p3 = ((empty_reg_1156[0:0] == 1'b1) ? 6'd1 : add_ln
 
 assign select_ln187_fu_755_p3 = ((icmp_ln188_mid242_reg_1167[0:0] == 1'b1) ? add_ln187_fu_750_p2 : y2_mid237_reg_1161);
 
-assign sext_ln211_fu_1062_p1 = $signed(tmp_16_fu_1054_p3);
+assign sext_ln211_fu_1062_p1 = $signed(tmp_17_fu_1054_p3);
 
 assign sub_ln190_fu_1004_p2 = (p_shl1_fu_997_p3 - zext_ln190_1_fu_994_p1);
 
@@ -1614,9 +1614,9 @@ assign sub_ln196_fu_783_p2 = (p_shl_fu_761_p4 - zext_ln196_fu_779_p1);
 
 assign sub_ln197_fu_940_p2 = (tmp_s_fu_864_p35 - threshold_l2);
 
-assign tmp_14_fu_770_p4 = {{{select_ln187_fu_755_p3}, {tmp_reg_1189}}, {1'd0}};
+assign tmp_15_fu_770_p4 = {{{select_ln187_fu_755_p3}, {tmp_reg_1189}}, {1'd0}};
 
-assign tmp_16_fu_1054_p3 = {{emit_wt_fu_1034_p3}, {zext_ln191_1_fu_1026_p1}};
+assign tmp_17_fu_1054_p3 = {{emit_wt_fu_1034_p3}, {zext_ln191_1_fu_1026_p1}};
 
 assign tmp_s_fu_864_p33 = 'bx;
 
@@ -1626,7 +1626,7 @@ assign trunc_ln184_fu_699_p1 = select_ln184_fu_659_p3[3:0];
 
 assign trunc_ln190_fu_703_p1 = select_ln184_fu_659_p3[1:0];
 
-assign x2_mid2_fu_679_p3 = ((empty_102_fu_673_p2[0:0] == 1'b1) ? 3'd0 : x2_fu_174);
+assign x2_mid2_fu_679_p3 = ((empty_101_fu_673_p2[0:0] == 1'b1) ? 3'd0 : x2_fu_174);
 
 assign xor_ln183_fu_583_p2 = (icmp_ln184_fu_569_p2 ^ 1'd1);
 
@@ -1644,7 +1644,7 @@ assign zext_ln196_1_fu_795_p1 = or_ln_fu_789_p3;
 
 assign zext_ln196_2_fu_805_p1 = add_ln196_fu_799_p2;
 
-assign zext_ln196_fu_779_p1 = tmp_14_fu_770_p4;
+assign zext_ln196_fu_779_p1 = tmp_15_fu_770_p4;
 
 assign zext_ln211_1_cast_fu_1070_p3 = {{17'd69391}, {zext_ln211_fu_1066_p1}};
 

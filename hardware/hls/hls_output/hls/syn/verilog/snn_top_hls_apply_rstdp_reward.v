@@ -117,8 +117,8 @@ reg[1:0] learn_bridge_dst_group;
 wire    ap_CS_fsm_state1;
 wire   [0:0] and_ln582_fu_254_p2;
 reg   [0:0] and_ln582_reg_607;
-wire   [0:0] tmp_98_fu_260_p3;
-reg   [0:0] tmp_98_reg_618;
+wire   [0:0] tmp_99_fu_260_p3;
+reg   [0:0] tmp_99_reg_618;
 wire   [1:0] shift_sel_fu_358_p9;
 reg   [1:0] shift_sel_reg_623;
 wire   [2:0] add_ln599_fu_392_p2;
@@ -144,15 +144,15 @@ reg   [0:0] icmp_ln609_reg_686;
 wire   [4:0] zext_ln614_1_cast_fu_497_p11;
 reg   [4:0] zext_ln614_1_cast_reg_690;
 reg   [1:0] tmp_11_reg_700;
-wire  signed [13:0] tmp_80_fu_533_p11;
+wire  signed [13:0] tmp_81_fu_533_p11;
 wire    ap_CS_fsm_state6;
 wire   [13:0] grp_fu_588_p3;
 reg   [13:0] add_ln614_reg_711;
 wire    ap_CS_fsm_state7;
 (* use_dsp = "no" *) wire   [13:0] add_ln614_2_fu_559_p2;
 reg   [13:0] add_ln614_2_reg_716;
-wire   [8:0] tmp_81_fu_564_p11;
-reg   [8:0] tmp_81_reg_721;
+wire   [8:0] tmp_82_fu_564_p11;
+reg   [8:0] tmp_82_reg_721;
 wire    ap_CS_fsm_state8;
 wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_213_ap_start;
 wire    grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_213_ap_done;
@@ -202,9 +202,9 @@ reg    pre_eligibility_ce0_local;
 wire   [0:0] icmp_ln582_fu_248_p2;
 wire   [7:0] reward_mag_fu_268_p2;
 wire   [7:0] reward_mag_1_fu_274_p3;
-wire   [1:0] tmp_99_fu_282_p4;
-wire   [2:0] tmp_100_fu_298_p4;
-wire   [3:0] tmp_101_fu_314_p4;
+wire   [1:0] tmp_100_fu_282_p4;
+wire   [2:0] tmp_101_fu_298_p4;
+wire   [3:0] tmp_102_fu_314_p4;
 wire   [0:0] icmp_ln591_fu_324_p2;
 wire   [0:0] icmp_ln589_fu_292_p2;
 wire   [0:0] icmp_ln590_fu_308_p2;
@@ -218,9 +218,9 @@ wire   [6:0] tmp_fu_402_p11;
 wire   [9:0] tmp_s_fu_430_p9;
 wire   [9:0] zext_ln603_1_fu_465_p1;
 wire   [4:0] zext_ln614_1_cast_fu_497_p9;
-wire   [13:0] tmp_80_fu_533_p9;
+wire   [13:0] tmp_81_fu_533_p9;
 wire   [13:0] zext_ln614_2_fu_556_p1;
-wire   [8:0] tmp_81_fu_564_p9;
+wire   [8:0] tmp_82_fu_564_p9;
 wire   [7:0] grp_fu_588_p0;
 wire   [4:0] grp_fu_588_p1;
 reg   [8:0] ap_NS_fsm;
@@ -250,14 +250,14 @@ wire   [1:0] zext_ln614_1_cast_fu_497_p1;
 wire   [1:0] zext_ln614_1_cast_fu_497_p3;
 wire  signed [1:0] zext_ln614_1_cast_fu_497_p5;
 wire  signed [1:0] zext_ln614_1_cast_fu_497_p7;
-wire   [1:0] tmp_80_fu_533_p1;
-wire   [1:0] tmp_80_fu_533_p3;
-wire  signed [1:0] tmp_80_fu_533_p5;
-wire  signed [1:0] tmp_80_fu_533_p7;
-wire   [1:0] tmp_81_fu_564_p1;
-wire   [1:0] tmp_81_fu_564_p3;
-wire  signed [1:0] tmp_81_fu_564_p5;
-wire  signed [1:0] tmp_81_fu_564_p7;
+wire   [1:0] tmp_81_fu_533_p1;
+wire   [1:0] tmp_81_fu_533_p3;
+wire  signed [1:0] tmp_81_fu_533_p5;
+wire  signed [1:0] tmp_81_fu_533_p7;
+wire   [1:0] tmp_82_fu_564_p1;
+wire   [1:0] tmp_82_fu_564_p3;
+wire  signed [1:0] tmp_82_fu_564_p5;
+wire  signed [1:0] tmp_82_fu_564_p7;
 wire    ap_ce_reg;
 
 // power-on initialization
@@ -276,11 +276,11 @@ snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER grp_apply_rstdp_reward_Pipel
     .ap_ready(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_213_ap_ready),
     .add_ln614(add_ln614_reg_711),
     .add_ln614_2(add_ln614_2_reg_716),
-    .tmp_83(tmp_81_reg_721),
+    .tmp_84(tmp_82_reg_721),
     .sext_ln648(pre_elig_reg_681),
     .shift_sel(shift_sel_reg_623),
     .sext_ln599(params_reward_scale_val),
-    .empty(tmp_98_reg_618),
+    .empty(tmp_99_reg_618),
     .learn_weight_ready(learn_weight_ready),
     .pre_id(trunc_ln608_reg_666),
     .zext_ln339(tmp_11_reg_700),
@@ -426,9 +426,9 @@ sparsemux_9_2_14_1_1_U381(
     .din1(14'd3136),
     .din2(14'd6272),
     .din3(14'd9408),
-    .def(tmp_80_fu_533_p9),
+    .def(tmp_81_fu_533_p9),
     .sel(trunc_ln599_reg_636),
-    .dout(tmp_80_fu_533_p11)
+    .dout(tmp_81_fu_533_p11)
 );
 
 (* dissolve_hierarchy = "yes" *) snn_top_hls_sparsemux_9_2_9_1_1 #(
@@ -450,9 +450,9 @@ sparsemux_9_2_9_1_1_U382(
     .din1(9'd272),
     .din2(9'd272),
     .din3(9'd272),
-    .def(tmp_81_fu_564_p9),
+    .def(tmp_82_fu_564_p9),
     .sel(trunc_ln599_reg_636),
-    .dout(tmp_81_fu_564_p11)
+    .dout(tmp_82_fu_564_p11)
 );
 
 snn_top_hls_mac_muladd_8ns_5ns_14s_14_4_1 #(
@@ -467,7 +467,7 @@ mac_muladd_8ns_5ns_14s_14_4_1_U383(
     .reset(ap_rst),
     .din0(grp_fu_588_p0),
     .din1(grp_fu_588_p1),
-    .din2(tmp_80_fu_533_p11),
+    .din2(tmp_81_fu_533_p11),
     .ce(1'b1),
     .dout(grp_fu_588_p3)
 );
@@ -536,7 +536,7 @@ always @ (posedge ap_clk) begin
     if ((1'b1 == ap_CS_fsm_state1)) begin
         and_ln582_reg_607 <= and_ln582_fu_254_p2;
         shift_sel_reg_623 <= shift_sel_fu_358_p9;
-        tmp_98_reg_618 <= reward_signal[32'd7];
+        tmp_99_reg_618 <= reward_signal[32'd7];
     end
 end
 
@@ -599,7 +599,7 @@ end
 
 always @ (posedge ap_clk) begin
     if ((1'b1 == ap_CS_fsm_state8)) begin
-        tmp_81_reg_721 <= tmp_81_fu_564_p11;
+        tmp_82_reg_721 <= tmp_82_fu_564_p11;
     end
 end
 
@@ -828,11 +828,11 @@ assign grp_fu_588_p10 = zext_ln614_1_cast_fu_497_p11;
 
 assign icmp_ln582_fu_248_p2 = ((reward_signal != 8'd0) ? 1'b1 : 1'b0);
 
-assign icmp_ln589_fu_292_p2 = ((tmp_99_fu_282_p4 != 2'd0) ? 1'b1 : 1'b0);
+assign icmp_ln589_fu_292_p2 = ((tmp_100_fu_282_p4 != 2'd0) ? 1'b1 : 1'b0);
 
-assign icmp_ln590_fu_308_p2 = ((tmp_100_fu_298_p4 != 3'd0) ? 1'b1 : 1'b0);
+assign icmp_ln590_fu_308_p2 = ((tmp_101_fu_298_p4 != 3'd0) ? 1'b1 : 1'b0);
 
-assign icmp_ln591_fu_324_p2 = ((tmp_101_fu_314_p4 != 4'd0) ? 1'b1 : 1'b0);
+assign icmp_ln591_fu_324_p2 = ((tmp_102_fu_314_p4 != 4'd0) ? 1'b1 : 1'b0);
 
 assign icmp_ln599_fu_386_p2 = ((c_fu_160 == 3'd4) ? 1'b1 : 1'b0);
 
@@ -864,7 +864,7 @@ assign pre_eligibility_address0 = zext_ln608_fu_478_p1;
 
 assign pre_eligibility_ce0 = pre_eligibility_ce0_local;
 
-assign reward_mag_1_fu_274_p3 = ((tmp_98_fu_260_p3[0:0] == 1'b1) ? reward_mag_fu_268_p2 : reward_signal);
+assign reward_mag_1_fu_274_p3 = ((tmp_99_fu_260_p3[0:0] == 1'b1) ? reward_mag_fu_268_p2 : reward_signal);
 
 assign reward_mag_fu_268_p2 = (8'd0 - reward_signal);
 
@@ -876,17 +876,17 @@ assign shift_sel_fu_358_p7 = 'bx;
 
 assign shift_sel_fu_358_p8 = {{icmp_ln589_fu_292_p2}, {and_ln590_fu_344_p2}};
 
-assign tmp_100_fu_298_p4 = {{reward_mag_1_fu_274_p3[7:5]}};
+assign tmp_100_fu_282_p4 = {{reward_mag_1_fu_274_p3[7:6]}};
 
-assign tmp_101_fu_314_p4 = {{reward_mag_1_fu_274_p3[7:4]}};
+assign tmp_101_fu_298_p4 = {{reward_mag_1_fu_274_p3[7:5]}};
 
-assign tmp_80_fu_533_p9 = 'bx;
+assign tmp_102_fu_314_p4 = {{reward_mag_1_fu_274_p3[7:4]}};
 
-assign tmp_81_fu_564_p9 = 'bx;
+assign tmp_81_fu_533_p9 = 'bx;
 
-assign tmp_98_fu_260_p3 = reward_signal[32'd7];
+assign tmp_82_fu_564_p9 = 'bx;
 
-assign tmp_99_fu_282_p4 = {{reward_mag_1_fu_274_p3[7:6]}};
+assign tmp_99_fu_260_p3 = reward_signal[32'd7];
 
 assign tmp_fu_402_p9 = 'bx;
 
