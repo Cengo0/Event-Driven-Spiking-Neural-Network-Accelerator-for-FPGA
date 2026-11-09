@@ -271,7 +271,7 @@ def main():
         print(f"  HLS Layer 2 threshold configured          : {hw_threshold_l2}")
 
         # ── Allocate DMA Buffers ──────────────────────────────────────────────
-        MAX_SPIKES_PER_STEP = 4096
+        MAX_SPIKES_PER_STEP = 8192
         n_pixels   = int(test_imgs_q16.shape[1]) # 3072 for CIFAR-10 (3x32x32)
         n_l2       = int(q_fc_w.shape[1])        # 1024 for CIFAR-10
         group_size_l2 = n_l2 // 4
@@ -415,7 +415,7 @@ def main():
                         mm2s_sr = dma_arr[1] if dma_arr is not None else dma_mmio.read(0x04)
                         if (mm2s_sr & 0x1000) or (mm2s_sr & 0x0002):
                             mm2s_done = True
-                            quiet_deadline = time.time() + 0.050  # 50ms fallback (burst EoP exits early at ~6-12ms via s2mm_ioc)
+                            quiet_deadline = time.time() + 0.100  # 100ms fallback (burst EoP exits early at ~12-18ms via s2mm_ioc)
                     else:
                         if quiet_deadline is not None and time.time() >= quiet_deadline:
                             break

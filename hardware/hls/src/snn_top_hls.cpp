@@ -56,12 +56,12 @@ static void encoder_write_axis_spike(
 }
 
 //=============================================================================
-// CNN3 Streaming 2D Line-Buffer Convolution & LIF Engine (MNIST: 1x28x28)
+// CNN3 Streaming 2D Line-Buffer Convolution & LIF Engine (CIFAR-10: 3x32x32)
 //=============================================================================
-static ap_fixed<16,8> cnn_frame[CNN_IMG_HEIGHT][CNN_IMG_WIDTH];
+static ap_fixed<16,8> cnn_frame[CNN_IMG_CHANNELS][CNN_IMG_HEIGHT][CNN_IMG_WIDTH];
 static ap_fixed<16,8> cnn_v_mem[CNN_CONV1_CHANNELS][CNN_IMG_HEIGHT][CNN_IMG_WIDTH];
 static ap_int<16>     cnn_l2_v_mem[CNN_CONV2_CHANNELS][CNN_POOL1_HEIGHT][CNN_POOL1_WIDTH];
-static ap_uint<12>    conv1_spike_buf[2048];
+static ap_uint<12>    conv1_spike_buf[4096];
 static ap_uint<16>    cnn_pixel_counter = 0;
 static ap_uint<1>     cnn_spike_toggle = 0;
 
@@ -69,10 +69,12 @@ static void reset_cnn3_engine() {
     #pragma HLS INLINE
     cnn_pixel_counter = 0;
     cnn_spike_toggle = 0;
-    RESET_FRAME_R: for (int r = 0; r < CNN_IMG_HEIGHT; r++) {
-        RESET_FRAME_C: for (int c = 0; c < CNN_IMG_WIDTH; c++) {
-            #pragma HLS PIPELINE II=1
-            cnn_frame[r][c] = 0;
+    RESET_FRAME_CH: for (int ch = 0; ch < CNN_IMG_CHANNELS; ch++) {
+        RESET_FRAME_R: for (int r = 0; r < CNN_IMG_HEIGHT; r++) {
+            RESET_FRAME_C: for (int c = 0; c < CNN_IMG_WIDTH; c++) {
+                #pragma HLS PIPELINE II=1
+                cnn_frame[ch][r][c] = 0;
+            }
         }
     }
     RESET_V_K: for (int k = 0; k < CNN_CONV1_CHANNELS; k++) {
@@ -99,28 +101,32 @@ static bool run_cnn3_streaming_pixel(
     hls::stream<encoder_axis_word_t> &spike_fifo
 ) {
     #pragma HLS INLINE off
-    int r = cnn_pixel_counter / CNN_IMG_WIDTH;
-    int c = cnn_pixel_counter % CNN_IMG_WIDTH;
-    cnn_frame[r][c] = pixel_val;
+    int ch = cnn_pixel_counter / (CNN_IMG_HEIGHT * CNN_IMG_WIDTH);
+    int rem = cnn_pixel_counter % (CNN_IMG_HEIGHT * CNN_IMG_WIDTH);
+    int r = rem / CNN_IMG_WIDTH;
+    int c = rem % CNN_IMG_WIDTH;
+    cnn_frame[ch][r][c] = pixel_val;
     cnn_pixel_counter++;
 
     if (cnn_pixel_counter >= CNN_IMG_PIXELS) {
         cnn_pixel_counter = 0;
 
-        // Phase 1: Execute full Conv1 (1->8, 3x3) + LIF on buffered frame with exact zero-padding
+        // Phase 1: Execute full Conv1 (3->8, 3x3) + LIF on buffered frame with exact zero-padding
         ap_uint<12> conv1_spike_count = 0;
 
         CONV1_Y: for (int y = 0; y < CNN_IMG_HEIGHT; y++) {
             CONV1_X: for (int x = 0; x < CNN_IMG_WIDTH; x++) {
                 CONV1_FILTERS: for (int k = 0; k < CNN_CONV1_CHANNELS; k++) {
                     ap_fixed<16,8> acc = (ap_fixed<16,8>)CONV1_BIAS[k];
-                    CONV1_DY: for (int dy = -1; dy <= 1; dy++) {
-                        CONV1_DX: for (int dx = -1; dx <= 1; dx++) {
-                            int iy = y + dy;
-                            int ix = x + dx;
-                            ap_fixed<16,8> px = (iy >= 0 && iy < CNN_IMG_HEIGHT && ix >= 0 && ix < CNN_IMG_WIDTH)
-                                               ? cnn_frame[iy][ix] : (ap_fixed<16,8>)0;
-                            acc += (ap_fixed<16,8>)CONV1_WEIGHTS[k][dy+1][dx+1] * px;
+                    CONV1_CI: for (int ci = 0; ci < CNN_IMG_CHANNELS; ci++) {
+                        CONV1_DY: for (int dy = -1; dy <= 1; dy++) {
+                            CONV1_DX: for (int dx = -1; dx <= 1; dx++) {
+                                int iy = y + dy;
+                                int ix = x + dx;
+                                ap_fixed<16,8> px = (iy >= 0 && iy < CNN_IMG_HEIGHT && ix >= 0 && ix < CNN_IMG_WIDTH)
+                                                   ? cnn_frame[ci][iy][ix] : (ap_fixed<16,8>)0;
+                                acc += (ap_fixed<16,8>)CONV1_WEIGHTS[k][ci][dy+1][dx+1] * px;
+                            }
                         }
                     }
 
@@ -128,10 +134,10 @@ static bool run_cnn3_streaming_pixel(
                     cnn_v_mem[k][y][x] += acc;
                     if (cnn_v_mem[k][y][x] >= (ap_fixed<16,8>)1.0) {
                         cnn_v_mem[k][y][x] -= (ap_fixed<16,8>)1.0;
-                        ap_uint<4> py = y >> 1; // 2x2 average pool bin: 0..13
+                        ap_uint<4> py = y >> 1; // 2x2 average pool bin: 0..15
                         ap_uint<4> px = x >> 1;
 
-                        if (conv1_spike_count < 2048) {
+                        if (conv1_spike_count < 4096) {
                             conv1_spike_buf[conv1_spike_count] = ((ap_uint<12>)k << 8) | ((ap_uint<12>)py << 4) | (ap_uint<12>)px;
                             conv1_spike_count++;
                         }

@@ -529,7 +529,7 @@ module snn_core_group_top #(
     // in exact firing order, tagging the 8-bit weight field with the low 8 bits of the
     // 100 MHz RTL cycle counter at the exact clock cycle the spike is recorded.
     localparam OUTPUT_GROUP         = NUM_GROUPS - 1;  // Group 4 is output layer
-    localparam SPIKE_OUT_FIFO_DEPTH = 2048;
+    localparam SPIKE_OUT_FIFO_DEPTH = 4096;
     localparam SPIKE_OUT_FIFO_AW    = $clog2(SPIKE_OUT_FIFO_DEPTH);
     localparam SPIKE_OUT_FIFO_DW    = HLS_NEURON_ID_WIDTH + HLS_WEIGHT_WIDTH;
     localparam [SPIKE_OUT_FIFO_AW-1:0] SPIKE_OUT_FIFO_LAST = {SPIKE_OUT_FIFO_AW{1'b1}};
