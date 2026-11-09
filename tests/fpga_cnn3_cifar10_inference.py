@@ -415,7 +415,7 @@ def main():
                         mm2s_sr = dma_arr[1] if dma_arr is not None else dma_mmio.read(0x04)
                         if (mm2s_sr & 0x1000) or (mm2s_sr & 0x0002):
                             mm2s_done = True
-                            quiet_deadline = time.time() + 0.008
+                            quiet_deadline = time.time() + 0.050  # 50ms fallback (burst EoP exits early at ~6-12ms via s2mm_ioc)
                     else:
                         if quiet_deadline is not None and time.time() >= quiet_deadline:
                             break
@@ -425,6 +425,10 @@ def main():
                 dma_mmio.write(0x30, 0x00)     # stop S2MM
                 if not burst_eop_done:
                     out_buffer.invalidate()
+                    if spikes_received == 0:
+                        eop_matches = np.flatnonzero(out_buffer == 0xFFFFFFFF)
+                        if len(eop_matches) > 0:
+                            spikes_received = int(eop_matches[0])
                 step_pkt_slices.append(out_buffer[:spikes_received].tolist())
                 clear_n = min(MAX_SPIKES_PER_STEP, spikes_received + 2)
                 out_buffer[:clear_n] = 0
