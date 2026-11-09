@@ -196,7 +196,7 @@ def main():
                         help='Max number of images to record full cycle-by-cycle spike traces for (default: all --samples)')
     parser.add_argument('--skip-bitstream', action='store_true',
                         help='Skip PL programming if overlay is already active')
-    parser.add_argument('--reset-mode', choices=['flash', 'fast'], default='flash',
+    parser.add_argument('--reset-mode', choices=['flash', 'fast'], default='fast',
                         help='Hardware state reset mode: flash (bitstream reload) or fast (leak sweep)')
     args = parser.parse_args()
 
