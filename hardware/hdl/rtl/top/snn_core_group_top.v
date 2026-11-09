@@ -524,12 +524,12 @@ module snn_core_group_top #(
                                                      hls_spike_out_weight[WEIGHT_WIDTH-1:0];
     assign hls_weight_exc      = ~hls_weight_is_neg;
 
-    // 2. Output Spike FIFO for Class Output Spikes (Group 2 -> HLS -> S2MM DMA)
-    // Group 2 is the output classification layer (digits 0..9).
-    // Spikes from Group 2 are buffered in a FIFO and held valid until HLS consumes
-    // them and toggles spike_out_ready (hls_spike_in_ready).
-    localparam OUTPUT_GROUP         = NUM_GROUPS - 1;  // Group 2 is output layer
-    localparam SPIKE_OUT_FIFO_DEPTH = 32;
+    // 2. Output Spike FIFO for All Core Group Spikes (Groups 0..4 -> HLS -> S2MM DMA)
+    // Forwards both Layer 2 relay spikes (Groups 0..3) and Layer 3 class spikes (Group 4)
+    // in exact firing order, tagging the 8-bit weight field with the low 8 bits of the
+    // 100 MHz RTL cycle counter at the exact clock cycle the spike is recorded.
+    localparam OUTPUT_GROUP         = NUM_GROUPS - 1;  // Group 4 is output layer
+    localparam SPIKE_OUT_FIFO_DEPTH = 1024;
     localparam SPIKE_OUT_FIFO_AW    = $clog2(SPIKE_OUT_FIFO_DEPTH);
     localparam SPIKE_OUT_FIFO_DW    = HLS_NEURON_ID_WIDTH + HLS_WEIGHT_WIDTH;
     localparam [SPIKE_OUT_FIFO_AW-1:0] SPIKE_OUT_FIFO_LAST = {SPIKE_OUT_FIFO_AW{1'b1}};
@@ -539,13 +539,15 @@ module snn_core_group_top #(
     reg [SPIKE_OUT_FIFO_AW-1:0] spike_out_fifo_rd_ptr;
     reg [SPIKE_OUT_FIFO_AW:0]   spike_out_fifo_count;
     reg                         spike_out_ready_d;
+    reg [31:0]                  rtl_spike_cycle_cnt;
+    reg                         rtl_cycle_cnt_active;
 
     wire spike_out_fifo_empty = (spike_out_fifo_count == 0);
     wire spike_out_fifo_full  = (spike_out_fifo_count == SPIKE_OUT_FIFO_DEPTH);
 
-    // Only output class neurons (Group 2) are forwarded to HLS/DMA
+    // Forward all core group spikes (Groups 0..3 Layer 2 + Group 4 Layer 3) to HLS/DMA
     wire is_output_spike     = (learn_spike_src_id[GLOBAL_ID_WIDTH-1 : LOCAL_ID_WIDTH] == OUTPUT_GROUP[GROUP_ID_WIDTH-1:0]);
-    wire spike_out_fifo_push = learn_spike_valid && is_output_spike && !spike_out_fifo_full;
+    wire spike_out_fifo_push = learn_spike_valid && !spike_out_fifo_full;
 
     // HLS drives spike_out_ready as a consume-ack toggle token
     wire spike_out_ready_toggle = (hls_spike_in_ready ^ spike_out_ready_d);
@@ -563,13 +565,22 @@ module snn_core_group_top #(
             spike_out_fifo_rd_ptr <= {SPIKE_OUT_FIFO_AW{1'b0}};
             spike_out_fifo_count  <= {(SPIKE_OUT_FIFO_AW+1){1'b0}};
             spike_out_ready_d     <= 1'b0;
+            rtl_spike_cycle_cnt   <= 32'd0;
+            rtl_cycle_cnt_active  <= 1'b0;
         end else begin
             spike_out_ready_d <= hls_spike_in_ready;
+
+            if (hls_spike_event || rtl_snn_busy) begin
+                rtl_cycle_cnt_active <= 1'b1;
+            end
+            if (rtl_cycle_cnt_active || hls_spike_event) begin
+                rtl_spike_cycle_cnt <= rtl_spike_cycle_cnt + 32'd1;
+            end
 
             if (spike_out_fifo_push) begin
                 spike_out_fifo_mem[spike_out_fifo_wr_ptr] <= {
                     {{(HLS_NEURON_ID_WIDTH-GLOBAL_ID_WIDTH){1'b0}}, learn_spike_src_id},
-                    {{(HLS_WEIGHT_WIDTH-1){1'b0}}, 1'b1}
+                    rtl_spike_cycle_cnt[HLS_WEIGHT_WIDTH-1:0]
                 };
                 spike_out_fifo_wr_ptr <= spike_out_fifo_wr_ptr_next;
             end
