@@ -18,6 +18,7 @@ Usage:
 """
 
 import argparse
+import gc
 import time
 import json
 import os
@@ -200,12 +201,14 @@ def main():
                         help='Hardware state reset mode: flash (bitstream reload) or fast (leak sweep)')
     args = parser.parse_args()
 
-    # ── Load Deployment Payload ───────────────────────────────────────────────
+    # ── Load Deployment Payload (Memory-Optimized for PYNQ-Z2 512MB RAM) ──────
     print(f"Loading CNN3 deployment payload: {args.data}")
-    payload      = np.load(args.data)
-    q_fc_w       = payload['q_fc_w']        # (10, 784) int8
-    test_imgs    = payload['test_imgs']     # (10000, 28, 28) pre-normalized float32
-    test_lbls    = payload['test_lbls']     # (10000,)
+    payload   = np.load(args.data)
+    q_fc_w    = np.array(payload['q_fc_w'], copy=True)       # (10, 784) int8
+    test_lbls_full = np.array(payload['test_lbls'], copy=True)
+    n_test    = min(args.samples, len(test_lbls_full))
+    test_lbls = test_lbls_full[:n_test]
+    del test_lbls_full
 
     hw_threshold_l2 = args.threshold_l2 if args.threshold_l2 is not None else int(
         payload['hw_threshold_l2'] if 'hw_threshold_l2' in payload else payload['hw_threshold']
@@ -214,7 +217,14 @@ def main():
         payload['hw_threshold_l3'] if 'hw_threshold_l3' in payload else payload['hw_threshold']
     )
 
-    print(f"  Dataset: {len(test_imgs)} test images loaded.")
+    raw_imgs = payload['test_imgs'][:n_test]
+    test_imgs_q16 = np.clip(np.round(raw_imgs.reshape(n_test, -1) * 256.0), -32768, 32767).astype(np.int16)
+    del raw_imgs
+    payload.close()
+    del payload
+    gc.collect()
+
+    print(f"  Dataset: {n_test} test images loaded (int16 pre-quantized).")
     print(f"  Layer 2 Threshold (HLS 0x18)        : {hw_threshold_l2}")
     print(f"  Layer 3 Threshold (RTL Group 4 0x10): {hw_threshold_l3}")
     print(f"  Layer 3 Weight Range (q_fc_w)       : [{q_fc_w.min()}, {q_fc_w.max()}] "
@@ -260,8 +270,8 @@ def main():
 
         # ── Allocate DMA Buffers ──────────────────────────────────────────────
         MAX_SPIKES_PER_STEP = 4096
-        n_pixels   = int(test_imgs[0].size)     # 784 for MNIST (28x28), 3072 for CIFAR-10 (3x32x32)
-        n_l2       = int(q_fc_w.shape[1])       # 784 for MNIST, 1024 for CIFAR-10
+        n_pixels   = int(test_imgs_q16.shape[1]) # 784 for MNIST (28x28), 3072 for CIFAR-10 (3x32x32)
+        n_l2       = int(q_fc_w.shape[1])        # 784 for MNIST, 1024 for CIFAR-10
         group_size_l2 = n_l2 // 4
         in_buffer  = allocate(shape=(n_pixels,), dtype=np.uint32)
         out_buffer = allocate(shape=(MAX_SPIKES_PER_STEP,), dtype=np.uint32)
@@ -270,21 +280,20 @@ def main():
         ct_entries = prepare_ct_table(q_fc_w)
 
         # ── Run Hardware Inference Loop ───────────────────────────────────────
-        n_test  = min(args.samples, len(test_imgs))
         max_trace_imgs = n_test if args.max_trace_images is None else min(args.max_trace_images, n_test)
         correct = 0
         total_spikes = 0
         total_l2_spikes = 0
+        total_logged_spikes = 0
         accum_router_spk = 0
         accum_neuron_spk = 0
         latencies_ms = []
         log = []
-        all_spike_rows = []
 
         csv_dir = os.path.dirname(args.output_spikes_csv)
         if csv_dir:
             os.makedirs(csv_dir, exist_ok=True)
-        csv_file = open(args.output_spikes_csv, 'w')
+        csv_file = open(args.output_spikes_csv, 'w', buffering=65536)
         csv_file.write(
             "image_id,true_label,predicted_label,timestep,spike_order,"
             "clock_cycle,timestep_cycle,hls_timestamp,layer,group_id,"
@@ -299,7 +308,7 @@ def main():
         t_start_all = time.time()
 
         for i in range(n_test):
-            img = test_imgs[i] # 28x28 or 3x32x32 float32
+            px_quant = test_imgs_q16[i] # 1D pre-quantized int16
             lbl = int(test_lbls[i])
 
             # Zero hardware state & membrane potentials between images
@@ -319,8 +328,7 @@ def main():
             else:
                 reset_hardware_state(hls_ctrl, mmio)
 
-            # Quantize pixel values to Q8.8 fixed-point (pixel * 256)
-            px_quant = np.clip(np.round(img.flatten() * 256.0), -32768, 32767).astype(np.int16)
+            # Copy pre-quantized Q8.8 fixed-point pixels into DMA buffer
             in_buffer[:] = (px_quant.astype(np.int32) & 0xFFFF).astype(np.uint32)
             in_buffer.flush()
 
@@ -477,30 +485,16 @@ def main():
             if pred == lbl:
                 correct += 1
 
-            # Write all spikes for this image with both true_label and predicted_label attached
+            # Write all spikes for this image directly to disk without keeping dicts in RAM
             if i < max_trace_imgs:
-                for ev in image_spike_events:
-                    t_ev, s_ord, clk_cyc, ts_cyc, hls_t, lyr, grp_id, loc_id, lyr_id, glb_id = ev
-                    csv_file.write(
-                        f"{i},{lbl},{pred},{t_ev},{s_ord},"
-                        f"{clk_cyc},{ts_cyc},{hls_t},{lyr},{grp_id},"
-                        f"{loc_id},{lyr_id},{glb_id}\n"
-                    )
-                    all_spike_rows.append({
-                        "image_id": i,
-                        "true_label": lbl,
-                        "predicted_label": pred,
-                        "timestep": t_ev,
-                        "spike_order": s_ord,
-                        "clock_cycle": clk_cyc,
-                        "timestep_cycle": ts_cyc,
-                        "hls_timestamp": hls_t,
-                        "layer": lyr,
-                        "group_id": grp_id,
-                        "local_neuron_id": loc_id,
-                        "layer_neuron_id": lyr_id,
-                        "global_neuron_id": glb_id,
-                    })
+                lines = [
+                    f"{i},{lbl},{pred},{ev[0]},{ev[1]},{ev[2]},{ev[3]},{ev[4]},{ev[5]},{ev[6]},{ev[7]},{ev[8]},{ev[9]}\n"
+                    for ev in image_spike_events
+                ]
+                csv_file.writelines(lines)
+                total_logged_spikes += len(lines)
+                del lines
+            del image_spike_events
 
             log.append({
                 "image_index":     i,
@@ -519,17 +513,17 @@ def main():
                 avg_spk_so_far = total_spikes / (i + 1)
                 print(f"  Processed [{i+1:5d}/{n_test:5d}] | Pred: {pred} (True: {lbl}) | "
                       f"Spk: {class_spk.tolist()} | Acc: {acc_so_far:.2f}% | Avg Spk/Img: {avg_spk_so_far:.1f}")
+                if (i + 1) % 500 == 0:
+                    gc.collect()
 
+        csv_file.flush()
         csv_file.close()
-        print(f"Saved cycle-accurate all-layer spike trace CSV to: {args.output_spikes_csv} ({len(all_spike_rows)} total spike events)")
-        if args.output_spikes_parquet and len(all_spike_rows) > 0:
-            try:
-                import pandas as pd
-                df_spikes = pd.DataFrame(all_spike_rows)
-                df_spikes.to_parquet(args.output_spikes_parquet, index=False)
-                print(f"Saved columnar Parquet spike trace to: {args.output_spikes_parquet}")
-            except Exception as e:
-                print(f"Note: Parquet export skipped ({e}); CSV trace is complete and ready.")
+        in_buffer.freebuffer()
+        out_buffer.freebuffer()
+        del test_imgs_q16
+        gc.collect()
+        print(f"Saved cycle-accurate all-layer spike trace CSV to: {args.output_spikes_csv} ({total_logged_spikes} total spike events)")
+        print("Note: To convert CSV to Parquet & generate plots without PYNQ RAM overhead, run `python3 plot_all_layers_spikes.py` on your host PC.")
 
         total_time = time.time() - t_start_all
         accuracy = correct / n_test * 100
