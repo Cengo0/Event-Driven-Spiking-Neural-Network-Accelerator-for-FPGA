@@ -529,7 +529,7 @@ module snn_core_group_top #(
     // in exact firing order, tagging the 8-bit weight field with the low 8 bits of the
     // 100 MHz RTL cycle counter at the exact clock cycle the spike is recorded.
     localparam OUTPUT_GROUP         = NUM_GROUPS - 1;  // Group 4 is output layer
-    localparam SPIKE_OUT_FIFO_DEPTH = 1024;
+    localparam SPIKE_OUT_FIFO_DEPTH = 2048;
     localparam SPIKE_OUT_FIFO_AW    = $clog2(SPIKE_OUT_FIFO_DEPTH);
     localparam SPIKE_OUT_FIFO_DW    = HLS_NEURON_ID_WIDTH + HLS_WEIGHT_WIDTH;
     localparam [SPIKE_OUT_FIFO_AW-1:0] SPIKE_OUT_FIFO_LAST = {SPIKE_OUT_FIFO_AW{1'b1}};
@@ -540,7 +540,6 @@ module snn_core_group_top #(
     reg [SPIKE_OUT_FIFO_AW:0]   spike_out_fifo_count;
     reg                         spike_out_ready_d;
     reg [31:0]                  rtl_spike_cycle_cnt;
-    reg                         rtl_cycle_cnt_active;
 
     wire spike_out_fifo_empty = (spike_out_fifo_count == 0);
     wire spike_out_fifo_full  = (spike_out_fifo_count == SPIKE_OUT_FIFO_DEPTH);
@@ -566,14 +565,11 @@ module snn_core_group_top #(
             spike_out_fifo_count  <= {(SPIKE_OUT_FIFO_AW+1){1'b0}};
             spike_out_ready_d     <= 1'b0;
             rtl_spike_cycle_cnt   <= 32'd0;
-            rtl_cycle_cnt_active  <= 1'b0;
         end else begin
             spike_out_ready_d <= hls_spike_in_ready;
 
+            // Count active 100 MHz SNN hardware cycles (pauses automatically when SNN is idle/draining)
             if (hls_spike_event || rtl_snn_busy) begin
-                rtl_cycle_cnt_active <= 1'b1;
-            end
-            if (rtl_cycle_cnt_active || hls_spike_event) begin
                 rtl_spike_cycle_cnt <= rtl_spike_cycle_cnt + 32'd1;
             end
 

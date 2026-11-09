@@ -885,6 +885,7 @@ void snn_top_hls(
     // ap_none outputs are level signals across invocations, so using a toggle
     // avoids "stuck-high" ready that can break one-spike-per-ack semantics.
     static ap_uint<1> spike_out_ack_toggle = 0;
+    static ap_uint<4> cnn_drain_holdoff = 0;
     static hls::stream<encoder_axis_word_t> encoder_spikes("encoder_spikes");
     #pragma HLS STREAM variable=encoder_spikes depth=4096
     
@@ -949,6 +950,7 @@ void snn_top_hls(
         first_spike_pending_id = 0;
         first_spike_pending_weight = 0;
         spike_out_ack_toggle = 0;
+        cnn_drain_holdoff = 0;
         
         // Clear Per-Neuron eligibility traces (O(N) - much faster than O(N²)!)
         RESET_ELIG: for (int i = 0; i < TOTAL_LOGICAL_NEURONS; i++) {
@@ -1021,6 +1023,7 @@ void snn_top_hls(
         first_spike_pending = false;
         first_spike_pending_id = 0;
         first_spike_pending_weight = 0;
+        cnn_drain_holdoff = 0;
     }
     
     //=========================================================================
@@ -1080,6 +1083,7 @@ void snn_top_hls(
         spike_in_valid = 0;
         spike_in_neuron_id = 0;
         spike_in_weight = 0;
+        bool injected_spike_this_step = false;
 
         if (enable && spike_in_ready) {
             axis_spike_t in_pkt;
@@ -1114,6 +1118,7 @@ void snn_top_hls(
                 spike_in_valid = 1;
                 spike_in_neuron_id = (rtl_nid_t)pre_id;
                 spike_in_weight = weight;
+                injected_spike_this_step = true;
 
                 if (stdp_active) {
                     process_pre_spike_aer(
@@ -1129,6 +1134,20 @@ void snn_top_hls(
 
                 spike_counter++;
             }
+        }
+
+        // Decouple CNN3 Layer 2 spike injection / RTL routing from S2MM output draining:
+        // While Layer 2 spikes are being injected from encoder_spikes or the RTL router/groups
+        // are actively processing spikes, buffer all fired spikes in RTL spike_out_fifo_mem
+        // without touching m_axis_spikes. Once RTL settles, drain spike_out_fifo_mem cleanly.
+        if (op_mode == MODE_CNN_STREAM) {
+            if (injected_spike_this_step || !encoder_spikes.empty() || snn_busy || !snn_ready) {
+                cnn_drain_holdoff = 8;
+            } else if (cnn_drain_holdoff > 0) {
+                cnn_drain_holdoff--;
+            }
+        } else {
+            cnn_drain_holdoff = 0;
         }
 
         // Output Spike Processing
@@ -1156,7 +1175,7 @@ void snn_top_hls(
             first_spike_pending = false;
         }
 
-        if (enable && spike_out_valid) {
+        if (enable && spike_out_valid && (cnn_drain_holdoff == 0)) {
             neuron_id_t post_id = (neuron_id_t)spike_out_neuron_id;
             weight_t weight = spike_out_weight;
             bool consume_post_spike = false;

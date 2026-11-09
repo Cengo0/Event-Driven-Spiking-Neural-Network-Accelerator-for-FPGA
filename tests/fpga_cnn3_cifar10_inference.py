@@ -333,6 +333,7 @@ def main():
             class_spk = np.zeros(10, dtype=np.int32)
             l2_spk_count = 0
             image_spike_events = []
+            step_pkt_slices = []
             spike_order = 0
             cumulative_cycle_offset = 0
             t0 = time.time()
@@ -369,7 +370,7 @@ def main():
                 # 4. Start HLS Kernel with Auto-Restart (Pin Y18 SCA Trigger goes HIGH!)
                 hls_ctrl.write(0x00, 0x81)
 
-                # 5. Concurrent Drain Loop: Drain S2MM spikes while MM2S transfers & tail settles
+                # 5. Concurrent Burst Drain Loop: Drain buffered S2MM spikes with minimal syscall overhead
                 spikes_received = 0
                 mm2s_done = False
                 quiet_deadline = None
@@ -377,35 +378,37 @@ def main():
                 dma_arr = getattr(dma_mmio, 'array', None)
 
                 while time.time() < t_abort:
-                    # A. Service S2MM spike if arrived (prevents backpressure on router/HLS)
+                    # A. Tight inner burst drain for S2MM spikes (avoids time.time() per spike)
                     if dma_arr is not None:
-                        if dma_arr[13] & 0x1000: # 0x34 S2MM_DMASR
+                        got_burst = False
+                        while (dma_arr[13] & 0x1000) and spikes_received < MAX_SPIKES_PER_STEP:
+                            got_burst = True
+                            spikes_received += 1
+                            dma_arr[13] = 0x1000   # clear IOC flag
                             if spikes_received < MAX_SPIKES_PER_STEP:
-                                spikes_received += 1
-                                dma_arr[13] = 0x1000   # clear IOC flag
-                                if spikes_received < MAX_SPIKES_PER_STEP:
-                                    dma_arr[18] = dest_ptr + (spikes_received * 4) # 0x48 S2MM_DA
-                                    dma_arr[22] = 4    # 0x58 S2MM_LENGTH
-                            if mm2s_done:
-                                quiet_deadline = time.time() + 0.010
+                                dma_arr[18] = dest_ptr + (spikes_received << 2) # 0x48 S2MM_DA
+                                dma_arr[22] = 4    # 0x58 S2MM_LENGTH
+                        if got_burst and mm2s_done:
+                            quiet_deadline = time.time() + 0.005
                     else:
-                        if dma_mmio.read(0x34) & 0x1000:
+                        got_burst = False
+                        while (dma_mmio.read(0x34) & 0x1000) and spikes_received < MAX_SPIKES_PER_STEP:
+                            got_burst = True
+                            spikes_received += 1
+                            dma_mmio.write(0x34, 0x1000)   # clear IOC flag
+                            dma_mmio.write(0x30, 0x01)     # keep S2MM running
                             if spikes_received < MAX_SPIKES_PER_STEP:
-                                spikes_received += 1
-                                dma_mmio.write(0x34, 0x1000)   # clear IOC flag
-                                dma_mmio.write(0x30, 0x01)     # keep S2MM running
-                                if spikes_received < MAX_SPIKES_PER_STEP:
-                                    dma_mmio.write(0x48, dest_ptr + (spikes_received * 4))
-                                    dma_mmio.write(0x58, 4)    # re-arm for next spike
-                            if mm2s_done:
-                                quiet_deadline = time.time() + 0.010
+                                dma_mmio.write(0x48, dest_ptr + (spikes_received << 2))
+                                dma_mmio.write(0x58, 4)    # re-arm for next spike
+                        if got_burst and mm2s_done:
+                            quiet_deadline = time.time() + 0.005
 
                     # B. Check if MM2S has finished sending all 3072 pixels
                     if not mm2s_done:
                         mm2s_sr = dma_arr[1] if dma_arr is not None else dma_mmio.read(0x04)
                         if (mm2s_sr & 0x1000) or (mm2s_sr & 0x0002):
                             mm2s_done = True
-                            quiet_deadline = time.time() + 0.010  # start 10ms quiet drain countdown
+                            quiet_deadline = time.time() + 0.008  # start quiet drain countdown
                     else:
                         # C. MM2S is done and quiet drain window elapsed
                         if quiet_deadline is not None and time.time() >= quiet_deadline:
@@ -415,14 +418,19 @@ def main():
                 hls_ctrl.write(0x00, 0x00)     # deassert auto-restart
                 dma_mmio.write(0x30, 0x00)     # stop S2MM
                 out_buffer.invalidate()
+                step_pkt_slices.append(out_buffer[:spikes_received].tolist())
 
-                # 7. Decode received spikes across all Core Groups (Groups 0..3 = Layer 2, Group 4 = Layer 3)
+            t1 = time.time()
+            lat_ms = (t1 - t0) * 1000.0
+            latencies_ms.append(lat_ms)
+
+            # 7. Decode received spikes in cached RAM across all Core Groups (Groups 0..3 = Layer 2, Group 4 = Layer 3)
+            for t, step_pkts in enumerate(step_pkt_slices):
                 prev_rtl_lsb = None
                 rtl_wrap_offset = 0
                 max_step_cycle = 0
 
-                for s in range(spikes_received):
-                    pkt = int(out_buffer[s])
+                for pkt in step_pkts:
                     gid = pkt & 0x7FF
                     grp = (gid >> LOCAL_ID_WIDTH) & 0x7
                     nid = gid & 0xFF
@@ -459,12 +467,7 @@ def main():
                     spike_order += 1
 
                 cumulative_cycle_offset += max(max_step_cycle + 100, 1000)
-                out_buffer[:] = 0
-                out_buffer.flush()
-
-            t1 = time.time()
-            lat_ms = (t1 - t0) * 1000.0
-            latencies_ms.append(lat_ms)
+            del step_pkt_slices
 
             # Read hardware diagnostic counters for this image (snn_reset zeros RTL counters before each image)
             curr_r_spks = int(mmio.read(CFG_ROUTER_SPKS))
