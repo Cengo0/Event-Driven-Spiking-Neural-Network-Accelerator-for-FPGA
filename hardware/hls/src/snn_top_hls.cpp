@@ -93,7 +93,7 @@ static void reset_cnn3_engine() {
     }
 }
 
-static void run_cnn3_streaming_pixel(
+static bool run_cnn3_streaming_pixel(
     ap_fixed<16,8> pixel_val,
     ap_uint<16> threshold,
     hls::stream<encoder_axis_word_t> &spike_fifo
@@ -140,7 +140,9 @@ static void run_cnn3_streaming_pixel(
             }
         }
 
-        // Phase 2a: Add per-channel Layer 2 bias (scaled by 4 * SCALE2) once per timestep
+#if CNN_IMG_CHANNELS == 3
+        // Phase 2a: Add per-channel Layer 2 bias (scaled by 4 * SCALE2) once per timestep (CIFAR-10 only;
+        // MNIST was calibrated without Conv2 bias in prepare_cnn3_deployment.py)
         L2_BIAS_Y: for (int oy = 0; oy < CNN_POOL1_HEIGHT; oy++) {
             L2_BIAS_X: for (int ox = 0; ox < CNN_POOL1_WIDTH; ox++) {
                 #pragma HLS PIPELINE II=1
@@ -150,6 +152,7 @@ static void run_cnn3_streaming_pixel(
                 }
             }
         }
+#endif
 
         // Phase 2b: Conv2 event-driven scatter into 16x16x16 Layer 2 neurons
         CONV2_SPIKE_LOOP: for (int s = 0; s < conv1_spike_count; s++) {
@@ -215,7 +218,9 @@ static void run_cnn3_streaming_pixel(
                 }
             }
         }
+        return true;
     }
+    return false;
 }
 
 static void encoder_delta_sigma(
@@ -886,6 +891,8 @@ void snn_top_hls(
     // avoids "stuck-high" ready that can break one-spike-per-ack semantics.
     static ap_uint<1> spike_out_ack_toggle = 0;
     static ap_uint<4> cnn_drain_holdoff = 0;
+    static bool cnn_eop_pending = false;
+    static ap_uint<2> cnn_eop_holdoff = 0;
     static hls::stream<encoder_axis_word_t> encoder_spikes("encoder_spikes");
     #pragma HLS STREAM variable=encoder_spikes depth=4096
     
@@ -951,6 +958,8 @@ void snn_top_hls(
         first_spike_pending_weight = 0;
         spike_out_ack_toggle = 0;
         cnn_drain_holdoff = 0;
+        cnn_eop_pending = false;
+        cnn_eop_holdoff = 0;
         
         // Clear Per-Neuron eligibility traces (O(N) - much faster than O(N²)!)
         RESET_ELIG: for (int i = 0; i < TOTAL_LOGICAL_NEURONS; i++) {
@@ -1024,6 +1033,8 @@ void snn_top_hls(
         first_spike_pending_id = 0;
         first_spike_pending_weight = 0;
         cnn_drain_holdoff = 0;
+        cnn_eop_pending = false;
+        cnn_eop_holdoff = 0;
     }
     
     //=========================================================================
@@ -1093,7 +1104,11 @@ void snn_top_hls(
                 axis_spike_t px_pkt = s_axis_spikes.read();
                 ap_fixed<16,8> pixel_val;
                 pixel_val.range(15, 0) = (ap_uint<16>)px_pkt.data(15, 0);
-                run_cnn3_streaming_pixel(pixel_val, threshold, encoder_spikes);
+                if (run_cnn3_streaming_pixel(pixel_val, threshold, encoder_spikes)) {
+                    cnn_eop_pending = true;
+                    cnn_drain_holdoff = 12;
+                    cnn_eop_holdoff = 2;
+                }
             }
 
             if (!encoder_spikes.empty()) {
@@ -1139,15 +1154,19 @@ void snn_top_hls(
         // Decouple CNN3 Layer 2 spike injection / RTL routing from S2MM output draining:
         // While Layer 2 spikes are being injected from encoder_spikes or the RTL router/groups
         // are actively processing spikes, buffer all fired spikes in RTL spike_out_fifo_mem
-        // without touching m_axis_spikes. Once RTL settles, drain spike_out_fifo_mem cleanly.
+        // without touching m_axis_spikes. Once RTL settles, drain spike_out_fifo_mem cleanly
+        // in a single continuous S2MM DMA burst terminated by one End-of-Timestep packet (0xFFFFFFFF, TLAST=1).
         if (op_mode == MODE_CNN_STREAM) {
             if (injected_spike_this_step || !encoder_spikes.empty() || snn_busy || !snn_ready) {
-                cnn_drain_holdoff = 8;
+                cnn_drain_holdoff = 12;
+                cnn_eop_holdoff = 2;
             } else if (cnn_drain_holdoff > 0) {
                 cnn_drain_holdoff--;
             }
         } else {
             cnn_drain_holdoff = 0;
+            cnn_eop_pending = false;
+            cnn_eop_holdoff = 0;
         }
 
         // Output Spike Processing
@@ -1200,12 +1219,15 @@ void snn_top_hls(
                 out_pkt.data(SPIKE_PKT_TS_HI, SPIKE_PKT_TS_LO) = timestamp(SPIKE_PKT_TS_HI - SPIKE_PKT_TS_LO, 0);
                 out_pkt.keep = 0xF;
                 out_pkt.strb = 0xF;
-                out_pkt.last = 1;
+                // In MODE_CNN_STREAM, keep TLAST=0 on individual spikes so S2MM DMA bursts
+                // all spikes of the timestep in a single transfer, then emit TLAST=1 on 0xFFFFFFFF EoP.
+                out_pkt.last = (op_mode == MODE_CNN_STREAM) ? (ap_uint<1>)0 : (ap_uint<1>)1;
                 out_pkt.id = 0;
                 out_pkt.dest = 0;
                 out_pkt.user = 0;
                 m_axis_spikes.write(out_pkt);
                 consume_post_spike = true;
+                cnn_eop_holdoff = 2;
             }
 
             if (consume_post_spike) {
@@ -1222,6 +1244,22 @@ void snn_top_hls(
                     update_eligibility_on_post_spike(post_id);
                     update_counter++;
                 }
+            }
+        } else if (enable && (op_mode == MODE_CNN_STREAM) && !first_spike_only &&
+                   cnn_eop_pending && !spike_out_valid && (cnn_drain_holdoff == 0)) {
+            if (cnn_eop_holdoff > 0) {
+                cnn_eop_holdoff--;
+            } else if (!m_axis_spikes.full()) {
+                axis_spike_t eop_pkt;
+                eop_pkt.data = 0xFFFFFFFFU;
+                eop_pkt.keep = 0xF;
+                eop_pkt.strb = 0xF;
+                eop_pkt.last = 1;
+                eop_pkt.id = 0;
+                eop_pkt.dest = 0;
+                eop_pkt.user = 0;
+                m_axis_spikes.write(eop_pkt);
+                cnn_eop_pending = false;
             }
         }
 

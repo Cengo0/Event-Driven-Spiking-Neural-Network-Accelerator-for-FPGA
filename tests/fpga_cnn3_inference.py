@@ -275,6 +275,8 @@ def main():
         group_size_l2 = n_l2 // 4
         in_buffer  = allocate(shape=(n_pixels,), dtype=np.uint32)
         out_buffer = allocate(shape=(MAX_SPIKES_PER_STEP,), dtype=np.uint32)
+        out_buffer[:] = 0
+        out_buffer.flush()
 
         # Pre-compute connectivity table entries
         ct_entries = prepare_ct_table(q_fc_w)
@@ -355,12 +357,12 @@ def main():
                 while (dma_mmio.read(0x30) & 0x04) and time.time() < t_rst_wait:
                     pass
 
-                # 2. Arm S2MM DMA (FPGA -> ARM) to capture all layer spikes
+                # 2. Arm S2MM DMA (FPGA -> ARM) for a single full-timestep burst (terminated by 0xFFFFFFFF TLAST=1)
                 dest_ptr = out_buffer.device_address
                 dma_mmio.write(0x34, 0x1000)   # clear S2MM IOC flag
                 dma_mmio.write(0x30, 0x01)     # run S2MM channel
                 dma_mmio.write(0x48, dest_ptr)
-                dma_mmio.write(0x58, 4)        # arm for 1st spike (4 bytes)
+                dma_mmio.write(0x58, MAX_SPIKES_PER_STEP * 4)  # single burst up to 4096 words
 
                 # 3. Start MM2S DMA (ARM -> FPGA): send n_pixels (784 or 3072) pixels
                 src_ptr = in_buffer.device_address
@@ -372,55 +374,63 @@ def main():
                 # 4. Start HLS Kernel with Auto-Restart (Pin Y18 SCA Trigger goes HIGH!)
                 hls_ctrl.write(0x00, 0x81)
 
-                # 5. Concurrent Burst Drain Loop: Drain buffered S2MM spikes with minimal syscall overhead
+                # 5. Wait for Single-Burst S2MM End-of-Timestep EoP (0xFFFFFFFF, TLAST=1),
+                #    with automatic fallback for legacy per-spike TLAST=1 bitstreams.
                 spikes_received = 0
+                burst_eop_done = False
                 mm2s_done = False
                 quiet_deadline = None
                 t_abort = time.time() + 1.0    # 1.0s hard safety timeout
                 dma_arr = getattr(dma_mmio, 'array', None)
 
                 while time.time() < t_abort:
-                    # A. Tight inner burst drain for S2MM spikes (avoids time.time() per spike)
-                    if dma_arr is not None:
-                        got_burst = False
-                        while (dma_arr[13] & 0x1000) and spikes_received < MAX_SPIKES_PER_STEP:
-                            got_burst = True
+                    s2mm_ioc = (dma_arr[13] & 0x1000) if dma_arr is not None else (dma_mmio.read(0x34) & 0x1000)
+                    if s2mm_ioc:
+                        if dma_arr is not None:
+                            dma_arr[13] = 0x1000
+                        else:
+                            dma_mmio.write(0x34, 0x1000)
+
+                        if spikes_received == 0:
+                            out_buffer.invalidate()
+                            eop_matches = np.flatnonzero(out_buffer == 0xFFFFFFFF)
+                            if len(eop_matches) > 0:
+                                spikes_received = int(eop_matches[0])
+                                burst_eop_done = True
+                                break
+
+                        # Legacy per-spike TLAST=1 fallback
+                        if spikes_received < MAX_SPIKES_PER_STEP:
                             spikes_received += 1
-                            dma_arr[13] = 0x1000   # clear IOC flag
                             if spikes_received < MAX_SPIKES_PER_STEP:
-                                dma_arr[18] = dest_ptr + (spikes_received << 2) # 0x48 S2MM_DA
-                                dma_arr[22] = 4    # 0x58 S2MM_LENGTH
-                        if got_burst and mm2s_done:
-                            quiet_deadline = time.time() + 0.005
-                    else:
-                        got_burst = False
-                        while (dma_mmio.read(0x34) & 0x1000) and spikes_received < MAX_SPIKES_PER_STEP:
-                            got_burst = True
-                            spikes_received += 1
-                            dma_mmio.write(0x34, 0x1000)   # clear IOC flag
-                            dma_mmio.write(0x30, 0x01)     # keep S2MM running
-                            if spikes_received < MAX_SPIKES_PER_STEP:
-                                dma_mmio.write(0x48, dest_ptr + (spikes_received << 2))
-                                dma_mmio.write(0x58, 4)    # re-arm for next spike
-                        if got_burst and mm2s_done:
+                                if dma_arr is not None:
+                                    dma_arr[18] = dest_ptr + (spikes_received << 2)
+                                    dma_arr[22] = 4
+                                else:
+                                    dma_mmio.write(0x30, 0x01)
+                                    dma_mmio.write(0x48, dest_ptr + (spikes_received << 2))
+                                    dma_mmio.write(0x58, 4)
+                        if mm2s_done:
                             quiet_deadline = time.time() + 0.005
 
-                    # B. Check if MM2S has finished sending all 784 pixels
                     if not mm2s_done:
                         mm2s_sr = dma_arr[1] if dma_arr is not None else dma_mmio.read(0x04)
                         if (mm2s_sr & 0x1000) or (mm2s_sr & 0x0002):
                             mm2s_done = True
-                            quiet_deadline = time.time() + 0.008  # start quiet drain countdown
+                            quiet_deadline = time.time() + 0.008
                     else:
-                        # C. MM2S is done and quiet drain window elapsed
                         if quiet_deadline is not None and time.time() >= quiet_deadline:
                             break
 
                 # 6. Stop HLS & S2MM channel for this timestep cleanly (Pin Y18 SCA Trigger drops LOW!)
                 hls_ctrl.write(0x00, 0x00)     # deassert auto-restart
                 dma_mmio.write(0x30, 0x00)     # stop S2MM
-                out_buffer.invalidate()
+                if not burst_eop_done:
+                    out_buffer.invalidate()
                 step_pkt_slices.append(out_buffer[:spikes_received].tolist())
+                clear_n = min(MAX_SPIKES_PER_STEP, spikes_received + 2)
+                out_buffer[:clear_n] = 0
+                out_buffer.flush()
 
             t1 = time.time()
             lat_ms = (t1 - t0) * 1000.0
