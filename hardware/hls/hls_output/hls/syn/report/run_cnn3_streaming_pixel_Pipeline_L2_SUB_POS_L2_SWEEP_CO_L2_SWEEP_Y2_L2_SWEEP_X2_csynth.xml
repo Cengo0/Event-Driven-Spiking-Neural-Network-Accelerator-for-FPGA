@@ -49,14 +49,14 @@
 <SummaryOfViolations>
 <IssueType>Timing Violation</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:188</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:191</SourceLocation>
 <SummaryOfLoopViolations>
 <L2_SUB_POS_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2>
 <Name>L2_SUB_POS_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2</Name>
 <IssueType>II Violation</IssueType>
 <ViolationType>Memory Dependency</ViolationType>
 <IterationDistance>1</IterationDistance>
-<SourceLocation>src/snn_top_hls.cpp:187</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:190</SourceLocation>
 </L2_SUB_POS_L2_SWEEP_CO_L2_SWEEP_Y2_L2_SWEEP_X2>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>

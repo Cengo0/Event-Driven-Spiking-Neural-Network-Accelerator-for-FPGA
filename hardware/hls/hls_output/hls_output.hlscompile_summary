@@ -9,10 +9,10 @@
 <ENTRY>
 {
  "type": "ET_CmdStep",
- "dateTimestamp": "Mon Nov  9 10:29:21 2026",
- "timestampMillis": "1794216561790",
+ "dateTimestamp": "Mon Nov  9 13:22:12 2026",
+ "timestampMillis": "1794226932949",
  "buildStep": {
-  "cmdId": "4309f1af-4495-4ded-9766-5648a575617d",
+  "cmdId": "15173e67-055c-4103-875f-4774a5e6c7b1",
   "name": "v++",
   "logFile": "/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_output/logs/hls_output.steps.log",
   "commandLine": "/home/chipwisperer/AMD/2025.2/Vitis/bin/unwrapped/lnx64.o/v++  -c --mode hls --part xc7z020clg400-1 --work_dir ./hls_output --hls.clock 10ns --hls.syn.top snn_top_hls --hls.syn.file src/snn_top_hls.cpp --hls.flow_target vivado ",
@@ -41,10 +41,10 @@
 <ENTRY>
 {
  "type": "ET_Status",
- "dateTimestamp": "Mon Nov  9 10:29:21 2026",
- "timestampMillis": "1794216561791",
+ "dateTimestamp": "Mon Nov  9 13:22:12 2026",
+ "timestampMillis": "1794226932949",
  "status": {
-  "cmdId": "4309f1af-4495-4ded-9766-5648a575617d",
+  "cmdId": "15173e67-055c-4103-875f-4774a5e6c7b1",
   "state": "CS_RUNNING"
  }
 }
@@ -52,8 +52,8 @@
 <ENTRY>
 {
  "type": "ET_FlowMetaData",
- "dateTimestamp": "Mon Nov  9 10:29:26 2026",
- "timestampMillis": "1794216566816",
+ "dateTimestamp": "Mon Nov  9 13:22:17 2026",
+ "timestampMillis": "1794226937981",
  "buildSummary": {
   "hardwarePlatform": "",
   "hardwareDsa": "",
@@ -88,10 +88,10 @@
 <ENTRY>
 {
  "type": "ET_SubCmdStep",
- "dateTimestamp": "Mon Nov  9 10:29:26 2026",
- "timestampMillis": "1794216566817",
+ "dateTimestamp": "Mon Nov  9 13:22:17 2026",
+ "timestampMillis": "1794226937983",
  "buildStep": {
-  "cmdId": "fa354280-6cfd-42dd-9d14-faba185165e2",
+  "cmdId": "1efe1a57-6417-405c-95a6-8a5697f26928",
   "name": "",
   "logFile": "/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_output/hls/hls.log",
   "commandLine": "",
@@ -104,10 +104,10 @@
 <ENTRY>
 {
  "type": "ET_Status",
- "dateTimestamp": "Mon Nov  9 10:29:26 2026",
- "timestampMillis": "1794216566817",
+ "dateTimestamp": "Mon Nov  9 13:22:17 2026",
+ "timestampMillis": "1794226937983",
  "status": {
-  "cmdId": "fa354280-6cfd-42dd-9d14-faba185165e2",
+  "cmdId": "1efe1a57-6417-405c-95a6-8a5697f26928",
   "state": "CS_RUNNING"
  }
 }
@@ -115,8 +115,8 @@
 <ENTRY>
 {
  "type": "ET_Report",
- "dateTimestamp": "Mon Nov  9 10:29:26 2026",
- "timestampMillis": "1794216566818",
+ "dateTimestamp": "Mon Nov  9 13:22:17 2026",
+ "timestampMillis": "1794226937983",
  "report": {
   "path": "/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_output/hls/hls_data.json",
   "name": "",
@@ -129,8 +129,8 @@
 <ENTRY>
 {
  "type": "ET_Report",
- "dateTimestamp": "Mon Nov  9 10:29:26 2026",
- "timestampMillis": "1794216566818",
+ "dateTimestamp": "Mon Nov  9 13:22:17 2026",
+ "timestampMillis": "1794226937984",
  "report": {
   "path": "/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_output/hls/syn/report/csynth.rpt",
   "name": "",
@@ -143,8 +143,8 @@
 <ENTRY>
 {
  "type": "ET_Report",
- "dateTimestamp": "Mon Nov  9 10:29:26 2026",
- "timestampMillis": "1794216566818",
+ "dateTimestamp": "Mon Nov  9 13:22:17 2026",
+ "timestampMillis": "1794226937984",
  "report": {
   "path": "/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_output/hls/syn/report/csynth.xml",
   "name": "",
@@ -157,8 +157,8 @@
 <ENTRY>
 {
  "type": "ET_Report",
- "dateTimestamp": "Mon Nov  9 10:30:08 2026",
- "timestampMillis": "1794216608171",
+ "dateTimestamp": "Mon Nov  9 13:22:59 2026",
+ "timestampMillis": "1794226979898",
  "report": {
   "path": "/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_output/hls",
   "name": "",
@@ -171,8 +171,8 @@
 <ENTRY>
 {
  "type": "ET_Report",
- "dateTimestamp": "Mon Nov  9 10:30:08 2026",
- "timestampMillis": "1794216608172",
+ "dateTimestamp": "Mon Nov  9 13:22:59 2026",
+ "timestampMillis": "1794226979899",
  "report": {
   "path": "/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_output/hls",
   "name": "",
@@ -185,8 +185,8 @@
 <ENTRY>
 {
  "type": "ET_Report",
- "dateTimestamp": "Mon Nov  9 10:30:08 2026",
- "timestampMillis": "1794216608172",
+ "dateTimestamp": "Mon Nov  9 13:22:59 2026",
+ "timestampMillis": "1794226979899",
  "report": {
   "path": "/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_output/hls",
   "name": "",
@@ -199,10 +199,10 @@
 <ENTRY>
 {
  "type": "ET_Status",
- "dateTimestamp": "Mon Nov  9 10:30:08 2026",
- "timestampMillis": "1794216608172",
+ "dateTimestamp": "Mon Nov  9 13:22:59 2026",
+ "timestampMillis": "1794226979900",
  "status": {
-  "cmdId": "fa354280-6cfd-42dd-9d14-faba185165e2",
+  "cmdId": "1efe1a57-6417-405c-95a6-8a5697f26928",
   "state": "CS_PASSED"
  }
 }
@@ -210,10 +210,10 @@
 <ENTRY>
 {
  "type": "ET_Status",
- "dateTimestamp": "Mon Nov  9 10:30:24 2026",
- "timestampMillis": "1794216624243",
+ "dateTimestamp": "Mon Nov  9 13:23:15 2026",
+ "timestampMillis": "1794226995817",
  "status": {
-  "cmdId": "4309f1af-4495-4ded-9766-5648a575617d",
+  "cmdId": "15173e67-055c-4103-875f-4774a5e6c7b1",
   "state": "CS_PASSED"
  }
 }
@@ -221,8 +221,8 @@
 <ENTRY>
 {
  "type": "ET_Report",
- "dateTimestamp": "Mon Nov  9 10:30:24 2026",
- "timestampMillis": "1794216624368",
+ "dateTimestamp": "Mon Nov  9 13:23:15 2026",
+ "timestampMillis": "1794226995926",
  "report": {
   "path": "/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_output/reports/v++_compile_hls_output_guidance.html",
   "name": "",
@@ -235,8 +235,8 @@
 <ENTRY>
 {
  "type": "ET_Report",
- "dateTimestamp": "Mon Nov  9 10:30:24 2026",
- "timestampMillis": "1794216624369",
+ "dateTimestamp": "Mon Nov  9 13:23:15 2026",
+ "timestampMillis": "1794226995927",
  "report": {
   "path": "/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_output/reports/.db/v++_compile_hls_output_guidance.pb3",
   "name": "",
