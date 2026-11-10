@@ -278,6 +278,7 @@ module snn_core_group_top #(
     // Router status
     wire [31:0]                   routed_spike_count;
     wire                          router_busy;
+    reg  [31:0]                   rtl_spike_cycle_cnt;
 
     //=========================================================================
     // Config Register Decode Logic
@@ -470,11 +471,12 @@ module snn_core_group_top #(
         .cfg_global_refrac_period(cfg_global_refrac_period),
 
         // Status
-        .cfg_router_spike_count  (routed_spike_count),
-        .cfg_neuron_spike_count  (total_neuron_spikes),
-        .cfg_fifo_overflow       (1'b0),  // TODO: aggregate from groups
-        .cfg_active_neurons      (8'd0),  // TODO: aggregate
-        .cfg_throughput_counter  (routed_spike_count)
+        .cfg_router_spike_count     (routed_spike_count),
+        .cfg_neuron_spike_count     (total_neuron_spikes),
+        .cfg_fifo_overflow          (1'b0),  // TODO: aggregate from groups
+        .cfg_active_neurons         (8'd0),  // TODO: aggregate
+        .cfg_throughput_counter     (routed_spike_count),
+        .cfg_service_cycles_counter (rtl_spike_cycle_cnt)
     );
 
     //=========================================================================
@@ -519,12 +521,12 @@ module snn_core_group_top #(
     assign hls_global_id       = hls_spike_out_neuron_id[GLOBAL_ID_WIDTH-1:0];
     assign hls_weight_truncated = hls_spike_out_weight[WEIGHT_WIDTH-1:0];
 
-    // 2. Output Spike FIFO for Class Output Spikes (Group 2 -> HLS -> S2MM DMA)
-    // Group 2 is the output classification layer (digits 0..9).
-    // Spikes from Group 2 are buffered in a FIFO and held valid until HLS consumes
-    // them and toggles spike_out_ready (hls_spike_in_ready).
+    // 2. Output Spike FIFO for All Core Group Spikes (Groups 0..2 -> HLS -> S2MM DMA)
+    // Forwards Layer 1 relay spikes (Group 0), Layer 2 hidden spikes (Group 1), and
+    // Layer 3 class output spikes (Group 2) in exact hardware firing order, tagging
+    // the 8-bit weight field with the low 8 bits of the 100 MHz active RTL cycle counter.
     localparam OUTPUT_GROUP         = NUM_GROUPS - 1;  // Group 2 is output layer
-    localparam SPIKE_OUT_FIFO_DEPTH = 32;
+    localparam SPIKE_OUT_FIFO_DEPTH = 2048;
     localparam SPIKE_OUT_FIFO_AW    = $clog2(SPIKE_OUT_FIFO_DEPTH);
     localparam SPIKE_OUT_FIFO_DW    = HLS_NEURON_ID_WIDTH + HLS_WEIGHT_WIDTH;
     localparam [SPIKE_OUT_FIFO_AW-1:0] SPIKE_OUT_FIFO_LAST = {SPIKE_OUT_FIFO_AW{1'b1}};
@@ -538,9 +540,9 @@ module snn_core_group_top #(
     wire spike_out_fifo_empty = (spike_out_fifo_count == 0);
     wire spike_out_fifo_full  = (spike_out_fifo_count == SPIKE_OUT_FIFO_DEPTH);
 
-    // Only output class neurons (Group 2) are forwarded to HLS/DMA
+    // Forward all core group spikes (Group 0 Layer 1, Group 1 Layer 2, Group 2 Layer 3) to HLS/DMA
     wire is_output_spike     = (learn_spike_src_id[GLOBAL_ID_WIDTH-1 : LOCAL_ID_WIDTH] == OUTPUT_GROUP[GROUP_ID_WIDTH-1:0]);
-    wire spike_out_fifo_push = learn_spike_valid && is_output_spike && !spike_out_fifo_full;
+    wire spike_out_fifo_push = learn_spike_valid && !spike_out_fifo_full;
 
     // HLS drives spike_out_ready as a consume-ack toggle token
     wire spike_out_ready_toggle = (hls_spike_in_ready ^ spike_out_ready_d);
@@ -558,13 +560,19 @@ module snn_core_group_top #(
             spike_out_fifo_rd_ptr <= {SPIKE_OUT_FIFO_AW{1'b0}};
             spike_out_fifo_count  <= {(SPIKE_OUT_FIFO_AW+1){1'b0}};
             spike_out_ready_d     <= 1'b0;
+            rtl_spike_cycle_cnt   <= 32'd0;
         end else begin
             spike_out_ready_d <= hls_spike_in_ready;
+
+            // Count active 100 MHz SNN hardware cycles (pauses automatically when SNN is idle/draining)
+            if (hls_spike_event || rtl_snn_busy) begin
+                rtl_spike_cycle_cnt <= rtl_spike_cycle_cnt + 32'd1;
+            end
 
             if (spike_out_fifo_push) begin
                 spike_out_fifo_mem[spike_out_fifo_wr_ptr] <= {
                     {{(HLS_NEURON_ID_WIDTH-GLOBAL_ID_WIDTH){1'b0}}, learn_spike_src_id},
-                    {{(HLS_WEIGHT_WIDTH-1){1'b0}}, 1'b1}
+                    rtl_spike_cycle_cnt[HLS_WEIGHT_WIDTH-1:0]
                 };
                 spike_out_fifo_wr_ptr <= spike_out_fifo_wr_ptr_next;
             end
