@@ -715,6 +715,9 @@ void snn_top_hls(
     // ap_none outputs are level signals across invocations, so using a toggle
     // avoids "stuck-high" ready that can break one-spike-per-ack semantics.
     static ap_uint<1> spike_out_ack_toggle = 0;
+    static ap_uint<5> drain_holdoff = 0;
+    static bool eop_pending = false;
+    static ap_uint<2> eop_holdoff = 0;
     
     //=========================================================================
     // Control Signal Extraction
@@ -777,6 +780,9 @@ void snn_top_hls(
         first_spike_pending_id = 0;
         first_spike_pending_weight = 0;
         spike_out_ack_toggle = 0;
+        drain_holdoff = 0;
+        eop_pending = false;
+        eop_holdoff = 0;
         
         // Clear Per-Neuron eligibility traces (O(N) - much faster than O(N²)!)
         RESET_ELIG: for (int i = 0; i < TOTAL_LOGICAL_NEURONS; i++) {
@@ -843,6 +849,9 @@ void snn_top_hls(
         first_spike_pending = false;
         first_spike_pending_id = 0;
         first_spike_pending_weight = 0;
+        drain_holdoff = 0;
+        eop_pending = false;
+        eop_holdoff = 0;
     }
     
     //=========================================================================
@@ -905,6 +914,7 @@ void snn_top_hls(
         spike_in_valid = 0;
         spike_in_neuron_id = 0;
         spike_in_weight = 0;
+        bool injected_spike_this_step = false;
 
         if (enable && spike_in_ready) {
             axis_spike_t in_pkt;
@@ -932,6 +942,13 @@ void snn_top_hls(
                 spike_in_valid = 1;
                 spike_in_neuron_id = (rtl_nid_t)pre_id;
                 spike_in_weight = weight;
+                injected_spike_this_step = true;
+
+                if (in_pkt.last) {
+                    eop_pending = true;
+                    drain_holdoff = 31;
+                    eop_holdoff = 3;
+                }
 
                 if (stdp_active) {
                     process_pre_spike_aer(
@@ -947,6 +964,25 @@ void snn_top_hls(
 
                 spike_counter++;
             }
+        }
+
+        // Decouple Layer 1 spike injection / RTL routing from S2MM output draining:
+        // While input spikes are being injected from s_axis_spikes or the RTL router/groups
+        // are actively processing spikes, buffer all fired spikes in RTL spike_out_fifo_mem
+        // without touching m_axis_spikes. Once the final input spike of the timestep (TLAST=1)
+        // has been injected and RTL settles, drain spike_out_fifo_mem cleanly in a single
+        // continuous S2MM DMA burst terminated by one End-of-Timestep packet (0xFFFFFFFF, TLAST=1).
+        if (!first_spike_only) {
+            if (injected_spike_this_step || !s_axis_spikes.empty() || snn_busy || !snn_ready) {
+                drain_holdoff = 31;
+                eop_holdoff = 3;
+            } else if (drain_holdoff > 0) {
+                drain_holdoff--;
+            }
+        } else {
+            drain_holdoff = 0;
+            eop_pending = false;
+            eop_holdoff = 0;
         }
 
         // Output Spike Processing
@@ -974,7 +1010,7 @@ void snn_top_hls(
             first_spike_pending = false;
         }
 
-        if (enable && spike_out_valid) {
+        if (enable && spike_out_valid && (first_spike_only || (eop_pending && (drain_holdoff == 0)))) {
             neuron_id_t post_id = (neuron_id_t)spike_out_neuron_id;
             weight_t weight = spike_out_weight;
             bool consume_post_spike = false;
@@ -999,12 +1035,15 @@ void snn_top_hls(
                 out_pkt.data(SPIKE_PKT_TS_HI, SPIKE_PKT_TS_LO) = timestamp(SPIKE_PKT_TS_HI - SPIKE_PKT_TS_LO, 0);
                 out_pkt.keep = 0xF;
                 out_pkt.strb = 0xF;
-                out_pkt.last = 1;
+                // Keep TLAST=0 on individual spikes so S2MM DMA bursts all spikes of the
+                // timestep in a single transfer, then emit TLAST=1 on 0xFFFFFFFF EoP.
+                out_pkt.last = 0;
                 out_pkt.id = 0;
                 out_pkt.dest = 0;
                 out_pkt.user = 0;
                 m_axis_spikes.write(out_pkt);
                 consume_post_spike = true;
+                eop_holdoff = 3;
             }
 
             if (consume_post_spike) {
@@ -1021,6 +1060,21 @@ void snn_top_hls(
                     update_eligibility_on_post_spike(post_id);
                     update_counter++;
                 }
+            }
+        } else if (enable && !first_spike_only && eop_pending && !spike_out_valid && (drain_holdoff == 0)) {
+            if (eop_holdoff > 0) {
+                eop_holdoff--;
+            } else if (!m_axis_spikes.full()) {
+                axis_spike_t eop_pkt;
+                eop_pkt.data = 0xFFFFFFFFU;
+                eop_pkt.keep = 0xF;
+                eop_pkt.strb = 0xF;
+                eop_pkt.last = 1;
+                eop_pkt.id = 0;
+                eop_pkt.dest = 0;
+                eop_pkt.user = 0;
+                m_axis_spikes.write(eop_pkt);
+                eop_pending = false;
             }
         }
 

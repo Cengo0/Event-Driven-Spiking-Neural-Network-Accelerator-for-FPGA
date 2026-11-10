@@ -238,8 +238,18 @@ module core_group #(
 
     // Block external writes during intra-group routing to prevent FIFO write collision
     wire intra_routing = ENABLE_INTRA_GROUP && (state == ST_INTRA_ROUTE || state == ST_INTRA_READ);
+
+    reg sf_any_pending;
+    integer sf_k;
+    always @(*) begin
+        sf_any_pending = 1'b0;
+        for (sf_k = 0; sf_k < SF_DEPTH; sf_k = sf_k + 1) begin
+            sf_any_pending = sf_any_pending | (|spike_flag_mem[sf_k]);
+        end
+    end
+
     assign ext_spike_ready = !fifo_full && !intra_routing;
-    assign group_busy  = (state != ST_IDLE) || !fifo_empty;
+    assign group_busy  = (state != ST_IDLE) || !fifo_empty || sf_any_pending || sf_set_pending || out_spike_valid;
     assign spike_count = total_spikes;
 
     always @(posedge clk) begin

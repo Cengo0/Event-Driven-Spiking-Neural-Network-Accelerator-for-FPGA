@@ -500,6 +500,7 @@ puts "===== Implementation Complete ====="
 # =============================================================================
 # Copy Outputs
 # =============================================================================
+file mkdir $output_dir
 set bit_file [glob -nocomplain ${build_dir}/snn_core_group_v2.runs/impl_1/*.bit]
 set hwh_file [glob -nocomplain ${build_dir}/snn_core_group_v2.gen/sources_1/bd/design_1/hw_handoff/*.hwh]
 

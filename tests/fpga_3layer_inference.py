@@ -25,6 +25,7 @@ import argparse
 import time
 import json
 import os
+import gc
 import numpy as np
 from datetime import datetime
 from pynq import Overlay, allocate
@@ -186,6 +187,12 @@ def main():
                         help='Number of SNN timesteps')
     parser.add_argument('--output-json',   default='mnist_inference_results_v2.json',
                         help='Results output JSON')
+    parser.add_argument('--output-spikes-csv', default=None,
+                        help='Per-image all-layer temporal spike trace CSV output path (auto-named if omitted)')
+    parser.add_argument('--output-spikes-parquet', default=None,
+                        help='Optional Parquet output path for TVLA/plotting (if pandas/pyarrow installed)')
+    parser.add_argument('--max-trace-images', type=int, default=None,
+                        help='Max number of images to record full cycle-by-cycle spike traces for (default: all --samples)')
     parser.add_argument('--skip-bitstream', action='store_true',
                         help='Skip PL programming')
     parser.add_argument('--rate-coding',   action='store_true',
@@ -194,18 +201,30 @@ def main():
                         help='Hardware state reset between images: fast (100%% leak sweep, default) or none')
     args = parser.parse_args()
 
-    # ── Load payload ──────────────────────────────────────────────────────────
+    if args.output_spikes_csv is None:
+        if 'cifar' in args.data.lower() or 'cifar' in args.output_json.lower():
+            args.output_spikes_csv = 'cifar10_fc3_spike_trace.csv'
+        else:
+            args.output_spikes_csv = 'mnist_fc3_spike_trace.csv'
+
+    # ── Load payload (Memory-Optimized for PYNQ-Z2 512MB RAM) ─────────────────
     print(f"Loading deployment payload: {args.data}")
     payload      = np.load(args.data)
-    w1_f         = payload['w1_f']          # (256, 784) or (256, 3072) float32
-    b1_f         = payload['b1_f']          # (256,)     float32
-    q_w2_aug     = payload['q_w2_aug']      # (256, 257) int8
-    q_w3_aug     = payload['q_w3_aug']      # (10, 257)  int8
-    test_imgs    = payload['test_imgs']     # (10000, ...) pre-normalized
-    test_lbls    = payload['test_lbls']     # (10000,)
+    w1_f         = np.array(payload['w1_f'], dtype=np.float32, copy=True)
+    b1_f         = np.array(payload['b1_f'], dtype=np.float32, copy=True)
+    q_w2_aug     = np.array(payload['q_w2_aug'], copy=True)
+    q_w3_aug     = np.array(payload['q_w3_aug'], copy=True)
+    test_lbls_full = np.array(payload['test_lbls'], copy=True)
+    n_test       = min(args.samples, len(test_lbls_full))
+    test_lbls    = test_lbls_full[:n_test]
+    del test_lbls_full
     hw_threshold = int(payload['hw_threshold'])
+    test_imgs    = np.array(payload['test_imgs'][:n_test], dtype=np.float32, copy=True)
+    payload.close()
+    del payload
+    gc.collect()
 
-    print(f"  Dataset: {len(test_imgs)} test images loaded.")
+    print(f"  Dataset: {n_test} test images loaded, shape: {test_imgs.shape}")
     print(f"  Hardware threshold (Reg 0x10): {hw_threshold}")
 
     # ── Load Overlay ──────────────────────────────────────────────────────────
@@ -242,139 +261,282 @@ def main():
     hls_ctrl.write(0x28, 1)                 # time_steps = 1 (kernel processes per-batch)
 
     # ── Allocate DMA Buffers ──────────────────────────────────────────────────
+    MAX_SPIKES_PER_STEP = 4096
     in_buffer  = allocate(shape=(512,), dtype=np.uint32)
-    out_buffer = allocate(shape=(512,), dtype=np.uint32)
+    out_buffer = allocate(shape=(MAX_SPIKES_PER_STEP,), dtype=np.uint32)
+    out_buffer[:] = 0
+    out_buffer.flush()
 
     # ── Inference Loop ────────────────────────────────────────────────────────
-    n_test   = min(args.samples, len(test_imgs))
+    max_trace_imgs = n_test if args.max_trace_images is None else min(args.max_trace_images, n_test)
     correct  = 0
+    total_l1_spikes = 0
+    total_l2_spikes = 0
+    total_l3_spikes = 0
+    total_logged_spikes = 0
+    latencies_ms = []
     log      = []
+
+    csv_dir = os.path.dirname(args.output_spikes_csv)
+    if csv_dir:
+        os.makedirs(csv_dir, exist_ok=True)
+    csv_file = open(args.output_spikes_csv, 'w', buffering=65536)
+    csv_file.write(
+        "image_id,true_label,predicted_label,timestep,spike_order,"
+        "clock_cycle,timestep_cycle,hls_timestamp,layer,group_id,"
+        "local_neuron_id,layer_neuron_id,global_neuron_id\n"
+    )
 
     print(f"\nStarting inference on {n_test} images (SCA trigger enabled on Pin Y18, reset_mode={args.reset_mode})...")
     t_start = time.time()
 
-    for img_idx in range(n_test):
-        img_flat = test_imgs[img_idx].flatten().astype(np.float32)
-        lbl      = int(test_lbls[img_idx])
+    try:
+        for img_idx in range(n_test):
+            img_flat = test_imgs[img_idx].reshape(-1).astype(np.float32)
+            lbl      = int(test_lbls[img_idx])
 
-        if args.reset_mode == 'fast':
-            reset_hardware_state(hls_ctrl, mmio)
+            if args.reset_mode == 'fast':
+                reset_hardware_state(hls_ctrl, mmio)
 
-        mem1 = np.zeros(256, dtype=np.float32)
-        class_spikes = np.zeros(10, dtype=np.int32)
+            mem1 = np.zeros(256, dtype=np.float32)
+            class_spikes = np.zeros(10, dtype=np.int32)
+            l1_spk_count = 0
+            l2_spk_count = 0
+            image_spike_events = []
+            step_pkt_slices = []
+            spike_order = 0
+            cumulative_cycle_offset = 0
+            t0 = time.time()
 
-        for t in range(args.timesteps):
-            # ── Layer 1 (CPU Host, Float32 LIF): ~0.08 ms ────────────────────
-            if args.rate_coding:
-                # Stochastic Poisson/Bernoulli rate spikes matching training
-                in_val = (np.random.rand(*img_flat.shape) < img_flat).astype(np.float32)
-            else:
-                in_val = img_flat
+            for t in range(args.timesteps):
+                # ── Layer 1 (CPU Host, Float32 LIF): ~0.08 ms ─────────────────
+                if args.rate_coding:
+                    # Stochastic Poisson/Bernoulli rate spikes matching training
+                    in_val = (np.random.rand(*img_flat.shape) < img_flat).astype(np.float32)
+                else:
+                    in_val = img_flat
 
-            mem1 += np.dot(w1_f, in_val) + b1_f
-            mem1  = np.maximum(mem1, 0.0)
-            sp1   = (mem1 >= 1.0).astype(np.uint32)
-            mem1[sp1 > 0] = 0.0
+                mem1 += np.dot(w1_f, in_val) + b1_f
+                mem1  = np.maximum(mem1, 0.0)
+                sp1   = (mem1 >= 1.0).astype(np.uint32)
+                mem1[sp1 > 0] = 0.0
 
-            l1_spike_ids = np.nonzero(sp1)[0].tolist()
-            pkt_len      = len(l1_spike_ids)
+                l1_spike_ids = np.nonzero(sp1)[0].tolist()
+                pkt_len      = len(l1_spike_ids)
 
-            if pkt_len > 0:
-                # ── Pack Input Spikes: [9:0]=global_id(0, id), [17:10]=weight ─
-                for k, sid in enumerate(l1_spike_ids):
-                    gid = global_id(0, sid) & 0x3FF
-                    weight_val = 127
-                    in_buffer[k] = gid | ((weight_val & 0xFF) << 10)
+                if pkt_len > 0:
+                    # ── Pack Input Spikes: [9:0]=global_id(0, id), [17:10]=weight ─
+                    for k, sid in enumerate(l1_spike_ids):
+                        gid = global_id(0, sid) & 0x3FF
+                        weight_val = 127
+                        in_buffer[k] = gid | ((weight_val & 0xFF) << 10)
 
-                in_buffer.flush()
+                    in_buffer.flush()
 
-                # ── Reset DMA Channels for Clean State ───────────────────────
-                dma_mmio.write(0x00, 0x04)                 # MM2S reset
-                dma_mmio.write(0x30, 0x04)                 # S2MM reset
-                time.sleep(0.0001)
+                    # ── Reset DMA Channels for Clean State ────────────────────
+                    dma_mmio.write(0x00, 0x04)                 # MM2S reset
+                    dma_mmio.write(0x30, 0x04)                 # S2MM reset
+                    t_rst_wait = time.time() + 0.005
+                    while (dma_mmio.read(0x00) & 0x04 or dma_mmio.read(0x30) & 0x04) and time.time() < t_rst_wait:
+                        pass
 
-                # ── Arm S2MM DMA (FPGA -> ARM) ───────────────────────────────
-                dest_ptr = out_buffer.device_address
-                dma_mmio.write(0x34, 0x1000)               # clear IOC
-                dma_mmio.write(0x30, 0x01)                 # run
-                dma_mmio.write(0x48, dest_ptr)
-                dma_mmio.write(0x58, 4)                    # arm for 1st spike
+                    # ── Arm S2MM DMA (FPGA -> ARM) for Single-Burst Transfer ──
+                    dest_ptr = out_buffer.device_address
+                    dma_mmio.write(0x34, 0x1000)               # clear IOC
+                    dma_mmio.write(0x30, 0x01)                 # run
+                    dma_mmio.write(0x48, dest_ptr)
+                    dma_mmio.write(0x58, MAX_SPIKES_PER_STEP * 4)
 
-                # ── Start MM2S DMA (ARM -> FPGA) ─────────────────────────────
-                # Pin Y18 goes HIGH as FPGA processes Layer 2 and Layer 3!
-                src_ptr = in_buffer.device_address
-                dma_mmio.write(0x00, 0x01)
-                dma_mmio.write(0x18, src_ptr)
-                dma_mmio.write(0x28, pkt_len * 4)
+                    # ── Start MM2S DMA (ARM -> FPGA) ──────────────────────────
+                    # Pin Y18 goes HIGH as FPGA processes Layer 1 -> Layer 2 -> Layer 3!
+                    src_ptr = in_buffer.device_address
+                    dma_mmio.write(0x04, 0x1000)               # clear MM2S IOC
+                    dma_mmio.write(0x00, 0x01)
+                    dma_mmio.write(0x18, src_ptr)
+                    dma_mmio.write(0x28, pkt_len * 4)
 
-                # ── Start HLS Kernel with Auto-Restart ───────────────────────
-                hls_ctrl.write(0x00, 0x81)
+                    # ── Start HLS Kernel with Auto-Restart ────────────────────
+                    hls_ctrl.write(0x00, 0x81)
 
-                # ── Poll for output spikes from Group 2 (Classes 0..9) ────────
-                spikes_received = 0
-                while spikes_received < 128:
-                    timeout = time.time() + 0.003          # 3 ms tight timeout
-                    got_spike = False
+                    # ── Wait for Single-Burst S2MM End-of-Timestep EoP (0xFFFFFFFF, TLAST=1) ─
+                    spikes_received = 0
+                    burst_eop_done = False
+                    mm2s_done = False
+                    quiet_deadline = None
+                    t_abort = time.time() + 0.500              # 500ms hard safety timeout
+                    dma_arr = getattr(dma_mmio, 'array', None)
 
-                    while time.time() < timeout:
-                        if dma_mmio.read(0x34) & 0x1000:   # IOC set
-                            got_spike = True
-                            break
+                    while time.time() < t_abort:
+                        s2mm_ioc = (dma_arr[13] & 0x1000) if dma_arr is not None else (dma_mmio.read(0x34) & 0x1000)
+                        if s2mm_ioc:
+                            if dma_arr is not None:
+                                dma_arr[13] = 0x1000
+                            else:
+                                dma_mmio.write(0x34, 0x1000)
 
-                    if got_spike:
-                        spikes_received += 1
-                        dma_mmio.write(0x34, 0x1000)
-                        dma_mmio.write(0x30, 0x01)
-                        dma_mmio.write(0x48, dest_ptr + (spikes_received * 4))
-                        dma_mmio.write(0x58, 4)
+                            if spikes_received == 0:
+                                out_buffer.invalidate()
+                                eop_matches = np.flatnonzero(out_buffer == 0xFFFFFFFF)
+                                if len(eop_matches) > 0:
+                                    spikes_received = int(eop_matches[0])
+                                    burst_eop_done = True
+                                    break
+
+                            # Legacy per-spike TLAST=1 fallback
+                            if spikes_received < MAX_SPIKES_PER_STEP:
+                                spikes_received += 1
+                                if spikes_received < MAX_SPIKES_PER_STEP:
+                                    if dma_arr is not None:
+                                        dma_arr[18] = dest_ptr + (spikes_received << 2)
+                                        dma_arr[22] = 4
+                                    else:
+                                        dma_mmio.write(0x30, 0x01)
+                                        dma_mmio.write(0x48, dest_ptr + (spikes_received << 2))
+                                        dma_mmio.write(0x58, 4)
+                            if mm2s_done:
+                                quiet_deadline = time.time() + 0.005
+
+                        if not mm2s_done:
+                            mm2s_sr = dma_arr[1] if dma_arr is not None else dma_mmio.read(0x04)
+                            if (mm2s_sr & 0x1000) or (mm2s_sr & 0x0002):
+                                mm2s_done = True
+                                quiet_deadline = time.time() + 0.050  # 50ms fallback (burst EoP exits early via s2mm_ioc)
+                        else:
+                            if quiet_deadline is not None and time.time() >= quiet_deadline:
+                                break
+
+                    # Stop HLS & S2MM channel for this timestep
+                    hls_ctrl.write(0x00, 0x00)
+                    dma_mmio.write(0x30, 0x00)
+
+                    if not burst_eop_done:
+                        out_buffer.invalidate()
+                        if spikes_received == 0:
+                            eop_matches = np.flatnonzero(out_buffer == 0xFFFFFFFF)
+                            if len(eop_matches) > 0:
+                                spikes_received = int(eop_matches[0])
+
+                    step_pkt_slices.append((t, out_buffer[:spikes_received].tolist()))
+                    clear_n = min(MAX_SPIKES_PER_STEP, spikes_received + 2)
+                    out_buffer[:clear_n] = 0
+                    out_buffer.flush()
+                else:
+                    step_pkt_slices.append((t, []))
+
+            t1 = time.time()
+            lat_ms = (t1 - t0) * 1000.0
+            latencies_ms.append(lat_ms)
+
+            # ── Decode All-Layer Spikes (Group 0 = Layer 1, Group 1 = Layer 2, Group 2 = Layer 3) ─
+            for t, step_pkts in step_pkt_slices:
+                prev_rtl_lsb = None
+                rtl_wrap_offset = 0
+                max_step_cycle = 0
+
+                for pkt in step_pkts:
+                    if pkt == 0 or pkt == 0xFFFFFFFF:
+                        continue
+                    gid = pkt & 0x3FF
+                    grp = (gid >> LOCAL_ID_WIDTH) & 0x3
+                    loc = gid & 0xFF
+                    rtl_lsb = (pkt >> 10) & 0xFF
+                    hls_ts  = (pkt >> 18) & 0x3FFF
+
+                    if prev_rtl_lsb is not None and rtl_lsb < prev_rtl_lsb:
+                        rtl_wrap_offset += 256
+                    prev_rtl_lsb = rtl_lsb
+
+                    timestep_cycle = (rtl_wrap_offset + rtl_lsb) if (rtl_wrap_offset > 0 or rtl_lsb != 1) else hls_ts
+                    if timestep_cycle > max_step_cycle:
+                        max_step_cycle = timestep_cycle
+                    clock_cycle = cumulative_cycle_offset + timestep_cycle
+
+                    if grp == 0:
+                        l1_spk_count += 1
+                        layer = 1
+                        layer_nid = loc
+                        global_nid = loc
+                    elif grp == 1:
+                        l2_spk_count += 1
+                        layer = 2
+                        layer_nid = loc
+                        global_nid = GROUP_SIZE_0 + loc
+                    elif grp == 2 and loc < 10:
+                        class_spikes[loc] += 1
+                        layer = 3
+                        layer_nid = loc
+                        global_nid = GROUP_SIZE_0 + GROUP_SIZE_1 + loc
                     else:
-                        break
+                        continue
 
-                # Stop HLS & S2MM channel for this timestep
-                hls_ctrl.write(0x00, 0x00)
-                dma_mmio.write(0x30, 0x00)
+                    if img_idx < max_trace_imgs:
+                        image_spike_events.append((
+                            t, spike_order, clock_cycle, timestep_cycle, hls_ts,
+                            layer, grp, loc, layer_nid, global_nid
+                        ))
+                    spike_order += 1
 
-                out_buffer.invalidate()
+                cumulative_cycle_offset += max(max_step_cycle + 100, 1000)
+            del step_pkt_slices
 
-                # ── Decode Output Class Spikes ────────────────────────────────
-                for s in range(spikes_received):
-                    out_val = int(out_buffer[s])
-                    if out_val > 0:
-                        gid = out_val & 0x3FF
-                        grp = gid >> LOCAL_ID_WIDTH
-                        loc = gid & 0xFF
-                        # Output class spikes come from Group 2
-                        if grp == 2 and loc < 10:
-                            class_spikes[loc] += 1
+            prediction = int(np.argmax(class_spikes))
+            if prediction == lbl:
+                correct += 1
 
-                out_buffer[:] = 0
+            curr_r_spks = int(mmio.read(CFG_ROUTER_SPKS))
+            curr_n_spks = int(mmio.read(CFG_NEURON_SPKS))
 
-        prediction = int(np.argmax(class_spikes))
-        if prediction == lbl:
-            correct += 1
+            total_l1_spikes += l1_spk_count
+            total_l2_spikes += l2_spk_count
+            total_l3_spikes += int(np.sum(class_spikes))
 
-        curr_r_spks = int(mmio.read(CFG_ROUTER_SPKS))
-        curr_n_spks = int(mmio.read(CFG_NEURON_SPKS))
+            if img_idx < max_trace_imgs and len(image_spike_events) > 0:
+                lines = [
+                    f"{img_idx},{lbl},{prediction},{ev[0]},{ev[1]},{ev[2]},{ev[3]},{ev[4]},{ev[5]},{ev[6]},{ev[7]},{ev[8]},{ev[9]}\n"
+                    for ev in image_spike_events
+                ]
+                csv_file.writelines(lines)
+                total_logged_spikes += len(lines)
+                del lines
+            del image_spike_events
 
-        log.append({
-            "image_index":     img_idx,
-            "true_label":      lbl,
-            "predicted_label": prediction,
-            "spikes":          class_spikes.tolist(),
-            "router_spikes":   curr_r_spks,
-            "neuron_spikes":   curr_n_spks
-        })
+            log.append({
+                "image_index":     img_idx,
+                "true_label":      lbl,
+                "predicted_label": prediction,
+                "spikes":          class_spikes.tolist(),
+                "l1_spikes":       l1_spk_count,
+                "l2_spikes":       l2_spk_count,
+                "router_spikes":   curr_r_spks,
+                "neuron_spikes":   curr_n_spks,
+                "latency_ms":      round(lat_ms, 2)
+            })
 
-        if (img_idx + 1) % 100 == 0:
-            acc = correct / (img_idx + 1) * 100
-            print(f"  [{img_idx+1}/{n_test}] Accuracy: {acc:.1f}%")
-
-    # ── Stop HLS ──────────────────────────────────────────────────────────────
-    hls_ctrl.write(0x00, 0x00)
+            if (img_idx + 1) % 100 == 0 or (img_idx + 1) == n_test:
+                acc = correct / (img_idx + 1) * 100
+                mean_lat = float(np.mean(latencies_ms))
+                print(f"  [{img_idx+1:5d}/{n_test}] Acc: {acc:.2f}% | "
+                      f"Latency: {mean_lat:.2f} ms | "
+                      f"L1: {l1_spk_count} | L2: {l2_spk_count} | L3: {class_spikes.tolist()}")
+    finally:
+        hls_ctrl.write(0x00, 0x00)
+        try:
+            csv_file.flush()
+            csv_file.close()
+        except Exception:
+            pass
+        try:
+            in_buffer.freebuffer()
+            out_buffer.freebuffer()
+        except Exception:
+            pass
 
     t_end   = time.time()
     acc     = correct / n_test * 100
-    avg_lat = (t_end - t_start) / n_test * 1000
+    avg_lat = float(np.mean(latencies_ms)) if latencies_ms else ((t_end - t_start) / n_test * 1000)
+    avg_l1  = total_l1_spikes / n_test
+    avg_l2  = total_l2_spikes / n_test
+    avg_l3  = total_l3_spikes / n_test
 
     if args.reset_mode == 'fast':
         final_router_spks = sum(entry["router_spikes"] for entry in log)
@@ -383,30 +545,53 @@ def main():
         final_router_spks = int(mmio.read(CFG_ROUTER_SPKS))
         final_neuron_spks = int(mmio.read(CFG_NEURON_SPKS))
 
-    print(f"\n{'='*50}")
+    print(f"Saved cycle-accurate 3-layer spike trace CSV ({total_logged_spikes} spikes) to: {args.output_spikes_csv}")
+
+    if args.output_spikes_parquet:
+        try:
+            import pandas as pd
+            df_spikes = pd.read_csv(args.output_spikes_csv)
+            df_spikes.to_parquet(args.output_spikes_parquet, index=False)
+            print(f"Saved spike trace Parquet to: {args.output_spikes_parquet}")
+            del df_spikes
+            gc.collect()
+        except Exception as e:
+            print(f"Note: Parquet export skipped ({e}); CSV trace is complete.")
+
+    print(f"\n{'='*60}")
     print(f"  Multi-Layer Inference Complete")
-    print(f"  Accuracy   : {acc:.2f}% ({correct}/{n_test})")
-    print(f"  Avg Latency: {avg_lat:.2f} ms/image")
-    print(f"  Trigger Pin: PACKAGE_PIN Y18 (snn_busy)")
+    print(f"  Accuracy        : {acc:.2f}% ({correct}/{n_test})")
+    print(f"  Avg Latency     : {avg_lat:.2f} ms/image")
+    print(f"  Avg L1 Spikes   : {avg_l1:.2f} / image (Group 0)")
+    print(f"  Avg L2 Spikes   : {avg_l2:.2f} / image (Group 1)")
+    print(f"  Avg L3 Spikes   : {avg_l3:.2f} / image (Group 2)")
+    print(f"  Trigger Pin     : PACKAGE_PIN Y18 (snn_busy)")
     print(f"\n  Diagnostics:")
     print(f"    Router spikes : {final_router_spks}")
     print(f"    Neuron spikes : {final_neuron_spks}")
-    print(f"{'='*50}")
+    print(f"{'='*60}")
 
     results = {
         "metadata": {
             "timestamp":    datetime.now().isoformat(),
+            "data":         args.data,
             "samples":      n_test,
             "timesteps":    args.timesteps,
             "hw_threshold": hw_threshold,
+            "rate_coding":  args.rate_coding,
             "reset_mode":   args.reset_mode,
             "trigger_pin":  "Y18",
         },
         "metrics": {
-            "accuracy_percent":   round(acc, 2),
-            "correct":            correct,
-            "total":              n_test,
-            "average_latency_ms": round(avg_lat, 2),
+            "accuracy_percent":          round(acc, 2),
+            "correct":                   correct,
+            "total":                     n_test,
+            "average_latency_ms":        round(avg_lat, 2),
+            "avg_l1_spikes_per_image":   round(avg_l1, 2),
+            "avg_l2_spikes_per_image":   round(avg_l2, 2),
+            "avg_spikes_per_image":      round(avg_l3, 2),
+            "total_logged_spike_events": total_logged_spikes,
+            "spike_trace_csv":           args.output_spikes_csv,
             "diagnostics": {
                 "router_spikes": final_router_spks,
                 "neuron_spikes": final_neuron_spks,
