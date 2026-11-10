@@ -3,8 +3,8 @@
 # SW Build 6299465 on Fri Nov 14 12:34:56 MST 2025
 # IP Build 6300035 on Fri Nov 14 10:48:45 MST 2025
 # SharedData Build 6298862 on Thu Nov 13 04:50:51 MST 2025
-# Start of session at: Mon Nov  9 05:38:51 2026
-# Process ID         : 2499864
+# Start of session at: Mon Nov  9 19:37:35 2026
+# Process ID         : 2769235
 # Current directory  : /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1
 # Command line       : vivado -log snn_core_group_top.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source snn_core_group_top.tcl
 # Log file           : /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/snn_core_group_top.vds
@@ -13,13 +13,13 @@
 # Platform           : Ubuntu
 # Operating System   : Ubuntu 22.04.5 LTS
 # Processor Detail   : Intel(R) Xeon(R) CPU E5-2620 v4 @ 2.10GHz
-# CPU Frequency      : 2099.383 MHz
+# CPU Frequency      : 2773.207 MHz
 # CPU Physical cores : 8
 # CPU Logical cores  : 16
 # Host memory        : 67332 MB
 # Swap memory        : 2147 MB
 # Total Virtual      : 69479 MB
-# Available Virtual  : 57765 MB
+# Available Virtual  : 57418 MB
 #-----------------------------------------------------------
 source snn_core_group_top.tcl -notrace
 INFO: [IP_Flow 19-234] Refreshing IP repositories
@@ -39,9 +39,9 @@ INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7z020
 INFO: [Device 21-403] Loading part xc7z020clg400-1
 INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 7 processes.
 INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
-INFO: [Synth 8-7075] Helper process launched with PID 2500089
+INFO: [Synth 8-7075] Helper process launched with PID 2769462
 ---------------------------------------------------------------------------------
-Starting RTL Elaboration : Time (s): cpu = 00:00:06 ; elapsed = 00:00:06 . Memory (MB): peak = 2262.484 ; gain = 452.578 ; free physical = 5424 ; free virtual = 53746
+Starting RTL Elaboration : Time (s): cpu = 00:00:06 ; elapsed = 00:00:06 . Memory (MB): peak = 2261.957 ; gain = 455.984 ; free physical = 5486 ; free virtual = 53346
 ---------------------------------------------------------------------------------
 INFO: [Synth 8-6157] synthesizing module 'snn_core_group_top' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:74]
 INFO: [Synth 8-6157] synthesizing module 'core_group' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
@@ -106,15 +106,15 @@ INFO: [Synth 8-6157] synthesizing module 'core_group__parameterized3' [/home/chi
 INFO: [Synth 8-6155] done synthesizing module 'core_group__parameterized3' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/core_group.v:36]
 INFO: [Synth 8-6157] synthesizing module 'design_1_wrapper' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13]
 INFO: [Synth 8-6157] synthesizing module 'design_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:13]
-INFO: [Synth 8-6157] synthesizing module 'design_1_axi_dma_0_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_dma_0_0_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_dma_0_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_dma_0_0_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_dma_0_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_dma_0_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_dma_0_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_dma_0_0_stub.v:6]
 WARNING: [Synth 8-7071] port 'mm2s_prmry_reset_out_n' of module 'design_1_axi_dma_0_0' is unconnected for instance 'axi_dma_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:435]
 WARNING: [Synth 8-7071] port 's2mm_prmry_reset_out_n' of module 'design_1_axi_dma_0_0' is unconnected for instance 'axi_dma_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:435]
 WARNING: [Synth 8-7071] port 's2mm_introut' of module 'design_1_axi_dma_0_0' is unconnected for instance 'axi_dma_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:435]
 WARNING: [Synth 8-7071] port 'axi_dma_tstvec' of module 'design_1_axi_dma_0_0' is unconnected for instance 'axi_dma_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:435]
 WARNING: [Synth 8-7023] instance 'axi_dma_0' of module 'design_1_axi_dma_0_0' has 64 connections declared, but only 60 given [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:435]
-INFO: [Synth 8-6157] synthesizing module 'design_1_axi_dma_1_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_dma_1_0_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_dma_1_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_dma_1_0_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_dma_1_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_dma_1_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_dma_1_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_dma_1_0_stub.v:6]
 WARNING: [Synth 8-7071] port 'mm2s_prmry_reset_out_n' of module 'design_1_axi_dma_1_0' is unconnected for instance 'axi_dma_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:496]
 WARNING: [Synth 8-7071] port 's2mm_prmry_reset_out_n' of module 'design_1_axi_dma_1_0' is unconnected for instance 'axi_dma_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:496]
 WARNING: [Synth 8-7071] port 'mm2s_introut' of module 'design_1_axi_dma_1_0' is unconnected for instance 'axi_dma_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:496]
@@ -131,11 +131,11 @@ INFO: [Synth 8-6155] done synthesizing module 'm02_couplers_imp_1BOGR4T' (0#1) [
 INFO: [Synth 8-6157] synthesizing module 'm03_couplers_imp_J0G1J0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:3055]
 INFO: [Synth 8-6155] done synthesizing module 'm03_couplers_imp_J0G1J0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:3055]
 INFO: [Synth 8-6157] synthesizing module 's00_couplers_imp_O7FAN0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:3164]
-INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_0_imp_auto_pc_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_0_imp_auto_pc_0_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_0_imp_auto_pc_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_0_imp_auto_pc_0_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_0_imp_auto_pc_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_0_imp_auto_pc_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_0_imp_auto_pc_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_0_imp_auto_pc_0_stub.v:6]
 INFO: [Synth 8-6155] done synthesizing module 's00_couplers_imp_O7FAN0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:3164]
-INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_0_imp_xbar_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_0_imp_xbar_0_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_0_imp_xbar_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_0_imp_xbar_0_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_0_imp_xbar_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_0_imp_xbar_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_0_imp_xbar_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_0_imp_xbar_0_stub.v:6]
 WARNING: [Synth 8-689] width (6) of port connection 'm_axi_arprot' does not match port width (12) of module 'design_1_axi_interconnect_0_imp_xbar_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:1690]
 WARNING: [Synth 8-689] width (6) of port connection 'm_axi_awprot' does not match port width (12) of module 'design_1_axi_interconnect_0_imp_xbar_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:1694]
 WARNING: [Synth 8-689] width (8) of port connection 'm_axi_wstrb' does not match port width (16) of module 'design_1_axi_interconnect_0_imp_xbar_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:1706]
@@ -144,31 +144,31 @@ INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_0' [/hom
 INFO: [Synth 8-6157] synthesizing module 'm00_couplers_imp_17E8JHA' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:2463]
 INFO: [Synth 8-6155] done synthesizing module 'm00_couplers_imp_17E8JHA' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:2463]
 INFO: [Synth 8-6157] synthesizing module 's00_couplers_imp_S4BDUK' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:3410]
-INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_0_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_0_stub.v:6]
-INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_0_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_0_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_0_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_0_stub.v:6]
 INFO: [Synth 8-6155] done synthesizing module 's00_couplers_imp_S4BDUK' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:3410]
 INFO: [Synth 8-6157] synthesizing module 's01_couplers_imp_12AUBLP' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:3591]
-INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_1_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_1_stub.v:6]
-INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_1_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_1_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_1_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_1_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_1_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_1_stub.v:6]
 INFO: [Synth 8-6155] done synthesizing module 's01_couplers_imp_12AUBLP' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:3591]
 INFO: [Synth 8-6157] synthesizing module 's02_couplers_imp_QSEXJZ' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:3805]
-INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_2' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_2_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_2' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_2_stub.v:6]
-INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_2' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_2_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_2' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_2_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_2' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_2_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_2' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_2_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_2' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_2_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_2' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_2_stub.v:6]
 INFO: [Synth 8-6155] done synthesizing module 's02_couplers_imp_QSEXJZ' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:3805]
 INFO: [Synth 8-6157] synthesizing module 's03_couplers_imp_13X28CE' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:3986]
-INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_3' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_3_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_3' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_3_stub.v:6]
-INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_3' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_3_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_3' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_3_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_3' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_3_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_pc_3' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_pc_3_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_3' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_3_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_auto_us_3' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_hp0_imp_auto_us_3_stub.v:6]
 INFO: [Synth 8-6155] done synthesizing module 's03_couplers_imp_13X28CE' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:3986]
-INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_xbar_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_hp0_imp_xbar_0_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_xbar_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_axi_interconnect_hp0_imp_xbar_0_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_axi_interconnect_hp0_imp_xbar_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_hp0_imp_xbar_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_axi_interconnect_hp0_imp_xbar_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_axi_interconnect_hp0_imp_xbar_0_stub.v:6]
 WARNING: [Synth 8-689] width (3) of port connection 's_axi_arready' does not match port width (4) of module 'design_1_axi_interconnect_hp0_imp_xbar_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:2433]
 WARNING: [Synth 8-689] width (192) of port connection 's_axi_rdata' does not match port width (256) of module 'design_1_axi_interconnect_hp0_imp_xbar_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:2450]
 WARNING: [Synth 8-689] width (3) of port connection 's_axi_rlast' does not match port width (4) of module 'design_1_axi_interconnect_hp0_imp_xbar_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:2451]
@@ -190,15 +190,15 @@ INFO: [Synth 8-6157] synthesizing module 'design_1_const_zero_4bit_0' [/home/chi
 INFO: [Synth 8-6157] synthesizing module 'xlconstant_v1_1_10_xlconstant__parameterized1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/ipshared/a165/hdl/xlconstant_v1_1_vl_rfs.v:68]
 INFO: [Synth 8-6155] done synthesizing module 'xlconstant_v1_1_10_xlconstant__parameterized1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/ipshared/a165/hdl/xlconstant_v1_1_vl_rfs.v:68]
 INFO: [Synth 8-6155] done synthesizing module 'design_1_const_zero_4bit_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/ip/design_1_const_zero_4bit_0/synth/design_1_const_zero_4bit_0.v:53]
-INFO: [Synth 8-6157] synthesizing module 'design_1_proc_sys_reset_0_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_proc_sys_reset_0_0_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'design_1_proc_sys_reset_0_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_proc_sys_reset_0_0_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_proc_sys_reset_0_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_proc_sys_reset_0_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_proc_sys_reset_0_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_proc_sys_reset_0_0_stub.v:6]
 WARNING: [Synth 8-7071] port 'mb_reset' of module 'design_1_proc_sys_reset_0_0' is unconnected for instance 'proc_sys_reset_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:790]
 WARNING: [Synth 8-7071] port 'bus_struct_reset' of module 'design_1_proc_sys_reset_0_0' is unconnected for instance 'proc_sys_reset_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:790]
 WARNING: [Synth 8-7071] port 'peripheral_reset' of module 'design_1_proc_sys_reset_0_0' is unconnected for instance 'proc_sys_reset_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:790]
 WARNING: [Synth 8-7071] port 'interconnect_aresetn' of module 'design_1_proc_sys_reset_0_0' is unconnected for instance 'proc_sys_reset_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:790]
 WARNING: [Synth 8-7023] instance 'proc_sys_reset_0' of module 'design_1_proc_sys_reset_0_0' has 10 connections declared, but only 6 given [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:790]
-INFO: [Synth 8-6157] synthesizing module 'design_1_processing_system7_0_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_processing_system7_0_0_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'design_1_processing_system7_0_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_processing_system7_0_0_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_processing_system7_0_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_processing_system7_0_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_processing_system7_0_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_processing_system7_0_0_stub.v:6]
 WARNING: [Synth 8-7071] port 'ENET0_GMII_TX_EN' of module 'design_1_processing_system7_0_0' is unconnected for instance 'processing_system7_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:797]
 WARNING: [Synth 8-7071] port 'ENET0_GMII_TX_ER' of module 'design_1_processing_system7_0_0' is unconnected for instance 'processing_system7_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:797]
 WARNING: [Synth 8-7071] port 'ENET0_GMII_TXD' of module 'design_1_processing_system7_0_0' is unconnected for instance 'processing_system7_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:797]
@@ -210,10 +210,10 @@ WARNING: [Synth 8-7071] port 'S_AXI_HP0_WCOUNT' of module 'design_1_processing_s
 WARNING: [Synth 8-7071] port 'S_AXI_HP0_RACOUNT' of module 'design_1_processing_system7_0_0' is unconnected for instance 'processing_system7_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:797]
 WARNING: [Synth 8-7071] port 'S_AXI_HP0_WACOUNT' of module 'design_1_processing_system7_0_0' is unconnected for instance 'processing_system7_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:797]
 WARNING: [Synth 8-7023] instance 'processing_system7_0' of module 'design_1_processing_system7_0_0' has 124 connections declared, but only 114 given [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:797]
-INFO: [Synth 8-6157] synthesizing module 'design_1_snn_config_regs_0_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_snn_config_regs_0_0_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'design_1_snn_config_regs_0_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_snn_config_regs_0_0_stub.v:6]
-INFO: [Synth 8-6157] synthesizing module 'design_1_snn_top_hls_0_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_snn_top_hls_0_0_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'design_1_snn_top_hls_0_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2499864-Mariana/realtime/design_1_snn_top_hls_0_0_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_snn_config_regs_0_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_snn_config_regs_0_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_snn_config_regs_0_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_snn_config_regs_0_0_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'design_1_snn_top_hls_0_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_snn_top_hls_0_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_snn_top_hls_0_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/.Xil/Vivado-2769235-Mariana/realtime/design_1_snn_top_hls_0_0_stub.v:6]
 WARNING: [Synth 8-7071] port 'interrupt' of module 'design_1_snn_top_hls_0_0' is unconnected for instance 'snn_top_hls_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:950]
 WARNING: [Synth 8-7071] port 's_axis_data_TREADY' of module 'design_1_snn_top_hls_0_0' is unconnected for instance 'snn_top_hls_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:950]
 WARNING: [Synth 8-7071] port 'm_axis_spikes_TDEST' of module 'design_1_snn_top_hls_0_0' is unconnected for instance 'snn_top_hls_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/synth/design_1.v:950]
@@ -229,7 +229,7 @@ INFO: [Synth 8-6155] done synthesizing module 'design_1' (0#1) [/home/chipwisper
 INFO: [Synth 8-6155] done synthesizing module 'design_1_wrapper' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v:13]
 WARNING: [Synth 8-7071] port 'cfg_service_cycles_counter' of module 'design_1_wrapper' is unconnected for instance 'u_block_design' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:393]
 WARNING: [Synth 8-7023] instance 'u_block_design' of module 'design_1_wrapper' has 64 connections declared, but only 63 given [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:393]
-WARNING: [Synth 8-693] zero replication count - replication ignored [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:582]
+WARNING: [Synth 8-693] zero replication count - replication ignored [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/top/snn_core_group_top.v:578]
 INFO: [Synth 8-6157] synthesizing module 'synaptic_connectivity_table' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hdl/rtl/core/synaptic_connectivity_table.v:35]
 	Parameter NUM_GROUPS bound to: 5 - type: integer 
 	Parameter NEURONS_PER_GROUP bound to: 256 - type: integer 
@@ -301,18 +301,18 @@ WARNING: [Synth 8-7129] Port M03_ARESETN in module design_1_axi_interconnect_0_0
 WARNING: [Synth 8-7129] Port S00_ACLK in module design_1_axi_interconnect_0_0 is either unconnected or has no load
 WARNING: [Synth 8-7129] Port S00_ARESETN in module design_1_axi_interconnect_0_0 is either unconnected or has no load
 ---------------------------------------------------------------------------------
-Finished RTL Elaboration : Time (s): cpu = 00:00:25 ; elapsed = 00:00:25 . Memory (MB): peak = 2535.992 ; gain = 726.086 ; free physical = 5250 ; free virtual = 53575
+Finished RTL Elaboration : Time (s): cpu = 00:00:22 ; elapsed = 00:00:22 . Memory (MB): peak = 2535.465 ; gain = 729.492 ; free physical = 5289 ; free virtual = 53152
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:25 ; elapsed = 00:00:25 . Memory (MB): peak = 2535.992 ; gain = 726.086 ; free physical = 5250 ; free virtual = 53574
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:22 ; elapsed = 00:00:23 . Memory (MB): peak = 2535.465 ; gain = 729.492 ; free physical = 5289 ; free virtual = 53152
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:25 ; elapsed = 00:00:25 . Memory (MB): peak = 2535.992 ; gain = 726.086 ; free physical = 5250 ; free virtual = 53574
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:22 ; elapsed = 00:00:23 . Memory (MB): peak = 2535.465 ; gain = 729.492 ; free physical = 5289 ; free virtual = 53152
 ---------------------------------------------------------------------------------
-Netlist sorting complete. Time (s): cpu = 00:00:00.12 ; elapsed = 00:00:00.11 . Memory (MB): peak = 2535.992 ; gain = 0.000 ; free physical = 5250 ; free virtual = 53574
+Netlist sorting complete. Time (s): cpu = 00:00:00.09 ; elapsed = 00:00:00.09 . Memory (MB): peak = 2535.465 ; gain = 0.000 ; free physical = 5290 ; free virtual = 53153
 INFO: [Project 1-570] Preparing netlist for logic optimization
 
 Processing XDC Constraints
@@ -359,26 +359,26 @@ Parsing XDC File [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-N
 Finished Parsing XDC File [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/dont_touch.xdc]
 Completed Processing XDC Constraints
 
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2605.824 ; gain = 0.000 ; free physical = 5239 ; free virtual = 53563
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.01 . Memory (MB): peak = 2597.297 ; gain = 0.000 ; free physical = 5258 ; free virtual = 53122
 INFO: [Project 1-111] Unisim Transformation Summary:
 No Unisim elements were transformed.
 
-Constraint Validation Runtime : Time (s): cpu = 00:00:00.04 ; elapsed = 00:00:00.04 . Memory (MB): peak = 2605.859 ; gain = 0.000 ; free physical = 5239 ; free virtual = 53563
+Constraint Validation Runtime : Time (s): cpu = 00:00:00.04 ; elapsed = 00:00:00.04 . Memory (MB): peak = 2597.332 ; gain = 0.000 ; free physical = 5260 ; free virtual = 53125
 ---------------------------------------------------------------------------------
-Finished Constraint Validation : Time (s): cpu = 00:00:37 ; elapsed = 00:00:38 . Memory (MB): peak = 2605.859 ; gain = 795.953 ; free physical = 5232 ; free virtual = 53557
+Finished Constraint Validation : Time (s): cpu = 00:00:33 ; elapsed = 00:00:33 . Memory (MB): peak = 2597.332 ; gain = 791.359 ; free physical = 5277 ; free virtual = 53139
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Loading Part and Timing Information
 ---------------------------------------------------------------------------------
 Loading part: xc7z020clg400-1
 ---------------------------------------------------------------------------------
-Finished Loading Part and Timing Information : Time (s): cpu = 00:00:37 ; elapsed = 00:00:38 . Memory (MB): peak = 2613.828 ; gain = 803.922 ; free physical = 5232 ; free virtual = 53557
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:33 ; elapsed = 00:00:33 . Memory (MB): peak = 2605.301 ; gain = 799.328 ; free physical = 5277 ; free virtual = 53139
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Applying 'set_property' XDC Constraints
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:38 ; elapsed = 00:00:38 . Memory (MB): peak = 2613.828 ; gain = 803.922 ; free physical = 5234 ; free virtual = 53558
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:34 ; elapsed = 00:00:34 . Memory (MB): peak = 2605.301 ; gain = 799.328 ; free physical = 5279 ; free virtual = 53141
 ---------------------------------------------------------------------------------
 INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'core_group'
 INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'core_group__parameterized3'
@@ -422,7 +422,7 @@ INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 
 ---------------------------------------------------------------------------------------------------
 INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'event_router_ng'
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:40 ; elapsed = 00:00:41 . Memory (MB): peak = 2613.828 ; gain = 803.922 ; free physical = 5235 ; free virtual = 53560
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:36 ; elapsed = 00:00:36 . Memory (MB): peak = 2605.301 ; gain = 799.328 ; free physical = 5266 ; free virtual = 53131
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start RTL Component Statistics 
@@ -435,8 +435,7 @@ Detailed RTL Component Info :
 	   3 Input   17 Bit       Adders := 5     
 	   2 Input   16 Bit       Adders := 5     
 	   3 Input   16 Bit       Adders := 10    
-	   2 Input   11 Bit       Adders := 1     
-	   2 Input   10 Bit       Adders := 2     
+	   2 Input   12 Bit       Adders := 2     
 	   2 Input    9 Bit       Adders := 15    
 	   2 Input    8 Bit       Adders := 26    
 	   2 Input    7 Bit       Adders := 5     
@@ -452,8 +451,8 @@ Detailed RTL Component Info :
 	               24 Bit    Registers := 5     
 	               21 Bit    Registers := 1     
 	               18 Bit    Registers := 1     
-	               11 Bit    Registers := 3     
-	               10 Bit    Registers := 1     
+	               12 Bit    Registers := 1     
+	               11 Bit    Registers := 2     
 	                9 Bit    Registers := 5     
 	                8 Bit    Registers := 202   
 	                7 Bit    Registers := 7     
@@ -461,11 +460,11 @@ Detailed RTL Component Info :
 	                5 Bit    Registers := 13    
 	                4 Bit    Registers := 5     
 	                3 Bit    Registers := 18    
-	                1 Bit    Registers := 74    
+	                1 Bit    Registers := 73    
 +---RAMs : 
 	             576K Bit	(65536 X 9 bit)          RAMs := 4     
 	             336K Bit	(16384 X 21 bit)          RAMs := 1     
-	              19K Bit	(1024 X 19 bit)          RAMs := 1     
+	              76K Bit	(4096 X 19 bit)          RAMs := 1     
 	               6K Bit	(256 X 24 bit)          RAMs := 4     
 	               2K Bit	(256 X 9 bit)          RAMs := 1     
 	               1K Bit	(64 X 17 bit)          RAMs := 5     
@@ -541,7 +540,7 @@ WARNING: [Synth 8-7129] Port weight_src_id[6] in module core_group__parameterize
 WARNING: [Synth 8-7129] Port weight_src_id[5] in module core_group__parameterized3 is either unconnected or has no load
 WARNING: [Synth 8-7129] Port weight_src_id[4] in module core_group__parameterized3 is either unconnected or has no load
 ---------------------------------------------------------------------------------
-Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:01:16 ; elapsed = 00:01:17 . Memory (MB): peak = 2613.828 ; gain = 803.922 ; free physical = 5258 ; free virtual = 53598
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:01:13 ; elapsed = 00:01:13 . Memory (MB): peak = 2623.324 ; gain = 817.352 ; free physical = 5380 ; free virtual = 53258
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start ROM, RAM, DSP, Shift Register and Retiming Reporting
@@ -551,9 +550,13 @@ Block RAM: Preliminary Mapping Report (see note below)
 +---------------------+----------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
 |Module Name          | RTL Object           | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | 
 +---------------------+----------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|core_group:          | weight_mem_reg       | 64 K x 9(READ_FIRST)   | W |   | 64 K x 9(WRITE_FIRST)  |   | R | Port A and B     | 0      | 18     | 
 |core_group:          | neuron_state_mem_reg | 256 x 24(READ_FIRST)   | W |   | 256 x 24(WRITE_FIRST)  |   | R | Port A and B     | 1      | 0      | 
+|core_group:          | weight_mem_reg       | 64 K x 9(READ_FIRST)   | W |   | 64 K x 9(WRITE_FIRST)  |   | R | Port A and B     | 0      | 18     | 
 |core_group:          | neuron_state_mem_reg | 256 x 24(READ_FIRST)   | W |   | 256 x 24(WRITE_FIRST)  |   | R | Port A and B     | 1      | 0      | 
+|core_group:          | weight_mem_reg       | 64 K x 9(READ_FIRST)   | W |   | 64 K x 9(WRITE_FIRST)  |   | R | Port A and B     | 0      | 18     | 
 |core_group:          | neuron_state_mem_reg | 256 x 24(READ_FIRST)   | W |   | 256 x 24(WRITE_FIRST)  |   | R | Port A and B     | 1      | 0      | 
+|core_group:          | weight_mem_reg       | 64 K x 9(READ_FIRST)   | W |   | 64 K x 9(WRITE_FIRST)  |   | R | Port A and B     | 0      | 18     | 
 |core_group:          | neuron_state_mem_reg | 256 x 24(READ_FIRST)   | W |   | 256 x 24(WRITE_FIRST)  |   | R | Port A and B     | 1      | 0      | 
 |u_connectivity_table | conn_mem_reg         | 16 K x 21(READ_FIRST)  | W |   | 16 K x 21(WRITE_FIRST) |   | R | Port A and B     | 1      | 10     | 
 +---------------------+----------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
@@ -570,7 +573,7 @@ Distributed RAM: Preliminary Mapping Report (see note below)
 |core_group:                       | spike_fifo_reg         | Implied   | 64 x 17              | RAM64M x 6    | 
 |\gen_core_groups[4].u_core_group  | spike_fifo_reg         | Implied   | 64 x 17              | RAM64M x 6    | 
 |\gen_core_groups[4].u_core_group  | neuron_state_mem_reg   | Implied   | 16 x 24              | RAM32M x 4    | 
-|snn_core_group_top                | spike_out_fifo_mem_reg | Implied   | 1 K x 19             | RAM64M x 112  | 
+|snn_core_group_top                | spike_out_fifo_mem_reg | Implied   | 4 K x 19             | RAM64M x 448  | 
 +----------------------------------+------------------------+-----------+----------------------+---------------+
 
 Note: The table above is a preliminary report that shows the Distributed RAMs at the current stage of the synthesis flow. Some Distributed RAMs may be reimplemented as non Distributed RAM primitives later in the synthesis flow. Multiple instantiated RAMs are reported only once.
@@ -581,13 +584,13 @@ Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
 Start Applying XDC Timing Constraints
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Applying XDC Timing Constraints : Time (s): cpu = 00:01:24 ; elapsed = 00:01:25 . Memory (MB): peak = 2613.828 ; gain = 803.922 ; free physical = 5245 ; free virtual = 53586
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:01:20 ; elapsed = 00:01:21 . Memory (MB): peak = 2631.324 ; gain = 825.352 ; free physical = 5383 ; free virtual = 53260
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Timing Optimization
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Timing Optimization : Time (s): cpu = 00:01:34 ; elapsed = 00:01:35 . Memory (MB): peak = 2691.836 ; gain = 881.930 ; free physical = 5185 ; free virtual = 53525
+Finished Timing Optimization : Time (s): cpu = 00:01:32 ; elapsed = 00:01:33 . Memory (MB): peak = 2735.840 ; gain = 929.867 ; free physical = 5245 ; free virtual = 53123
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start ROM, RAM, DSP, Shift Register and Retiming Reporting
@@ -597,8 +600,11 @@ Block RAM: Final Mapping Report
 +---------------------+----------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
 |Module Name          | RTL Object           | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | 
 +---------------------+----------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|core_group:          | weight_mem_reg       | 64 K x 9(READ_FIRST)   | W |   | 64 K x 9(WRITE_FIRST)  |   | R | Port A and B     | 0      | 18     | 
 |core_group:          | neuron_state_mem_reg | 256 x 24(READ_FIRST)   | W |   | 256 x 24(WRITE_FIRST)  |   | R | Port A and B     | 1      | 0      | 
+|core_group:          | weight_mem_reg       | 64 K x 9(READ_FIRST)   | W |   | 64 K x 9(WRITE_FIRST)  |   | R | Port A and B     | 0      | 18     | 
 |core_group:          | neuron_state_mem_reg | 256 x 24(READ_FIRST)   | W |   | 256 x 24(WRITE_FIRST)  |   | R | Port A and B     | 1      | 0      | 
+|core_group:          | weight_mem_reg       | 64 K x 9(READ_FIRST)   | W |   | 64 K x 9(WRITE_FIRST)  |   | R | Port A and B     | 0      | 18     | 
 |core_group:          | neuron_state_mem_reg | 256 x 24(READ_FIRST)   | W |   | 256 x 24(WRITE_FIRST)  |   | R | Port A and B     | 1      | 0      | 
 |core_group:          | neuron_state_mem_reg | 256 x 24(READ_FIRST)   | W |   | 256 x 24(WRITE_FIRST)  |   | R | Port A and B     | 1      | 0      | 
 |u_connectivity_table | conn_mem_reg         | 16 K x 21(READ_FIRST)  | W |   | 16 K x 21(WRITE_FIRST) |   | R | Port A and B     | 1      | 10     | 
@@ -615,7 +621,7 @@ Distributed RAM: Final Mapping Report
 |core_group:                       | spike_fifo_reg         | Implied   | 64 x 17              | RAM64M x 6    | 
 |\gen_core_groups[4].u_core_group  | spike_fifo_reg         | Implied   | 64 x 17              | RAM64M x 6    | 
 |\gen_core_groups[4].u_core_group  | neuron_state_mem_reg   | Implied   | 16 x 24              | RAM32M x 4    | 
-|snn_core_group_top                | spike_out_fifo_mem_reg | Implied   | 1 K x 19             | RAM64M x 112  | 
+|snn_core_group_top                | spike_out_fifo_mem_reg | Implied   | 4 K x 19             | RAM64M x 448  | 
 +----------------------------------+------------------------+-----------+----------------------+---------------+
 
 ---------------------------------------------------------------------------------
@@ -624,12 +630,36 @@ Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
 ---------------------------------------------------------------------------------
 Start Technology Mapping
 ---------------------------------------------------------------------------------
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[0].u_core_group/weight_mem_reg_1_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[0].u_core_group/weight_mem_reg_1_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[0].u_core_group/weight_mem_reg_1_2 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[0].u_core_group/weight_mem_reg_1_3 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[0].u_core_group/weight_mem_reg_1_4 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[0].u_core_group/weight_mem_reg_1_5 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[0].u_core_group/weight_mem_reg_1_6 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[0].u_core_group/weight_mem_reg_1_7 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 INFO: [Synth 8-7052] The timing for the instance gen_core_groups[0].u_core_group/neuron_state_mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[1].u_core_group/weight_mem_reg_1_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[1].u_core_group/weight_mem_reg_1_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[1].u_core_group/weight_mem_reg_1_2 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[1].u_core_group/weight_mem_reg_1_3 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[1].u_core_group/weight_mem_reg_1_4 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[1].u_core_group/weight_mem_reg_1_5 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[1].u_core_group/weight_mem_reg_1_6 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[1].u_core_group/weight_mem_reg_1_7 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 INFO: [Synth 8-7052] The timing for the instance gen_core_groups[1].u_core_group/neuron_state_mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[2].u_core_group/weight_mem_reg_1_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[2].u_core_group/weight_mem_reg_1_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[2].u_core_group/weight_mem_reg_1_2 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[2].u_core_group/weight_mem_reg_1_3 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[2].u_core_group/weight_mem_reg_1_4 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[2].u_core_group/weight_mem_reg_1_5 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[2].u_core_group/weight_mem_reg_1_6 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_core_groups[2].u_core_group/weight_mem_reg_1_7 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 INFO: [Synth 8-7052] The timing for the instance gen_core_groups[2].u_core_group/neuron_state_mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 INFO: [Synth 8-7052] The timing for the instance gen_core_groups[3].u_core_group/neuron_state_mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 ---------------------------------------------------------------------------------
-Finished Technology Mapping : Time (s): cpu = 00:01:39 ; elapsed = 00:01:40 . Memory (MB): peak = 2737.836 ; gain = 927.930 ; free physical = 5134 ; free virtual = 53474
+Finished Technology Mapping : Time (s): cpu = 00:01:37 ; elapsed = 00:01:39 . Memory (MB): peak = 2751.855 ; gain = 945.883 ; free physical = 5237 ; free virtual = 53115
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start IO Insertion
@@ -647,37 +677,37 @@ Start Final Netlist Cleanup
 Finished Final Netlist Cleanup
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished IO Insertion : Time (s): cpu = 00:01:44 ; elapsed = 00:01:46 . Memory (MB): peak = 2814.648 ; gain = 1004.742 ; free physical = 5063 ; free virtual = 53403
+Finished IO Insertion : Time (s): cpu = 00:01:43 ; elapsed = 00:01:44 . Memory (MB): peak = 2842.668 ; gain = 1036.695 ; free physical = 5156 ; free virtual = 53034
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Instances
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Instances : Time (s): cpu = 00:01:44 ; elapsed = 00:01:46 . Memory (MB): peak = 2814.648 ; gain = 1004.742 ; free physical = 5063 ; free virtual = 53403
+Finished Renaming Generated Instances : Time (s): cpu = 00:01:43 ; elapsed = 00:01:44 . Memory (MB): peak = 2842.668 ; gain = 1036.695 ; free physical = 5156 ; free virtual = 53034
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Rebuilding User Hierarchy
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Rebuilding User Hierarchy : Time (s): cpu = 00:01:45 ; elapsed = 00:01:47 . Memory (MB): peak = 2814.648 ; gain = 1004.742 ; free physical = 5055 ; free virtual = 53395
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:01:44 ; elapsed = 00:01:45 . Memory (MB): peak = 2842.668 ; gain = 1036.695 ; free physical = 5147 ; free virtual = 53025
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Ports
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Ports : Time (s): cpu = 00:01:45 ; elapsed = 00:01:47 . Memory (MB): peak = 2814.648 ; gain = 1004.742 ; free physical = 5055 ; free virtual = 53395
+Finished Renaming Generated Ports : Time (s): cpu = 00:01:44 ; elapsed = 00:01:45 . Memory (MB): peak = 2842.668 ; gain = 1036.695 ; free physical = 5147 ; free virtual = 53025
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:01:46 ; elapsed = 00:01:47 . Memory (MB): peak = 2818.617 ; gain = 1008.711 ; free physical = 5063 ; free virtual = 53403
+Finished Handling Custom Attributes : Time (s): cpu = 00:01:44 ; elapsed = 00:01:46 . Memory (MB): peak = 2848.605 ; gain = 1042.633 ; free physical = 5139 ; free virtual = 53019
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Nets
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Nets : Time (s): cpu = 00:01:46 ; elapsed = 00:01:47 . Memory (MB): peak = 2818.617 ; gain = 1008.711 ; free physical = 5063 ; free virtual = 53403
+Finished Renaming Generated Nets : Time (s): cpu = 00:01:44 ; elapsed = 00:01:46 . Memory (MB): peak = 2848.605 ; gain = 1042.633 ; free physical = 5139 ; free virtual = 53019
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Writing Synthesis Report
@@ -721,51 +751,51 @@ Report Cell Usage:
 |15    |design_1_processing_system7_0             |     1|
 |16    |design_1_snn_config_regs_0                |     1|
 |17    |design_1_snn_top_hls_0                    |     1|
-|18    |CARRY4                                    |   184|
-|19    |LUT1                                      |   144|
-|20    |LUT2                                      |   431|
-|21    |LUT3                                      |   309|
-|22    |LUT4                                      |   416|
-|23    |LUT5                                      |  1131|
-|24    |LUT6                                      |  2383|
-|25    |MUXF7                                     |   422|
-|26    |MUXF8                                     |   115|
+|18    |CARRY4                                    |   191|
+|19    |LUT1                                      |   134|
+|20    |LUT2                                      |   468|
+|21    |LUT3                                      |   340|
+|22    |LUT4                                      |   523|
+|23    |LUT5                                      |   860|
+|24    |LUT6                                      |  3443|
+|25    |MUXF7                                     |   533|
+|26    |MUXF8                                     |   166|
 |27    |RAM32M                                    |     4|
-|28    |RAM64M                                    |   126|
-|29    |RAM64X1D                                  |    16|
+|28    |RAM64M                                    |   414|
+|29    |RAM64X1D                                  |    64|
 |30    |RAMB18E1                                  |     5|
-|32    |RAMB36E1                                  |    10|
-|33    |FDRE                                      |  2187|
-|34    |FDSE                                      |    40|
-|35    |OBUF                                      |     1|
+|32    |RAMB36E1                                  |    58|
+|35    |FDRE                                      |  2378|
+|36    |FDSE                                      |    40|
+|37    |OBUF                                      |     1|
 +------+------------------------------------------+------+
 ---------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): cpu = 00:01:46 ; elapsed = 00:01:47 . Memory (MB): peak = 2818.617 ; gain = 1008.711 ; free physical = 5063 ; free virtual = 53403
+Finished Writing Synthesis Report : Time (s): cpu = 00:01:44 ; elapsed = 00:01:46 . Memory (MB): peak = 2848.605 ; gain = 1042.633 ; free physical = 5139 ; free virtual = 53019
 ---------------------------------------------------------------------------------
 Synthesis finished with 0 errors, 0 critical warnings and 32 warnings.
-Synthesis Optimization Runtime : Time (s): cpu = 00:01:41 ; elapsed = 00:01:43 . Memory (MB): peak = 2818.617 ; gain = 938.844 ; free physical = 5055 ; free virtual = 53395
-Synthesis Optimization Complete : Time (s): cpu = 00:01:46 ; elapsed = 00:01:47 . Memory (MB): peak = 2818.625 ; gain = 1008.711 ; free physical = 5055 ; free virtual = 53395
+Synthesis Optimization Runtime : Time (s): cpu = 00:01:40 ; elapsed = 00:01:42 . Memory (MB): peak = 2848.605 ; gain = 980.766 ; free physical = 5134 ; free virtual = 53014
+Synthesis Optimization Complete : Time (s): cpu = 00:01:45 ; elapsed = 00:01:46 . Memory (MB): peak = 2848.613 ; gain = 1042.633 ; free physical = 5134 ; free virtual = 53014
 INFO: [Project 1-571] Translating synthesized netlist
-Netlist sorting complete. Time (s): cpu = 00:00:00.09 ; elapsed = 00:00:00.09 . Memory (MB): peak = 2818.625 ; gain = 0.000 ; free physical = 5225 ; free virtual = 53565
-INFO: [Netlist 29-17] Analyzing 882 Unisim elements for replacement
+Netlist sorting complete. Time (s): cpu = 00:00:00.12 ; elapsed = 00:00:00.11 . Memory (MB): peak = 2848.613 ; gain = 0.000 ; free physical = 5303 ; free virtual = 53183
+INFO: [Netlist 29-17] Analyzing 1435 Unisim elements for replacement
 INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
 INFO: [Project 1-570] Preparing netlist for logic optimization
 INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.01 . Memory (MB): peak = 2877.613 ; gain = 0.000 ; free physical = 5213 ; free virtual = 53555
+Netlist sorting complete. Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00 . Memory (MB): peak = 2904.633 ; gain = 0.000 ; free physical = 5306 ; free virtual = 53184
 INFO: [Project 1-111] Unisim Transformation Summary:
-  A total of 146 instances were transformed.
+  A total of 482 instances were transformed.
   RAM32M => RAM32M (RAMD32(x6), RAMS32(x2)): 4 instances
-  RAM64M => RAM64M (RAMD64E(x4)): 126 instances
-  RAM64X1D => RAM64X1D (RAMD64E(x2)): 16 instances
+  RAM64M => RAM64M (RAMD64E(x4)): 414 instances
+  RAM64X1D => RAM64X1D (RAMD64E(x2)): 64 instances
 
-Synth Design complete | Checksum: 5ef5347a
+Synth Design complete | Checksum: 49004c93
 INFO: [Common 17-83] Releasing license: Synthesis
-119 Infos, 141 Warnings, 0 Critical Warnings and 0 Errors encountered.
+143 Infos, 141 Warnings, 0 Critical Warnings and 0 Errors encountered.
 synth_design completed successfully
-synth_design: Time (s): cpu = 00:02:04 ; elapsed = 00:02:01 . Memory (MB): peak = 2877.648 ; gain = 1259.836 ; free physical = 5212 ; free virtual = 53554
-INFO: [Common 17-2834] synth_design peak Physical Memory [PSS] (MB): overall = 2136.171; main = 1985.289; forked = 283.302
-INFO: [Common 17-2834] synth_design peak Virtual Memory [VSS] (MB): overall = 3724.289; main = 2877.617; forked = 986.449
-Write ShapeDB Complete: Time (s): cpu = 00:00:00.05 ; elapsed = 00:00:00.02 . Memory (MB): peak = 2901.625 ; gain = 0.000 ; free physical = 5213 ; free virtual = 53555
+synth_design: Time (s): cpu = 00:02:02 ; elapsed = 00:01:59 . Memory (MB): peak = 2904.668 ; gain = 1290.789 ; free physical = 5298 ; free virtual = 53178
+INFO: [Common 17-2834] synth_design peak Physical Memory [PSS] (MB): overall = 2141.714; main = 2002.041; forked = 282.321
+INFO: [Common 17-2834] synth_design peak Virtual Memory [VSS] (MB): overall = 3738.309; main = 2904.637; forked = 986.449
+Write ShapeDB Complete: Time (s): cpu = 00:00:00.07 ; elapsed = 00:00:00.02 . Memory (MB): peak = 2928.645 ; gain = 0.000 ; free physical = 5296 ; free virtual = 53177
 INFO: [Common 17-1381] The checkpoint '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_conv_cifar10/snn_core_group_conv_cifar10.runs/synth_1/snn_core_group_top.dcp' has been generated.
 INFO: [Vivado 12-24828] Executing command : report_utilization -file snn_core_group_top_utilization_synth.rpt -pb snn_core_group_top_utilization_synth.pb
-INFO: [Common 17-206] Exiting Vivado at Mon Nov  9 05:41:02 2026...
+INFO: [Common 17-206] Exiting Vivado at Mon Nov  9 19:39:45 2026...
