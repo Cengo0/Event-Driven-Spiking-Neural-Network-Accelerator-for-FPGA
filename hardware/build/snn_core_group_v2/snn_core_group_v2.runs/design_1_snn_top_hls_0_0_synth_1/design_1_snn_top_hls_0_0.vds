@@ -3,8 +3,8 @@
 # SW Build 6299465 on Fri Nov 14 12:34:56 MST 2025
 # IP Build 6300035 on Fri Nov 14 10:48:45 MST 2025
 # SharedData Build 6298862 on Thu Nov 13 04:50:51 MST 2025
-# Start of session at: Sun Sep 20 03:12:12 2026
-# Process ID         : 1911225
+# Start of session at: Tue Nov 10 14:39:45 2026
+# Process ID         : 2969609
 # Current directory  : /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/design_1_snn_top_hls_0_0_synth_1
 # Command line       : vivado -log design_1_snn_top_hls_0_0.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source design_1_snn_top_hls_0_0.tcl
 # Log file           : /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/design_1_snn_top_hls_0_0_synth_1/design_1_snn_top_hls_0_0.vds
@@ -13,16 +13,16 @@
 # Platform           : Ubuntu
 # Operating System   : Ubuntu 22.04.5 LTS
 # Processor Detail   : Intel(R) Xeon(R) CPU E5-2620 v4 @ 2.10GHz
-# CPU Frequency      : 1576.876 MHz
+# CPU Frequency      : 2301.376 MHz
 # CPU Physical cores : 8
 # CPU Logical cores  : 16
 # Host memory        : 67332 MB
 # Swap memory        : 2147 MB
 # Total Virtual      : 69479 MB
-# Available Virtual  : 50598 MB
+# Available Virtual  : 52633 MB
 #-----------------------------------------------------------
 source design_1_snn_top_hls_0_0.tcl -notrace
-create_project: Time (s): cpu = 00:00:26 ; elapsed = 00:00:07 . Memory (MB): peak = 1619.391 ; gain = 64.055 ; free physical = 12393 ; free virtual = 46522
+create_project: Time (s): cpu = 00:00:26 ; elapsed = 00:00:08 . Memory (MB): peak = 1575.016 ; gain = 98.055 ; free physical = 20729 ; free virtual = 48599
 INFO: [IP_Flow 19-234] Refreshing IP repositories
 INFO: [IP_Flow 19-1700] Loaded user IP repository '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_output/hls/impl/ip'.
 INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/home/chipwisperer/AMD/2025.2/data/ip'.
@@ -33,94 +33,94 @@ INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7z020
 INFO: [Device 21-403] Loading part xc7z020clg400-1
 INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 7 processes.
 INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
-INFO: [Synth 8-7075] Helper process launched with PID 1911560
+INFO: [Synth 8-7075] Helper process launched with PID 2969772
 ---------------------------------------------------------------------------------
-Starting RTL Elaboration : Time (s): cpu = 00:00:07 ; elapsed = 00:00:08 . Memory (MB): peak = 2240.242 ; gain = 483.961 ; free physical = 8999 ; free virtual = 43129
+Starting RTL Elaboration : Time (s): cpu = 00:00:09 ; elapsed = 00:00:09 . Memory (MB): peak = 2239.992 ; gain = 483.273 ; free physical = 16901 ; free virtual = 44775
 ---------------------------------------------------------------------------------
 INFO: [Synth 8-6157] synthesizing module 'design_1_snn_top_hls_0_0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ip/design_1_snn_top_hls_0_0/synth/design_1_snn_top_hls_0_0.v:53]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_pre_eligibility_RAM_2P_LUTRAM_1R1W' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_pre_eligibility_RAM_2P_LUTRAM_1R1W.v:7]
-INFO: [Synth 8-3876] $readmem data file './snn_top_hls_pre_eligibility_RAM_2P_LUTRAM_1R1W.dat' is read successfully [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_pre_eligibility_RAM_2P_LUTRAM_1R1W.v:31]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_pre_eligibility_RAM_2P_LUTRAM_1R1W' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_pre_eligibility_RAM_2P_LUTRAM_1R1W.v:7]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_p_ZL17encoder_phase_acc_0_RAM_2P_LUTRAM_1R1W' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_p_ZL17encoder_phase_acc_0_RAM_2P_LUTRAM_1R1W.v:7]
-INFO: [Synth 8-3876] $readmem data file './snn_top_hls_p_ZL17encoder_phase_acc_0_RAM_2P_LUTRAM_1R1W.dat' is read successfully [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_p_ZL17encoder_phase_acc_0_RAM_2P_LUTRAM_1R1W.v:31]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_p_ZL17encoder_phase_acc_0_RAM_2P_LUTRAM_1R1W' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_p_ZL17encoder_phase_acc_0_RAM_2P_LUTRAM_1R1W.v:7]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_weight_memory_RAM_T2P_BRAM_3R2W' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_weight_memory_RAM_T2P_BRAM_3R2W.v:7]
-INFO: [Synth 8-3876] $readmem data file './snn_top_hls_weight_memory_RAM_T2P_BRAM_3R2W.dat' is read successfully [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_weight_memory_RAM_T2P_BRAM_3R2W.v:46]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_weight_memory_RAM_T2P_BRAM_3R2W' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_weight_memory_RAM_T2P_BRAM_3R2W.v:7]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_p_ZL13encoder_frame_0_RAM_AUTO_1R1W' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_p_ZL13encoder_frame_0_RAM_AUTO_1R1W.v:7]
-INFO: [Synth 8-3876] $readmem data file './snn_top_hls_p_ZL13encoder_frame_0_RAM_AUTO_1R1W.dat' is read successfully [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_p_ZL13encoder_frame_0_RAM_AUTO_1R1W.v:34]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_p_ZL13encoder_frame_0_RAM_AUTO_1R1W' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_p_ZL13encoder_frame_0_RAM_AUTO_1R1W.v:7]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_RESET_ELIG' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_RESET_ELIG.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_flow_control_loop_pipe_sequential_init' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_flow_control_loop_pipe_sequential_init.v:11]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_flow_control_loop_pipe_sequential_init' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_flow_control_loop_pipe_sequential_init.v:11]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_RESET_ELIG' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_RESET_ELIG.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_RESET_TRACES' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_RESET_TRACES.v:9]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_RESET_TRACES' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_RESET_TRACES.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_RESET_ENCODER' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_RESET_ENCODER.v:9]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_RESET_ENCODER' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_RESET_ENCODER.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_INIT_WEIGHT' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_INIT_WEIGHT.v:9]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_INIT_WEIGHT' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_INIT_WEIGHT.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_LOAD_FRAME' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_LOAD_FRAME.v:9]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_LOAD_FRAME' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_LOAD_FRAME.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_decay_all_traces' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_decay_all_traces.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_decay_all_traces_Pipeline_DECAY_PRE_TRACE' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_decay_all_traces_Pipeline_DECAY_PRE_TRACE.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_mul_8ns_8ns_16_3_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_mul_8ns_8ns_16_3_1.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_mul_8ns_8ns_16_3_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_mul_8ns_8ns_16_3_1.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_decay_all_traces_Pipeline_DECAY_PRE_TRACE' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_decay_all_traces_Pipeline_DECAY_PRE_TRACE.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_decay_all_traces_Pipeline_DECAY_POST_TRACE' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_decay_all_traces_Pipeline_DECAY_POST_TRACE.v:9]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_decay_all_traces_Pipeline_DECAY_POST_TRACE' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_decay_all_traces_Pipeline_DECAY_POST_TRACE.v:9]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_decay_all_traces' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_decay_all_traces.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_WEIGHT_SUM' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_WEIGHT_SUM.v:9]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_WEIGHT_SUM' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_WEIGHT_SUM.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_ENCODER_LOOP' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_ENCODER_LOOP.v:9]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_ENCODER_LOOP' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_ENCODER_LOOP.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_process_pre_spike_aer' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_process_pre_spike_aer.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_process_pre_spike_aer_Pipeline_LTD_LOOP' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_process_pre_spike_aer_Pipeline_LTD_LOOP.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_mul_4ns_8ns_12_3_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_mul_4ns_8ns_12_3_1.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_mul_4ns_8ns_12_3_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_mul_4ns_8ns_12_3_1.v:5]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_mul_12ns_16s_28_4_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_mul_12ns_16s_28_4_1.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_mul_12ns_16s_28_4_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_mul_12ns_16s_28_4_1.v:5]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_mul_12s_16s_28_4_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_mul_12s_16s_28_4_1.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_mul_12s_16s_28_4_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_mul_12s_16s_28_4_1.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_process_pre_spike_aer_Pipeline_LTD_LOOP' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_process_pre_spike_aer_Pipeline_LTD_LOOP.v:9]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_process_pre_spike_aer' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_process_pre_spike_aer.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_process_post_spike_aer' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_process_post_spike_aer.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_process_post_spike_aer_Pipeline_LTP_LOOP' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_process_post_spike_aer_Pipeline_LTP_LOOP.v:9]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_process_post_spike_aer_Pipeline_LTP_LOOP' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_process_post_spike_aer_Pipeline_LTP_LOOP.v:9]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_process_post_spike_aer' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_process_post_spike_aer.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_apply_rstdp_reward' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_apply_rstdp_reward.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_mul_8s_8s_16_3_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_mul_8s_8s_16_3_1.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_mul_8s_8s_16_3_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_mul_8s_8s_16_3_1.v:5]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_sparsemux_9_3_7_1_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_sparsemux_9_3_7_1_1.v:8]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_sparsemux_9_3_7_1_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_sparsemux_9_3_7_1_1.v:8]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_mul_7s_16s_23_3_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_mul_7s_16s_23_3_1.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_mul_7s_16s_23_3_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_mul_7s_16s_23_3_1.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_sparsemux_7_2_2_1_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_sparsemux_7_2_2_1_1.v:8]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_sparsemux_7_2_2_1_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_sparsemux_7_2_2_1_1.v:8]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_apply_rstdp_reward' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_apply_rstdp_reward.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_decay_eligibility_traces' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_decay_eligibility_traces.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_PRE' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_PRE.v:9]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_PRE' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_PRE.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_POST' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_POST.v:9]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_POST' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_POST.v:9]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_decay_eligibility_traces' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_decay_eligibility_traces.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_ctrl_s_axi' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_ctrl_s_axi.v:9]
-INFO: [Synth 8-155] case statement is not full and has no default [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_ctrl_s_axi.v:311]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_ctrl_s_axi' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_ctrl_s_axi.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_fifo_w41_d32_A' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_fifo_w41_d32_A.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_fifo_w41_d32_A_ram' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_fifo_w41_d32_A.v:184]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_fifo_w41_d32_A_ram' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_fifo_w41_d32_A.v:184]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_fifo_w41_d32_A' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_fifo_w41_d32_A.v:9]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_regslice_both' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_regslice_both.v:8]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_regslice_both' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_regslice_both.v:8]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_regslice_both__parameterized0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_regslice_both.v:8]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_regslice_both__parameterized0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_regslice_both.v:8]
-INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_regslice_both__parameterized1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_regslice_both.v:8]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_regslice_both__parameterized1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_regslice_both.v:8]
-INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_pre_eligibility_RAM_2P_LUTRAM_1R1W' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_pre_eligibility_RAM_2P_LUTRAM_1R1W.v:7]
+INFO: [Synth 8-3876] $readmem data file './snn_top_hls_pre_eligibility_RAM_2P_LUTRAM_1R1W.dat' is read successfully [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_pre_eligibility_RAM_2P_LUTRAM_1R1W.v:31]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_pre_eligibility_RAM_2P_LUTRAM_1R1W' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_pre_eligibility_RAM_2P_LUTRAM_1R1W.v:7]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_p_ZL17encoder_phase_acc_0_RAM_2P_LUTRAM_1R1W' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_p_ZL17encoder_phase_acc_0_RAM_2P_LUTRAM_1R1W.v:7]
+INFO: [Synth 8-3876] $readmem data file './snn_top_hls_p_ZL17encoder_phase_acc_0_RAM_2P_LUTRAM_1R1W.dat' is read successfully [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_p_ZL17encoder_phase_acc_0_RAM_2P_LUTRAM_1R1W.v:31]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_p_ZL17encoder_phase_acc_0_RAM_2P_LUTRAM_1R1W' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_p_ZL17encoder_phase_acc_0_RAM_2P_LUTRAM_1R1W.v:7]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_weight_memory_RAM_T2P_BRAM_3R2W' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_weight_memory_RAM_T2P_BRAM_3R2W.v:7]
+INFO: [Synth 8-3876] $readmem data file './snn_top_hls_weight_memory_RAM_T2P_BRAM_3R2W.dat' is read successfully [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_weight_memory_RAM_T2P_BRAM_3R2W.v:46]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_weight_memory_RAM_T2P_BRAM_3R2W' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_weight_memory_RAM_T2P_BRAM_3R2W.v:7]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_p_ZL13encoder_frame_0_RAM_AUTO_1R1W' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_p_ZL13encoder_frame_0_RAM_AUTO_1R1W.v:7]
+INFO: [Synth 8-3876] $readmem data file './snn_top_hls_p_ZL13encoder_frame_0_RAM_AUTO_1R1W.dat' is read successfully [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_p_ZL13encoder_frame_0_RAM_AUTO_1R1W.v:34]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_p_ZL13encoder_frame_0_RAM_AUTO_1R1W' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_p_ZL13encoder_frame_0_RAM_AUTO_1R1W.v:7]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_RESET_ELIG' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_RESET_ELIG.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_flow_control_loop_pipe_sequential_init' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_flow_control_loop_pipe_sequential_init.v:11]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_flow_control_loop_pipe_sequential_init' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_flow_control_loop_pipe_sequential_init.v:11]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_RESET_ELIG' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_RESET_ELIG.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_RESET_TRACES' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_RESET_TRACES.v:9]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_RESET_TRACES' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_RESET_TRACES.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_RESET_ENCODER' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_RESET_ENCODER.v:9]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_RESET_ENCODER' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_RESET_ENCODER.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_INIT_WEIGHT' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_INIT_WEIGHT.v:9]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_INIT_WEIGHT' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_INIT_WEIGHT.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_LOAD_FRAME' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_LOAD_FRAME.v:9]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_LOAD_FRAME' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_LOAD_FRAME.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_decay_all_traces' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_decay_all_traces.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_decay_all_traces_Pipeline_DECAY_PRE_TRACE' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_decay_all_traces_Pipeline_DECAY_PRE_TRACE.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_mul_8ns_8ns_16_3_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_mul_8ns_8ns_16_3_1.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_mul_8ns_8ns_16_3_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_mul_8ns_8ns_16_3_1.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_decay_all_traces_Pipeline_DECAY_PRE_TRACE' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_decay_all_traces_Pipeline_DECAY_PRE_TRACE.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_decay_all_traces_Pipeline_DECAY_POST_TRACE' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_decay_all_traces_Pipeline_DECAY_POST_TRACE.v:9]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_decay_all_traces_Pipeline_DECAY_POST_TRACE' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_decay_all_traces_Pipeline_DECAY_POST_TRACE.v:9]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_decay_all_traces' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_decay_all_traces.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_WEIGHT_SUM' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_WEIGHT_SUM.v:9]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_WEIGHT_SUM' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_WEIGHT_SUM.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_ENCODER_LOOP' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_ENCODER_LOOP.v:9]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_snn_top_hls_Pipeline_ENCODER_LOOP' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_snn_top_hls_Pipeline_ENCODER_LOOP.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_process_pre_spike_aer' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_process_pre_spike_aer.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_process_pre_spike_aer_Pipeline_LTD_LOOP' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_process_pre_spike_aer_Pipeline_LTD_LOOP.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_mul_4ns_8ns_12_3_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_mul_4ns_8ns_12_3_1.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_mul_4ns_8ns_12_3_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_mul_4ns_8ns_12_3_1.v:5]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_mul_12ns_16s_28_4_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_mul_12ns_16s_28_4_1.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_mul_12ns_16s_28_4_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_mul_12ns_16s_28_4_1.v:5]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_mul_12s_16s_28_4_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_mul_12s_16s_28_4_1.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_mul_12s_16s_28_4_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_mul_12s_16s_28_4_1.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_process_pre_spike_aer_Pipeline_LTD_LOOP' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_process_pre_spike_aer_Pipeline_LTD_LOOP.v:9]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_process_pre_spike_aer' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_process_pre_spike_aer.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_process_post_spike_aer' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_process_post_spike_aer.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_process_post_spike_aer_Pipeline_LTP_LOOP' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_process_post_spike_aer_Pipeline_LTP_LOOP.v:9]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_process_post_spike_aer_Pipeline_LTP_LOOP' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_process_post_spike_aer_Pipeline_LTP_LOOP.v:9]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_process_post_spike_aer' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_process_post_spike_aer.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_apply_rstdp_reward' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_apply_rstdp_reward.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_mul_8s_8s_16_3_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_mul_8s_8s_16_3_1.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_mul_8s_8s_16_3_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_mul_8s_8s_16_3_1.v:5]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_sparsemux_9_3_7_1_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_sparsemux_9_3_7_1_1.v:8]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_sparsemux_9_3_7_1_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_sparsemux_9_3_7_1_1.v:8]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_mul_7s_16s_23_3_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_mul_7s_16s_23_3_1.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_mul_7s_16s_23_3_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_mul_7s_16s_23_3_1.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_sparsemux_7_2_2_1_1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_sparsemux_7_2_2_1_1.v:8]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_sparsemux_7_2_2_1_1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_sparsemux_7_2_2_1_1.v:8]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_apply_rstdp_reward' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_apply_rstdp_reward.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_decay_eligibility_traces' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_decay_eligibility_traces.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_PRE' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_PRE.v:9]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_PRE' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_PRE.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_POST' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_POST.v:9]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_POST' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_decay_eligibility_traces_Pipeline_DECAY_POST.v:9]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_decay_eligibility_traces' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_decay_eligibility_traces.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_ctrl_s_axi' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_ctrl_s_axi.v:9]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_ctrl_s_axi.v:311]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_ctrl_s_axi' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_ctrl_s_axi.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_fifo_w41_d32_A' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_fifo_w41_d32_A.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_fifo_w41_d32_A_ram' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_fifo_w41_d32_A.v:184]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_fifo_w41_d32_A_ram' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_fifo_w41_d32_A.v:184]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_fifo_w41_d32_A' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_fifo_w41_d32_A.v:9]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_regslice_both' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_regslice_both.v:8]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_regslice_both' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_regslice_both.v:8]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_regslice_both__parameterized0' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_regslice_both.v:8]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_regslice_both__parameterized0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_regslice_both.v:8]
+INFO: [Synth 8-6157] synthesizing module 'snn_top_hls_regslice_both__parameterized1' [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_regslice_both.v:8]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls_regslice_both__parameterized1' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_regslice_both.v:8]
+INFO: [Synth 8-6155] done synthesizing module 'snn_top_hls' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls.v:9]
 INFO: [Synth 8-6155] done synthesizing module 'design_1_snn_top_hls_0_0' (0#1) [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ip/design_1_snn_top_hls_0_0/synth/design_1_snn_top_hls_0_0.v:53]
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
@@ -129,7 +129,7 @@ INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' throug
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
-INFO: [Synth 8-6014] Unused sequential element int_ap_done_reg was removed.  [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_ctrl_s_axi.v:438]
+INFO: [Synth 8-6014] Unused sequential element int_ap_done_reg was removed.  [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_ctrl_s_axi.v:438]
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
 INFO: [Synth 8-7129] Port AWADDR[1] in module snn_top_hls_ctrl_s_axi is either unconnected or has no load
 INFO: [Synth 8-7129] Port AWADDR[0] in module snn_top_hls_ctrl_s_axi is either unconnected or has no load
@@ -155,18 +155,18 @@ INFO: [Synth 8-7129] Port reset in module snn_top_hls_weight_memory_RAM_T2P_BRAM
 INFO: [Synth 8-7129] Port reset in module snn_top_hls_p_ZL17encoder_phase_acc_0_RAM_2P_LUTRAM_1R1W is either unconnected or has no load
 INFO: [Synth 8-7129] Port reset in module snn_top_hls_pre_eligibility_RAM_2P_LUTRAM_1R1W is either unconnected or has no load
 ---------------------------------------------------------------------------------
-Finished RTL Elaboration : Time (s): cpu = 00:00:12 ; elapsed = 00:00:13 . Memory (MB): peak = 2407.180 ; gain = 650.898 ; free physical = 8830 ; free virtual = 42963
+Finished RTL Elaboration : Time (s): cpu = 00:00:14 ; elapsed = 00:00:15 . Memory (MB): peak = 2400.930 ; gain = 644.211 ; free physical = 16493 ; free virtual = 44373
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:13 ; elapsed = 00:00:13 . Memory (MB): peak = 2416.086 ; gain = 659.805 ; free physical = 8807 ; free virtual = 42940
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:15 ; elapsed = 00:00:15 . Memory (MB): peak = 2409.836 ; gain = 653.117 ; free physical = 16543 ; free virtual = 44423
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:13 ; elapsed = 00:00:13 . Memory (MB): peak = 2416.086 ; gain = 659.805 ; free physical = 8807 ; free virtual = 42940
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:15 ; elapsed = 00:00:15 . Memory (MB): peak = 2409.836 ; gain = 653.117 ; free physical = 16548 ; free virtual = 44428
 ---------------------------------------------------------------------------------
-Netlist sorting complete. Time (s): cpu = 00:00:00.09 ; elapsed = 00:00:00.1 . Memory (MB): peak = 2416.086 ; gain = 0.000 ; free physical = 8768 ; free virtual = 42901
+Netlist sorting complete. Time (s): cpu = 00:00:00.11 ; elapsed = 00:00:00.12 . Memory (MB): peak = 2409.836 ; gain = 0.000 ; free physical = 16548 ; free virtual = 44430
 INFO: [Project 1-570] Preparing netlist for logic optimization
 
 Processing XDC Constraints
@@ -177,33 +177,33 @@ Parsing XDC File [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-N
 Finished Parsing XDC File [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/design_1_snn_top_hls_0_0_synth_1/dont_touch.xdc]
 Completed Processing XDC Constraints
 
-Netlist sorting complete. Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00 . Memory (MB): peak = 2507.855 ; gain = 0.000 ; free physical = 8586 ; free virtual = 42722
+Netlist sorting complete. Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00.01 . Memory (MB): peak = 2511.574 ; gain = 0.000 ; free physical = 16522 ; free virtual = 44403
 INFO: [Project 1-111] Unisim Transformation Summary:
 No Unisim elements were transformed.
 
-Constraint Validation Runtime : Time (s): cpu = 00:00:00.25 ; elapsed = 00:00:00.12 . Memory (MB): peak = 2507.891 ; gain = 0.000 ; free physical = 8575 ; free virtual = 42711
+Constraint Validation Runtime : Time (s): cpu = 00:00:00.26 ; elapsed = 00:00:00.12 . Memory (MB): peak = 2511.609 ; gain = 0.000 ; free physical = 16414 ; free virtual = 44295
 INFO: [Designutils 20-5008] Incremental synthesis strategy off
 ---------------------------------------------------------------------------------
-Finished Constraint Validation : Time (s): cpu = 00:00:26 ; elapsed = 00:00:26 . Memory (MB): peak = 2507.891 ; gain = 751.609 ; free physical = 8414 ; free virtual = 42554
+Finished Constraint Validation : Time (s): cpu = 00:00:30 ; elapsed = 00:00:30 . Memory (MB): peak = 2511.609 ; gain = 754.891 ; free physical = 16569 ; free virtual = 44454
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Loading Part and Timing Information
 ---------------------------------------------------------------------------------
 Loading part: xc7z020clg400-1
 ---------------------------------------------------------------------------------
-Finished Loading Part and Timing Information : Time (s): cpu = 00:00:26 ; elapsed = 00:00:26 . Memory (MB): peak = 2515.859 ; gain = 759.578 ; free physical = 8414 ; free virtual = 42554
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:30 ; elapsed = 00:00:30 . Memory (MB): peak = 2519.578 ; gain = 762.859 ; free physical = 16569 ; free virtual = 44455
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Applying 'set_property' XDC Constraints
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:26 ; elapsed = 00:00:26 . Memory (MB): peak = 2515.859 ; gain = 759.578 ; free physical = 8410 ; free virtual = 42550
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:30 ; elapsed = 00:00:30 . Memory (MB): peak = 2519.578 ; gain = 762.859 ; free physical = 16569 ; free virtual = 44455
 ---------------------------------------------------------------------------------
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
-INFO: [Synth 8-3936] Found unconnected internal register 'widx_1_reg_637_reg' and it is trimmed from '33' to '17' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_process_pre_spike_aer_Pipeline_LTD_LOOP.v:641]
+INFO: [Synth 8-3936] Found unconnected internal register 'widx_1_reg_637_reg' and it is trimmed from '33' to '17' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_process_pre_spike_aer_Pipeline_LTD_LOOP.v:641]
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
@@ -212,7 +212,7 @@ INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' throug
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
-INFO: [Synth 8-3936] Found unconnected internal register 'widx_2_reg_743_reg' and it is trimmed from '63' to '17' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER.v:469]
+INFO: [Synth 8-3936] Found unconnected internal register 'widx_2_reg_743_reg' and it is trimmed from '63' to '17' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER.v:469]
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
@@ -223,7 +223,7 @@ INFO: [Synth 8-802] inferred FSM for state register 'rstate_reg' in module 'snn_
 INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'snn_top_hls_regslice_both'
 INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'snn_top_hls_regslice_both__parameterized0'
 INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'snn_top_hls_regslice_both__parameterized1'
-INFO: [Synth 8-3936] Found unconnected internal register 'w_pkt_data_reg_3252_reg' and it is trimmed from '32' to '28' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls.v:3021]
+INFO: [Synth 8-3936] Found unconnected internal register 'w_pkt_data_reg_3517_reg' and it is trimmed from '32' to '28' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls.v:3124]
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
 INFO: [Synth 8-4490] FSM extraction disabled for register 'ap_CS_fsm_reg' through user attribute
@@ -278,7 +278,7 @@ INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 
 ---------------------------------------------------------------------------------------------------
 INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'snn_top_hls_regslice_both__parameterized1'
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:30 ; elapsed = 00:00:30 . Memory (MB): peak = 2515.859 ; gain = 759.578 ; free physical = 8394 ; free virtual = 42535
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:34 ; elapsed = 00:00:34 . Memory (MB): peak = 2519.578 ; gain = 762.859 ; free physical = 16510 ; free virtual = 44405
 ---------------------------------------------------------------------------------
 INFO: [Synth 8-223] decloning instance 'inst/regslice_both_m_axis_spikes_V_keep_V_U' (snn_top_hls_regslice_both__parameterized0) to 'inst/regslice_both_m_axis_spikes_V_strb_V_U'
 INFO: [Synth 8-223] decloning instance 'inst/regslice_both_m_axis_weights_V_keep_V_U' (snn_top_hls_regslice_both__parameterized0) to 'inst/regslice_both_m_axis_weights_V_strb_V_U'
@@ -306,19 +306,19 @@ Detailed RTL Component Info :
 	   3 Input    8 Bit       Adders := 4     
 	   2 Input    7 Bit       Adders := 1     
 	   2 Input    6 Bit       Adders := 2     
-	   2 Input    5 Bit       Adders := 2     
+	   2 Input    5 Bit       Adders := 3     
 	   2 Input    4 Bit       Adders := 4     
-	   2 Input    2 Bit       Adders := 3     
+	   2 Input    2 Bit       Adders := 4     
 +---XORs : 
-	   2 Input      1 Bit         XORs := 31    
+	   2 Input      1 Bit         XORs := 32    
 +---Registers : 
 	               45 Bit    Registers := 1     
 	               41 Bit    Registers := 1     
-	               33 Bit    Registers := 1     
-	               32 Bit    Registers := 31    
+	               33 Bit    Registers := 2     
+	               32 Bit    Registers := 30    
 	               28 Bit    Registers := 5     
 	               23 Bit    Registers := 1     
-	               18 Bit    Registers := 3     
+	               18 Bit    Registers := 2     
 	               17 Bit    Registers := 24    
 	               16 Bit    Registers := 26    
 	               15 Bit    Registers := 2     
@@ -326,40 +326,40 @@ Detailed RTL Component Info :
 	               13 Bit    Registers := 3     
 	               12 Bit    Registers := 3     
 	               11 Bit    Registers := 1     
-	               10 Bit    Registers := 36    
+	               10 Bit    Registers := 38    
 	                9 Bit    Registers := 12    
-	                8 Bit    Registers := 52    
+	                8 Bit    Registers := 53    
 	                7 Bit    Registers := 3     
 	                6 Bit    Registers := 4     
-	                5 Bit    Registers := 5     
+	                5 Bit    Registers := 6     
 	                4 Bit    Registers := 45    
 	                3 Bit    Registers := 2     
-	                2 Bit    Registers := 51    
-	                1 Bit    Registers := 396   
+	                2 Bit    Registers := 52    
+	                1 Bit    Registers := 405   
 +---RAMs : 
 	             272K Bit	(69632 X 4 bit)          RAMs := 1     
 	               3K Bit	(392 X 8 bit)          RAMs := 2     
 	               1K Bit	(31 X 41 bit)          RAMs := 1     
 +---Muxes : 
+	   2 Input   33 Bit        Muxes := 2     
 	   2 Input   32 Bit        Muxes := 9     
 	   2 Input   31 Bit        Muxes := 1     
-	   2 Input   30 Bit        Muxes := 1     
-	   3 Input   29 Bit        Muxes := 1     
-	   2 Input   29 Bit        Muxes := 2     
+	   3 Input   30 Bit        Muxes := 1     
+	   2 Input   30 Bit        Muxes := 2     
+	   2 Input   26 Bit        Muxes := 1     
 	   2 Input   25 Bit        Muxes := 1     
-	   2 Input   24 Bit        Muxes := 1     
-	   3 Input   22 Bit        Muxes := 1     
+	   2 Input   23 Bit        Muxes := 3     
 	   2 Input   21 Bit        Muxes := 2     
 	   2 Input   20 Bit        Muxes := 2     
-	   2 Input   19 Bit        Muxes := 1     
-	   2 Input   18 Bit        Muxes := 3     
+	   2 Input   19 Bit        Muxes := 2     
+	   2 Input   18 Bit        Muxes := 2     
 	   2 Input   17 Bit        Muxes := 5     
 	   3 Input   17 Bit        Muxes := 2     
 	   2 Input   16 Bit        Muxes := 11    
 	   2 Input   13 Bit        Muxes := 1     
-	   2 Input   10 Bit        Muxes := 27    
+	   2 Input   10 Bit        Muxes := 31    
 	   2 Input    9 Bit        Muxes := 9     
-	   2 Input    8 Bit        Muxes := 40    
+	   2 Input    8 Bit        Muxes := 43    
 	   3 Input    7 Bit        Muxes := 1     
 	   2 Input    7 Bit        Muxes := 1     
 	   3 Input    6 Bit        Muxes := 2     
@@ -373,7 +373,7 @@ Detailed RTL Component Info :
 	   4 Input    2 Bit        Muxes := 118   
 	   2 Input    2 Bit        Muxes := 315   
 	   5 Input    2 Bit        Muxes := 4     
-	   2 Input    1 Bit        Muxes := 318   
+	   2 Input    1 Bit        Muxes := 323   
 ---------------------------------------------------------------------------------
 Finished RTL Component Statistics 
 ---------------------------------------------------------------------------------
@@ -401,10 +401,10 @@ DSP Report: register grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36/mul_8n
 DSP Report: register grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36/mul_8ns_8ns_16_3_1_U21/buff0_reg is absorbed into DSP grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36/mul_8ns_8ns_16_3_1_U21/buff0_reg.
 DSP Report: register grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36/mul_8ns_8ns_16_3_1_U21/buff0_reg is absorbed into DSP grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36/mul_8ns_8ns_16_3_1_U21/buff0_reg.
 DSP Report: operator grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36/mul_8ns_8ns_16_3_1_U21/tmp_product is absorbed into DSP grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36/mul_8ns_8ns_16_3_1_U21/buff0_reg.
-INFO: [Synth 8-3936] Found unconnected internal register 'grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/mul_12s_16s_28_4_1_U43/buff1_reg' and it is trimmed from '28' to '24' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_mul_12s_16s_28_4_1.v:71]
-INFO: [Synth 8-3936] Found unconnected internal register 'grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/mul_12s_16s_28_4_1_U43/buff0_reg' and it is trimmed from '28' to '24' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_mul_12s_16s_28_4_1.v:65]
-INFO: [Synth 8-3936] Found unconnected internal register 'grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/sext_ln294_cast_reg_622_reg' and it is trimmed from '28' to '16' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_process_pre_spike_aer_Pipeline_LTD_LOOP.v:639]
-INFO: [Synth 8-3936] Found unconnected internal register 'grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/sext_ln168_cast_reg_627_reg' and it is trimmed from '28' to '16' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_process_pre_spike_aer_Pipeline_LTD_LOOP.v:637]
+INFO: [Synth 8-3936] Found unconnected internal register 'grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/mul_12s_16s_28_4_1_U43/buff1_reg' and it is trimmed from '28' to '24' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_mul_12s_16s_28_4_1.v:71]
+INFO: [Synth 8-3936] Found unconnected internal register 'grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/mul_12s_16s_28_4_1_U43/buff0_reg' and it is trimmed from '28' to '24' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_mul_12s_16s_28_4_1.v:65]
+INFO: [Synth 8-3936] Found unconnected internal register 'grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/sext_ln294_cast_reg_622_reg' and it is trimmed from '28' to '16' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_process_pre_spike_aer_Pipeline_LTD_LOOP.v:639]
+INFO: [Synth 8-3936] Found unconnected internal register 'grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/sext_ln168_cast_reg_627_reg' and it is trimmed from '28' to '16' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_process_pre_spike_aer_Pipeline_LTD_LOOP.v:637]
 DSP Report: Generating DSP grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/mul_12ns_16s_28_4_1_U42/buff1_reg, operation Mode is: (A''*B2)'.
 DSP Report: register grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/mul_4ns_8ns_12_3_1_U41/buff0_reg is absorbed into DSP grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/mul_12ns_16s_28_4_1_U42/buff1_reg.
 DSP Report: register grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/mul_12ns_16s_28_4_1_U42/buff1_reg is absorbed into DSP grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/mul_12ns_16s_28_4_1_U42/buff1_reg.
@@ -425,10 +425,10 @@ DSP Report: register grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/mul_12s_
 DSP Report: register grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/mul_12s_16s_28_4_1_U43/buff1_reg is absorbed into DSP grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/mul_12s_16s_28_4_1_U43/buff1_reg.
 DSP Report: register grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/mul_12s_16s_28_4_1_U43/buff0_reg is absorbed into DSP grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/mul_12s_16s_28_4_1_U43/buff1_reg.
 DSP Report: operator grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/mul_12s_16s_28_4_1_U43/tmp_product is absorbed into DSP grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/mul_12s_16s_28_4_1_U43/buff1_reg.
-INFO: [Synth 8-3936] Found unconnected internal register 'grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/mul_12s_16s_28_4_1_U83/buff1_reg' and it is trimmed from '28' to '24' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_mul_12s_16s_28_4_1.v:71]
-INFO: [Synth 8-3936] Found unconnected internal register 'grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/mul_12s_16s_28_4_1_U83/buff0_reg' and it is trimmed from '28' to '24' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_mul_12s_16s_28_4_1.v:65]
-INFO: [Synth 8-3936] Found unconnected internal register 'grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/sext_ln169_cast_reg_585_reg' and it is trimmed from '28' to '16' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_process_post_spike_aer_Pipeline_LTP_LOOP.v:372]
-INFO: [Synth 8-3936] Found unconnected internal register 'grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/sext_ln381_cast_reg_575_reg' and it is trimmed from '28' to '16' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_process_post_spike_aer_Pipeline_LTP_LOOP.v:373]
+INFO: [Synth 8-3936] Found unconnected internal register 'grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/mul_12s_16s_28_4_1_U83/buff1_reg' and it is trimmed from '28' to '24' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_mul_12s_16s_28_4_1.v:71]
+INFO: [Synth 8-3936] Found unconnected internal register 'grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/mul_12s_16s_28_4_1_U83/buff0_reg' and it is trimmed from '28' to '24' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_mul_12s_16s_28_4_1.v:65]
+INFO: [Synth 8-3936] Found unconnected internal register 'grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/sext_ln169_cast_reg_585_reg' and it is trimmed from '28' to '16' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_process_post_spike_aer_Pipeline_LTP_LOOP.v:372]
+INFO: [Synth 8-3936] Found unconnected internal register 'grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/sext_ln381_cast_reg_575_reg' and it is trimmed from '28' to '16' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_process_post_spike_aer_Pipeline_LTP_LOOP.v:373]
 DSP Report: Generating DSP grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/mul_12ns_16s_28_4_1_U82/buff1_reg, operation Mode is: (A''*B2)'.
 DSP Report: register grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/mul_12ns_16s_28_4_1_U82/buff1_reg is absorbed into DSP grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/mul_12ns_16s_28_4_1_U82/buff1_reg.
 DSP Report: register grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/mul_12ns_16s_28_4_1_U82/buff1_reg is absorbed into DSP grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/mul_12ns_16s_28_4_1_U82/buff1_reg.
@@ -449,8 +449,8 @@ DSP Report: register grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/mul_12s
 DSP Report: register grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/mul_12s_16s_28_4_1_U83/buff1_reg is absorbed into DSP grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/mul_12s_16s_28_4_1_U83/buff1_reg.
 DSP Report: register grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/mul_12s_16s_28_4_1_U83/buff0_reg is absorbed into DSP grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/mul_12s_16s_28_4_1_U83/buff1_reg.
 DSP Report: operator grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/mul_12s_16s_28_4_1_U83/tmp_product is absorbed into DSP grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/mul_12s_16s_28_4_1_U83/buff1_reg.
-INFO: [Synth 8-3936] Found unconnected internal register 'grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/sext_ln485_cast_reg_733_reg' and it is trimmed from '16' to '8' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER.v:468]
-INFO: [Synth 8-3936] Found unconnected internal register 'grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/sext_ln436_cast_reg_728_reg' and it is trimmed from '23' to '16' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/0676/hdl/verilog/snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER.v:467]
+INFO: [Synth 8-3936] Found unconnected internal register 'grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/sext_ln485_cast_reg_733_reg' and it is trimmed from '16' to '8' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER.v:468]
+INFO: [Synth 8-3936] Found unconnected internal register 'grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/sext_ln436_cast_reg_728_reg' and it is trimmed from '23' to '16' bits. [/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.gen/sources_1/bd/design_1/ipshared/289d/hdl/verilog/snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER.v:467]
 DSP Report: Generating DSP grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/mul_8s_8s_16_3_1_U118/buff0_reg, operation Mode is: (A2*B'')'.
 DSP Report: register grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/sext_ln485_cast_reg_733_reg is absorbed into DSP grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/mul_8s_8s_16_3_1_U118/buff0_reg.
 DSP Report: register grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/mul_8s_8s_16_3_1_U118/din1_reg_reg is absorbed into DSP grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/mul_8s_8s_16_3_1_U118/buff0_reg.
@@ -487,8 +487,6 @@ INFO: [Synth 8-3332] Sequential element (FSM_sequential_state_reg[1]) is unused 
 INFO: [Synth 8-3332] Sequential element (FSM_sequential_state_reg[0]) is unused and will be removed from module snn_top_hls_regslice_both__parameterized0__2.
 INFO: [Synth 8-3332] Sequential element (FSM_sequential_state_reg[1]) is unused and will be removed from module snn_top_hls_regslice_both__parameterized1__1.
 INFO: [Synth 8-3332] Sequential element (FSM_sequential_state_reg[0]) is unused and will be removed from module snn_top_hls_regslice_both__parameterized1__1.
-INFO: [Synth 8-3332] Sequential element (FSM_sequential_state_reg[1]) is unused and will be removed from module snn_top_hls_regslice_both__parameterized1__2.
-INFO: [Synth 8-3332] Sequential element (FSM_sequential_state_reg[0]) is unused and will be removed from module snn_top_hls_regslice_both__parameterized1__2.
 INFO: [Synth 8-3332] Sequential element (FSM_sequential_state_reg[1]) is unused and will be removed from module snn_top_hls_regslice_both__parameterized1__3.
 INFO: [Synth 8-3332] Sequential element (FSM_sequential_state_reg[0]) is unused and will be removed from module snn_top_hls_regslice_both__parameterized1__3.
 INFO: [Synth 8-3332] Sequential element (FSM_sequential_state_reg[1]) is unused and will be removed from module snn_top_hls_regslice_both__parameterized1__4.
@@ -516,7 +514,7 @@ INFO: [Synth 8-3332] Sequential element (FSM_sequential_state_reg[0]) is unused 
 INFO: [Synth 8-3332] Sequential element (FSM_sequential_state_reg[1]) is unused and will be removed from module snn_top_hls_regslice_both__parameterized1__12.
 INFO: [Synth 8-3332] Sequential element (FSM_sequential_state_reg[0]) is unused and will be removed from module snn_top_hls_regslice_both__parameterized1__12.
 ---------------------------------------------------------------------------------
-Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:49 ; elapsed = 00:00:50 . Memory (MB): peak = 2531.867 ; gain = 775.586 ; free physical = 8137 ; free virtual = 42283
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:58 ; elapsed = 00:00:59 . Memory (MB): peak = 2519.578 ; gain = 762.859 ; free physical = 17262 ; free virtual = 45155
 ---------------------------------------------------------------------------------
  Sort Area is  grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_147/mul_12ns_16s_28_4_1_U82/buff1_reg_a : 0 0 : 1585 1585 : Used 1 time 100
  Sort Area is  grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/mul_12ns_16s_28_4_1_U42/buff1_reg_5 : 0 0 : 1585 1585 : Used 1 time 100
@@ -582,13 +580,13 @@ Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
 Start Applying XDC Timing Constraints
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Applying XDC Timing Constraints : Time (s): cpu = 00:01:01 ; elapsed = 00:01:01 . Memory (MB): peak = 2619.867 ; gain = 863.586 ; free physical = 9565 ; free virtual = 43714
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:01:11 ; elapsed = 00:01:12 . Memory (MB): peak = 2620.578 ; gain = 863.859 ; free physical = 18769 ; free virtual = 46665
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Timing Optimization
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Timing Optimization : Time (s): cpu = 00:01:06 ; elapsed = 00:01:07 . Memory (MB): peak = 2693.492 ; gain = 937.211 ; free physical = 12133 ; free virtual = 46286
+Finished Timing Optimization : Time (s): cpu = 00:01:19 ; elapsed = 00:01:21 . Memory (MB): peak = 2701.203 ; gain = 944.484 ; free physical = 18135 ; free virtual = 46030
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start ROM, RAM, DSP, Shift Register and Retiming Reporting
@@ -643,7 +641,7 @@ INFO: [Synth 8-7052] The timing for the instance inst/p_ZL13encoder_frame_0_U/ra
 INFO: [Synth 8-7052] The timing for the instance inst/p_ZL13encoder_frame_1_U/ram_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 INFO: [Synth 8-7052] The timing for the instance inst/encoder_spikes_fifo_U/U_snn_top_hls_fifo_w41_d32_A_ram/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 ---------------------------------------------------------------------------------
-Finished Technology Mapping : Time (s): cpu = 00:01:11 ; elapsed = 00:01:12 . Memory (MB): peak = 2701.500 ; gain = 945.219 ; free physical = 11953 ; free virtual = 46106
+Finished Technology Mapping : Time (s): cpu = 00:01:24 ; elapsed = 00:01:26 . Memory (MB): peak = 2709.211 ; gain = 952.492 ; free physical = 17203 ; free virtual = 45105
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start IO Insertion
@@ -661,37 +659,37 @@ Start Final Netlist Cleanup
 Finished Final Netlist Cleanup
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished IO Insertion : Time (s): cpu = 00:01:19 ; elapsed = 00:01:20 . Memory (MB): peak = 2840.312 ; gain = 1084.031 ; free physical = 10821 ; free virtual = 44974
+Finished IO Insertion : Time (s): cpu = 00:01:32 ; elapsed = 00:01:35 . Memory (MB): peak = 2848.023 ; gain = 1091.305 ; free physical = 17660 ; free virtual = 45712
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Instances
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Instances : Time (s): cpu = 00:01:19 ; elapsed = 00:01:20 . Memory (MB): peak = 2840.312 ; gain = 1084.031 ; free physical = 10821 ; free virtual = 44973
+Finished Renaming Generated Instances : Time (s): cpu = 00:01:32 ; elapsed = 00:01:35 . Memory (MB): peak = 2848.023 ; gain = 1091.305 ; free physical = 17660 ; free virtual = 45713
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Rebuilding User Hierarchy
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Rebuilding User Hierarchy : Time (s): cpu = 00:01:19 ; elapsed = 00:01:21 . Memory (MB): peak = 2840.312 ; gain = 1084.031 ; free physical = 10723 ; free virtual = 44875
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:01:33 ; elapsed = 00:01:35 . Memory (MB): peak = 2848.023 ; gain = 1091.305 ; free physical = 17665 ; free virtual = 45739
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Ports
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Ports : Time (s): cpu = 00:01:20 ; elapsed = 00:01:21 . Memory (MB): peak = 2840.312 ; gain = 1084.031 ; free physical = 10713 ; free virtual = 44866
+Finished Renaming Generated Ports : Time (s): cpu = 00:01:33 ; elapsed = 00:01:35 . Memory (MB): peak = 2848.023 ; gain = 1091.305 ; free physical = 17654 ; free virtual = 45730
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:01:20 ; elapsed = 00:01:21 . Memory (MB): peak = 2844.281 ; gain = 1088.000 ; free physical = 10681 ; free virtual = 44834
+Finished Handling Custom Attributes : Time (s): cpu = 00:01:33 ; elapsed = 00:01:36 . Memory (MB): peak = 2851.992 ; gain = 1095.273 ; free physical = 17619 ; free virtual = 45699
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Nets
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Nets : Time (s): cpu = 00:01:20 ; elapsed = 00:01:21 . Memory (MB): peak = 2844.281 ; gain = 1088.000 ; free physical = 10677 ; free virtual = 44830
+Finished Renaming Generated Nets : Time (s): cpu = 00:01:33 ; elapsed = 00:01:36 . Memory (MB): peak = 2851.992 ; gain = 1095.273 ; free physical = 17619 ; free virtual = 45700
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start ROM, RAM, DSP, Shift Register and Retiming Reporting
@@ -701,19 +699,19 @@ Static Shift Register Report:
 +------------+----------------------------------------------------------------------------------------------------------------------------------------+--------+-------+--------------+--------------------+-------------------+--------+---------+
 |Module Name | RTL Name                                                                                                                               | Length | Width | Reset Signal | Pull out first Reg | Pull out last Reg | SRL16E | SRLC32E | 
 +------------+----------------------------------------------------------------------------------------------------------------------------------------+--------+-------+--------------+--------------------+-------------------+--------+---------+
-|snn_top_hls | grp_decay_all_traces_fu_1327/grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28/pre_traces_addr_reg_164_pp0_iter2_reg_reg[0]          | 3      | 1     | NO           | NO                 | YES               | 1      | 0       | 
-|snn_top_hls | grp_decay_all_traces_fu_1327/grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36/post_traces_addr_reg_164_pp0_iter2_reg_reg[0]        | 3      | 1     | NO           | NO                 | YES               | 1      | 0       | 
-|snn_top_hls | grp_process_pre_spike_aer_fu_1365/grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/weight_memory_addr_reg_667_pp0_iter13_reg_reg[16] | 12     | 17    | NO           | NO                 | YES               | 17     | 0       | 
-|snn_top_hls | grp_process_pre_spike_aer_fu_1365/grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/icmp_ln276_reg_663_pp0_iter13_reg_reg[0]          | 12     | 1     | NO           | NO                 | YES               | 1      | 0       | 
-|snn_top_hls | grp_process_pre_spike_aer_fu_1365/grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/current_w_reg_681_pp0_iter12_reg_reg[3]           | 7      | 4     | NO           | NO                 | YES               | 4      | 0       | 
-|snn_top_hls | grp_process_pre_spike_aer_fu_1365/grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/or_ln168_reg_677_pp0_iter13_reg_reg[0]            | 12     | 1     | NO           | NO                 | YES               | 1      | 0       | 
-|snn_top_hls | grp_process_pre_spike_aer_fu_1365/grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/or_ln163_reg_673_pp0_iter13_reg_reg[0]            | 12     | 1     | NO           | NO                 | YES               | 1      | 0       | 
-|snn_top_hls | grp_process_pre_spike_aer_fu_1365/grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/ap_loop_exit_ready_pp0_iter14_reg_reg             | 13     | 1     | NO           | NO                 | YES               | 1      | 0       | 
-|snn_top_hls | grp_apply_rstdp_reward_fu_1425/grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/weight_memory_addr_reg_773_pp0_iter3_reg_reg[16]     | 3      | 17    | NO           | NO                 | YES               | 17     | 0       | 
-|snn_top_hls | grp_apply_rstdp_reward_fu_1425/grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/weight_memory_addr_reg_773_pp0_iter7_reg_reg[16]     | 4      | 17    | NO           | NO                 | YES               | 17     | 0       | 
-|snn_top_hls | grp_apply_rstdp_reward_fu_1425/grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/icmp_ln457_reg_764_pp0_iter7_reg_reg[0]              | 6      | 1     | NO           | NO                 | YES               | 1      | 0       | 
-|snn_top_hls | grp_apply_rstdp_reward_fu_1425/grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/or_ln168_reg_779_pp0_iter8_reg_reg[0]                | 7      | 1     | NO           | NO                 | YES               | 1      | 0       | 
-|snn_top_hls | grp_apply_rstdp_reward_fu_1425/grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/ap_loop_exit_ready_pp0_iter8_reg_reg                 | 7      | 1     | NO           | NO                 | YES               | 1      | 0       | 
+|snn_top_hls | grp_decay_all_traces_fu_1378/grp_decay_all_traces_Pipeline_DECAY_PRE_TRACE_fu_28/pre_traces_addr_reg_164_pp0_iter2_reg_reg[0]          | 3      | 1     | NO           | NO                 | YES               | 1      | 0       | 
+|snn_top_hls | grp_decay_all_traces_fu_1378/grp_decay_all_traces_Pipeline_DECAY_POST_TRACE_fu_36/post_traces_addr_reg_164_pp0_iter2_reg_reg[0]        | 3      | 1     | NO           | NO                 | YES               | 1      | 0       | 
+|snn_top_hls | grp_process_pre_spike_aer_fu_1416/grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/weight_memory_addr_reg_667_pp0_iter13_reg_reg[16] | 12     | 17    | NO           | NO                 | YES               | 17     | 0       | 
+|snn_top_hls | grp_process_pre_spike_aer_fu_1416/grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/icmp_ln276_reg_663_pp0_iter13_reg_reg[0]          | 12     | 1     | NO           | NO                 | YES               | 1      | 0       | 
+|snn_top_hls | grp_process_pre_spike_aer_fu_1416/grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/current_w_reg_681_pp0_iter12_reg_reg[3]           | 7      | 4     | NO           | NO                 | YES               | 4      | 0       | 
+|snn_top_hls | grp_process_pre_spike_aer_fu_1416/grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/or_ln168_reg_677_pp0_iter13_reg_reg[0]            | 12     | 1     | NO           | NO                 | YES               | 1      | 0       | 
+|snn_top_hls | grp_process_pre_spike_aer_fu_1416/grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/or_ln163_reg_673_pp0_iter13_reg_reg[0]            | 12     | 1     | NO           | NO                 | YES               | 1      | 0       | 
+|snn_top_hls | grp_process_pre_spike_aer_fu_1416/grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151/ap_loop_exit_ready_pp0_iter14_reg_reg             | 13     | 1     | NO           | NO                 | YES               | 1      | 0       | 
+|snn_top_hls | grp_apply_rstdp_reward_fu_1477/grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/weight_memory_addr_reg_773_pp0_iter3_reg_reg[16]     | 3      | 17    | NO           | NO                 | YES               | 17     | 0       | 
+|snn_top_hls | grp_apply_rstdp_reward_fu_1477/grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/weight_memory_addr_reg_773_pp0_iter7_reg_reg[16]     | 4      | 17    | NO           | NO                 | YES               | 17     | 0       | 
+|snn_top_hls | grp_apply_rstdp_reward_fu_1477/grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/icmp_ln457_reg_764_pp0_iter7_reg_reg[0]              | 6      | 1     | NO           | NO                 | YES               | 1      | 0       | 
+|snn_top_hls | grp_apply_rstdp_reward_fu_1477/grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/or_ln168_reg_779_pp0_iter8_reg_reg[0]                | 7      | 1     | NO           | NO                 | YES               | 1      | 0       | 
+|snn_top_hls | grp_apply_rstdp_reward_fu_1477/grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/ap_loop_exit_ready_pp0_iter8_reg_reg                 | 7      | 1     | NO           | NO                 | YES               | 1      | 0       | 
 +------------+----------------------------------------------------------------------------------------------------------------------------------------+--------+-------+--------------+--------------------+-------------------+--------+---------+
 
 ---------------------------------------------------------------------------------
@@ -752,51 +750,51 @@ Report Cell Usage:
 +------+---------+------+
 |1     |CARRY4   |   155|
 |2     |DSP48E1  |    10|
-|6     |LUT1     |    50|
-|7     |LUT2     |   322|
+|6     |LUT1     |    51|
+|7     |LUT2     |   326|
 |8     |LUT3     |   853|
-|9     |LUT4     |   472|
-|10    |LUT5     |   369|
-|11    |LUT6     |   909|
+|9     |LUT4     |   453|
+|10    |LUT5     |   437|
+|11    |LUT6     |   896|
 |12    |MUXF7    |    49|
 |13    |RAM64M   |   178|
 |14    |RAM64X1D |    14|
 |15    |RAMB18E1 |     2|
 |16    |RAMB36E1 |    13|
 |20    |SRL16E   |    64|
-|21    |FDRE     |  2719|
-|22    |FDSE     |    50|
+|21    |FDRE     |  2714|
+|22    |FDSE     |    87|
 +------+---------+------+
 ---------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): cpu = 00:01:20 ; elapsed = 00:01:21 . Memory (MB): peak = 2844.281 ; gain = 1088.000 ; free physical = 10668 ; free virtual = 44821
+Finished Writing Synthesis Report : Time (s): cpu = 00:01:33 ; elapsed = 00:01:36 . Memory (MB): peak = 2851.992 ; gain = 1095.273 ; free physical = 17619 ; free virtual = 45700
 ---------------------------------------------------------------------------------
 Synthesis finished with 0 errors, 0 critical warnings and 0 warnings.
-Synthesis Optimization Runtime : Time (s): cpu = 00:01:15 ; elapsed = 00:01:17 . Memory (MB): peak = 2844.281 ; gain = 996.195 ; free physical = 10637 ; free virtual = 44789
-Synthesis Optimization Complete : Time (s): cpu = 00:01:20 ; elapsed = 00:01:21 . Memory (MB): peak = 2844.289 ; gain = 1088.000 ; free physical = 10637 ; free virtual = 44789
+Synthesis Optimization Runtime : Time (s): cpu = 00:01:28 ; elapsed = 00:01:31 . Memory (MB): peak = 2851.992 ; gain = 993.500 ; free physical = 17580 ; free virtual = 45666
+Synthesis Optimization Complete : Time (s): cpu = 00:01:33 ; elapsed = 00:01:36 . Memory (MB): peak = 2852.000 ; gain = 1095.273 ; free physical = 17580 ; free virtual = 45666
 INFO: [Project 1-571] Translating synthesized netlist
-Netlist sorting complete. Time (s): cpu = 00:00:00.1 ; elapsed = 00:00:00.1 . Memory (MB): peak = 2844.289 ; gain = 0.000 ; free physical = 10477 ; free virtual = 44630
+Netlist sorting complete. Time (s): cpu = 00:00:00.1 ; elapsed = 00:00:00.09 . Memory (MB): peak = 2852.000 ; gain = 0.000 ; free physical = 17691 ; free virtual = 45807
 INFO: [Netlist 29-17] Analyzing 421 Unisim elements for replacement
 INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
 INFO: [Project 1-570] Preparing netlist for logic optimization
 INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2900.309 ; gain = 0.000 ; free physical = 9762 ; free virtual = 43918
+Netlist sorting complete. Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00 . Memory (MB): peak = 2908.020 ; gain = 0.000 ; free physical = 17530 ; free virtual = 45742
 INFO: [Project 1-111] Unisim Transformation Summary:
   A total of 192 instances were transformed.
   RAM64M => RAM64M (RAMD64E(x4)): 178 instances
   RAM64X1D => RAM64X1D (RAMD64E(x2)): 14 instances
 
-Synth Design complete | Checksum: df2a2066
+Synth Design complete | Checksum: 277bf3ee
 INFO: [Common 17-83] Releasing license: Synthesis
-255 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
+253 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
 synth_design completed successfully
-synth_design: Time (s): cpu = 00:01:34 ; elapsed = 00:01:30 . Memory (MB): peak = 2900.344 ; gain = 1280.953 ; free physical = 9517 ; free virtual = 43671
-INFO: [Common 17-2834] synth_design peak Physical Memory [PSS] (MB): overall = 2032.567; main = 1816.610; forked = 235.042
-INFO: [Common 17-2834] synth_design peak Virtual Memory [VSS] (MB): overall = 3826.625; main = 2900.312; forked = 986.309
-Write ShapeDB Complete: Time (s): cpu = 00:00:00.04 ; elapsed = 00:00:00.02 . Memory (MB): peak = 2924.320 ; gain = 0.000 ; free physical = 9502 ; free virtual = 43655
+synth_design: Time (s): cpu = 00:01:48 ; elapsed = 00:01:45 . Memory (MB): peak = 2908.055 ; gain = 1333.039 ; free physical = 17537 ; free virtual = 45755
+INFO: [Common 17-2834] synth_design peak Physical Memory [PSS] (MB): overall = 1911.680; main = 1795.225; forked = 221.732
+INFO: [Common 17-2834] synth_design peak Virtual Memory [VSS] (MB): overall = 3728.664; main = 2908.023; forked = 986.449
+Write ShapeDB Complete: Time (s): cpu = 00:00:00.04 ; elapsed = 00:00:00.01 . Memory (MB): peak = 2932.031 ; gain = 0.000 ; free physical = 17522 ; free virtual = 45740
 INFO: [Common 17-1381] The checkpoint '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/design_1_snn_top_hls_0_0_synth_1/design_1_snn_top_hls_0_0.dcp' has been generated.
-INFO: [Coretcl 2-1648] Added synthesis output to IP cache for IP design_1_snn_top_hls_0_0, cache-ID = 8bc9e235673d8815
-INFO: [Coretcl 2-1174] Renamed 66 cell refs.
-Write ShapeDB Complete: Time (s): cpu = 00:00:00.04 ; elapsed = 00:00:00.02 . Memory (MB): peak = 2924.320 ; gain = 0.000 ; free physical = 9024 ; free virtual = 43186
+INFO: [Coretcl 2-1648] Added synthesis output to IP cache for IP design_1_snn_top_hls_0_0, cache-ID = 6f7562237687bd7c
+INFO: [Coretcl 2-1174] Renamed 67 cell refs.
+Write ShapeDB Complete: Time (s): cpu = 00:00:00.07 ; elapsed = 00:00:00.03 . Memory (MB): peak = 2932.031 ; gain = 0.000 ; free physical = 17371 ; free virtual = 45595
 INFO: [Common 17-1381] The checkpoint '/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/build/snn_core_group_v2/snn_core_group_v2.runs/design_1_snn_top_hls_0_0_synth_1/design_1_snn_top_hls_0_0.dcp' has been generated.
 INFO: [Vivado 12-24828] Executing command : report_utilization -file design_1_snn_top_hls_0_0_utilization_synth.rpt -pb design_1_snn_top_hls_0_0_utilization_synth.pb
-INFO: [Common 17-206] Exiting Vivado at Sun Sep 20 03:13:59 2026...
+INFO: [Common 17-206] Exiting Vivado at Tue Nov 10 14:41:49 2026...

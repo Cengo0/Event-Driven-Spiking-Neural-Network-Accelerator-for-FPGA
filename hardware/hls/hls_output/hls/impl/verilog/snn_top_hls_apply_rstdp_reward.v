@@ -143,7 +143,7 @@ reg   [7:0] pre_elig_reg_605;
 wire    ap_CS_fsm_state4;
 wire   [0:0] icmp_ln446_fu_447_p2;
 reg   [0:0] icmp_ln446_reg_610;
-reg   [0:0] tmp_37_reg_614;
+reg   [0:0] tmp_41_reg_614;
 wire   [16:0] add_ln_fu_493_p3;
 reg   [16:0] add_ln_reg_619;
 wire   [17:0] add_ln451_fu_506_p2;
@@ -196,9 +196,9 @@ reg    pre_eligibility_ce0_local;
 wire   [0:0] icmp_ln419_fu_225_p2;
 wire   [7:0] reward_mag_fu_245_p2;
 wire   [7:0] reward_mag_1_fu_251_p3;
-wire   [1:0] tmp_34_fu_259_p4;
-wire   [2:0] tmp_35_fu_275_p4;
-wire   [3:0] tmp_36_fu_291_p4;
+wire   [1:0] tmp_38_fu_259_p4;
+wire   [2:0] tmp_39_fu_275_p4;
+wire   [3:0] tmp_40_fu_291_p4;
 wire   [0:0] icmp_ln428_fu_301_p2;
 wire   [0:0] icmp_ln426_fu_269_p2;
 wire   [0:0] icmp_ln427_fu_285_p2;
@@ -210,7 +210,7 @@ wire   [1:0] shift_sel_fu_335_p8;
 wire   [11:0] tmp_s_fu_461_p3;
 wire   [15:0] zext_ln451_fu_468_p1;
 wire   [15:0] sf2_fu_472_p3;
-wire   [0:0] tmp_38_fu_486_p3;
+wire   [0:0] tmp_42_fu_486_p3;
 wire   [15:0] select_ln451_1_fu_479_p3;
 wire   [17:0] zext_ln451_2_fu_502_p1;
 reg   [4:0] ap_NS_fsm;
@@ -247,7 +247,7 @@ snn_top_hls_apply_rstdp_reward_Pipeline_RSTDP_INNER grp_apply_rstdp_reward_Pipel
     .empty(tmp_reg_533),
     .learn_weight_ready(learn_weight_ready),
     .pre_id(trunc_ln445_reg_595),
-    .zext_ln176(tmp_37_reg_614),
+    .zext_ln176(tmp_41_reg_614),
     .post_eligibility_address0(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_post_eligibility_address0),
     .post_eligibility_ce0(grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_post_eligibility_ce0),
     .post_eligibility_q0(post_eligibility_q0),
@@ -361,7 +361,7 @@ always @ (posedge ap_clk) begin
         add_ln_reg_619[16 : 4] <= add_ln_fu_493_p3[16 : 4];
         icmp_ln446_reg_610 <= icmp_ln446_fu_447_p2;
         pre_elig_reg_605 <= pre_eligibility_q0;
-        tmp_37_reg_614 <= add_ln444_reg_590[32'd8];
+        tmp_41_reg_614 <= add_ln444_reg_590[32'd8];
     end
 end
 
@@ -586,7 +586,7 @@ assign add_ln444_fu_429_p2 = (ii_reg_179 + select_ln440_reg_556);
 
 assign add_ln451_fu_506_p2 = (select_ln440_1_reg_571 + zext_ln451_2_fu_502_p1);
 
-assign add_ln_fu_493_p3 = {{tmp_38_fu_486_p3}, {select_ln451_1_fu_479_p3}};
+assign add_ln_fu_493_p3 = {{tmp_42_fu_486_p3}, {select_ln451_1_fu_479_p3}};
 
 assign and_ln419_fu_231_p2 = (params_rstdp_enable_val & icmp_ln419_fu_225_p2);
 
@@ -610,11 +610,11 @@ assign grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190_ap_start = grp_apply_r
 
 assign icmp_ln419_fu_225_p2 = ((reward_signal != 8'd0) ? 1'b1 : 1'b0);
 
-assign icmp_ln426_fu_269_p2 = ((tmp_34_fu_259_p4 != 2'd0) ? 1'b1 : 1'b0);
+assign icmp_ln426_fu_269_p2 = ((tmp_38_fu_259_p4 != 2'd0) ? 1'b1 : 1'b0);
 
-assign icmp_ln427_fu_285_p2 = ((tmp_35_fu_275_p4 != 3'd0) ? 1'b1 : 1'b0);
+assign icmp_ln427_fu_285_p2 = ((tmp_39_fu_275_p4 != 3'd0) ? 1'b1 : 1'b0);
 
-assign icmp_ln428_fu_301_p2 = ((tmp_36_fu_291_p4 != 4'd0) ? 1'b1 : 1'b0);
+assign icmp_ln428_fu_301_p2 = ((tmp_40_fu_291_p4 != 4'd0) ? 1'b1 : 1'b0);
 
 assign icmp_ln436_fu_363_p2 = ((c_fu_138 == 2'd2) ? 1'b1 : 1'b0);
 
@@ -670,13 +670,13 @@ assign shift_sel_fu_335_p7 = 'bx;
 
 assign shift_sel_fu_335_p8 = {{icmp_ln426_fu_269_p2}, {and_ln427_fu_321_p2}};
 
-assign tmp_34_fu_259_p4 = {{reward_mag_1_fu_251_p3[7:6]}};
+assign tmp_38_fu_259_p4 = {{reward_mag_1_fu_251_p3[7:6]}};
 
-assign tmp_35_fu_275_p4 = {{reward_mag_1_fu_251_p3[7:5]}};
+assign tmp_39_fu_275_p4 = {{reward_mag_1_fu_251_p3[7:5]}};
 
-assign tmp_36_fu_291_p4 = {{reward_mag_1_fu_251_p3[7:4]}};
+assign tmp_40_fu_291_p4 = {{reward_mag_1_fu_251_p3[7:4]}};
 
-assign tmp_38_fu_486_p3 = select_ln448_reg_561[32'd16];
+assign tmp_42_fu_486_p3 = select_ln448_reg_561[32'd16];
 
 assign tmp_fu_237_p3 = reward_signal[32'd7];
 

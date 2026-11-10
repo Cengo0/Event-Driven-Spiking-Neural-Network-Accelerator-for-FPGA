@@ -123,7 +123,7 @@ wire    ap_CS_fsm_state1;
 wire   [7:0] empty_fu_184_p1;
 reg   [7:0] empty_reg_381;
 reg   [9:0] pre_traces_addr_reg_386;
-reg   [0:0] tmp_29_reg_392;
+reg   [0:0] tmp_33_reg_392;
 reg   [7:0] pre_traces_load_reg_397;
 wire    ap_CS_fsm_state2;
 wire    ap_CS_fsm_state3;
@@ -192,7 +192,7 @@ wire   [7:0] select_ln246_fu_227_p3;
 reg    pre_traces_ce1_local;
 wire   [8:0] zext_ln245_1_fu_206_p1;
 wire   [8:0] new_trace_fu_209_p2;
-wire   [0:0] tmp_28_fu_215_p3;
+wire   [0:0] tmp_32_fu_215_p3;
 wire   [7:0] trunc_ln246_fu_223_p1;
 wire   [9:0] select_ln258_fu_262_p3;
 wire   [0:0] icmp_ln259_1_fu_283_p2;
@@ -237,7 +237,7 @@ snn_top_hls_process_pre_spike_aer_Pipeline_LTD_LOOP grp_process_pre_spike_aer_Pi
     .learn_weight_ready(learn_weight_ready),
     .icmp_ln168(icmp_ln168_reg_417),
     .pre_id(empty_reg_381),
-    .src_group(tmp_29_reg_392),
+    .src_group(tmp_33_reg_392),
     .post_traces_address0(grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151_post_traces_address0),
     .post_traces_ce0(grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151_post_traces_ce0),
     .post_traces_q0(post_traces_q0),
@@ -316,7 +316,7 @@ always @ (posedge ap_clk) begin
     if ((1'b1 == ap_CS_fsm_state1)) begin
         empty_reg_381 <= empty_fu_184_p1;
         pre_traces_addr_reg_386 <= zext_ln245_fu_188_p1;
-        tmp_29_reg_392 <= pre_id[32'd8];
+        tmp_33_reg_392 <= pre_id[32'd8];
     end
 end
 
@@ -630,7 +630,7 @@ assign pre_traces_d1 = select_ln246_fu_227_p3;
 
 assign pre_traces_we1 = pre_traces_we1_local;
 
-assign select_ln246_fu_227_p3 = ((tmp_28_fu_215_p3[0:0] == 1'b1) ? 8'd255 : trunc_ln246_fu_223_p1);
+assign select_ln246_fu_227_p3 = ((tmp_32_fu_215_p3[0:0] == 1'b1) ? 8'd255 : trunc_ln246_fu_223_p1);
 
 assign select_ln258_fu_262_p3 = ((icmp_ln257_fu_256_p2[0:0] == 1'b1) ? 10'd256 : 10'd0);
 
@@ -648,7 +648,7 @@ assign sf_fu_323_p3 = {{local_src_reg_446}, {8'd0}};
 
 assign src_end_fu_270_p3 = ((icmp_ln257_fu_256_p2[0:0] == 1'b1) ? 10'd512 : 10'd256);
 
-assign tmp_28_fu_215_p3 = new_trace_fu_209_p2[32'd8];
+assign tmp_32_fu_215_p3 = new_trace_fu_209_p2[32'd8];
 
 assign tmp_fu_312_p3 = {{local_src_reg_446}, {4'd0}};
 

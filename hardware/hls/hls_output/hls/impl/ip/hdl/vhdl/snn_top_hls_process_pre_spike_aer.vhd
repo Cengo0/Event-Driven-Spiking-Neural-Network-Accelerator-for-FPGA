@@ -104,7 +104,7 @@ attribute shreg_extract : string;
     signal empty_fu_184_p1 : STD_LOGIC_VECTOR (7 downto 0);
     signal empty_reg_381 : STD_LOGIC_VECTOR (7 downto 0);
     signal pre_traces_addr_reg_386 : STD_LOGIC_VECTOR (9 downto 0);
-    signal tmp_29_reg_392 : STD_LOGIC_VECTOR (0 downto 0);
+    signal tmp_33_reg_392 : STD_LOGIC_VECTOR (0 downto 0);
     signal pre_traces_load_reg_397 : STD_LOGIC_VECTOR (7 downto 0);
     signal ap_CS_fsm_state2 : STD_LOGIC;
     attribute fsm_encoding of ap_CS_fsm_state2 : signal is "none";
@@ -178,7 +178,7 @@ attribute shreg_extract : string;
     signal pre_traces_ce1_local : STD_LOGIC;
     signal zext_ln245_1_fu_206_p1 : STD_LOGIC_VECTOR (8 downto 0);
     signal new_trace_fu_209_p2 : STD_LOGIC_VECTOR (8 downto 0);
-    signal tmp_28_fu_215_p3 : STD_LOGIC_VECTOR (0 downto 0);
+    signal tmp_32_fu_215_p3 : STD_LOGIC_VECTOR (0 downto 0);
     signal trunc_ln246_fu_223_p1 : STD_LOGIC_VECTOR (7 downto 0);
     signal select_ln258_fu_262_p3 : STD_LOGIC_VECTOR (9 downto 0);
     signal icmp_ln259_1_fu_283_p2 : STD_LOGIC_VECTOR (0 downto 0);
@@ -266,7 +266,7 @@ begin
         learn_weight_ready => learn_weight_ready,
         icmp_ln168 => icmp_ln168_reg_417,
         pre_id => empty_reg_381,
-        src_group => tmp_29_reg_392,
+        src_group => tmp_33_reg_392,
         post_traces_address0 => grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151_post_traces_address0,
         post_traces_ce0 => grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151_post_traces_ce0,
         post_traces_q0 => post_traces_q0,
@@ -364,7 +364,7 @@ begin
             if ((ap_const_logic_1 = ap_CS_fsm_state1)) then
                 empty_reg_381 <= empty_fu_184_p1;
                 pre_traces_addr_reg_386 <= zext_ln245_fu_188_p1(10 - 1 downto 0);
-                tmp_29_reg_392 <= pre_id(8 downto 8);
+                tmp_33_reg_392 <= pre_id(8 downto 8);
             end if;
         end if;
     end process;
@@ -691,7 +691,7 @@ begin
     end process;
 
     select_ln246_fu_227_p3 <= 
-        ap_const_lv8_FF when (tmp_28_fu_215_p3(0) = '1') else 
+        ap_const_lv8_FF when (tmp_32_fu_215_p3(0) = '1') else 
         trunc_ln246_fu_223_p1;
     select_ln258_fu_262_p3 <= 
         ap_const_lv10_100 when (icmp_ln257_fu_256_p2(0) = '1') else 
@@ -713,7 +713,7 @@ begin
     src_end_fu_270_p3 <= 
         ap_const_lv10_200 when (icmp_ln257_fu_256_p2(0) = '1') else 
         ap_const_lv10_100;
-    tmp_28_fu_215_p3 <= new_trace_fu_209_p2(8 downto 8);
+    tmp_32_fu_215_p3 <= new_trace_fu_209_p2(8 downto 8);
     tmp_fu_312_p3 <= (local_src_reg_446 & ap_const_lv4_0);
     trunc_ln246_fu_223_p1 <= new_trace_fu_209_p2(8 - 1 downto 0);
     weight_memory_address0 <= grp_process_pre_spike_aer_Pipeline_LTD_LOOP_fu_151_weight_memory_address0;

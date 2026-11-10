@@ -74,7 +74,7 @@
 <Name>TIME_LOOP</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:884</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:893</SourceLocation>
 </TIME_LOOP>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>
@@ -84,8 +84,8 @@
 <Resources>
 <BRAM_18K>37</BRAM_18K>
 <DSP>10</DSP>
-<FF>4053</FF>
-<LUT>7891</LUT>
+<FF>4070</FF>
+<LUT>8072</LUT>
 <URAM>0</URAM>
 </Resources>
 <AvailableResources>

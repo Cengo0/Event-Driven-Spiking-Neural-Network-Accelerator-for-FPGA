@@ -115,7 +115,7 @@ reg   [0:0] icmp_ln95_reg_405;
 reg   [0:0] icmp_ln95_reg_405_pp0_iter1_reg;
 reg   [0:0] icmp_ln99_reg_391;
 reg   [0:0] icmp_ln77_reg_442;
-reg   [0:0] tmp_5_reg_446;
+reg   [0:0] tmp_s_reg_446;
 reg    ap_predicate_op70_write_state4;
 reg    ap_block_state4_pp0_stage1_iter1_grp1;
 reg    ap_block_pp0_stage1_subdone;
@@ -300,7 +300,7 @@ always @ (posedge ap_clk) begin
         p_ZL17encoder_phase_acc_1_addr_reg_425 <= zext_ln93_1_fu_245_p1;
         p_ZL17encoder_phase_acc_1_addr_reg_425_pp0_iter1_reg <= p_ZL17encoder_phase_acc_1_addr_reg_425;
         sub_ln79_reg_450 <= sub_ln79_fu_315_p2;
-        tmp_5_reg_446 <= encoder_spikes_full_n;
+        tmp_s_reg_446 <= encoder_spikes_full_n;
     end
 end
 
@@ -361,7 +361,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((1'b0 == ap_block_pp0_stage1_subdone_grp0_done_reg) & (1'b0 == ap_block_pp0_stage1_11001_grp0) & (tmp_5_reg_446 == 1'd1) & (icmp_ln77_reg_442 == 1'd0) & (icmp_ln99_reg_391 == 1'd1) & (icmp_ln95_reg_405_pp0_iter1_reg == 1'd1) & (ap_enable_reg_pp0_iter1 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage1))) begin
+    if (((1'b0 == ap_block_pp0_stage1_subdone_grp0_done_reg) & (1'b0 == ap_block_pp0_stage1_11001_grp0) & (tmp_s_reg_446 == 1'd1) & (icmp_ln77_reg_442 == 1'd0) & (icmp_ln99_reg_391 == 1'd1) & (icmp_ln95_reg_405_pp0_iter1_reg == 1'd1) & (ap_enable_reg_pp0_iter1 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage1))) begin
         encoder_spike_counter_flag_3_out_ap_vld = 1'b1;
     end else begin
         encoder_spike_counter_flag_3_out_ap_vld = 1'b0;
@@ -369,7 +369,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((1'b0 == ap_block_pp0_stage1_grp0) & (tmp_5_reg_446 == 1'd1) & (icmp_ln77_reg_442 == 1'd0) & (icmp_ln99_reg_391 == 1'd1) & (icmp_ln95_reg_405_pp0_iter1_reg == 1'd1) & (ap_enable_reg_pp0_iter1 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage1))) begin
+    if (((1'b0 == ap_block_pp0_stage1_grp0) & (tmp_s_reg_446 == 1'd1) & (icmp_ln77_reg_442 == 1'd0) & (icmp_ln99_reg_391 == 1'd1) & (icmp_ln95_reg_405_pp0_iter1_reg == 1'd1) & (ap_enable_reg_pp0_iter1 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage1))) begin
         encoder_spike_counter_loc_3_out_o = add_ln55_fu_338_p2;
     end else begin
         encoder_spike_counter_loc_3_out_o = encoder_spike_counter_loc_3_out_i;
@@ -377,7 +377,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((1'b0 == ap_block_pp0_stage1_subdone_grp0_done_reg) & (1'b0 == ap_block_pp0_stage1_11001_grp0) & (tmp_5_reg_446 == 1'd1) & (icmp_ln77_reg_442 == 1'd0) & (icmp_ln99_reg_391 == 1'd1) & (icmp_ln95_reg_405_pp0_iter1_reg == 1'd1) & (ap_enable_reg_pp0_iter1 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage1))) begin
+    if (((1'b0 == ap_block_pp0_stage1_subdone_grp0_done_reg) & (1'b0 == ap_block_pp0_stage1_11001_grp0) & (tmp_s_reg_446 == 1'd1) & (icmp_ln77_reg_442 == 1'd0) & (icmp_ln99_reg_391 == 1'd1) & (icmp_ln95_reg_405_pp0_iter1_reg == 1'd1) & (ap_enable_reg_pp0_iter1 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage1))) begin
         encoder_spike_counter_loc_3_out_o_ap_vld = 1'b1;
     end else begin
         encoder_spike_counter_loc_3_out_o_ap_vld = 1'b0;
@@ -385,7 +385,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((1'b0 == ap_block_pp0_stage1_subdone_grp0_done_reg) & (1'b0 == ap_block_pp0_stage1_11001_grp0) & (tmp_5_reg_446 == 1'd1) & (icmp_ln77_reg_442 == 1'd0) & (icmp_ln99_reg_391 == 1'd1) & (icmp_ln95_reg_405_pp0_iter1_reg == 1'd1) & (ap_enable_reg_pp0_iter1 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage1))) begin
+    if (((1'b0 == ap_block_pp0_stage1_subdone_grp0_done_reg) & (1'b0 == ap_block_pp0_stage1_11001_grp0) & (tmp_s_reg_446 == 1'd1) & (icmp_ln77_reg_442 == 1'd0) & (icmp_ln99_reg_391 == 1'd1) & (icmp_ln95_reg_405_pp0_iter1_reg == 1'd1) & (ap_enable_reg_pp0_iter1 == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage1))) begin
         encoder_spike_counter_new_3_out_ap_vld = 1'b1;
     end else begin
         encoder_spike_counter_new_3_out_ap_vld = 1'b0;
@@ -595,7 +595,7 @@ assign ap_enable_pp0 = (ap_idle_pp0 ^ 1'b1);
 assign ap_loop_exit_ready = ap_condition_exit_pp0_iter0_stage1;
 
 always @ (*) begin
-    ap_predicate_op70_write_state4 = ((tmp_5_reg_446 == 1'd1) & (icmp_ln77_reg_442 == 1'd0) & (icmp_ln99_reg_391 == 1'd1) & (icmp_ln95_reg_405_pp0_iter1_reg == 1'd1));
+    ap_predicate_op70_write_state4 = ((tmp_s_reg_446 == 1'd1) & (icmp_ln77_reg_442 == 1'd0) & (icmp_ln99_reg_391 == 1'd1) & (icmp_ln95_reg_405_pp0_iter1_reg == 1'd1));
 end
 
 assign ap_ready = ap_ready_sig;

@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
-| Date         : Sun Sep 20 03:23:51 2026
+| Date         : Tue Nov 10 14:59:33 2026
 | Host         : Mariana running 64-bit Ubuntu 22.04.5 LTS
 | Command      : report_timing_summary -file /home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/outputs_v2/snn_core_group_v2_timing.rpt
 | Design       : snn_core_group_top
@@ -144,7 +144,7 @@ Table of Contents
 
     WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
     -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
-      0.295        0.000                      0                36835        0.008        0.000                      0                36835        3.750        0.000                       0                 12062  
+      0.222        0.000                      0                43138        0.009        0.000                      0                43138        3.750        0.000                       0                 12978  
 
 
 All user specified timing constraints are met.
@@ -167,7 +167,7 @@ clk_fpga_0  {0.000 5.000}      10.000          100.000
 
 Clock             WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
 -----             -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
-clk_fpga_0          0.295        0.000                      0                36643        0.008        0.000                      0                36643        3.750        0.000                       0                 12062  
+clk_fpga_0          0.222        0.000                      0                42946        0.009        0.000                      0                42946        3.750        0.000                       0                 12978  
 
 
 ------------------------------------------------------------------------------------------------
@@ -186,7 +186,7 @@ From Clock    To Clock          WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS
 
 Path Group         From Clock         To Clock               WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints  
 ----------         ----------         --------               -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------  
-**async_default**  clk_fpga_0         clk_fpga_0               6.124        0.000                      0                  192        0.448        0.000                      0                  192  
+**async_default**  clk_fpga_0         clk_fpga_0               6.057        0.000                      0                  192        0.473        0.000                      0                  192  
 
 
 ------------------------------------------------------------------------------------------------
@@ -199,27 +199,27 @@ Path Group         From Clock         To Clock               WNS(ns)      TNS(ns
 From Clock:  clk_fpga_0
   To Clock:  clk_fpga_0
 
-Setup :            0  Failing Endpoints,  Worst Slack        0.295ns,  Total Violation        0.000ns
-Hold  :            0  Failing Endpoints,  Worst Slack        0.008ns,  Total Violation        0.000ns
+Setup :            0  Failing Endpoints,  Worst Slack        0.222ns,  Total Violation        0.000ns
+Hold  :            0  Failing Endpoints,  Worst Slack        0.009ns,  Total Violation        0.000ns
 PW    :            0  Failing Endpoints,  Worst Slack        3.750ns,  Total Violation        0.000ns
 ---------------------------------------------------------------------------------------------------
 
 
 Max Delay Paths
 --------------------------------------------------------------------------------------
-Slack (MET) :             0.295ns  (required time - arrival time)
+Slack (MET) :             0.222ns  (required time - arrival time)
   Source:                 gen_core_groups[1].u_core_group/neuron_state_mem_reg/CLKARDCLK
                             (rising edge-triggered cell RAMB18E1 clocked by clk_fpga_0  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            gen_core_groups[1].u_core_group/ns_din_reg[16]/D
+  Destination:            gen_core_groups[1].u_core_group/ns_din_reg[10]/D
                             (rising edge-triggered cell FDRE clocked by clk_fpga_0  {rise@0.000ns fall@5.000ns period=10.000ns})
   Path Group:             clk_fpga_0
   Path Type:              Setup (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk_fpga_0 rise@10.000ns - clk_fpga_0 rise@0.000ns)
-  Data Path Delay:        9.347ns  (logic 4.721ns (50.510%)  route 4.626ns (49.490%))
+  Data Path Delay:        9.354ns  (logic 4.644ns (49.647%)  route 4.710ns (50.353%))
   Logic Levels:           9  (CARRY4=4 LUT4=1 LUT5=1 LUT6=3)
-  Clock Path Skew:        -0.233ns (DCD - SCD + CPR)
-    Destination Clock Delay (DCD):    2.659ns = ( 12.659 - 10.000 ) 
-    Source Clock Delay      (SCD):    3.006ns
+  Clock Path Skew:        -0.299ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    2.724ns = ( 12.724 - 10.000 ) 
+    Source Clock Delay      (SCD):    3.137ns
     Clock Pessimism Removal (CPR):    0.115ns
   Clock Uncertainty:      0.154ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
     Total System Jitter     (TSJ):    0.071ns
@@ -234,35 +234,35 @@ Slack (MET) :             0.295ns  (required time - arrival time)
     PS7_X0Y0             PS7                          0.000     0.000 r  u_block_design/design_1_i/processing_system7_0/inst/PS7_i/FCLKCLK[0]
                          net (fo=1, routed)           1.193     1.193    u_block_design/design_1_i/processing_system7_0/inst/FCLK_CLK_unbuffered[0]
     BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.101     1.294 r  u_block_design/design_1_i/processing_system7_0/inst/buffer_fclk_clk_0.FCLK_CLK_0_BUFG/O
-                         net (fo=12063, routed)       1.712     3.006    gen_core_groups[1].u_core_group/clk_100mhz
-    RAMB18_X2Y18         RAMB18E1                                     r  gen_core_groups[1].u_core_group/neuron_state_mem_reg/CLKARDCLK
+                         net (fo=12979, routed)       1.843     3.137    gen_core_groups[1].u_core_group/clk_100mhz
+    RAMB18_X4Y19         RAMB18E1                                     r  gen_core_groups[1].u_core_group/neuron_state_mem_reg/CLKARDCLK
   -------------------------------------------------------------------    -------------------
-    RAMB18_X2Y18         RAMB18E1 (Prop_ramb18e1_CLKARDCLK_DOADO[11])
-                                                      2.454     5.460 r  gen_core_groups[1].u_core_group/neuron_state_mem_reg/DOADO[11]
-                         net (fo=15, routed)          1.196     6.656    gen_core_groups[1].u_core_group/mem_rd[3]
-    SLICE_X33Y46         LUT6 (Prop_lut6_I1_O)        0.124     6.780 r  gen_core_groups[1].u_core_group/ns_din[11]_i_29/O
-                         net (fo=2, routed)           0.582     7.362    u_block_design/ns_din_reg[11]_i_18_3
-    SLICE_X34Y47         LUT5 (Prop_lut5_I0_O)        0.124     7.486 r  u_block_design/ns_din[11]_i_21/O
-                         net (fo=2, routed)           0.641     8.127    u_block_design/gen_core_groups[1].u_core_group/leak_primary[1]
-    SLICE_X35Y48         CARRY4 (Prop_carry4_DI[1]_CO[3])
-                                                      0.507     8.634 r  u_block_design/ns_din_reg[11]_i_18/CO[3]
-                         net (fo=1, routed)           0.000     8.634    u_block_design/ns_din_reg[11]_i_18_n_0
-    SLICE_X35Y49         CARRY4 (Prop_carry4_CI_CO[3])
-                                                      0.114     8.748 r  u_block_design/ns_din_reg[15]_i_18/CO[3]
-                         net (fo=1, routed)           0.001     8.749    u_block_design/ns_din_reg[15]_i_18_n_0
-    SLICE_X35Y50         CARRY4 (Prop_carry4_CI_O[1])
-                                                      0.334     9.083 r  u_block_design/ns_din_reg[19]_i_14/O[1]
-                         net (fo=3, routed)           0.760     9.843    u_block_design/neuron_state_mem_reg[9]
-    SLICE_X36Y50         LUT4 (Prop_lut4_I0_O)        0.303    10.146 r  u_block_design/ns_din[23]_i_37__0/O
-                         net (fo=1, routed)           0.000    10.146    u_block_design/ns_din[23]_i_37__0_n_0
-    SLICE_X36Y50         CARRY4 (Prop_carry4_S[0]_CO[3])
-                                                      0.513    10.659 r  u_block_design/ns_din_reg[23]_i_11__0/CO[3]
-                         net (fo=1, routed)           0.883    11.541    gen_core_groups[1].u_core_group/CO[0]
-    SLICE_X37Y50         LUT6 (Prop_lut6_I3_O)        0.124    11.665 f  gen_core_groups[1].u_core_group/ns_din[23]_i_5__0/O
-                         net (fo=16, routed)          0.564    12.229    gen_core_groups[1].u_core_group/ns_din[23]_i_5__0_n_0
-    SLICE_X37Y51         LUT6 (Prop_lut6_I4_O)        0.124    12.353 r  gen_core_groups[1].u_core_group/ns_din[16]_i_1__0/O
-                         net (fo=1, routed)           0.000    12.353    gen_core_groups[1].u_core_group/ns_din__0[16]
-    SLICE_X37Y51         FDRE                                         r  gen_core_groups[1].u_core_group/ns_din_reg[16]/D
+    RAMB18_X4Y19         RAMB18E1 (Prop_ramb18e1_CLKARDCLK_DOBDO[3])
+                                                      2.454     5.591 r  gen_core_groups[1].u_core_group/neuron_state_mem_reg/DOBDO[3]
+                         net (fo=18, routed)          1.457     7.049    gen_core_groups[1].u_core_group/mem_rd[11]
+    SLICE_X83Y49         LUT6 (Prop_lut6_I0_O)        0.124     7.173 r  gen_core_groups[1].u_core_group/ns_din[15]_i_29/O
+                         net (fo=2, routed)           0.595     7.768    u_block_design/ns_din_reg[15]_i_18_3
+    SLICE_X83Y50         LUT5 (Prop_lut5_I1_O)        0.124     7.892 r  u_block_design/ns_din[15]_i_22/O
+                         net (fo=2, routed)           0.612     8.504    u_block_design/gen_core_groups[1].u_core_group/leak_primary[4]
+    SLICE_X82Y52         CARRY4 (Prop_carry4_DI[0]_CO[3])
+                                                      0.550     9.054 r  u_block_design/ns_din_reg[15]_i_18/CO[3]
+                         net (fo=1, routed)           0.000     9.054    u_block_design/ns_din_reg[15]_i_18_n_0
+    SLICE_X82Y53         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117     9.171 r  u_block_design/ns_din_reg[19]_i_14/CO[3]
+                         net (fo=1, routed)           0.000     9.171    u_block_design/ns_din_reg[19]_i_14_n_0
+    SLICE_X82Y54         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.323     9.494 r  u_block_design/ns_din_reg[23]_i_39/O[1]
+                         net (fo=3, routed)           0.721    10.214    u_block_design/neuron_state_mem_reg[13]
+    SLICE_X83Y53         LUT4 (Prop_lut4_I0_O)        0.306    10.520 r  u_block_design/ns_din[23]_i_36__0/O
+                         net (fo=1, routed)           0.000    10.520    u_block_design/ns_din[23]_i_36__0_n_0
+    SLICE_X83Y53         CARRY4 (Prop_carry4_S[2]_CO[3])
+                                                      0.398    10.918 r  u_block_design/ns_din_reg[23]_i_12/CO[3]
+                         net (fo=1, routed)           0.761    11.679    gen_core_groups[1].u_core_group/CO[0]
+    SLICE_X81Y53         LUT6 (Prop_lut6_I5_O)        0.124    11.803 f  gen_core_groups[1].u_core_group/ns_din[23]_i_6__0/O
+                         net (fo=16, routed)          0.564    12.367    gen_core_groups[1].u_core_group/ns_din[23]_i_6__0_n_0
+    SLICE_X81Y55         LUT6 (Prop_lut6_I4_O)        0.124    12.491 r  gen_core_groups[1].u_core_group/ns_din[10]_i_1__0/O
+                         net (fo=1, routed)           0.000    12.491    gen_core_groups[1].u_core_group/ns_din__0[10]
+    SLICE_X81Y55         FDRE                                         r  gen_core_groups[1].u_core_group/ns_din_reg[10]/D
   -------------------------------------------------------------------    -------------------
 
                          (clock clk_fpga_0 rise edge)
@@ -270,16 +270,16 @@ Slack (MET) :             0.295ns  (required time - arrival time)
     PS7_X0Y0             PS7                          0.000    10.000 r  u_block_design/design_1_i/processing_system7_0/inst/PS7_i/FCLKCLK[0]
                          net (fo=1, routed)           1.088    11.088    u_block_design/design_1_i/processing_system7_0/inst/FCLK_CLK_unbuffered[0]
     BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.091    11.179 r  u_block_design/design_1_i/processing_system7_0/inst/buffer_fclk_clk_0.FCLK_CLK_0_BUFG/O
-                         net (fo=12063, routed)       1.480    12.659    gen_core_groups[1].u_core_group/clk_100mhz
-    SLICE_X37Y51         FDRE                                         r  gen_core_groups[1].u_core_group/ns_din_reg[16]/C
-                         clock pessimism              0.115    12.774    
-                         clock uncertainty           -0.154    12.620    
-    SLICE_X37Y51         FDRE (Setup_fdre_C_D)        0.029    12.649    gen_core_groups[1].u_core_group/ns_din_reg[16]
+                         net (fo=12979, routed)       1.545    12.724    gen_core_groups[1].u_core_group/clk_100mhz
+    SLICE_X81Y55         FDRE                                         r  gen_core_groups[1].u_core_group/ns_din_reg[10]/C
+                         clock pessimism              0.115    12.839    
+                         clock uncertainty           -0.154    12.685    
+    SLICE_X81Y55         FDRE (Setup_fdre_C_D)        0.029    12.714    gen_core_groups[1].u_core_group/ns_din_reg[10]
   -------------------------------------------------------------------
-                         required time                         12.649    
-                         arrival time                         -12.353    
+                         required time                         12.714    
+                         arrival time                         -12.491    
   -------------------------------------------------------------------
-                         slack                                  0.295    
+                         slack                                  0.222    
 
 
 
@@ -287,18 +287,18 @@ Slack (MET) :             0.295ns  (required time - arrival time)
 
 Min Delay Paths
 --------------------------------------------------------------------------------------
-Slack (MET) :             0.008ns  (arrival time - required time)
-  Source:                 u_block_design/design_1_i/axi_dma_0/U0/I_PRMRY_DATAMOVER/GEN_S2MM_FULL.I_S2MM_FULL_WRAPPER/I_CMD_STATUS/I_CMD_FIFO/USE_SINGLE_REG.sig_regfifo_dout_reg_reg[60]/C
+Slack (MET) :             0.009ns  (arrival time - required time)
+  Source:                 u_block_design/design_1_i/axi_dma_0/U0/I_PRMRY_DATAMOVER/GEN_S2MM_FULL.I_S2MM_FULL_WRAPPER/I_CMD_STATUS/GEN_INCLUDE_STATUS_FIFO.I_STS_FIFO/USE_SINGLE_REG.sig_regfifo_dout_reg_reg[13]/C
                             (rising edge-triggered cell FDRE clocked by clk_fpga_0  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_block_design/design_1_i/axi_dma_0/U0/I_PRMRY_DATAMOVER/GEN_S2MM_FULL.I_S2MM_FULL_WRAPPER/GEN_INCLUDE_IBTTCC.I_S2MM_MSTR_IBTTCC/sig_input_addr_reg_reg[25]/D
+  Destination:            u_block_design/design_1_i/axi_dma_0/U0/INCLUDE_S2MM_SOF_EOF_GENERATOR.I_S2MM_DMA_MNGR/GEN_S2MM_DMA_CONTROL.I_S2MM_CMDSTS/INDETERMINATE_BTT_MODE.s2mm_brcvd_reg[5]/D
                             (rising edge-triggered cell FDRE clocked by clk_fpga_0  {rise@0.000ns fall@5.000ns period=10.000ns})
   Path Group:             clk_fpga_0
   Path Type:              Hold (Min at Fast Process Corner)
   Requirement:            0.000ns  (clk_fpga_0 rise@0.000ns - clk_fpga_0 rise@0.000ns)
-  Data Path Delay:        0.318ns  (logic 0.141ns (44.376%)  route 0.177ns (55.624%))
-  Logic Levels:           0  
-  Clock Path Skew:        0.262ns (DCD - SCD - CPR)
-    Destination Clock Delay (DCD):    1.187ns
+  Data Path Delay:        0.367ns  (logic 0.186ns (50.653%)  route 0.181ns (49.347%))
+  Logic Levels:           1  (LUT3=1)
+  Clock Path Skew:        0.266ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    1.191ns
     Source Clock Delay      (SCD):    0.895ns
     Clock Pessimism Removal (CPR):    0.030ns
 
@@ -309,12 +309,14 @@ Slack (MET) :             0.008ns  (arrival time - required time)
     PS7_X0Y0             PS7                          0.000     0.000 r  u_block_design/design_1_i/processing_system7_0/inst/PS7_i/FCLKCLK[0]
                          net (fo=1, routed)           0.310     0.310    u_block_design/design_1_i/processing_system7_0/inst/FCLK_CLK_unbuffered[0]
     BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.026     0.336 r  u_block_design/design_1_i/processing_system7_0/inst/buffer_fclk_clk_0.FCLK_CLK_0_BUFG/O
-                         net (fo=12063, routed)       0.559     0.895    u_block_design/design_1_i/axi_dma_0/U0/I_PRMRY_DATAMOVER/GEN_S2MM_FULL.I_S2MM_FULL_WRAPPER/I_CMD_STATUS/I_CMD_FIFO/m_axi_s2mm_aclk
-    SLICE_X52Y49         FDRE                                         r  u_block_design/design_1_i/axi_dma_0/U0/I_PRMRY_DATAMOVER/GEN_S2MM_FULL.I_S2MM_FULL_WRAPPER/I_CMD_STATUS/I_CMD_FIFO/USE_SINGLE_REG.sig_regfifo_dout_reg_reg[60]/C
+                         net (fo=12979, routed)       0.559     0.895    u_block_design/design_1_i/axi_dma_0/U0/I_PRMRY_DATAMOVER/GEN_S2MM_FULL.I_S2MM_FULL_WRAPPER/I_CMD_STATUS/GEN_INCLUDE_STATUS_FIFO.I_STS_FIFO/m_axi_s2mm_aclk
+    SLICE_X51Y49         FDRE                                         r  u_block_design/design_1_i/axi_dma_0/U0/I_PRMRY_DATAMOVER/GEN_S2MM_FULL.I_S2MM_FULL_WRAPPER/I_CMD_STATUS/GEN_INCLUDE_STATUS_FIFO.I_STS_FIFO/USE_SINGLE_REG.sig_regfifo_dout_reg_reg[13]/C
   -------------------------------------------------------------------    -------------------
-    SLICE_X52Y49         FDRE (Prop_fdre_C_Q)         0.141     1.036 r  u_block_design/design_1_i/axi_dma_0/U0/I_PRMRY_DATAMOVER/GEN_S2MM_FULL.I_S2MM_FULL_WRAPPER/I_CMD_STATUS/I_CMD_FIFO/USE_SINGLE_REG.sig_regfifo_dout_reg_reg[60]/Q
-                         net (fo=1, routed)           0.177     1.212    u_block_design/design_1_i/axi_dma_0/U0/I_PRMRY_DATAMOVER/GEN_S2MM_FULL.I_S2MM_FULL_WRAPPER/GEN_INCLUDE_IBTTCC.I_S2MM_MSTR_IBTTCC/Q[50]
-    SLICE_X52Y50         FDRE                                         r  u_block_design/design_1_i/axi_dma_0/U0/I_PRMRY_DATAMOVER/GEN_S2MM_FULL.I_S2MM_FULL_WRAPPER/GEN_INCLUDE_IBTTCC.I_S2MM_MSTR_IBTTCC/sig_input_addr_reg_reg[25]/D
+    SLICE_X51Y49         FDRE (Prop_fdre_C_Q)         0.141     1.036 r  u_block_design/design_1_i/axi_dma_0/U0/I_PRMRY_DATAMOVER/GEN_S2MM_FULL.I_S2MM_FULL_WRAPPER/I_CMD_STATUS/GEN_INCLUDE_STATUS_FIFO.I_STS_FIFO/USE_SINGLE_REG.sig_regfifo_dout_reg_reg[13]/Q
+                         net (fo=1, routed)           0.181     1.217    u_block_design/design_1_i/axi_dma_0/U0/I_PRMRY_DATAMOVER/GEN_S2MM_FULL.I_S2MM_FULL_WRAPPER/I_CMD_STATUS/GEN_INCLUDE_STATUS_FIFO.I_STS_FIFO/m_axis_s2mm_sts_tdata_int[13]
+    SLICE_X49Y50         LUT3 (Prop_lut3_I0_O)        0.045     1.262 r  u_block_design/design_1_i/axi_dma_0/U0/I_PRMRY_DATAMOVER/GEN_S2MM_FULL.I_S2MM_FULL_WRAPPER/I_CMD_STATUS/GEN_INCLUDE_STATUS_FIFO.I_STS_FIFO/INDETERMINATE_BTT_MODE.s2mm_brcvd[5]_i_1/O
+                         net (fo=1, routed)           0.000     1.262    u_block_design/design_1_i/axi_dma_0/U0/INCLUDE_S2MM_SOF_EOF_GENERATOR.I_S2MM_DMA_MNGR/GEN_S2MM_DMA_CONTROL.I_S2MM_CMDSTS/INDETERMINATE_BTT_MODE.s2mm_brcvd_reg[22]_0[5]
+    SLICE_X49Y50         FDRE                                         r  u_block_design/design_1_i/axi_dma_0/U0/INCLUDE_S2MM_SOF_EOF_GENERATOR.I_S2MM_DMA_MNGR/GEN_S2MM_DMA_CONTROL.I_S2MM_CMDSTS/INDETERMINATE_BTT_MODE.s2mm_brcvd_reg[5]/D
   -------------------------------------------------------------------    -------------------
 
                          (clock clk_fpga_0 rise edge)
@@ -322,15 +324,15 @@ Slack (MET) :             0.008ns  (arrival time - required time)
     PS7_X0Y0             PS7                          0.000     0.000 r  u_block_design/design_1_i/processing_system7_0/inst/PS7_i/FCLKCLK[0]
                          net (fo=1, routed)           0.337     0.337    u_block_design/design_1_i/processing_system7_0/inst/FCLK_CLK_unbuffered[0]
     BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.029     0.366 r  u_block_design/design_1_i/processing_system7_0/inst/buffer_fclk_clk_0.FCLK_CLK_0_BUFG/O
-                         net (fo=12063, routed)       0.821     1.187    u_block_design/design_1_i/axi_dma_0/U0/I_PRMRY_DATAMOVER/GEN_S2MM_FULL.I_S2MM_FULL_WRAPPER/GEN_INCLUDE_IBTTCC.I_S2MM_MSTR_IBTTCC/m_axi_s2mm_aclk
-    SLICE_X52Y50         FDRE                                         r  u_block_design/design_1_i/axi_dma_0/U0/I_PRMRY_DATAMOVER/GEN_S2MM_FULL.I_S2MM_FULL_WRAPPER/GEN_INCLUDE_IBTTCC.I_S2MM_MSTR_IBTTCC/sig_input_addr_reg_reg[25]/C
-                         clock pessimism             -0.030     1.157    
-    SLICE_X52Y50         FDRE (Hold_fdre_C_D)         0.047     1.204    u_block_design/design_1_i/axi_dma_0/U0/I_PRMRY_DATAMOVER/GEN_S2MM_FULL.I_S2MM_FULL_WRAPPER/GEN_INCLUDE_IBTTCC.I_S2MM_MSTR_IBTTCC/sig_input_addr_reg_reg[25]
+                         net (fo=12979, routed)       0.825     1.191    u_block_design/design_1_i/axi_dma_0/U0/INCLUDE_S2MM_SOF_EOF_GENERATOR.I_S2MM_DMA_MNGR/GEN_S2MM_DMA_CONTROL.I_S2MM_CMDSTS/s_axi_lite_aclk
+    SLICE_X49Y50         FDRE                                         r  u_block_design/design_1_i/axi_dma_0/U0/INCLUDE_S2MM_SOF_EOF_GENERATOR.I_S2MM_DMA_MNGR/GEN_S2MM_DMA_CONTROL.I_S2MM_CMDSTS/INDETERMINATE_BTT_MODE.s2mm_brcvd_reg[5]/C
+                         clock pessimism             -0.030     1.161    
+    SLICE_X49Y50         FDRE (Hold_fdre_C_D)         0.092     1.253    u_block_design/design_1_i/axi_dma_0/U0/INCLUDE_S2MM_SOF_EOF_GENERATOR.I_S2MM_DMA_MNGR/GEN_S2MM_DMA_CONTROL.I_S2MM_CMDSTS/INDETERMINATE_BTT_MODE.s2mm_brcvd_reg[5]
   -------------------------------------------------------------------
-                         required time                         -1.204    
-                         arrival time                           1.212    
+                         required time                         -1.253    
+                         arrival time                           1.262    
   -------------------------------------------------------------------
-                         slack                                  0.008    
+                         slack                                  0.009    
 
 
 
@@ -344,9 +346,9 @@ Period(ns):         10.000
 Sources:            { u_block_design/design_1_i/processing_system7_0/inst/PS7_i/FCLKCLK[0] }
 
 Check Type        Corner  Lib Pin      Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location      Pin
-Min Period        n/a     DSP48E1/CLK  n/a            3.884         10.000      6.116      DSP48_X2Y5    u_block_design/design_1_i/snn_top_hls_0/inst/grp_apply_rstdp_reward_fu_1425/grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/mul_8s_8s_16_3_1_U118/buff0_reg/CLK
-Low Pulse Width   Slow    RAMD64E/CLK  n/a            1.250         5.000       3.750      SLICE_X58Y50  gen_core_groups[0].u_core_group/spike_fifo_reg_0_63_0_2/RAMA/CLK
-High Pulse Width  Slow    RAMD64E/CLK  n/a            1.250         5.000       3.750      SLICE_X58Y50  gen_core_groups[0].u_core_group/spike_fifo_reg_0_63_0_2/RAMA/CLK
+Min Period        n/a     DSP48E1/CLK  n/a            3.884         10.000      6.116      DSP48_X2Y10   u_block_design/design_1_i/snn_top_hls_0/inst/grp_apply_rstdp_reward_fu_1477/grp_apply_rstdp_reward_Pipeline_RSTDP_INNER_fu_190/mul_8s_8s_16_3_1_U118/buff0_reg/CLK
+Low Pulse Width   Slow    RAMD64E/CLK  n/a            1.250         5.000       3.750      SLICE_X94Y52  gen_core_groups[0].u_core_group/spike_fifo_reg_0_63_0_2/RAMA/CLK
+High Pulse Width  Slow    RAMD64E/CLK  n/a            1.250         5.000       3.750      SLICE_X94Y52  gen_core_groups[0].u_core_group/spike_fifo_reg_0_63_0_2/RAMA/CLK
 
 
 
@@ -355,27 +357,27 @@ Path Group:  **async_default**
 From Clock:  clk_fpga_0
   To Clock:  clk_fpga_0
 
-Setup :            0  Failing Endpoints,  Worst Slack        6.124ns,  Total Violation        0.000ns
-Hold  :            0  Failing Endpoints,  Worst Slack        0.448ns,  Total Violation        0.000ns
+Setup :            0  Failing Endpoints,  Worst Slack        6.057ns,  Total Violation        0.000ns
+Hold  :            0  Failing Endpoints,  Worst Slack        0.473ns,  Total Violation        0.000ns
 ---------------------------------------------------------------------------------------------------
 
 
 Max Delay Paths
 --------------------------------------------------------------------------------------
-Slack (MET) :             6.124ns  (required time - arrival time)
-  Source:                 snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo_0/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+Slack (MET) :             6.057ns  (required time - arrival time)
+  Source:                 snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s03_couplers_imp_13X28CE/design_1_axi_interconnect_hp0_imp_auto_pc_3/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
                             (rising edge-triggered cell FDPE clocked by clk_fpga_0  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo_0/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+  Destination:            snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s03_couplers_imp_13X28CE/design_1_axi_interconnect_hp0_imp_auto_pc_3/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
                             (recovery check against rising-edge clock clk_fpga_0  {rise@0.000ns fall@5.000ns period=10.000ns})
   Path Group:             **async_default**
   Path Type:              Recovery (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk_fpga_0 rise@10.000ns - clk_fpga_0 rise@0.000ns)
-  Data Path Delay:        3.338ns  (logic 0.773ns (23.157%)  route 2.565ns (76.843%))
+  Data Path Delay:        3.405ns  (logic 0.773ns (22.699%)  route 2.632ns (77.301%))
   Logic Levels:           1  (LUT3=1)
-  Clock Path Skew:        -0.023ns (DCD - SCD + CPR)
-    Destination Clock Delay (DCD):    2.674ns = ( 12.674 - 10.000 ) 
-    Source Clock Delay      (SCD):    2.960ns
-    Clock Pessimism Removal (CPR):    0.263ns
+  Clock Path Skew:        0.022ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    2.825ns = ( 12.825 - 10.000 ) 
+    Source Clock Delay      (SCD):    3.033ns
+    Clock Pessimism Removal (CPR):    0.230ns
   Clock Uncertainty:      0.154ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
     Total System Jitter     (TSJ):    0.071ns
     Total Input Jitter      (TIJ):    0.300ns
@@ -389,14 +391,14 @@ Slack (MET) :             6.124ns  (required time - arrival time)
     PS7_X0Y0             PS7                          0.000     0.000 r  u_block_design/design_1_i/processing_system7_0/inst/PS7_i/FCLKCLK[0]
                          net (fo=1, routed)           1.193     1.193    u_block_design/design_1_i/processing_system7_0/inst/FCLK_CLK_unbuffered[0]
     BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.101     1.294 r  u_block_design/design_1_i/processing_system7_0/inst/buffer_fclk_clk_0.FCLK_CLK_0_BUFG/O
-                         net (fo=12063, routed)       1.666     2.960    snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo_0/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
-    SLICE_X42Y39         FDPE                                         r  snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo_0/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+                         net (fo=12979, routed)       1.739     3.033    snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s03_couplers_imp_13X28CE/design_1_axi_interconnect_hp0_imp_auto_pc_3/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+    SLICE_X8Y27          FDPE                                         r  snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s03_couplers_imp_13X28CE/design_1_axi_interconnect_hp0_imp_auto_pc_3/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
   -------------------------------------------------------------------    -------------------
-    SLICE_X42Y39         FDPE (Prop_fdpe_C_Q)         0.478     3.438 f  snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo_0/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
-                         net (fo=3, routed)           0.980     4.418    snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo_0/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
-    SLICE_X41Y41         LUT3 (Prop_lut3_I2_O)        0.295     4.713 f  snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo_0/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
-                         net (fo=32, routed)          1.585     6.298    snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo_0/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
-    SLICE_X42Y44         FDPE                                         f  snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo_0/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+    SLICE_X8Y27          FDPE (Prop_fdpe_C_Q)         0.478     3.511 f  snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s03_couplers_imp_13X28CE/design_1_axi_interconnect_hp0_imp_auto_pc_3/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+                         net (fo=3, routed)           1.254     4.765    snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s03_couplers_imp_13X28CE/design_1_axi_interconnect_hp0_imp_auto_pc_3/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+    SLICE_X7Y26          LUT3 (Prop_lut3_I2_O)        0.295     5.060 f  snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s03_couplers_imp_13X28CE/design_1_axi_interconnect_hp0_imp_auto_pc_3/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+                         net (fo=32, routed)          1.378     6.438    snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s03_couplers_imp_13X28CE/design_1_axi_interconnect_hp0_imp_auto_pc_3/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+    SLICE_X5Y28          FDCE                                         f  snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s03_couplers_imp_13X28CE/design_1_axi_interconnect_hp0_imp_auto_pc_3/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
   -------------------------------------------------------------------    -------------------
 
                          (clock clk_fpga_0 rise edge)
@@ -404,16 +406,16 @@ Slack (MET) :             6.124ns  (required time - arrival time)
     PS7_X0Y0             PS7                          0.000    10.000 r  u_block_design/design_1_i/processing_system7_0/inst/PS7_i/FCLKCLK[0]
                          net (fo=1, routed)           1.088    11.088    u_block_design/design_1_i/processing_system7_0/inst/FCLK_CLK_unbuffered[0]
     BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.091    11.179 r  u_block_design/design_1_i/processing_system7_0/inst/buffer_fclk_clk_0.FCLK_CLK_0_BUFG/O
-                         net (fo=12063, routed)       1.495    12.674    snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo_0/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
-    SLICE_X42Y44         FDPE                                         r  snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo_0/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
-                         clock pessimism              0.263    12.937    
-                         clock uncertainty           -0.154    12.783    
-    SLICE_X42Y44         FDPE (Recov_fdpe_C_PRE)     -0.361    12.422    snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo_0/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+                         net (fo=12979, routed)       1.646    12.825    snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s03_couplers_imp_13X28CE/design_1_axi_interconnect_hp0_imp_auto_pc_3/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+    SLICE_X5Y28          FDCE                                         r  snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s03_couplers_imp_13X28CE/design_1_axi_interconnect_hp0_imp_auto_pc_3/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+                         clock pessimism              0.230    13.055    
+                         clock uncertainty           -0.154    12.901    
+    SLICE_X5Y28          FDCE (Recov_fdce_C_CLR)     -0.405    12.496    snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s03_couplers_imp_13X28CE/design_1_axi_interconnect_hp0_imp_auto_pc_3/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_3_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
   -------------------------------------------------------------------
-                         required time                         12.422    
-                         arrival time                          -6.298    
+                         required time                         12.496    
+                         arrival time                          -6.438    
   -------------------------------------------------------------------
-                         slack                                  6.124    
+                         slack                                  6.057    
 
 
 
@@ -421,20 +423,20 @@ Slack (MET) :             6.124ns  (required time - arrival time)
 
 Min Delay Paths
 --------------------------------------------------------------------------------------
-Slack (MET) :             0.448ns  (arrival time - required time)
-  Source:                 snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+Slack (MET) :             0.473ns  (arrival time - required time)
+  Source:                 snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s00_couplers_imp_S4BDUK/design_1_axi_interconnect_hp0_imp_auto_pc_0/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
                             (rising edge-triggered cell FDRE clocked by clk_fpga_0  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+  Destination:            snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s00_couplers_imp_S4BDUK/design_1_axi_interconnect_hp0_imp_auto_pc_0/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
                             (removal check against rising-edge clock clk_fpga_0  {rise@0.000ns fall@5.000ns period=10.000ns})
   Path Group:             **async_default**
   Path Type:              Removal (Min at Fast Process Corner)
   Requirement:            0.000ns  (clk_fpga_0 rise@0.000ns - clk_fpga_0 rise@0.000ns)
-  Data Path Delay:        0.664ns  (logic 0.226ns (34.046%)  route 0.438ns (65.954%))
+  Data Path Delay:        0.440ns  (logic 0.186ns (42.275%)  route 0.254ns (57.725%))
   Logic Levels:           1  (LUT3=1)
-  Clock Path Skew:        0.282ns (DCD - SCD - CPR)
-    Destination Clock Delay (DCD):    1.225ns
-    Source Clock Delay      (SCD):    0.913ns
-    Clock Pessimism Removal (CPR):    0.030ns
+  Clock Path Skew:        0.034ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    1.219ns
+    Source Clock Delay      (SCD):    0.922ns
+    Clock Pessimism Removal (CPR):    0.263ns
 
     Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
   -------------------------------------------------------------------    -------------------
@@ -443,14 +445,14 @@ Slack (MET) :             0.448ns  (arrival time - required time)
     PS7_X0Y0             PS7                          0.000     0.000 r  u_block_design/design_1_i/processing_system7_0/inst/PS7_i/FCLKCLK[0]
                          net (fo=1, routed)           0.310     0.310    u_block_design/design_1_i/processing_system7_0/inst/FCLK_CLK_unbuffered[0]
     BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.026     0.336 r  u_block_design/design_1_i/processing_system7_0/inst/buffer_fclk_clk_0.FCLK_CLK_0_BUFG/O
-                         net (fo=12063, routed)       0.577     0.913    snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
-    SLICE_X28Y50         FDRE                                         r  snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+                         net (fo=12979, routed)       0.586     0.922    snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s00_couplers_imp_S4BDUK/design_1_axi_interconnect_hp0_imp_auto_pc_0/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+    SLICE_X11Y21         FDRE                                         r  snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s00_couplers_imp_S4BDUK/design_1_axi_interconnect_hp0_imp_auto_pc_0/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
   -------------------------------------------------------------------    -------------------
-    SLICE_X28Y50         FDRE (Prop_fdre_C_Q)         0.128     1.041 f  snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
-                         net (fo=2, routed)           0.121     1.162    snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
-    SLICE_X28Y50         LUT3 (Prop_lut3_I0_O)        0.098     1.260 f  snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
-                         net (fo=32, routed)          0.317     1.576    snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
-    SLICE_X30Y49         FDCE                                         f  snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+    SLICE_X11Y21         FDRE (Prop_fdre_C_Q)         0.141     1.062 f  snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s00_couplers_imp_S4BDUK/design_1_axi_interconnect_hp0_imp_auto_pc_0/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+                         net (fo=1, routed)           0.091     1.154    snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s00_couplers_imp_S4BDUK/design_1_axi_interconnect_hp0_imp_auto_pc_0/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+    SLICE_X10Y21         LUT3 (Prop_lut3_I0_O)        0.045     1.199 f  snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s00_couplers_imp_S4BDUK/design_1_axi_interconnect_hp0_imp_auto_pc_0/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+                         net (fo=33, routed)          0.163     1.361    snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s00_couplers_imp_S4BDUK/design_1_axi_interconnect_hp0_imp_auto_pc_0/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+    SLICE_X8Y21          FDCE                                         f  snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s00_couplers_imp_S4BDUK/design_1_axi_interconnect_hp0_imp_auto_pc_0/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
   -------------------------------------------------------------------    -------------------
 
                          (clock clk_fpga_0 rise edge)
@@ -458,15 +460,15 @@ Slack (MET) :             0.448ns  (arrival time - required time)
     PS7_X0Y0             PS7                          0.000     0.000 r  u_block_design/design_1_i/processing_system7_0/inst/PS7_i/FCLKCLK[0]
                          net (fo=1, routed)           0.337     0.337    u_block_design/design_1_i/processing_system7_0/inst/FCLK_CLK_unbuffered[0]
     BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.029     0.366 r  u_block_design/design_1_i/processing_system7_0/inst/buffer_fclk_clk_0.FCLK_CLK_0_BUFG/O
-                         net (fo=12063, routed)       0.859     1.225    snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
-    SLICE_X30Y49         FDCE                                         r  snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
-                         clock pessimism             -0.030     1.195    
-    SLICE_X30Y49         FDCE (Remov_fdce_C_CLR)     -0.067     1.128    snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s01_couplers_imp_12AUBLP/design_1_axi_interconnect_hp0_imp_auto_pc_1/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_1_axi_data_fifo_v2_1_36_fifo_gen_1/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+                         net (fo=12979, routed)       0.853     1.219    snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s00_couplers_imp_S4BDUK/design_1_axi_interconnect_hp0_imp_auto_pc_0/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+    SLICE_X8Y21          FDCE                                         r  snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s00_couplers_imp_S4BDUK/design_1_axi_interconnect_hp0_imp_auto_pc_0/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
+                         clock pessimism             -0.263     0.956    
+    SLICE_X8Y21          FDCE (Remov_fdce_C_CLR)     -0.067     0.888    snn_core_group_top/design_1_wrapper/design_1/design_1_axi_interconnect_hp0_0/s00_couplers_imp_S4BDUK/design_1_axi_interconnect_hp0_imp_auto_pc_0/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi_protocol_converter/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_protocol_converter_v2_1_37_a_axi3_conv/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_axic_fifo/design_1_axi_interconnect_hp0_imp_auto_pc_0_axi_data_fifo_v2_1_36_fifo_gen/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>/<hidden>
   -------------------------------------------------------------------
-                         required time                         -1.128    
-                         arrival time                           1.576    
+                         required time                         -0.888    
+                         arrival time                           1.361    
   -------------------------------------------------------------------
-                         slack                                  0.448    
+                         slack                                  0.473    
 
 
 

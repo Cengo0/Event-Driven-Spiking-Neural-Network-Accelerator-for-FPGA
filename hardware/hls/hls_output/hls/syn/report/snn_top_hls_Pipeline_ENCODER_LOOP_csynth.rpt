@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'snn_top_hls_Pipeline_ENCODER_LOOP'
 ================================================================
-* Date:           Sun Sep 20 02:25:02 2026
+* Date:           Tue Nov 10 14:37:28 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -149,7 +149,7 @@
     |p_ZL17encoder_phase_acc_1_addr_reg_425                |   9|   0|    9|          0|
     |p_ZL17encoder_phase_acc_1_addr_reg_425_pp0_iter1_reg  |   9|   0|    9|          0|
     |sub_ln79_reg_450                                      |  16|   0|   16|          0|
-    |tmp_5_reg_446                                         |   1|   0|    1|          0|
+    |tmp_s_reg_446                                         |   1|   0|    1|          0|
     |trunc_ln93_reg_431                                    |   1|   0|    1|          0|
     +------------------------------------------------------+----+----+-----+-----------+
     |Total                                                 | 111|   0|  111|          0|

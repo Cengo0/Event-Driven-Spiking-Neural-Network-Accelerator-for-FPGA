@@ -237,11 +237,11 @@ wire   [11:0] grp_fu_440_p2;
 wire   [11:0] grp_fu_450_p0;
 wire  signed [15:0] grp_fu_450_p1;
 wire   [27:0] grp_fu_450_p2;
-wire  signed [11:0] trunc_ln7_fu_455_p4;
+wire  signed [11:0] trunc_ln6_fu_455_p4;
 wire  signed [15:0] grp_fu_469_p1;
 wire   [27:0] grp_fu_469_p2;
 wire  signed [15:0] sext_ln282_fu_474_p1;
-wire   [15:0] trunc_ln8_fu_477_p4;
+wire   [15:0] trunc_ln7_fu_477_p4;
 wire   [15:0] w_fu_487_p2;
 wire   [12:0] tmp_fu_493_p4;
 wire   [0:0] icmp_ln131_fu_503_p2;
@@ -249,7 +249,7 @@ wire   [0:0] icmp_ln132_fu_509_p2;
 wire   [0:0] or_ln131_fu_527_p2;
 wire   [3:0] select_ln131_fu_519_p3;
 wire   [3:0] trunc_ln133_fu_515_p1;
-wire   [0:0] tmp_27_fu_541_p3;
+wire   [0:0] tmp_31_fu_541_p3;
 wire   [3:0] mag_1_fu_554_p2;
 reg    ap_done_reg;
 wire    ap_continue_int;
@@ -339,7 +339,7 @@ snn_top_hls_mul_12s_16s_28_4_1 #(
 mul_12s_16s_28_4_1_U43(
     .clk(ap_clk),
     .reset(ap_rst),
-    .din0(trunc_ln7_fu_455_p4),
+    .din0(trunc_ln6_fu_455_p4),
     .din1(grp_fu_469_p1),
     .ce(1'b1),
     .dout(grp_fu_469_p2)
@@ -861,13 +861,13 @@ assign icmp_ln265_fu_280_p2 = ((widx_fu_156 == sext_ln265_reg_632) ? 1'b1 : 1'b0
 
 assign icmp_ln276_fu_325_p2 = ((post_traces_q0 == 8'd0) ? 1'b1 : 1'b0);
 
-assign learn_bridge_data = ((tmp_27_fu_541_p3[0:0] == 1'b1) ? mag_1_fu_554_p2 : updated_reg_706);
+assign learn_bridge_data = ((tmp_31_fu_541_p3[0:0] == 1'b1) ? mag_1_fu_554_p2 : updated_reg_706);
 
 assign learn_bridge_dst = post_id_reg_646[7:0];
 
 assign learn_bridge_dst_group = {{post_id_reg_646[9:8]}};
 
-assign learn_bridge_exc = (tmp_27_fu_541_p3 ^ 1'd1);
+assign learn_bridge_exc = (tmp_31_fu_541_p3 ^ 1'd1);
 
 assign learn_bridge_group = src_group;
 
@@ -901,7 +901,7 @@ assign sext_ln294_cast_fu_248_p1 = $signed(sext_ln294);
 
 assign src_group_cast_fu_244_p1 = src_group;
 
-assign tmp_27_fu_541_p3 = updated_reg_706[32'd3];
+assign tmp_31_fu_541_p3 = updated_reg_706[32'd3];
 
 assign tmp_fu_493_p4 = {{w_fu_487_p2[15:3]}};
 
@@ -911,13 +911,13 @@ assign trunc_ln282_fu_421_p0 = weight_memory_q1;
 
 assign trunc_ln282_fu_421_p1 = trunc_ln282_fu_421_p0[2:0];
 
-assign trunc_ln7_fu_455_p4 = {{grp_fu_450_p2[27:16]}};
+assign trunc_ln6_fu_455_p4 = {{grp_fu_450_p2[27:16]}};
 
-assign trunc_ln8_fu_477_p4 = {{grp_fu_469_p2[23:8]}};
+assign trunc_ln7_fu_477_p4 = {{grp_fu_469_p2[23:8]}};
 
 assign updated_fu_533_p3 = ((or_ln131_fu_527_p2[0:0] == 1'b1) ? select_ln131_fu_519_p3 : trunc_ln133_fu_515_p1);
 
-assign w_fu_487_p2 = ($signed(sext_ln282_fu_474_p1) - $signed(trunc_ln8_fu_477_p4));
+assign w_fu_487_p2 = ($signed(sext_ln282_fu_474_p1) - $signed(trunc_ln7_fu_477_p4));
 
 assign weight_memory_address0 = weight_memory_addr_reg_667_pp0_iter13_reg;
 
