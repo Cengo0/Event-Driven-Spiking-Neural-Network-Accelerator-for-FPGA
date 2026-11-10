@@ -7,12 +7,12 @@ import numpy as np
 import torch
 
 parser = argparse.ArgumentParser(description="Prepare 3-Layer SNN Payload with Dynamic Threshold Calibration")
-parser.add_argument('--model',  default='models/fc3_T_4_rate_spikes_clean_l2[0.000500].pth',
+parser.add_argument('--model',  default='models/fc3_T_4_clean_l2[0.000500].pth',
                     help='Path to PyTorch .pth model checkpoint')
-parser.add_argument('--output', default='data/cache/mnist_3layer_deployment_v2.npz',
+parser.add_argument('--output', default='data/cache/mnist_3layer_deployment_clean.npz',
                     help='Output deployment payload path')
 parser.add_argument('--bias-report', '--bias-json', dest='bias_report',
-                    default='data/cache/mnist_3layer_bias_report.json',
+                    default='data/cache/mnist_3layer_clean_bias_report.json',
                     help='Output path for the detailed JSON bias diagnostic report')
 parser.add_argument('--timesteps', type=int, default=4,
                     help='Number of SNN timesteps')

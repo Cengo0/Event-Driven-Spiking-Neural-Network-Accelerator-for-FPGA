@@ -12,7 +12,7 @@ parser.add_argument('--model',  default='models/cifar_fc3_T_4_rate_logits_clean_
 parser.add_argument('--output', default='data/cache/cifar10_3layer_deployment_logits.npz',
                     help='Output deployment payload path')
 parser.add_argument('--bias-report', '--bias-json', dest='bias_report',
-                    default='data/cache/cifar10_3layer_bias_report.json',
+                    default='data/cache/cifar10_3layer_logits_bias_report.json',
                     help='Output path for the detailed JSON bias diagnostic report')
 parser.add_argument('--timesteps', type=int, default=4,
                     help='Number of SNN timesteps')
