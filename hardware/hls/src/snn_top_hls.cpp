@@ -146,9 +146,7 @@ static bool run_cnn3_streaming_pixel(
             }
         }
 
-#if CNN_IMG_CHANNELS == 3
-        // Phase 2a: Add per-channel Layer 2 bias (scaled by 4 * SCALE2) once per timestep (CIFAR-10 only;
-        // MNIST was calibrated without Conv2 bias in prepare_cnn3_deployment.py)
+        // Phase 2a: Add per-channel Layer 2 bias (scaled by 4 * SCALE2) once per timestep
         L2_BIAS_Y: for (int oy = 0; oy < CNN_POOL1_HEIGHT; oy++) {
             L2_BIAS_X: for (int ox = 0; ox < CNN_POOL1_WIDTH; ox++) {
                 #pragma HLS PIPELINE II=1
@@ -158,7 +156,6 @@ static bool run_cnn3_streaming_pixel(
                 }
             }
         }
-#endif
 
         // Phase 2b: Conv2 event-driven scatter into 16x16x16 Layer 2 neurons
         CONV2_SPIKE_LOOP: for (int s = 0; s < conv1_spike_count; s++) {
@@ -1112,8 +1109,8 @@ void snn_top_hls(
                 pixel_val.range(15, 0) = (ap_uint<16>)px_pkt.data(15, 0);
                 if (run_cnn3_streaming_pixel(pixel_val, threshold, encoder_spikes)) {
                     cnn_eop_pending = true;
-                    cnn_drain_holdoff = 12;
-                    cnn_eop_holdoff = 2;
+                    cnn_drain_holdoff = 15;
+                    cnn_eop_holdoff = 3;
                 }
             }
 
@@ -1164,8 +1161,8 @@ void snn_top_hls(
         // in a single continuous S2MM DMA burst terminated by one End-of-Timestep packet (0xFFFFFFFF, TLAST=1).
         if (op_mode == MODE_CNN_STREAM) {
             if (injected_spike_this_step || !encoder_spikes.empty() || snn_busy || !snn_ready) {
-                cnn_drain_holdoff = 12;
-                cnn_eop_holdoff = 2;
+                cnn_drain_holdoff = 15;
+                cnn_eop_holdoff = 3;
             } else if (cnn_drain_holdoff > 0) {
                 cnn_drain_holdoff--;
             }
