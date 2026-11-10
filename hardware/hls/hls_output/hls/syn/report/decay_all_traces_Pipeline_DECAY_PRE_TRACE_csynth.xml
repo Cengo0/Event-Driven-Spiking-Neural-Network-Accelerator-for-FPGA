@@ -49,13 +49,13 @@
 <SummaryOfViolations>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:383</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:380</SourceLocation>
 <SummaryOfLoopViolations>
 <DECAY_PRE_TRACE>
 <Name>DECAY_PRE_TRACE</Name>
 <IssueType>-</IssueType>
 <ViolationType>-</ViolationType>
-<SourceLocation>src/snn_top_hls.cpp:383</SourceLocation>
+<SourceLocation>src/snn_top_hls.cpp:380</SourceLocation>
 </DECAY_PRE_TRACE>
 </SummaryOfLoopViolations>
 </SummaryOfViolations>
@@ -146,8 +146,8 @@
 <Attribute>control</Attribute>
 </RtlPorts>
 <RtlPorts>
-<name>zext_ln383</name>
-<Object>zext_ln383</Object>
+<name>zext_ln380</name>
+<Object>zext_ln380</Object>
 <Type>scalar</Type>
 <Scope></Scope>
 <IOProtocol>ap_none</IOProtocol>

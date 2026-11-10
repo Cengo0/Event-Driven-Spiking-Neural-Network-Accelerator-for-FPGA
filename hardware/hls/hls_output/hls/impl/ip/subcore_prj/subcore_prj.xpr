@@ -7,7 +7,7 @@
 <Project Product="Vivado" Version="7" Minor="71" Path="/home/chipwisperer/Documents/SNN/Event-Driven-Spiking-Neural-Network-Accelerator-for-FPGA/hardware/hls/hls_output/hls/impl/ip/subcore_prj/subcore_prj.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
-    <Option Name="Id" Val="6f6e33af47fd41778e31efaaa959ab9b"/>
+    <Option Name="Id" Val="58f2647d77914f3082f222067c5aeb85"/>
     <Option Name="Part" Val="xc7z020clg400-1"/>
     <Option Name="CompiledLibDir" Val="$PCACHEDIR/compile_simlib"/>
     <Option Name="CompiledLibDirXSim" Val=""/>

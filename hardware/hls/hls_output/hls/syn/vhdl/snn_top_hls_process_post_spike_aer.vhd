@@ -111,18 +111,18 @@ attribute shreg_extract : string;
     attribute fsm_encoding of ap_CS_fsm_state2 : signal is "none";
     signal ap_CS_fsm_state3 : STD_LOGIC;
     attribute fsm_encoding of ap_CS_fsm_state3 : signal is "none";
-    signal icmp_ln343_fu_269_p2 : STD_LOGIC_VECTOR (0 downto 0);
-    signal icmp_ln343_reg_518 : STD_LOGIC_VECTOR (0 downto 0);
-    signal add_ln515_fu_283_p2 : STD_LOGIC_VECTOR (2 downto 0);
-    signal add_ln515_reg_526 : STD_LOGIC_VECTOR (2 downto 0);
+    signal icmp_ln340_fu_269_p2 : STD_LOGIC_VECTOR (0 downto 0);
+    signal icmp_ln340_reg_518 : STD_LOGIC_VECTOR (0 downto 0);
+    signal add_ln512_fu_283_p2 : STD_LOGIC_VECTOR (2 downto 0);
+    signal add_ln512_reg_526 : STD_LOGIC_VECTOR (2 downto 0);
     signal ap_CS_fsm_state4 : STD_LOGIC;
     attribute fsm_encoding of ap_CS_fsm_state4 : signal is "none";
-    signal trunc_ln515_fu_289_p1 : STD_LOGIC_VECTOR (1 downto 0);
-    signal trunc_ln515_reg_531 : STD_LOGIC_VECTOR (1 downto 0);
-    signal zext_ln526_1_cast_fu_321_p11 : STD_LOGIC_VECTOR (4 downto 0);
-    signal zext_ln526_1_cast_reg_538 : STD_LOGIC_VECTOR (4 downto 0);
-    signal or_ln520_fu_371_p2 : STD_LOGIC_VECTOR (0 downto 0);
-    signal or_ln520_reg_543 : STD_LOGIC_VECTOR (0 downto 0);
+    signal trunc_ln512_fu_289_p1 : STD_LOGIC_VECTOR (1 downto 0);
+    signal trunc_ln512_reg_531 : STD_LOGIC_VECTOR (1 downto 0);
+    signal zext_ln523_1_cast_fu_321_p11 : STD_LOGIC_VECTOR (4 downto 0);
+    signal zext_ln523_1_cast_reg_538 : STD_LOGIC_VECTOR (4 downto 0);
+    signal or_ln517_fu_371_p2 : STD_LOGIC_VECTOR (0 downto 0);
+    signal or_ln517_reg_543 : STD_LOGIC_VECTOR (0 downto 0);
     signal local_dst_fu_377_p2 : STD_LOGIC_VECTOR (3 downto 0);
     signal local_dst_reg_547 : STD_LOGIC_VECTOR (3 downto 0);
     signal tmp_s_fu_382_p11 : STD_LOGIC_VECTOR (8 downto 0);
@@ -170,32 +170,32 @@ attribute shreg_extract : string;
     signal learn_bridge_exc_reg : STD_LOGIC_VECTOR (0 downto 0);
     signal learn_bridge_is_inter_reg : STD_LOGIC_VECTOR (0 downto 0);
     signal learn_bridge_dst_group_reg : STD_LOGIC_VECTOR (2 downto 0);
-    signal zext_ln506_fu_219_p1 : STD_LOGIC_VECTOR (63 downto 0);
+    signal zext_ln503_fu_219_p1 : STD_LOGIC_VECTOR (63 downto 0);
     signal c_fu_136 : STD_LOGIC_VECTOR (2 downto 0) := "000";
     signal ap_block_state6_on_subcall_done : BOOLEAN;
     signal post_traces_ce0_local : STD_LOGIC;
     signal post_traces_we1_local : STD_LOGIC;
-    signal select_ln507_fu_260_p3 : STD_LOGIC_VECTOR (7 downto 0);
+    signal select_ln504_fu_260_p3 : STD_LOGIC_VECTOR (7 downto 0);
     signal post_traces_ce1_local : STD_LOGIC;
-    signal zext_ln506_1_fu_239_p1 : STD_LOGIC_VECTOR (8 downto 0);
+    signal zext_ln503_1_fu_239_p1 : STD_LOGIC_VECTOR (8 downto 0);
     signal new_trace_fu_242_p2 : STD_LOGIC_VECTOR (8 downto 0);
     signal tmp_fu_248_p3 : STD_LOGIC_VECTOR (0 downto 0);
-    signal trunc_ln507_fu_256_p1 : STD_LOGIC_VECTOR (7 downto 0);
+    signal trunc_ln504_fu_256_p1 : STD_LOGIC_VECTOR (7 downto 0);
     signal dst_start_fu_293_p9 : STD_LOGIC_VECTOR (10 downto 0);
     signal dst_start_fu_293_p11 : STD_LOGIC_VECTOR (10 downto 0);
-    signal zext_ln526_1_cast_fu_321_p9 : STD_LOGIC_VECTOR (4 downto 0);
-    signal zext_ln519_fu_345_p1 : STD_LOGIC_VECTOR (10 downto 0);
+    signal zext_ln523_1_cast_fu_321_p9 : STD_LOGIC_VECTOR (4 downto 0);
+    signal zext_ln516_fu_345_p1 : STD_LOGIC_VECTOR (10 downto 0);
     signal dst_end_fu_349_p2 : STD_LOGIC_VECTOR (10 downto 0);
-    signal icmp_ln520_1_fu_360_p2 : STD_LOGIC_VECTOR (0 downto 0);
-    signal icmp_ln520_fu_355_p2 : STD_LOGIC_VECTOR (0 downto 0);
-    signal xor_ln520_fu_365_p2 : STD_LOGIC_VECTOR (0 downto 0);
-    signal trunc_ln518_fu_317_p1 : STD_LOGIC_VECTOR (3 downto 0);
+    signal icmp_ln517_1_fu_360_p2 : STD_LOGIC_VECTOR (0 downto 0);
+    signal icmp_ln517_fu_355_p2 : STD_LOGIC_VECTOR (0 downto 0);
+    signal xor_ln517_fu_365_p2 : STD_LOGIC_VECTOR (0 downto 0);
+    signal trunc_ln515_fu_317_p1 : STD_LOGIC_VECTOR (3 downto 0);
     signal tmp_s_fu_382_p9 : STD_LOGIC_VECTOR (8 downto 0);
     signal tmp_193_fu_409_p9 : STD_LOGIC_VECTOR (13 downto 0);
-    signal zext_ln523_fu_406_p1 : STD_LOGIC_VECTOR (13 downto 0);
+    signal zext_ln520_fu_406_p1 : STD_LOGIC_VECTOR (13 downto 0);
     signal tmp_193_fu_409_p11 : STD_LOGIC_VECTOR (13 downto 0);
     signal tmp_194_fu_439_p9 : STD_LOGIC_VECTOR (9 downto 0);
-    signal icmp_ln515_fu_277_p2 : STD_LOGIC_VECTOR (0 downto 0);
+    signal icmp_ln512_fu_277_p2 : STD_LOGIC_VECTOR (0 downto 0);
     signal ap_NS_fsm : STD_LOGIC_VECTOR (5 downto 0);
     signal ap_ST_fsm_state1_blk : STD_LOGIC;
     signal ap_ST_fsm_state2_blk : STD_LOGIC;
@@ -207,10 +207,10 @@ attribute shreg_extract : string;
     signal dst_start_fu_293_p3 : STD_LOGIC_VECTOR (1 downto 0);
     signal dst_start_fu_293_p5 : STD_LOGIC_VECTOR (1 downto 0);
     signal dst_start_fu_293_p7 : STD_LOGIC_VECTOR (1 downto 0);
-    signal zext_ln526_1_cast_fu_321_p1 : STD_LOGIC_VECTOR (1 downto 0);
-    signal zext_ln526_1_cast_fu_321_p3 : STD_LOGIC_VECTOR (1 downto 0);
-    signal zext_ln526_1_cast_fu_321_p5 : STD_LOGIC_VECTOR (1 downto 0);
-    signal zext_ln526_1_cast_fu_321_p7 : STD_LOGIC_VECTOR (1 downto 0);
+    signal zext_ln523_1_cast_fu_321_p1 : STD_LOGIC_VECTOR (1 downto 0);
+    signal zext_ln523_1_cast_fu_321_p3 : STD_LOGIC_VECTOR (1 downto 0);
+    signal zext_ln523_1_cast_fu_321_p5 : STD_LOGIC_VECTOR (1 downto 0);
+    signal zext_ln523_1_cast_fu_321_p7 : STD_LOGIC_VECTOR (1 downto 0);
     signal tmp_s_fu_382_p1 : STD_LOGIC_VECTOR (1 downto 0);
     signal tmp_s_fu_382_p3 : STD_LOGIC_VECTOR (1 downto 0);
     signal tmp_s_fu_382_p5 : STD_LOGIC_VECTOR (1 downto 0);
@@ -233,14 +233,14 @@ attribute shreg_extract : string;
         ap_done : OUT STD_LOGIC;
         ap_idle : OUT STD_LOGIC;
         ap_ready : OUT STD_LOGIC;
-        zext_ln526 : IN STD_LOGIC_VECTOR (13 downto 0);
+        zext_ln523 : IN STD_LOGIC_VECTOR (13 downto 0);
         tmp_s : IN STD_LOGIC_VECTOR (8 downto 0);
-        zext_ln526_1 : IN STD_LOGIC_VECTOR (4 downto 0);
+        zext_ln523_1 : IN STD_LOGIC_VECTOR (4 downto 0);
         tmp_194 : IN STD_LOGIC_VECTOR (9 downto 0);
-        sext_ln555 : IN STD_LOGIC_VECTOR (15 downto 0);
-        sext_ln343 : IN STD_LOGIC_VECTOR (15 downto 0);
+        sext_ln552 : IN STD_LOGIC_VECTOR (15 downto 0);
+        sext_ln340 : IN STD_LOGIC_VECTOR (15 downto 0);
         learn_weight_ready : IN STD_LOGIC_VECTOR (0 downto 0);
-        icmp_ln343 : IN STD_LOGIC_VECTOR (0 downto 0);
+        icmp_ln340 : IN STD_LOGIC_VECTOR (0 downto 0);
         post_id : IN STD_LOGIC_VECTOR (3 downto 0);
         dst_group : IN STD_LOGIC_VECTOR (2 downto 0);
         pre_traces_address0 : OUT STD_LOGIC_VECTOR (10 downto 0);
@@ -411,14 +411,14 @@ begin
         ap_done => grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_ap_done,
         ap_idle => grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_ap_idle,
         ap_ready => grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_ap_ready,
-        zext_ln526 => widx_reg_557,
+        zext_ln523 => widx_reg_557,
         tmp_s => tmp_s_reg_552,
-        zext_ln526_1 => zext_ln526_1_cast_reg_538,
+        zext_ln523_1 => zext_ln523_1_cast_reg_538,
         tmp_194 => tmp_194_reg_562,
-        sext_ln555 => params_a_plus_val,
-        sext_ln343 => params_learning_rate_val,
+        sext_ln552 => params_a_plus_val,
+        sext_ln340 => params_learning_rate_val,
         learn_weight_ready => learn_weight_ready,
-        icmp_ln343 => icmp_ln343_reg_518,
+        icmp_ln340 => icmp_ln340_reg_518,
         post_id => empty_reg_481,
         dst_group => dst_group_reg_493,
         pre_traces_address0 => grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_pre_traces_address0,
@@ -447,7 +447,7 @@ begin
         learn_bridge_dst_group => grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst_group,
         learn_bridge_dst_group_ap_vld => grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst_group_ap_vld);
 
-    sparsemux_9_2_11_1_1_U470 : component snn_top_hls_sparsemux_9_2_11_1_1
+    sparsemux_9_2_11_1_1_U481 : component snn_top_hls_sparsemux_9_2_11_1_1
     generic map (
         ID => 1,
         NUM_STAGE => 1,
@@ -468,10 +468,10 @@ begin
         din2 => ap_const_lv11_400,
         din3 => ap_const_lv11_400,
         def => dst_start_fu_293_p9,
-        sel => trunc_ln515_fu_289_p1,
+        sel => trunc_ln512_fu_289_p1,
         dout => dst_start_fu_293_p11);
 
-    sparsemux_9_2_5_1_1_U471 : component snn_top_hls_sparsemux_9_2_5_1_1
+    sparsemux_9_2_5_1_1_U482 : component snn_top_hls_sparsemux_9_2_5_1_1
     generic map (
         ID => 1,
         NUM_STAGE => 1,
@@ -491,11 +491,11 @@ begin
         din1 => ap_const_lv5_10,
         din2 => ap_const_lv5_10,
         din3 => ap_const_lv5_10,
-        def => zext_ln526_1_cast_fu_321_p9,
-        sel => trunc_ln515_fu_289_p1,
-        dout => zext_ln526_1_cast_fu_321_p11);
+        def => zext_ln523_1_cast_fu_321_p9,
+        sel => trunc_ln512_fu_289_p1,
+        dout => zext_ln523_1_cast_fu_321_p11);
 
-    sparsemux_9_2_9_1_1_U472 : component snn_top_hls_sparsemux_9_2_9_1_1
+    sparsemux_9_2_9_1_1_U483 : component snn_top_hls_sparsemux_9_2_9_1_1
     generic map (
         ID => 1,
         NUM_STAGE => 1,
@@ -516,10 +516,10 @@ begin
         din2 => ap_const_lv9_100,
         din3 => ap_const_lv9_100,
         def => tmp_s_fu_382_p9,
-        sel => trunc_ln515_reg_531,
+        sel => trunc_ln512_reg_531,
         dout => tmp_s_fu_382_p11);
 
-    sparsemux_9_2_14_1_1_U473 : component snn_top_hls_sparsemux_9_2_14_1_1
+    sparsemux_9_2_14_1_1_U484 : component snn_top_hls_sparsemux_9_2_14_1_1
     generic map (
         ID => 1,
         NUM_STAGE => 1,
@@ -540,10 +540,10 @@ begin
         din2 => ap_const_lv14_2000,
         din3 => ap_const_lv14_3000,
         def => tmp_193_fu_409_p9,
-        sel => trunc_ln515_reg_531,
+        sel => trunc_ln512_reg_531,
         dout => tmp_193_fu_409_p11);
 
-    sparsemux_9_2_10_1_1_U474 : component snn_top_hls_sparsemux_9_2_10_1_1
+    sparsemux_9_2_10_1_1_U485 : component snn_top_hls_sparsemux_9_2_10_1_1
     generic map (
         ID => 1,
         NUM_STAGE => 1,
@@ -564,7 +564,7 @@ begin
         din2 => ap_const_lv10_200,
         din3 => ap_const_lv10_300,
         def => tmp_194_fu_439_p9,
-        sel => trunc_ln515_reg_531,
+        sel => trunc_ln512_reg_531,
         dout => tmp_194_fu_439_p11);
 
 
@@ -605,7 +605,7 @@ begin
             if (((ap_const_logic_1 = ap_CS_fsm_state1) and (ap_start = ap_const_logic_1))) then 
                 c_fu_136 <= ap_const_lv3_0;
             elsif (((ap_const_boolean_0 = ap_block_state6_on_subcall_done) and (ap_const_logic_1 = ap_CS_fsm_state6))) then 
-                c_fu_136 <= add_ln515_reg_526;
+                c_fu_136 <= add_ln512_reg_526;
             end if; 
         end if;
     end process;
@@ -613,11 +613,11 @@ begin
     begin
         if (ap_clk'event and ap_clk = '1') then
             if ((ap_const_logic_1 = ap_CS_fsm_state4)) then
-                add_ln515_reg_526 <= add_ln515_fu_283_p2;
+                add_ln512_reg_526 <= add_ln512_fu_283_p2;
                 local_dst_reg_547 <= local_dst_fu_377_p2;
-                or_ln520_reg_543 <= or_ln520_fu_371_p2;
-                trunc_ln515_reg_531 <= trunc_ln515_fu_289_p1;
-                zext_ln526_1_cast_reg_538 <= zext_ln526_1_cast_fu_321_p11;
+                or_ln517_reg_543 <= or_ln517_fu_371_p2;
+                trunc_ln512_reg_531 <= trunc_ln512_fu_289_p1;
+                zext_ln523_1_cast_reg_538 <= zext_ln523_1_cast_fu_321_p11;
             end if;
         end if;
     end process;
@@ -627,7 +627,7 @@ begin
             if ((ap_const_logic_1 = ap_CS_fsm_state1)) then
                 dst_group_reg_493 <= post_id(10 downto 8);
                 empty_reg_481 <= empty_fu_215_p1;
-                post_traces_addr_reg_487 <= zext_ln506_fu_219_p1(11 - 1 downto 0);
+                post_traces_addr_reg_487 <= zext_ln503_fu_219_p1(11 - 1 downto 0);
             end if;
         end if;
     end process;
@@ -635,14 +635,14 @@ begin
     begin
         if (ap_clk'event and ap_clk = '1') then
             if ((ap_const_logic_1 = ap_CS_fsm_state3)) then
-                icmp_ln343_reg_518 <= icmp_ln343_fu_269_p2;
+                icmp_ln340_reg_518 <= icmp_ln340_fu_269_p2;
             end if;
         end if;
     end process;
     process (ap_clk)
     begin
         if (ap_clk'event and ap_clk = '1') then
-            if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_data_ap_vld = ap_const_logic_1) and (or_ln520_reg_543 = ap_const_lv1_0))) then
+            if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_data_ap_vld = ap_const_logic_1) and (or_ln517_reg_543 = ap_const_lv1_0))) then
                 learn_bridge_data_reg <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_data;
             end if;
         end if;
@@ -650,7 +650,7 @@ begin
     process (ap_clk)
     begin
         if (ap_clk'event and ap_clk = '1') then
-            if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst_group_ap_vld = ap_const_logic_1) and (or_ln520_reg_543 = ap_const_lv1_0))) then
+            if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst_group_ap_vld = ap_const_logic_1) and (or_ln517_reg_543 = ap_const_lv1_0))) then
                 learn_bridge_dst_group_reg <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst_group;
             end if;
         end if;
@@ -658,7 +658,7 @@ begin
     process (ap_clk)
     begin
         if (ap_clk'event and ap_clk = '1') then
-            if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst_ap_vld = ap_const_logic_1) and (or_ln520_reg_543 = ap_const_lv1_0))) then
+            if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst_ap_vld = ap_const_logic_1) and (or_ln517_reg_543 = ap_const_lv1_0))) then
                 learn_bridge_dst_reg <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst;
             end if;
         end if;
@@ -666,7 +666,7 @@ begin
     process (ap_clk)
     begin
         if (ap_clk'event and ap_clk = '1') then
-            if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_exc_ap_vld = ap_const_logic_1) and (or_ln520_reg_543 = ap_const_lv1_0))) then
+            if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_exc_ap_vld = ap_const_logic_1) and (or_ln517_reg_543 = ap_const_lv1_0))) then
                 learn_bridge_exc_reg <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_exc;
             end if;
         end if;
@@ -674,7 +674,7 @@ begin
     process (ap_clk)
     begin
         if (ap_clk'event and ap_clk = '1') then
-            if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_group_ap_vld = ap_const_logic_1) and (or_ln520_reg_543 = ap_const_lv1_0))) then
+            if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_group_ap_vld = ap_const_logic_1) and (or_ln517_reg_543 = ap_const_lv1_0))) then
                 learn_bridge_group_reg <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_group;
             end if;
         end if;
@@ -682,7 +682,7 @@ begin
     process (ap_clk)
     begin
         if (ap_clk'event and ap_clk = '1') then
-            if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_is_inter_ap_vld = ap_const_logic_1) and (or_ln520_reg_543 = ap_const_lv1_0))) then
+            if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_is_inter_ap_vld = ap_const_logic_1) and (or_ln517_reg_543 = ap_const_lv1_0))) then
                 learn_bridge_is_inter_reg <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_is_inter;
             end if;
         end if;
@@ -690,7 +690,7 @@ begin
     process (ap_clk)
     begin
         if (ap_clk'event and ap_clk = '1') then
-            if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_src_ap_vld = ap_const_logic_1) and (or_ln520_reg_543 = ap_const_lv1_0))) then
+            if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_src_ap_vld = ap_const_logic_1) and (or_ln517_reg_543 = ap_const_lv1_0))) then
                 learn_bridge_src_reg <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_src;
             end if;
         end if;
@@ -698,7 +698,7 @@ begin
     process (ap_clk)
     begin
         if (ap_clk'event and ap_clk = '1') then
-            if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_valid_o_ap_vld = ap_const_logic_1) and (or_ln520_reg_543 = ap_const_lv1_0))) then
+            if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_valid_o_ap_vld = ap_const_logic_1) and (or_ln517_reg_543 = ap_const_lv1_0))) then
                 learn_bridge_valid_o_reg <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_valid_o;
             end if;
         end if;
@@ -722,7 +722,7 @@ begin
         end if;
     end process;
 
-    ap_NS_fsm_assign_proc : process (ap_start, ap_CS_fsm, ap_CS_fsm_state1, ap_CS_fsm_state4, or_ln520_fu_371_p2, ap_CS_fsm_state6, ap_block_state6_on_subcall_done, icmp_ln515_fu_277_p2)
+    ap_NS_fsm_assign_proc : process (ap_start, ap_CS_fsm, ap_CS_fsm_state1, ap_CS_fsm_state4, or_ln517_fu_371_p2, ap_CS_fsm_state6, ap_block_state6_on_subcall_done, icmp_ln512_fu_277_p2)
     begin
         case ap_CS_fsm is
             when ap_ST_fsm_state1 => 
@@ -736,9 +736,9 @@ begin
             when ap_ST_fsm_state3 => 
                 ap_NS_fsm <= ap_ST_fsm_state4;
             when ap_ST_fsm_state4 => 
-                if (((icmp_ln515_fu_277_p2 = ap_const_lv1_1) and (ap_const_logic_1 = ap_CS_fsm_state4))) then
+                if (((icmp_ln512_fu_277_p2 = ap_const_lv1_1) and (ap_const_logic_1 = ap_CS_fsm_state4))) then
                     ap_NS_fsm <= ap_ST_fsm_state1;
-                elsif (((icmp_ln515_fu_277_p2 = ap_const_lv1_0) and (ap_const_logic_1 = ap_CS_fsm_state4) and (or_ln520_fu_371_p2 = ap_const_lv1_1))) then
+                elsif (((icmp_ln512_fu_277_p2 = ap_const_lv1_0) and (ap_const_logic_1 = ap_CS_fsm_state4) and (or_ln517_fu_371_p2 = ap_const_lv1_1))) then
                     ap_NS_fsm <= ap_ST_fsm_state6;
                 else
                     ap_NS_fsm <= ap_ST_fsm_state5;
@@ -755,7 +755,7 @@ begin
                 ap_NS_fsm <= "XXXXXX";
         end case;
     end process;
-    add_ln515_fu_283_p2 <= std_logic_vector(unsigned(c_fu_136) + unsigned(ap_const_lv3_1));
+    add_ln512_fu_283_p2 <= std_logic_vector(unsigned(c_fu_136) + unsigned(ap_const_lv3_1));
     ap_CS_fsm_state1 <= ap_CS_fsm(0);
     ap_CS_fsm_state2 <= ap_CS_fsm(1);
     ap_CS_fsm_state3 <= ap_CS_fsm(2);
@@ -787,15 +787,15 @@ begin
     end process;
 
 
-    ap_block_state6_on_subcall_done_assign_proc : process(or_ln520_reg_543, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_ap_done)
+    ap_block_state6_on_subcall_done_assign_proc : process(or_ln517_reg_543, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_ap_done)
     begin
-                ap_block_state6_on_subcall_done <= ((grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_ap_done = ap_const_logic_0) and (or_ln520_reg_543 = ap_const_lv1_0));
+                ap_block_state6_on_subcall_done <= ((grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_ap_done = ap_const_logic_0) and (or_ln517_reg_543 = ap_const_lv1_0));
     end process;
 
 
-    ap_done_assign_proc : process(ap_start, ap_CS_fsm_state1, ap_CS_fsm_state4, icmp_ln515_fu_277_p2)
+    ap_done_assign_proc : process(ap_start, ap_CS_fsm_state1, ap_CS_fsm_state4, icmp_ln512_fu_277_p2)
     begin
-        if ((((icmp_ln515_fu_277_p2 = ap_const_lv1_1) and (ap_const_logic_1 = ap_CS_fsm_state4)) or ((ap_const_logic_1 = ap_CS_fsm_state1) and (ap_start = ap_const_logic_0)))) then 
+        if ((((icmp_ln512_fu_277_p2 = ap_const_lv1_1) and (ap_const_logic_1 = ap_CS_fsm_state4)) or ((ap_const_logic_1 = ap_CS_fsm_state1) and (ap_start = ap_const_logic_0)))) then 
             ap_done <= ap_const_logic_1;
         else 
             ap_done <= ap_const_logic_0;
@@ -813,27 +813,27 @@ begin
     end process;
 
 
-    ap_ready_assign_proc : process(ap_CS_fsm_state4, icmp_ln515_fu_277_p2)
+    ap_ready_assign_proc : process(ap_CS_fsm_state4, icmp_ln512_fu_277_p2)
     begin
-        if (((icmp_ln515_fu_277_p2 = ap_const_lv1_1) and (ap_const_logic_1 = ap_CS_fsm_state4))) then 
+        if (((icmp_ln512_fu_277_p2 = ap_const_lv1_1) and (ap_const_logic_1 = ap_CS_fsm_state4))) then 
             ap_ready <= ap_const_logic_1;
         else 
             ap_ready <= ap_const_logic_0;
         end if; 
     end process;
 
-    dst_end_fu_349_p2 <= std_logic_vector(unsigned(zext_ln519_fu_345_p1) + unsigned(dst_start_fu_293_p11));
+    dst_end_fu_349_p2 <= std_logic_vector(unsigned(zext_ln516_fu_345_p1) + unsigned(dst_start_fu_293_p11));
     dst_start_fu_293_p9 <= "XXXXXXXXXXX";
     empty_fu_215_p1 <= post_id(4 - 1 downto 0);
     grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_ap_start <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_ap_start_reg;
-    icmp_ln343_fu_269_p2 <= "1" when (unsigned(post_id) > unsigned(ap_const_lv11_40F)) else "0";
-    icmp_ln515_fu_277_p2 <= "1" when (c_fu_136 = ap_const_lv3_4) else "0";
-    icmp_ln520_1_fu_360_p2 <= "1" when (unsigned(post_id) < unsigned(dst_end_fu_349_p2)) else "0";
-    icmp_ln520_fu_355_p2 <= "1" when (unsigned(dst_start_fu_293_p11) > unsigned(post_id)) else "0";
+    icmp_ln340_fu_269_p2 <= "1" when (unsigned(post_id) > unsigned(ap_const_lv11_40F)) else "0";
+    icmp_ln512_fu_277_p2 <= "1" when (c_fu_136 = ap_const_lv3_4) else "0";
+    icmp_ln517_1_fu_360_p2 <= "1" when (unsigned(post_id) < unsigned(dst_end_fu_349_p2)) else "0";
+    icmp_ln517_fu_355_p2 <= "1" when (unsigned(dst_start_fu_293_p11) > unsigned(post_id)) else "0";
 
-    learn_bridge_data_assign_proc : process(or_ln520_reg_543, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_data, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_data_ap_vld, ap_CS_fsm_state6, learn_bridge_data_reg)
+    learn_bridge_data_assign_proc : process(or_ln517_reg_543, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_data, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_data_ap_vld, ap_CS_fsm_state6, learn_bridge_data_reg)
     begin
-        if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_data_ap_vld = ap_const_logic_1) and (or_ln520_reg_543 = ap_const_lv1_0))) then 
+        if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_data_ap_vld = ap_const_logic_1) and (or_ln517_reg_543 = ap_const_lv1_0))) then 
             learn_bridge_data <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_data;
         else 
             learn_bridge_data <= learn_bridge_data_reg;
@@ -842,9 +842,9 @@ begin
 
     learn_bridge_data_ap_vld <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_data_ap_vld;
 
-    learn_bridge_dst_assign_proc : process(or_ln520_reg_543, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst_ap_vld, ap_CS_fsm_state6, learn_bridge_dst_reg)
+    learn_bridge_dst_assign_proc : process(or_ln517_reg_543, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst_ap_vld, ap_CS_fsm_state6, learn_bridge_dst_reg)
     begin
-        if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst_ap_vld = ap_const_logic_1) and (or_ln520_reg_543 = ap_const_lv1_0))) then 
+        if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst_ap_vld = ap_const_logic_1) and (or_ln517_reg_543 = ap_const_lv1_0))) then 
             learn_bridge_dst <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst;
         else 
             learn_bridge_dst <= learn_bridge_dst_reg;
@@ -853,9 +853,9 @@ begin
 
     learn_bridge_dst_ap_vld <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst_ap_vld;
 
-    learn_bridge_dst_group_assign_proc : process(or_ln520_reg_543, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst_group, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst_group_ap_vld, ap_CS_fsm_state6, learn_bridge_dst_group_reg)
+    learn_bridge_dst_group_assign_proc : process(or_ln517_reg_543, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst_group, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst_group_ap_vld, ap_CS_fsm_state6, learn_bridge_dst_group_reg)
     begin
-        if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst_group_ap_vld = ap_const_logic_1) and (or_ln520_reg_543 = ap_const_lv1_0))) then 
+        if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst_group_ap_vld = ap_const_logic_1) and (or_ln517_reg_543 = ap_const_lv1_0))) then 
             learn_bridge_dst_group <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst_group;
         else 
             learn_bridge_dst_group <= learn_bridge_dst_group_reg;
@@ -864,9 +864,9 @@ begin
 
     learn_bridge_dst_group_ap_vld <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_dst_group_ap_vld;
 
-    learn_bridge_exc_assign_proc : process(or_ln520_reg_543, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_exc, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_exc_ap_vld, ap_CS_fsm_state6, learn_bridge_exc_reg)
+    learn_bridge_exc_assign_proc : process(or_ln517_reg_543, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_exc, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_exc_ap_vld, ap_CS_fsm_state6, learn_bridge_exc_reg)
     begin
-        if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_exc_ap_vld = ap_const_logic_1) and (or_ln520_reg_543 = ap_const_lv1_0))) then 
+        if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_exc_ap_vld = ap_const_logic_1) and (or_ln517_reg_543 = ap_const_lv1_0))) then 
             learn_bridge_exc <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_exc;
         else 
             learn_bridge_exc <= learn_bridge_exc_reg;
@@ -875,9 +875,9 @@ begin
 
     learn_bridge_exc_ap_vld <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_exc_ap_vld;
 
-    learn_bridge_group_assign_proc : process(or_ln520_reg_543, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_group, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_group_ap_vld, ap_CS_fsm_state6, learn_bridge_group_reg)
+    learn_bridge_group_assign_proc : process(or_ln517_reg_543, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_group, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_group_ap_vld, ap_CS_fsm_state6, learn_bridge_group_reg)
     begin
-        if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_group_ap_vld = ap_const_logic_1) and (or_ln520_reg_543 = ap_const_lv1_0))) then 
+        if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_group_ap_vld = ap_const_logic_1) and (or_ln517_reg_543 = ap_const_lv1_0))) then 
             learn_bridge_group <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_group;
         else 
             learn_bridge_group <= learn_bridge_group_reg;
@@ -886,9 +886,9 @@ begin
 
     learn_bridge_group_ap_vld <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_group_ap_vld;
 
-    learn_bridge_is_inter_assign_proc : process(or_ln520_reg_543, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_is_inter, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_is_inter_ap_vld, ap_CS_fsm_state6, learn_bridge_is_inter_reg)
+    learn_bridge_is_inter_assign_proc : process(or_ln517_reg_543, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_is_inter, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_is_inter_ap_vld, ap_CS_fsm_state6, learn_bridge_is_inter_reg)
     begin
-        if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_is_inter_ap_vld = ap_const_logic_1) and (or_ln520_reg_543 = ap_const_lv1_0))) then 
+        if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_is_inter_ap_vld = ap_const_logic_1) and (or_ln517_reg_543 = ap_const_lv1_0))) then 
             learn_bridge_is_inter <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_is_inter;
         else 
             learn_bridge_is_inter <= learn_bridge_is_inter_reg;
@@ -897,9 +897,9 @@ begin
 
     learn_bridge_is_inter_ap_vld <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_is_inter_ap_vld;
 
-    learn_bridge_src_assign_proc : process(or_ln520_reg_543, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_src, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_src_ap_vld, ap_CS_fsm_state6, learn_bridge_src_reg)
+    learn_bridge_src_assign_proc : process(or_ln517_reg_543, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_src, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_src_ap_vld, ap_CS_fsm_state6, learn_bridge_src_reg)
     begin
-        if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_src_ap_vld = ap_const_logic_1) and (or_ln520_reg_543 = ap_const_lv1_0))) then 
+        if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_src_ap_vld = ap_const_logic_1) and (or_ln517_reg_543 = ap_const_lv1_0))) then 
             learn_bridge_src <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_src;
         else 
             learn_bridge_src <= learn_bridge_src_reg;
@@ -908,9 +908,9 @@ begin
 
     learn_bridge_src_ap_vld <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_src_ap_vld;
 
-    learn_bridge_valid_o_assign_proc : process(or_ln520_reg_543, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_valid_o, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_valid_o_ap_vld, ap_CS_fsm_state6, learn_bridge_valid_o_reg)
+    learn_bridge_valid_o_assign_proc : process(or_ln517_reg_543, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_valid_o, grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_valid_o_ap_vld, ap_CS_fsm_state6, learn_bridge_valid_o_reg)
     begin
-        if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_valid_o_ap_vld = ap_const_logic_1) and (or_ln520_reg_543 = ap_const_lv1_0))) then 
+        if (((ap_const_logic_1 = ap_CS_fsm_state6) and (grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_valid_o_ap_vld = ap_const_logic_1) and (or_ln517_reg_543 = ap_const_lv1_0))) then 
             learn_bridge_valid_o <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_valid_o;
         else 
             learn_bridge_valid_o <= learn_bridge_valid_o_reg;
@@ -918,10 +918,10 @@ begin
     end process;
 
     learn_bridge_valid_o_ap_vld <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_learn_bridge_valid_o_ap_vld;
-    local_dst_fu_377_p2 <= std_logic_vector(unsigned(empty_reg_481) - unsigned(trunc_ln518_fu_317_p1));
-    new_trace_fu_242_p2 <= std_logic_vector(unsigned(zext_ln506_1_fu_239_p1) + unsigned(ap_const_lv9_80));
-    or_ln520_fu_371_p2 <= (xor_ln520_fu_365_p2 or icmp_ln520_fu_355_p2);
-    post_traces_address0 <= zext_ln506_fu_219_p1(11 - 1 downto 0);
+    local_dst_fu_377_p2 <= std_logic_vector(unsigned(empty_reg_481) - unsigned(trunc_ln515_fu_317_p1));
+    new_trace_fu_242_p2 <= std_logic_vector(unsigned(zext_ln503_1_fu_239_p1) + unsigned(ap_const_lv9_80));
+    or_ln517_fu_371_p2 <= (xor_ln517_fu_365_p2 or icmp_ln517_fu_355_p2);
+    post_traces_address0 <= zext_ln503_fu_219_p1(11 - 1 downto 0);
     post_traces_address1 <= post_traces_addr_reg_487;
     post_traces_ce0 <= post_traces_ce0_local;
 
@@ -945,7 +945,7 @@ begin
         end if; 
     end process;
 
-    post_traces_d1 <= select_ln507_fu_260_p3;
+    post_traces_d1 <= select_ln504_fu_260_p3;
     post_traces_we1 <= post_traces_we1_local;
 
     post_traces_we1_local_assign_proc : process(ap_CS_fsm_state3)
@@ -959,25 +959,25 @@ begin
 
     pre_traces_address0 <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_pre_traces_address0;
     pre_traces_ce0 <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_pre_traces_ce0;
-    select_ln507_fu_260_p3 <= 
+    select_ln504_fu_260_p3 <= 
         ap_const_lv8_FF when (tmp_fu_248_p3(0) = '1') else 
-        trunc_ln507_fu_256_p1;
+        trunc_ln504_fu_256_p1;
     tmp_193_fu_409_p9 <= "XXXXXXXXXXXXXX";
     tmp_194_fu_439_p9 <= "XXXXXXXXXX";
     tmp_fu_248_p3 <= new_trace_fu_242_p2(8 downto 8);
     tmp_s_fu_382_p9 <= "XXXXXXXXX";
-    trunc_ln507_fu_256_p1 <= new_trace_fu_242_p2(8 - 1 downto 0);
-    trunc_ln515_fu_289_p1 <= c_fu_136(2 - 1 downto 0);
-    trunc_ln518_fu_317_p1 <= dst_start_fu_293_p11(4 - 1 downto 0);
+    trunc_ln504_fu_256_p1 <= new_trace_fu_242_p2(8 - 1 downto 0);
+    trunc_ln512_fu_289_p1 <= c_fu_136(2 - 1 downto 0);
+    trunc_ln515_fu_317_p1 <= dst_start_fu_293_p11(4 - 1 downto 0);
     weight_memory_address0 <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_weight_memory_address0;
     weight_memory_ce0 <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_weight_memory_ce0;
     weight_memory_d0 <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_weight_memory_d0;
     weight_memory_we0 <= grp_process_post_spike_aer_Pipeline_LTP_LOOP_fu_181_weight_memory_we0;
-    widx_fu_432_p2 <= std_logic_vector(unsigned(zext_ln523_fu_406_p1) + unsigned(tmp_193_fu_409_p11));
-    xor_ln520_fu_365_p2 <= (icmp_ln520_1_fu_360_p2 xor ap_const_lv1_1);
-    zext_ln506_1_fu_239_p1 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(post_traces_load_reg_498),9));
-    zext_ln506_fu_219_p1 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(post_id),64));
-    zext_ln519_fu_345_p1 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(zext_ln526_1_cast_fu_321_p11),11));
-    zext_ln523_fu_406_p1 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(local_dst_reg_547),14));
-    zext_ln526_1_cast_fu_321_p9 <= "XXXXX";
+    widx_fu_432_p2 <= std_logic_vector(unsigned(zext_ln520_fu_406_p1) + unsigned(tmp_193_fu_409_p11));
+    xor_ln517_fu_365_p2 <= (icmp_ln517_1_fu_360_p2 xor ap_const_lv1_1);
+    zext_ln503_1_fu_239_p1 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(post_traces_load_reg_498),9));
+    zext_ln503_fu_219_p1 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(post_id),64));
+    zext_ln516_fu_345_p1 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(zext_ln523_1_cast_fu_321_p11),11));
+    zext_ln520_fu_406_p1 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(local_dst_reg_547),14));
+    zext_ln523_1_cast_fu_321_p9 <= "XXXXX";
 end behav;

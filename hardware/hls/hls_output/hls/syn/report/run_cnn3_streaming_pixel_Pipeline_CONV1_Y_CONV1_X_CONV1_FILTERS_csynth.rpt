@@ -3,7 +3,7 @@
 ================================================================
 == Vitis HLS Report for 'run_cnn3_streaming_pixel_Pipeline_CONV1_Y_CONV1_X_CONV1_FILTERS'
 ================================================================
-* Date:           Mon Nov  9 19:25:05 2026
+* Date:           Tue Nov 10 09:20:04 2026
 
 * Version:        2025.2 (Build 6295257 on Nov 14 2025)
 * Project:        hls_output
@@ -1424,32 +1424,32 @@
     |select_ln128_99_reg_14749                 |   16|   0|   16|          0|
     |select_ln128_9_reg_13103                  |   11|   0|   11|          0|
     |select_ln128_reg_13004                    |   54|   0|   54|          0|
-    |storemerge4_i120_1272_1_reg_14589         |   16|   0|   16|          0|
-    |storemerge4_i120_1272_2_reg_14594         |   16|   0|   16|          0|
-    |storemerge4_i120_1_1_1_reg_14774          |   16|   0|   16|          0|
-    |storemerge4_i120_1_1_2_reg_14779          |   16|   0|   16|          0|
-    |storemerge4_i120_1_1_reg_14629            |   16|   0|   16|          0|
-    |storemerge4_i120_1_2_1_reg_14789          |   16|   0|   16|          0|
-    |storemerge4_i120_1_2_2_reg_14794          |   16|   0|   16|          0|
-    |storemerge4_i120_1_2_reg_14784            |   16|   0|   16|          0|
-    |storemerge4_i120_1_3_reg_14624            |   16|   0|   16|          0|
-    |storemerge4_i120_1_reg_14614              |   16|   0|   16|          0|
-    |storemerge4_i120_1_s_reg_14619            |   16|   0|   16|          0|
-    |storemerge4_i120_2326_1_reg_14604         |   16|   0|   16|          0|
-    |storemerge4_i120_2326_2_reg_14609         |   16|   0|   16|          0|
-    |storemerge4_i120_2_1_1_reg_14819          |   16|   0|   16|          0|
-    |storemerge4_i120_2_1_2_reg_14824          |   16|   0|   16|          0|
-    |storemerge4_i120_2_1_reg_14814            |   16|   0|   16|          0|
-    |storemerge4_i120_2_2_1_reg_14834          |   16|   0|   16|          0|
-    |storemerge4_i120_2_2_2_reg_14839          |   16|   0|   16|          0|
-    |storemerge4_i120_2_2_reg_14829            |   16|   0|   16|          0|
-    |storemerge4_i120_2_3_reg_14809            |   16|   0|   16|          0|
-    |storemerge4_i120_2_reg_14799              |   16|   0|   16|          0|
-    |storemerge4_i120_2_s_reg_14804            |   16|   0|   16|          0|
-    |storemerge4_i120_3_reg_14579              |   16|   0|   16|          0|
-    |storemerge4_i120_4_reg_14584              |   16|   0|   16|          0|
-    |storemerge4_i120_5_reg_14599              |   16|   0|   16|          0|
-    |storemerge4_i120_s_reg_14574              |   16|   0|   16|          0|
+    |storemerge4_i129_1272_1_reg_14589         |   16|   0|   16|          0|
+    |storemerge4_i129_1272_2_reg_14594         |   16|   0|   16|          0|
+    |storemerge4_i129_1_1_1_reg_14774          |   16|   0|   16|          0|
+    |storemerge4_i129_1_1_2_reg_14779          |   16|   0|   16|          0|
+    |storemerge4_i129_1_1_reg_14629            |   16|   0|   16|          0|
+    |storemerge4_i129_1_2_1_reg_14789          |   16|   0|   16|          0|
+    |storemerge4_i129_1_2_2_reg_14794          |   16|   0|   16|          0|
+    |storemerge4_i129_1_2_reg_14784            |   16|   0|   16|          0|
+    |storemerge4_i129_1_3_reg_14624            |   16|   0|   16|          0|
+    |storemerge4_i129_1_reg_14614              |   16|   0|   16|          0|
+    |storemerge4_i129_1_s_reg_14619            |   16|   0|   16|          0|
+    |storemerge4_i129_2326_1_reg_14604         |   16|   0|   16|          0|
+    |storemerge4_i129_2326_2_reg_14609         |   16|   0|   16|          0|
+    |storemerge4_i129_2_1_1_reg_14819          |   16|   0|   16|          0|
+    |storemerge4_i129_2_1_2_reg_14824          |   16|   0|   16|          0|
+    |storemerge4_i129_2_1_reg_14814            |   16|   0|   16|          0|
+    |storemerge4_i129_2_2_1_reg_14834          |   16|   0|   16|          0|
+    |storemerge4_i129_2_2_2_reg_14839          |   16|   0|   16|          0|
+    |storemerge4_i129_2_2_reg_14829            |   16|   0|   16|          0|
+    |storemerge4_i129_2_3_reg_14809            |   16|   0|   16|          0|
+    |storemerge4_i129_2_reg_14799              |   16|   0|   16|          0|
+    |storemerge4_i129_2_s_reg_14804            |   16|   0|   16|          0|
+    |storemerge4_i129_3_reg_14579              |   16|   0|   16|          0|
+    |storemerge4_i129_4_reg_14584              |   16|   0|   16|          0|
+    |storemerge4_i129_5_reg_14599              |   16|   0|   16|          0|
+    |storemerge4_i129_s_reg_14574              |   16|   0|   16|          0|
     |storemerge4_i_reg_14569                   |   16|   0|   16|          0|
     |tmp_100_reg_12932                         |   11|   0|   11|          0|
     |tmp_101_reg_12779                         |    1|   0|    1|          0|
@@ -1492,13 +1492,13 @@
     |tmp_228_reg_13815                         |    1|   0|    1|          0|
     |tmp_25_reg_12285                          |    5|   0|    5|          0|
     |tmp_26_reg_12262                          |    1|   0|    1|          0|
-    |tmp_29_reg_12290                          |    1|   0|    1|          0|
-    |tmp_31_reg_12297                          |    5|   0|    5|          0|
-    |tmp_32_reg_12701                          |   11|   0|   11|          0|
-    |tmp_33_reg_12312                          |    1|   0|    1|          0|
+    |tmp_30_reg_12290                          |    1|   0|    1|          0|
+    |tmp_31_reg_12701                          |   11|   0|   11|          0|
+    |tmp_32_reg_12297                          |    5|   0|    5|          0|
+    |tmp_35_reg_12312                          |    1|   0|    1|          0|
     |tmp_36_reg_12319                          |    5|   0|    5|          0|
-    |tmp_40_reg_12722                          |   11|   0|   11|          0|
-    |tmp_41_reg_12331                          |    1|   0|    1|          0|
+    |tmp_39_reg_12722                          |   11|   0|   11|          0|
+    |tmp_43_reg_12331                          |    1|   0|    1|          0|
     |tmp_45_reg_12338                          |    1|   0|    1|          0|
     |tmp_46_reg_12743                          |   11|   0|   11|          0|
     |tmp_52_reg_12764                          |   11|   0|   11|          0|
@@ -1646,39 +1646,39 @@
     |px_50_reg_16256                           |   64|  32|   16|          0|
     |px_8_reg_16146                            |   64|  32|   16|          0|
     |py_reg_12250                              |   64|  32|    4|          0|
-    |storemerge4_i120_1272_1_reg_14589         |   64|  32|   16|          0|
-    |storemerge4_i120_1272_2_reg_14594         |   64|  32|   16|          0|
-    |storemerge4_i120_1_1_1_reg_14774          |   64|  32|   16|          0|
-    |storemerge4_i120_1_1_2_reg_14779          |   64|  32|   16|          0|
-    |storemerge4_i120_1_1_reg_14629            |   64|  32|   16|          0|
-    |storemerge4_i120_1_2_1_reg_14789          |   64|  32|   16|          0|
-    |storemerge4_i120_1_2_2_reg_14794          |   64|  32|   16|          0|
-    |storemerge4_i120_1_2_reg_14784            |   64|  32|   16|          0|
-    |storemerge4_i120_1_3_reg_14624            |   64|  32|   16|          0|
-    |storemerge4_i120_1_reg_14614              |   64|  32|   16|          0|
-    |storemerge4_i120_1_s_reg_14619            |   64|  32|   16|          0|
-    |storemerge4_i120_2326_1_reg_14604         |   64|  32|   16|          0|
-    |storemerge4_i120_2326_2_reg_14609         |   64|  32|   16|          0|
-    |storemerge4_i120_2_1_1_reg_14819          |   64|  32|   16|          0|
-    |storemerge4_i120_2_1_2_reg_14824          |   64|  32|   16|          0|
-    |storemerge4_i120_2_1_reg_14814            |   64|  32|   16|          0|
-    |storemerge4_i120_2_2_1_reg_14834          |   64|  32|   16|          0|
-    |storemerge4_i120_2_2_2_reg_14839          |   64|  32|   16|          0|
-    |storemerge4_i120_2_2_reg_14829            |   64|  32|   16|          0|
-    |storemerge4_i120_2_3_reg_14809            |   64|  32|   16|          0|
-    |storemerge4_i120_2_reg_14799              |   64|  32|   16|          0|
-    |storemerge4_i120_2_s_reg_14804            |   64|  32|   16|          0|
-    |storemerge4_i120_3_reg_14579              |   64|  32|   16|          0|
-    |storemerge4_i120_4_reg_14584              |   64|  32|   16|          0|
-    |storemerge4_i120_5_reg_14599              |   64|  32|   16|          0|
-    |storemerge4_i120_s_reg_14574              |   64|  32|   16|          0|
+    |storemerge4_i129_1272_1_reg_14589         |   64|  32|   16|          0|
+    |storemerge4_i129_1272_2_reg_14594         |   64|  32|   16|          0|
+    |storemerge4_i129_1_1_1_reg_14774          |   64|  32|   16|          0|
+    |storemerge4_i129_1_1_2_reg_14779          |   64|  32|   16|          0|
+    |storemerge4_i129_1_1_reg_14629            |   64|  32|   16|          0|
+    |storemerge4_i129_1_2_1_reg_14789          |   64|  32|   16|          0|
+    |storemerge4_i129_1_2_2_reg_14794          |   64|  32|   16|          0|
+    |storemerge4_i129_1_2_reg_14784            |   64|  32|   16|          0|
+    |storemerge4_i129_1_3_reg_14624            |   64|  32|   16|          0|
+    |storemerge4_i129_1_reg_14614              |   64|  32|   16|          0|
+    |storemerge4_i129_1_s_reg_14619            |   64|  32|   16|          0|
+    |storemerge4_i129_2326_1_reg_14604         |   64|  32|   16|          0|
+    |storemerge4_i129_2326_2_reg_14609         |   64|  32|   16|          0|
+    |storemerge4_i129_2_1_1_reg_14819          |   64|  32|   16|          0|
+    |storemerge4_i129_2_1_2_reg_14824          |   64|  32|   16|          0|
+    |storemerge4_i129_2_1_reg_14814            |   64|  32|   16|          0|
+    |storemerge4_i129_2_2_1_reg_14834          |   64|  32|   16|          0|
+    |storemerge4_i129_2_2_2_reg_14839          |   64|  32|   16|          0|
+    |storemerge4_i129_2_2_reg_14829            |   64|  32|   16|          0|
+    |storemerge4_i129_2_3_reg_14809            |   64|  32|   16|          0|
+    |storemerge4_i129_2_reg_14799              |   64|  32|   16|          0|
+    |storemerge4_i129_2_s_reg_14804            |   64|  32|   16|          0|
+    |storemerge4_i129_3_reg_14579              |   64|  32|   16|          0|
+    |storemerge4_i129_4_reg_14584              |   64|  32|   16|          0|
+    |storemerge4_i129_5_reg_14599              |   64|  32|   16|          0|
+    |storemerge4_i129_s_reg_14574              |   64|  32|   16|          0|
     |storemerge4_i_reg_14569                   |   64|  32|   16|          0|
     |tmp_26_reg_12262                          |   64|  32|    1|          0|
-    |tmp_29_reg_12290                          |   64|  32|    1|          0|
-    |tmp_31_reg_12297                          |   64|  32|    5|          0|
-    |tmp_33_reg_12312                          |   64|  32|    1|          0|
+    |tmp_30_reg_12290                          |   64|  32|    1|          0|
+    |tmp_32_reg_12297                          |   64|  32|    5|          0|
+    |tmp_35_reg_12312                          |   64|  32|    1|          0|
     |tmp_36_reg_12319                          |   64|  32|    5|          0|
-    |tmp_41_reg_12331                          |   64|  32|    1|          0|
+    |tmp_43_reg_12331                          |   64|  32|    1|          0|
     |tmp_45_reg_12338                          |   64|  32|    1|          0|
     |tmp_53_reg_12352                          |   64|  32|    1|          0|
     |trunc_ln125_reg_12244                     |   64|  32|    3|          0|
